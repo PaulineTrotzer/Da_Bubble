@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
   doc,
@@ -10,15 +10,24 @@ import {
   DocumentData,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
+import { BehaviorSubject } from 'rxjs';
+import { OverlayStatusService } from './overlay-status.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   private currentUser: string | null = null;
+  private selectedUserSubject = new BehaviorSubject<User | null>(null);
+  selectedUser$ = this.selectedUserSubject.asObservable();
+
+  private profileSelectionSubject = new BehaviorSubject<string | null>(null); // Neue Variable
+  profileSelection$ = this.profileSelectionSubject.asObservable();
+
   user: User = new User();
   uid: any;
   unsub?: () => void;
+  overlayStatusService = inject(OverlayStatusService);
 
   constructor(private firestore: Firestore) {}
 
@@ -51,9 +60,24 @@ export class UserService {
           const snapID = docSnapshot.id;
           if (snapID === uid) {
             const updatedUser = new User(userData, uid);
-            callback(updatedUser); 
+            callback(updatedUser);
           }
         });
       }
     );
-}}
+  }
+
+  setSelectedUser(user: User) {
+    this.selectedUserSubject.next(user);
+  }
+
+  selectProfile(profileType: string) {
+    this.profileSelectionSubject.next(profileType);
+    this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  resetProfileSelection() {
+    this.profileSelectionSubject.next(null);
+    this.overlayStatusService.setOverlayStatus(false);
+  }
+}

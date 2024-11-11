@@ -15,6 +15,11 @@ export class GlobalVariableService {
 
   constructor() { }
 
+  setCurrentUserData(userData: any) {
+    this.currentUserData = userData;
+    this.statusCheck = true;  
+  }
+
   setCurrentChannel(channel: any) {
     this.currentChannel = channel;
     this.channelSelected = true;

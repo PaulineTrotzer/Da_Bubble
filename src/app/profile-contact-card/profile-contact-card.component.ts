@@ -21,14 +21,26 @@ export class ProfileContactCardComponent implements OnInit {
   userID: any;
   @Output() closeProfile = new EventEmitter<void>();
   @Input() selectedContact?: User; 
+   @Output() contactSelected = new EventEmitter<User>(); 
+  userService =inject(UserService);
 
   constructor() {}
+
 
   ngOnInit(): void {
     if (this.selectedContact) {
       this.user = this.selectedContact;
+      this.userService.setSelectedUser(this.user); // Setze den selectedUser im UserService
+      this.contactSelected.emit(this.user); 
     }
   }
+  
+  updateContact(contact: User) {
+    this.selectedContact = contact;
+    this.userService.setSelectedUser(contact); // Aktualisiere den selectedUser
+  }
+  
+
 
   
   closeProfileCard() {

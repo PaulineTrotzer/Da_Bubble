@@ -24,6 +24,8 @@ import { Channel } from '../models/channel.class';
   styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
+  channelDrawerOpen: boolean = true;
+  messageDrawerOpen: boolean = true;
   userId: any | null = null;
   route = inject(ActivatedRoute);
   firestore = inject(Firestore);
@@ -63,8 +65,6 @@ export class WorkspaceComponent implements OnInit {
       this.getAllChannels();
     });
   }
-
-
 
   ngOnInit(): void {
     this.getAllUsers();
@@ -121,9 +121,6 @@ export class WorkspaceComponent implements OnInit {
     this.global.channelSelected = true;
     this.global.setCurrentChannel(channel);
   }
-
-  channelDrawerOpen: boolean = true;
-  messageDrawerOpen: boolean = true;
 
   toggleChannelDrawer() {
     this.channelDrawerOpen = !this.channelDrawerOpen;
