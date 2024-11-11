@@ -176,10 +176,11 @@
   border-radius: 30px;
   position: relative;
   cursor: pointer;
-
   img {
     height: 50px;
+    width: 50px;
     border-radius: 40px;
+    object-fit: cover;
   }
 
   h4 {
@@ -187,9 +188,9 @@
     font-size: 18px;
     font-weight: 400;
   }
-
   &:hover {
     background: #eceefe;
+    border-radius: 30px;
   }
 }
 
@@ -204,14 +205,13 @@
   padding: 4px 20px;
   margin-left: 24px;
   position: relative;
+  border-radius: 30px;
   cursor: pointer;
-
   img {
     height: 50px;
     min-width: 50px;
     border-radius: 30px;
   }
-
   h4 {
     font-family: "Nunito";
     font-size: 18px;

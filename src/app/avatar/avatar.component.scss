@@ -103,10 +103,10 @@
   display: flex;
   justify-content: center;
   margin: 0 auto;
-
   img {
     width: 168px;
     height: 168px;
+    border-radius: 90px;
   }
 
   &:hover {

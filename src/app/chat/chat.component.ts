@@ -84,7 +84,10 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {}
 
   onUserNameClick() {
-    const profileType = this.selectedUser.uid === this.userservice.getCurrentUser() ? 'currentUser' : 'contact';
+    const profileType =
+      this.selectedUser.uid === this.userservice.getCurrentUser()
+        ? 'currentUser'
+        : 'contact';
     this.userservice.selectProfile(profileType);
   }
 
@@ -92,7 +95,7 @@ export class ChatComponent implements OnInit {
     this.scrollAutoDown();
   }
 
-  editMessages(message: any ) {
+  editMessages(message: any) {
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
   }
@@ -160,6 +163,7 @@ export class ChatComponent implements OnInit {
       this.messagesData.length === 0
     ) {
       this.showWelcomeChatText = true;
+      this.showTwoPersonConversationTxt = false;
     } else {
       this.showWelcomeChatText = false;
       this.checkTwoPersonConversation();
