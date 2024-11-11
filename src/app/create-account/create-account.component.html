@@ -1,0 +1,82 @@
+<section>
+  <header>
+    <div class="header-content">
+      <img src="./assets/img/logo.png" alt="" />
+      <h1>DABubble</h1>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="heading">
+      <div class="img-container" routerLink="/">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <mask id="mask0_182_258" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+          <rect width="24" height="24" fill="#D9D9D9"/>
+          </mask>
+          <g mask="url(#mask0_182_258)">
+          <path d="M10.875 19.3001L4.275 12.7001C4.175 12.6001 4.104 12.4917 4.062 12.3751C4.02067 12.2584 4 12.1334 4 12.0001C4 11.8667 4.02067 11.7417 4.062 11.6251C4.104 11.5084 4.175 11.4001 4.275 11.3001L10.875 4.70008C11.0583 4.51675 11.2873 4.42075 11.562 4.41208C11.8373 4.40408 12.075 4.50008 12.275 4.70008C12.475 4.88342 12.5793 5.11242 12.588 5.38708C12.596 5.66242 12.5 5.90008 12.3 6.10008L7.4 11.0001H18.575C18.8583 11.0001 19.096 11.0957 19.288 11.2871C19.4793 11.4791 19.575 11.7167 19.575 12.0001C19.575 12.2834 19.4793 12.5207 19.288 12.7121C19.096 12.9041 18.8583 13.0001 18.575 13.0001H7.4L12.3 17.9001C12.4833 18.0834 12.5793 18.3167 12.588 18.6001C12.596 18.8834 12.5 19.1167 12.3 19.3001C12.1167 19.5001 11.8833 19.6001 11.6 19.6001C11.3167 19.6001 11.075 19.5001 10.875 19.3001Z" fill="black"/>
+          </g>
+          </svg>
+      </div>
+      <h2>Konto erstellen</h2>
+    </div>
+    <div class="sub-header">
+      <span>Mit deinem Namen und deiner E-mail-Adresse hast du dein neues
+        DABubble-Konto</span>
+    </div>
+    <form (ngSubmit)="onSubmit(userForm)" #userForm="ngForm">
+      <div class="form-row">
+        <label for="name"></label>
+        <input type="text" [(ngModel)]="userData.name" id="name" name="displayName" #name="ngModel" placeholder="Name und Nachname"
+          (focus)="nameIcon.src = './assets/img/person_filled_black.svg'"
+          (blur)="nameIcon.src = './assets/img/person_filled.svg'" required />
+        <img #nameIcon class="icon" #person src="./assets/img/person_filled.svg" alt="" />
+        <span class="error-message" *ngIf="!name.valid && name.touched">
+          <span>*Der Name ist erforderlich.</span>
+        </span>
+      </div>
+      <div class="form-row">
+        <label for="mail"></label>
+        <input pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" id="mail" type="email" name=email  placeholder="beispielname@email.com" #email="ngModel" [(ngModel)]="userData.email"
+          (focus)="emailIcon.src = './assets/img/email_filled_black.svg'" (blur)="emailIcon.src = './assets/img/mail.svg'"
+          required />
+        <img #emailIcon class="icon" #email src="./assets/img/mail.svg" alt="" />
+        <span class="error-message" *ngIf="!email.valid && email.touched">*Eine Mail ist erforderlich.</span>
+      </div>
+      <div class="form-row">
+        <label for="password"></label>
+        <input name=password  [(ngModel)]="userData.password" #password="ngModel" type="password" id="password" placeholder="Passwort"
+          (focus)="passwordIcon.src = './assets/img/lock_filled_black.svg'" (blur)="passwordIcon.src = './assets/img/lock.svg'"
+          required />
+        <img #passwordIcon class="icon" #password src="./assets/img/lock.svg" alt="" />
+        <span class="error-message" *ngIf="!password.valid && password.touched">*Ein Passwort ist erforderlich.</span>
+      </div>
+      <div class="checkbox-row">
+        <input id="privacy-policy" name="privacy-policy" (click)="toggleChecked()" type="checkbox" [(ngModel)]="userData.privacyPolicy"
+          required />
+        <label for="privacy-policy" class="custom-checkbox" [class.checked]="isChecked"></label>
+        <label for="privacy-policy" class="privacy">
+          Ich stimme der
+          <a routerLink="/privacy-policy">Datenschutzerklärung</a> zu.
+        </label>
+        <span class="error-message top"
+          *ngIf="userForm.controls['privacy-policy'] && !userForm.controls['privacy-policy'].valid && userForm.controls['privacy-policy'].touched">
+          *Bitte Datenschutzerklärung akzeptieren</span>
+      </div>
+      <div class="button-container">
+        <button type="submit" value="submit" [disabled]="userForm.invalid" (mouseenter)="toggleHover()"
+          (mouseleave)="toggleHover()" [ngClass]="{
+            'btn-primary': userForm.valid,
+            'btn-primary-disabled': userForm.invalid,
+            'btn-primary-hover': isHovered
+          }">
+          Weiter
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="policy">
+    <a routerLink="/impressum" routerLinkActive="active">Impressum</a>
+    <a routerLink="/privacy-policy" routerLinkActive="active">Datenschutz</a>
+  </div>
+</section>

@@ -1,0 +1,16 @@
+<app-header></app-header>
+<div class="full-page-content">
+    <app-workspace 
+    (userSelected)="onUserSelected($event)"
+    (channelSelected)="onChannelSelected($event)"
+    ></app-workspace> 
+    <app-start-screen 
+    [selectedUser]="selectedUser"  [mentionUser]="mentionUser"
+    [selectedChannel]="selectedChannel" 
+     >
+     </app-start-screen>
+</div>
+
+<!-- <app-thread></app-thread> -->
+
+<!-- [currentUser]="currentUser" -->

@@ -1,0 +1,142 @@
+.card {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subheader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #797ef3;
+  .hashtag path {
+    fill: #797ef3;
+  }
+}
+
+.add-input {
+  padding: 21px 20px;
+  border: 1px solid #adb0d9;
+  outline: none;
+  border-radius: 30px;
+  width: 100%;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 8px;
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  &:hover {
+    background-color: rgb(236, 238, 254);
+    cursor: pointer;
+
+    .icon path {
+      fill: #444df2;
+    }
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 25px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border: 1px solid #adb0d9;
+  box-shadow: 0px 2px 10px 0px #00000014;
+  background-color: white;
+  position: absolute;
+  z-index: 10;
+  top: 16px;
+  left: 21px;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  img {
+    height: 50px;
+    min-width: 50px;
+    border-radius: 100%;
+  }
+}
+
+.status-border {
+  position: absolute;
+  background-color: white;
+  padding: 2px;
+  border-radius: 100%;
+  top: 54px;
+  left: 59px;
+
+  span {
+    display: block;
+    background-color: #92c83e;
+    height: 14px;
+    width: 14px;
+    border-radius: 100%;
+  }
+}
+
+.selected-users {
+  position: absolute;
+  left: 16px;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selected-contact {
+  display: flex;
+  align-items: center;
+  border-radius: 35px;
+  gap: 8px;
+  padding: 3px 20px;
+  background: #eceefe;
+  img {
+    height: 34px;
+    min-width: 34px;
+    border-radius: 100%;
+  }
+  p {
+    font-family: Nunito;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24.55px;
+    text-align: left;
+  }
+}

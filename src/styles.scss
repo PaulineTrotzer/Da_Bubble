@@ -1,0 +1,71 @@
+@import "./assets/fonts/font.scss";
+@import "./assets/styles/buttons";
+@import '@ctrl/ngx-emoji-mart/picker';
+
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+  background-color: #eceefe;
+}
+
+body {
+  margin: 0;
+  font-family: Nunito, "Helvetica Neue", sans-serif;
+}
+
+.mat-mdc-button .mdc-button__label {
+  display: flex;
+  align-items: center;
+}
+
+img {
+  cursor: pointer;
+}
+
+
+.edit-dialog {
+  width: 100%;
+  .mat-mdc-dialog-surface {
+    border-top-left-radius: 0;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    box-shadow: 0px 6px 10px 0px #00000033;
+  }
+}
+
+.member-dialog {
+  width: 100%;
+  height: 100%;
+  .mat-mdc-dialog-surface {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    box-shadow: 0px 6px 10px 0px #00000033;
+  }
+}
+
+.add-member-dialog {
+  width: 100%;
+  .mat-mdc-dialog-surface {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    box-shadow: 0px 6px 10px 0px #00000033;
+  }
+}
+
+.member-profile-card {
+  width: 100%;
+  height: 100%;
+}

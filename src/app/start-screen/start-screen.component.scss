@@ -1,0 +1,144 @@
+mat-card {
+  background-color: white;
+  border-style: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 96px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
+  width: 100%;
+  position: absolute;
+  top: 0;
+}
+
+.big-chat-card {
+  position: relative;
+  max-width: 1600px;
+  min-width: 990px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.mat-mdc-card {
+  border-style: none;
+}
+
+.btn-text-img {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: black;
+}
+
+.user-chat-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px 8px;
+  width: fit-content;
+  height: 58px;
+  &:hover {
+    background: #eceefe;
+    border-radius: 30px;
+  }
+  img {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+  }
+  h4 {
+    white-space: nowrap;
+    padding-right: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32.74px;
+    text-align: left;
+    color: #000000;
+    :hover {
+      color: #444df2;
+      border-radius: 30px;
+    }
+  }
+}
+
+.drop-down-div {
+  display: flex;
+  align-items: center;
+  height: 96px;
+  position: absolute;
+  left: 20px;
+}
+
+/* Avatar Members Section*/
+.members-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.member-avatars {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border-radius: 30px;
+  cursor: pointer;
+  &:hover {
+    background: #eceefe;
+  }
+  &:hover > .member-count span {
+    color: #535af1;
+  }
+}
+
+.member-count {
+  font-family: Nunito;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 27.28px;
+  text-align: left;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 8px;
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  &:hover {
+    background-color: rgb(236, 238, 254);
+    cursor: pointer;
+    .icon path {
+      fill: #444df2;
+    }
+  }
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  height: 40px;
+  min-width: 40px;
+  border-radius: 100%;
+  margin-left: -12px;
+  border: 2px solid white;
+}
+
+.avatar:first-child {
+  margin: 0;
+}

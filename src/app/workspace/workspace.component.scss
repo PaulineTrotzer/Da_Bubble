@@ -1,0 +1,249 @@
+.background {
+  width: 100%;
+  height: 100vh;
+  background: #eceefe;
+}
+
+.card {
+  padding: 32px 30px;
+  background-color: #ffffff;
+  box-shadow: 0px 2px 10px 0px #00000014;
+  border-radius: 30px;
+  width: 100%;
+  max-width: 366px;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  .left-side {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    h2 {
+      font-family: "Nunito";
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #eceefe;
+  }
+
+  &:hover > .icon path {
+    fill: #444df2;
+  }
+}
+
+.channels-container {
+  margin: 16px 0;
+}
+
+.channels-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+
+  .header-left-side {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .middle-part {
+      display: flex;
+      gap: 8px;
+    }
+  }
+}
+
+.header-left-side,
+.message-header {
+  cursor: pointer;
+
+  &:hover {
+    color: #535af1;
+  }
+
+  &:hover > .icon path,
+  &:hover .middle-part > .icon path {
+    fill: #535af1;
+  }
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 24px;
+  margin: 24px 0;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.channel-row,
+.add-channel-container {
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eceefe;
+    }
+
+    &:hover > .icon path {
+      fill: #535af1;
+    }
+  }
+}
+
+.add-channel-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 24px;
+}
+
+.channels-drawer {
+  max-height: 600px;
+  overflow: hidden;
+  transition: max-height 175ms ease-in-out;
+}
+
+.channels-drawer-closed {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 175ms ease-in-out;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  .middle-part {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.message-drawer {
+  max-height: 600px;
+  overflow: hidden;
+  transition: max-height 175ms ease-in-out;
+}
+
+.message-drawer-closed {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 175ms ease-in-out;
+}
+
+.contacts {
+  margin-top: 24px;
+  max-height: 468px;
+  overflow-y: auto;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 4px 20px;
+  margin-left: 24px;
+  border-radius: 30px;
+  position: relative;
+  cursor: pointer;
+
+  img {
+    height: 50px;
+    border-radius: 40px;
+  }
+
+  h4 {
+    font-family: "Nunito";
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  &:hover {
+    background: #eceefe;
+  }
+}
+
+// .all-user-contacts {
+//   margin-top: 24px;
+// }
+
+.all-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 4px 20px;
+  margin-left: 24px;
+  position: relative;
+  cursor: pointer;
+
+  img {
+    height: 50px;
+    min-width: 50px;
+    border-radius: 30px;
+  }
+
+  h4 {
+    font-family: "Nunito";
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  &:hover {
+    background: #eceefe;
+  }
+}
+
+.status-border {
+  position: absolute;
+  background-color: white;
+  padding: 2px;
+  border-radius: 100%;
+  top: 37px;
+  left: 56px;
+}
+
+.online {
+  display: block;
+  background-color: #92c83e;
+  height: 14px;
+  width: 14px;
+  border-radius: 100%;
+}
+
+.offline {
+  display: block;
+  background-color: #757575;
+  height: 14px;
+  width: 14px;
+  border-radius: 100%;
+}

@@ -1,0 +1,74 @@
+<div class="full-page-content">
+    <header>
+        <img src="./assets/img/logo.png">
+        <div>
+            <span>Neu bei DABubble?</span>
+            <button class="grey-border-btn"><a routerLink="create-account" routerLinkActive="active">Konto
+                    erstellen</a></button>
+        </div>
+    </header>
+    <div class="form-wrapper">
+        <div class="login-form-headline">
+            <h2>Anmeldung</h2>
+            <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+                <span class="advice-mail">Wir empfehlen dir, die E-Mail Adresse zu benutzen,
+                    die du bei der Arbeit verwendest.</span>
+                <div class="input-container">
+                    <img src="./../../assets/img/mail.svg">
+                    <label for="email"></label>
+                    <input autocomplete="off" class="input-styling" name="email" type="email"
+                        placeholder="beispielname@email.com" id="email" #email="ngModel" [(ngModel)]="loginData.email"
+                        pattern="^(http(s){0,1}:\/\/.){0,1}[\-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([\-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$"
+                        (input)="onEmailChange()"
+                        required>
+                    <span class="error-message" *ngIf="!email.valid && email.touched">
+                        *Die E-Mail-Adresse ist erforderlich.
+                    </span>
+                    <span *ngIf="emailLoginFailed" class="error-message">
+                        Die E-Mail-Adresse ist leider ungültig.
+                    </span>
+                </div>
+                <div class="input-container mt">
+                    <span *ngIf="formFailed" class="error-message">
+                        Falsches Passwort oder Email. Bitte noch einmal versuchen.
+                    </span>
+                    <img src="./../../assets/img/lock.svg">
+                    <label for="password"></label>
+                    <input autocomplete="off" class="input-styling" type="password" placeholder="Passwort"
+                        name="password" [(ngModel)]="loginData.password" #password="ngModel"  (input)="onPasswordChange()" required>
+                    <span class="error-message" *ngIf="!password.valid && password.touched">*Das Passwort ist
+                        erforderlich.</span>
+                </div>
+                <div class="check-if-pw-ct">
+                    <a routerLink="/reset-password" class="forgotPw">
+                        Passwort vergessen?
+                    </a>
+                    <div class="oder-part">
+                        <img class="line-img" src="./../../assets/img/line.svg">
+                        <div class="oder">ODER</div>
+                    </div>
+                </div>
+                <div>
+                    <button (click)="googleLogIn()" class="input-styling google-button">
+                        <img src="./../../assets/img/google.svg">
+                        <p>Anmelden mit Google</p>
+                    </button>
+                </div>
+
+                <div class="button-flex-box">
+                    <button class="btn-primary-disabled" type="submit" value="submit"
+                        [disabled]="loginForm.invalid">Anmelden</button>
+                    <button class="btn-secondary" (click)="guestLogin()">Gäste-Login</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+    <div class="imprint-privacy">
+        <button class="grey-border-btn"> <a routerLink="/impressum">Impressum</a></button>
+
+        <button class="grey-border-btn"><a routerLink="/privacy-policy">Datenschutz</a></button>
+    </div>
+
+</div>

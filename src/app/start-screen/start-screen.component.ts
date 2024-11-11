@@ -1,0 +1,226 @@
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  OnInit,
+  inject,
+  ChangeDetectorRef,
+} from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { GlobalVariableService } from '../services/global-variable.service';
+import { FormsModule } from '@angular/forms';
+import {
+  Firestore,
+  doc,
+  getDoc,
+} from '@angular/fire/firestore';
+import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../services/user.service';
+import { User } from '../models/user.class';
+import { PeopleMentionComponent } from '../people-mention/people-mention.component';
+import { DialogHeaderProfilCardComponent } from '../dialog-header-profil-card/dialog-header-profil-card.component';
+import { OverlayStatusService } from '../services/overlay-status.service';
+import { DialogEditChannelComponent } from '../dialog-edit-channel/dialog-edit-channel.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogChannelUserComponent } from '../dialog-channel-user/dialog-channel-user.component';
+import { DialogAddMemberComponent } from '../dialog-add-member/dialog-add-member.component';
+import { ProfileContactCardComponent } from '../profile-contact-card/profile-contact-card.component';
+import { ChatComponent } from '../chat/chat.component';
+
+
+@Component({
+  selector: 'app-start-screen',
+  standalone: true,
+  imports: [
+    MatCardModule,
+    MatButtonModule,
+    CommonModule,
+    FormsModule,
+    PeopleMentionComponent,
+    DialogHeaderProfilCardComponent,
+    DialogEditChannelComponent,
+    DialogAddMemberComponent,
+    ProfileContactCardComponent,
+    ChatComponent
+  ],
+  templateUrl: './start-screen.component.html',
+  styleUrl: './start-screen.component.scss',
+})
+export class StartScreenComponent implements OnInit, OnChanges {
+  constructor(public global: GlobalVariableService) {}
+
+  currentUserwasSelected = false;
+  contactWasSelected = false;
+  overlayStatusService = inject(OverlayStatusService);
+  openMyProfile = false;
+  firestore = inject(Firestore);
+  userId: any | null = null;
+  route = inject(ActivatedRoute);
+  @Input() selectedUser: any;
+  @Input() selectedChannel: any;
+  @Input() mentionUser: string = '';
+  channelMembers: any[] = [];
+  messagesData: any = [];
+  commentImages: string[] = [
+    '../../assets/img/comment/hand.png',
+    '../../assets/img/comment/celebration.png',
+  ];
+  commentStricker: string[] = [
+    '../../assets/img/comment/face.png',
+    '../../assets/img/comment/rocket.png',
+  ];
+  concatStickerArray: string[] = [
+    ...this.commentImages,
+    ...this.commentStricker,
+  ];
+  isHovered: any = false;
+  hoveredName: any;
+  hoveredSenderName: any;
+  hoveredCurrentUser: any;
+  hoveredRecipienUser: any;
+  userservice = inject(UserService);
+  dialog = inject(MatDialog);
+  showStickerDiv: any;
+  checkUpdateBackcolor: any;
+  isiconShow: any;
+  selectFiles: any[] = [];
+  cdr = inject(ChangeDetectorRef);
+
+  ngOnInit(): void {
+    this.userId = this.route.snapshot.paramMap.get('id');
+    this.getcurrentUserById(this.userId);
+      this.userservice.profileSelection$.subscribe(profileType => {
+        if (profileType) {
+          this.resetProfileSelection();
+          this.checkProfileType();
+          this.openMyProfile = true;
+        } else {
+          this.closeMyUserProfile();
+        }
+      });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedUser'] && this.selectedUser?.id) {
+      this.checkProfileType();
+      this.global.clearCurrentChannel();
+    }
+    if (changes['selectedChannel'] && this.selectedChannel) {
+      this.fetchChannelMembers();
+      this.global.setCurrentChannel(this.selectedChannel);
+    }
+  }
+
+  onMessageForwarded(data: any) {
+    this.messagesData.push(data);
+  }
+
+  updateSelectedUser(newUser: any) {
+    this.selectedUser = newUser;
+    this.cdr.detectChanges();
+  }
+
+  openDialog() {
+    this.dialog.open(DialogEditChannelComponent, {
+      data: this.selectedChannel,
+      panelClass: 'edit-dialog',
+      maxWidth: '872px',
+      maxHeight: '616px',
+    });
+  }
+
+  openMemberDialog() {
+    this.dialog.open(DialogChannelUserComponent, {
+      data: {
+        members: this.selectedChannel.userIds,
+        channel: this.selectedChannel,
+      },
+      panelClass: 'member-dialog',
+      maxWidth: '415px',
+      maxHeight: '411px',
+    });
+  }
+
+  openAddMemberDialog() {
+    this.dialog.open(DialogAddMemberComponent, {
+      data: this.selectedChannel,
+      panelClass: 'add-member-dialog',
+      maxWidth: '514px',
+      maxHeight: '320px',
+    });
+  }
+
+  async fetchChannelMembers() {
+    if (!this.selectedChannel?.userIds) {
+      this.channelMembers = [];
+      return;
+    }
+    try {
+      const membersPromises = this.selectedChannel.userIds.map(
+        async (userId: string) => {
+          const userRef = doc(this.firestore, 'users', userId);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            return {
+              id: userSnap.id,
+              ...userSnap.data(),
+            };
+          }
+          return null;
+        }
+      );
+      const members = await Promise.all(membersPromises);
+      this.channelMembers = members.filter((member) => member !== null);
+    } catch (error) {
+      console.error('Error fetching channel members:', error);
+    }
+  }
+
+  async getcurrentUserById(userId: string) {
+    try {
+      const userRef = doc(this.firestore, 'users', userId);
+      const userSnapshot = await getDoc(userRef);
+      if (userSnapshot.exists()) {
+        this.global.currentUserData = {
+          id: userSnapshot.id,
+          ...userSnapshot.data(),
+        };
+        console.log('userdata',this.global.currentUserData )
+        this.userservice.observingUserChanges(userId, (updatedUser: User) => {
+          this.selectedUser = updatedUser;
+        });
+      }
+    } catch (error) {
+      console.error('Fehler beim Abruf s Benutzers:', error);
+    }
+  }
+
+
+  resetProfileSelection() {
+    this.currentUserwasSelected = false;
+    this.contactWasSelected = false;
+  }
+
+  showMyUserProfile() {
+    this.resetProfileSelection();
+    this.checkProfileType();
+    this.openMyProfile = true;
+    this.overlayStatusService.setOverlayStatus(this.openMyProfile);
+  }
+
+  checkProfileType() {
+    if (this.selectedUser.uid === this.userId) {
+      this.currentUserwasSelected = true;
+    } else {
+      this.contactWasSelected = true;
+    }
+  }
+
+  closeMyUserProfile() {
+    this.openMyProfile = false;
+    this.overlayStatusService.setOverlayStatus(false);
+  }
+}

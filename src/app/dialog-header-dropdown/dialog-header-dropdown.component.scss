@@ -1,0 +1,39 @@
+.dialog-ct {
+  position: absolute;
+  z-index: 20;
+  height: 180px;
+  width: 235px;
+  top: 85px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  background-color: white;
+  border-radius: 22px 0 22px 22px;
+  justify-content: center;
+  align-items: center;
+}
+
+.log-out {
+  &:hover {
+    background-color: #eceefe;
+    color: #444DF2;
+  }
+}
+
+button {
+  white-space: nowrap;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+  text-align: center;
+  width: 160px;
+  height: 45px;
+  border-radius: 20px;
+  position: relative;
+  p {
+    font-size: 25px;
+    font-weight: 600;
+    font-family: "Nunito";
+  }
+}

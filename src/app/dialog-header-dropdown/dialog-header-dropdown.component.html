@@ -1,0 +1,12 @@
+<div *ngIf="showDropDownOptions" class="dialog-ct">
+    <button (click)="openProfile()">
+        <p>Profil</p>
+    </button>
+    <button (click)="logOut()" class="log-out">
+        <p>Log out</p>
+    </button>
+</div>
+
+<div *ngIf="wasClicked">
+    <app-dialog-header-profil-card></app-dialog-header-profil-card>
+</div>

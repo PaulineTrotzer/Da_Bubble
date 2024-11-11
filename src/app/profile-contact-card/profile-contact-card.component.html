@@ -1,0 +1,29 @@
+<div class="profile-card-ct">
+    <div class="name-escape-flex">
+        <span>Profil</span>
+        <div>
+            <img (click)="closeProfileCard()" src="./assets/img/close.svg">
+        </div>
+    </div>
+    <div class="img-frame">
+        <img src={{user.picture}}>
+    </div>
+    <div class="name-edit-flex">
+        <div class="name-status-flex">
+            <h2>{{user.name}}</h2>
+            <div class="online-status-div"> <img src="./assets/img/green-dot.svg">
+                <p>Active</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mail-flex-column">
+        <img src="./assets/img/mail.svg">
+        <span class="email-title">E-Mail-Adresse</span>
+    </div>
+    <span class="user-mail">{{user.email}}</span>
+
+    <div class="btn-ct">
+        <button class="btn-primary"><img src="./assets/img/direct-msg.svg">Nachricht</button>
+    </div>
+</div>
