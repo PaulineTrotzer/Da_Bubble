@@ -67,18 +67,11 @@ export class LoginComponent implements OnInit {
       this.auth.currentUser = auth.currentUser
       this.router.navigate(['/welcome', userID]);
       if (userID) {
-        this.updateStatus(userID);
+        this.auth.updateStatus(userID, 'online');
       }
     } catch (error) {
       this.formFailed = true;
     }
-  }
-
-  async updateStatus(userId: string) {
-    const docRef = doc(this.firestore, 'users', userId);
-    await updateDoc(docRef, {
-      status: 'online',
-    });
   }
 
   async proofMail(email: string): Promise<boolean> {

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { getAuth, signInWithPopup, signOut } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { GoogleAuthProvider } from 'firebase/auth';
+import { GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { User } from '../models/user.class';
 import {
   Firestore,
@@ -14,6 +14,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { OverlayStatusService } from './overlay-status.service';
 import { GlobalService } from '../global.service';
@@ -27,10 +28,31 @@ export class AuthService {
   firestore = inject(Firestore);
   currentUser: any;
   guestUser: User = new User();
-  overlayStatusService =inject(OverlayStatusService);
-  globalservice =inject(GlobalService);
+  overlayStatusService = inject(OverlayStatusService);
+  globalservice = inject(GlobalService);
 
-  constructor() {}
+  constructor() {
+    window.addEventListener('beforeunload', async (event) => {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await this.updateStatus(currentUser.uid, 'offline');
+      }
+    });
+  }
+
+  async updateStatus(userId: string, status: 'online' | 'offline') {
+    if (!userId) return;
+    const docRef = doc(this.firestore, 'users', userId);
+
+    try {
+      await updateDoc(docRef, {
+        status: status,
+      });
+    } catch (err) {
+      console.error('Error updating user status: ', err);
+    }
+  }
 
   googleLogIn() {
     const auth = getAuth();
@@ -62,43 +84,48 @@ export class AuthService {
     }
   }
 
-  logOut() {
+  async logOut() {
     const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        this.overlayStatusService.setOverlayStatus(false);
-        this.router.navigate(['/']);
-      })
-      .catch((error) => {
-        console.error('Fehler beim Abmelden:', error);
-      });
+    const currentUser = auth.currentUser;
+    try {
+      if (currentUser) {
+        await this.updateStatus(currentUser.uid, 'offline');
+        if (currentUser.isAnonymous) {
+          await deleteDoc(doc(this.firestore, 'users', currentUser.uid));
+        }
+        await signOut(auth);
+      }
+      this.overlayStatusService.setOverlayStatus(false);
+      this.router.navigate(['/']);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   }
 
   async SignGuestIn() {
-    const guestEmail = 'guest@account.de'; 
-    const guestDocId = await this.findUserByMail(guestEmail); 
-
-    if (guestDocId) {
-      const guestRef = doc(this.firestore, 'users', guestDocId);
-      await updateDoc(guestRef, {
-        status: 'online'
-      })
-      this.router.navigate(['/welcome', guestDocId]);
-    } else {
+    const auth = getAuth();
+    try {
+      const result = await signInAnonymously(auth);
       this.guestUser = new User({
-        uid: 'xx-guest-2024',
+        uid: result.user.uid,
         name: 'Guest',
-        email: guestEmail,
+        email: `guest_${result.user.uid}@anonymous.com`,
         picture: './assets/img/picture_frame.png',
+        status: 'online',
       });
-      const docRef = await this.addUserToFirestore(this.guestUser);
-      this.router.navigate(['/welcome', docRef.id]);
+      await setDoc(
+        doc(this.firestore, 'users', this.guestUser.uid),
+        this.guestUser.toJSON()
+      );
+      this.router.navigate(['/welcome', this.guestUser.uid]);
+    } catch (error) {
+      console.error('Error during anonymous sign-in:', error);
     }
   }
 
   async findUserByMail(identifier: string) {
     const usersCollection = collection(this.firestore, 'users');
-    const q = query(usersCollection, where('email', '==', identifier)); 
+    const q = query(usersCollection, where('email', '==', identifier));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].id;
