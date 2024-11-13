@@ -184,6 +184,7 @@ export class ChatComponent implements OnInit {
   clearInput() {
     this.messagesData = [];
   }
+  
 
   saveOrDeleteMessage(message: any) {
     const messageRef = doc(this.firestore, 'messages', message.id);
@@ -192,8 +193,9 @@ export class ChatComponent implements OnInit {
         this.editMessageId = null;
       });
     } else {
-      const editMessage = { text: this.editableMessageText };
+      const editMessage = { text: this.editableMessageText,editedTextShow:true };
       updateDoc(messageRef, editMessage).then(() => {
+         
         this.editMessageId = null;
       });
     }
@@ -263,6 +265,7 @@ export class ChatComponent implements OnInit {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
+      
     };
   }
 

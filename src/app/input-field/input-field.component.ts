@@ -10,6 +10,8 @@ import {
   OnInit,
   Output,
   EventEmitter,
+  Renderer2
+
 } from '@angular/core';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -43,13 +45,23 @@ export class InputFieldComponent implements OnInit {
   recipientStickerCount: number = 0;
   messagesData: any[] = [];
 
-  ngOnChanges() {}
+
+
+  constructor(private renderer: Renderer2) { }
+
+  ngOnChanges() { }
 
   ngOnInit(): void {
     this.userService.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
     });
   }
+
+
+
+
+
+
 
   async sendMessage() {
     if (!this.selectedUser) {
@@ -102,14 +114,39 @@ export class InputFieldComponent implements OnInit {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
+      editedTextShow: false
     };
   }
 
+
+  formattedChatMessage: string = ''
+
+
+
   handleMentionUser(mention: string) {
     this.mentionUser = mention;
-    console.log(this.mentionUser);
-    this.chatMessage += this.mentionUser;
+    this.chatMessage += `@${this.mentionUser} `;
+
   }
+
+
+
+
+
+  formatMentions() { }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
