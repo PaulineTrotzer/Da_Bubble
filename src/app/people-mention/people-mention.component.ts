@@ -69,10 +69,10 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
   @Output() mentionUser = new EventEmitter<string>();
 
   selectUser(user: any) { 
-    const mention = '@' + user.name;
+    const mention =  user.name;
     this.mentionUser.emit(mention);
     console.log( this.mentionUser);
-    this.global.openMentionPeopleCard=false;''
+    this.global.openMentionPeopleCard=false;
   }
   
 }

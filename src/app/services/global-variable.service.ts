@@ -17,6 +17,8 @@ export class GlobalVariableService {
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
 
+  createNewPassword:boolean=false;
+  verifyEmail:boolean=true;
 
   constructor() { }
 

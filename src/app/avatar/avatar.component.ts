@@ -111,12 +111,15 @@ export class AvatarComponent implements OnInit {
     this.sendInfo = true;
     this.userService.setCurrentUser(this.userId);
     this.checkSendIfo();
-    this.router.navigate(['/']);
+    setTimeout(() => {
+      this.router.navigate(['/']);
+    }, 1500);
+    
   }
 
   checkSendIfo(): void {
     setTimeout(() => {
       this.sendInfo = false;
-    }, 1000);
+    }, 2000);
   }
 }

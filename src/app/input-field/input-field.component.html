@@ -1,17 +1,36 @@
 <div class="msg-input-ct">
     <label for="msg-input"></label>
-    <textarea placeholder="Schreib etwas..." class="chat-input" type="text"
-        [(ngModel)]="chatMessage">
-         </textarea>
+ 
+    
+
+    <div  style="position: relative; width: 100%;">
+        <label for="msg-input"></label>
+        <div class="formatted-preview" 
+        [innerHTML]="formattedChatMessage" 
+        (click)="handleMentionClick($event)">
+      </div>
+
+        <textarea  
+    id="msg-input" 
+    placeholder="Schreib etwas..." 
+    class="chat-input" 
+    contenteditable="true"
+    type="text" 
+    [(ngModel)]="chatMessage" 
+     (input)="formatMentions()" >
+    >
+   
+  </textarea>
+
+    </div>
+
     <div class="interactions-send-msg-ct">
         <div class="only-interactions-bottom-ct">
             <div class="plus-separator-flex">
                 <div>
                     <div>
-                        <input type="file" id="upload" (change)="onFileSelected($event)"
-                            hidden />
-                        <label for="upload"> <img class="plus"
-                                src="./assets/img/add_reaction.png"></label>
+                        <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
+                        <label for="upload"> <img class="plus" src="./assets/img/add_reaction.png"></label>
                     </div>
                 </div>
 
@@ -20,8 +39,8 @@
 
             <div class="emoji-at-ct">
                 <div class="emoji-picker-container">
-                    <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)"
-                        class="emoji-picker" size="18"></emoji-mart>
+                    <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
+                        size="18"></emoji-mart>
                     <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
                 </div>
                 <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>

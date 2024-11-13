@@ -10,6 +10,8 @@ import {
   OnInit,
   Output,
   EventEmitter,
+  Renderer2
+
 } from '@angular/core';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -43,13 +45,23 @@ export class InputFieldComponent implements OnInit {
   recipientStickerCount: number = 0;
   messagesData: any[] = [];
 
-  ngOnChanges() {}
+
+
+  constructor(private renderer: Renderer2) { }
+
+  ngOnChanges() { }
 
   ngOnInit(): void {
     this.userService.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
     });
   }
+
+
+
+
+
+
 
   async sendMessage() {
     if (!this.selectedUser) {
@@ -73,6 +85,7 @@ export class InputFieldComponent implements OnInit {
       this.messagesData.push(messageWithId);
       this.messageSent.emit();
       this.chatMessage = '';
+      this.formattedChatMessage=''
     } catch (error) {
       console.error('Error while sending message:', error);
     }
@@ -102,14 +115,42 @@ export class InputFieldComponent implements OnInit {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
+      editedTextShow: false
     };
   }
 
+
+  formattedChatMessage: any = ''
+  color:string='red'
+
+
   handleMentionUser(mention: string) {
-    this.mentionUser = mention;
-    console.log(this.mentionUser);
-    this.chatMessage += this.mentionUser;
+    this.chatMessage += `@${mention + ' '} `;
+    this.formatMentions();
   }
+
+  formatMentions() { 
+    const regex = /@([\w\s]+)/g;
+    this.formattedChatMessage = this.chatMessage.replace(
+      /@(\w+)/g,
+      `<span   class="mention"   contenteditable="false" >@$1</span>`
+    );
+  }
+
+  handleMentionClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('mention')) {
+      alert(`Mention clicked: ${target.innerText}`);
+    }
+  }
+
+
+
+
+  
+
+
+
 
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;

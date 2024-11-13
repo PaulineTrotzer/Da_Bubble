@@ -17,7 +17,7 @@
                     <textarea class="edit-input" [(ngModel)]="editableMessageText"></textarea>
                     <div class="button-box">
                         <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
-                        <button class="btn-primary" (click)="saveOrDeleteMessage(message)">Speichern</button>
+                        <button class="btn-primary" (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
                     </div>
                 </div>
                 <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
@@ -136,8 +136,11 @@
                   'card-content-user':
                     message.senderId !== global.currentUserData.id
                 }">{{ message.text }}</mat-card-content>
+              
                         </mat-card>
+                       
                     </div>
+                    <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
                     <div class="avatar-box">
                         <mat-card *ngIf="messageIdHovered === message.id" [class]="{
                 'sticker-senderName-current':

@@ -16,4 +16,6 @@ export interface SendMessageInfo {
   stickerBoxCurrentStyle?: any;
   stickerBoxOpacity?: any;
   selectedFiles?: any[];
+  editedTextShow?:boolean;
+
 }

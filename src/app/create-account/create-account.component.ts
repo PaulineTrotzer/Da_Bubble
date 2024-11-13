@@ -10,7 +10,7 @@ import {
 import { AvatarComponent } from '../avatar/avatar.component';
 import { Firestore, collection, addDoc, doc, setDoc } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
-import { getAuth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { getAuth, createUserWithEmailAndPassword,sendEmailVerification } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-create-account',
@@ -67,8 +67,10 @@ export class CreateAccountComponent implements OnInit {
       password: '',
       status: 'offline'
     });
+      
     const docRef = await this.addUserToFirestore(this.newUser);
-    this.router.navigate(['/avatar', authUser.uid]);
+    await sendEmailVerification(authUser);
+    // this.router.navigate(['/avatar', authUser.uid]);
   }
 
   async addUserToFirestore(user: User) {
