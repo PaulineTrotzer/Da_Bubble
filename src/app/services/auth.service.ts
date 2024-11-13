@@ -37,6 +37,8 @@ export class AuthService {
       const currentUser = auth.currentUser;
       if (currentUser) {
         await this.updateStatus(currentUser.uid, 'offline');
+  
+        
       }
     });
   }
@@ -118,6 +120,7 @@ export class AuthService {
         this.guestUser.toJSON()
       );
       this.router.navigate(['/welcome', this.guestUser.uid]);
+      console.log(auth)
     } catch (error) {
       console.error('Error during anonymous sign-in:', error);
     }
