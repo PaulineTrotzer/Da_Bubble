@@ -74,8 +74,8 @@ export class AuthService {
       });
   }
 
-  async SignGuestIn() {
-    const guestEmail = 'guest@account.de'; 
+/*   async SignGuestIn() {
+     const guestEmail = 'guest@account.de'; 
     const guestDocId = await this.findUserByMail(guestEmail); 
 
     if (guestDocId) {
@@ -86,15 +86,16 @@ export class AuthService {
       this.router.navigate(['/welcome', guestDocId]);
     } else {
       this.guestUser = new User({
-        uid: 'xx-guest-2024',
+        uid: this.user.uid,
         name: 'Guest',
         email: guestEmail,
         picture: './assets/img/picture_frame.png',
       });
       const docRef = await this.addUserToFirestore(this.guestUser);
       this.router.navigate(['/welcome', docRef.id]);
-    }
-  }
+    } 
+    
+  } */
 
   async findUserByMail(identifier: string) {
     const usersCollection = collection(this.firestore, 'users');

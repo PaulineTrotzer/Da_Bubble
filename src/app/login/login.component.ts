@@ -107,9 +107,9 @@ export class LoginComponent implements OnInit {
     this.formFailed = false;
   }
 
-  guestLogin() {
+/*   guestLogin() {
     this.auth.SignGuestIn();
-  }
+  } */
 
 
   googleLogIn() {
