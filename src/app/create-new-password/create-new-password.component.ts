@@ -126,7 +126,7 @@ export class CreateNewPasswordComponent {
         this.openDiv();
         setTimeout(() => {
           this.router.navigate(['/avatar', uid]);
-        }, 1000);
+        }, 1500);
       }
     }
   }
