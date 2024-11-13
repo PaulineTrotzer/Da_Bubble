@@ -112,6 +112,9 @@
     &:hover {
       background-color: #eceefe;
     }
+    &.active {
+      background-color: #eceefe;
+    }
 
     &:hover > .icon path {
       fill: #535af1;

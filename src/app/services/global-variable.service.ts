@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,10 @@ export class GlobalVariableService {
   mentionpeopleName:any;
   channelSelected: boolean = false;
   currentChannel: any = null;
+  welcomeChannel: boolean = false;
+
+  private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
+  welcomeChannel$ = this.welcomeChannelSubject.asObservable();
 
 
   constructor() { }
@@ -23,7 +28,18 @@ export class GlobalVariableService {
   setCurrentChannel(channel: any) {
     this.currentChannel = channel;
     this.channelSelected = true;
+    if (channel.name == 'Willkommen') {
+      this.welcomeChannelSubject.next(true); 
+      this.channelSelected = false;
+    } else {
+      this.welcomeChannelSubject.next(false); 
+    }
   }
+
+  getWelcomeChannel() {
+    return this.welcomeChannelSubject.asObservable();
+  }
+
 
   clearCurrentChannel() {
     this.currentChannel = null;

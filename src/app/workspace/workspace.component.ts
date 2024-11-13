@@ -8,8 +8,14 @@ import {
 } from '@angular/fire/firestore';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
-import { CommonModule, } from '@angular/common';
-import { Component, OnInit, inject, Output, EventEmitter,Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  Component,
+  OnInit,
+  inject,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
@@ -24,6 +30,7 @@ import { Channel } from '../models/channel.class';
   styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
+  selectedChannel: any = null;
   channelDrawerOpen: boolean = true;
   messageDrawerOpen: boolean = true;
   userId: any | null = null;
@@ -31,52 +38,62 @@ export class WorkspaceComponent implements OnInit {
   firestore = inject(Firestore);
   userData: any = {};
   allUsers: any = [];
-  allChannels: any = [];
-  user : User = new User();
+  allChannels: Channel[] = [];
+  user: User = new User();
   unsub?: () => void;
   checkUsersExsists: boolean = false;
-  userService =inject(UserService);
+  userService = inject(UserService);
   @Output() userSelected = new EventEmitter<any>();
   @Output() channelSelected = new EventEmitter<Channel>();
   readonly dialog = inject(MatDialog);
   private channelsUnsubscribe: Unsubscribe | undefined;
 
-  constructor(public global:GlobalVariableService ){}
+  constructor(public global: GlobalVariableService) {}
 
   selectUser(user: any) {
     this.userSelected.emit(user);
-    this.global.statusCheck=false;
+    this.global.statusCheck = false;
   }
 
-  selectCurrentUser() { 
-    this.global.statusCheck=true;
-    this.userSelected.emit(this.global.currentUserData);   
+  selectCurrentUser() {
+    this.global.statusCheck = true;
+    this.userSelected.emit(this.global.currentUserData);
   }
 
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
       data: {
-        userId: this.userId
+        userId: this.userId,
       },
       height: '539px',
       width: '872px',
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       this.getAllChannels();
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.getAllUsers();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
-        this.getUserById(this.userId);
-        this.userService.observingUserChanges(this.userId, (updatedUser: User) => {
-            this.global.currentUserData.name = updatedUser.name;  
-        });
+      this.getUserById(this.userId);
+      this.userService.observingUserChanges(
+        this.userId,
+        (updatedUser: User) => {
+          this.global.currentUserData.name = updatedUser.name;
+        }
+      );
     }
-    this.getAllChannels();
-}
+    await this.getAllChannels();
+  }
+
+  findWelcomeChannel() {
+    const willkommenChannel = this.allChannels.find(channel => channel.name == 'Willkommen');
+    if(willkommenChannel){
+      this.selectChannel(willkommenChannel);
+    }
+  }
 
   ngOnDestroy(): void {
     if (this.channelsUnsubscribe) {
@@ -84,10 +101,11 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  async getAllChannels(){
+  async getAllChannels() {
     const colRef = collection(this.firestore, 'channels');
     this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
-      this.allChannels = snapshot.docs.map(doc => doc.data());
+      this.allChannels = snapshot.docs.map(doc => new Channel(doc.data()));
+      this.findWelcomeChannel();
     });
   }
 
@@ -97,9 +115,8 @@ export class WorkspaceComponent implements OnInit {
     if (userDoc.exists()) {
       this.global.currentUserData = {
         id: userDoc.id,
-        ...userDoc.data() 
+        ...userDoc.data(),
       };
-
     }
   }
 
@@ -110,13 +127,14 @@ export class WorkspaceComponent implements OnInit {
       snapshot.forEach((doc) => {
         this.checkUsersExsists = true;
         if (doc.id !== this.userId) {
-          this.allUsers.push({ id: doc.id, ...doc.data()});
+          this.allUsers.push({ id: doc.id, ...doc.data() });
         }
       });
     });
-  } 
+  }
 
-  selectChannel(channel: any){
+  selectChannel(channel: any) {
+    this.selectedChannel = channel;
     this.channelSelected.emit(channel);
     this.global.channelSelected = true;
     this.global.setCurrentChannel(channel);

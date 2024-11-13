@@ -6,17 +6,14 @@ import {
   OnInit,
   inject,
   ChangeDetectorRef,
+  OnDestroy,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
-import {
-  Firestore,
-  doc,
-  getDoc,
-} from '@angular/fire/firestore';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
@@ -29,8 +26,8 @@ import { DialogChannelUserComponent } from '../dialog-channel-user/dialog-channe
 import { DialogAddMemberComponent } from '../dialog-add-member/dialog-add-member.component';
 import { ProfileContactCardComponent } from '../profile-contact-card/profile-contact-card.component';
 import { ChatComponent } from '../chat/chat.component';
-
-
+import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-start-screen',
   standalone: true,
@@ -44,14 +41,16 @@ import { ChatComponent } from '../chat/chat.component';
     DialogEditChannelComponent,
     DialogAddMemberComponent,
     ProfileContactCardComponent,
-    ChatComponent
+    ChatComponent,
+    WelcomeSheetComponent,
   ],
   templateUrl: './start-screen.component.html',
   styleUrl: './start-screen.component.scss',
 })
-export class StartScreenComponent implements OnInit, OnChanges {
+export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   constructor(public global: GlobalVariableService) {}
-
+  afterLoginSheet: boolean = false;
+  welcomeChannelSubscription: Subscription | undefined;
   currentUserwasSelected = false;
   contactWasSelected = false;
   overlayStatusService = inject(OverlayStatusService);
@@ -92,21 +91,32 @@ export class StartScreenComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
     this.getcurrentUserById(this.userId);
-      this.userservice.profileSelection$.subscribe(profileType => {
-        if (profileType) {
-          this.resetProfileSelection();
-          this.checkProfileType();
-          this.openMyProfile = true;
-        } else {
-          this.closeMyUserProfile();
-        }
-      });
+    this.userservice.profileSelection$.subscribe((profileType) => {
+      if (profileType) {
+        this.resetProfileSelection();
+        this.checkProfileType();
+        this.openMyProfile = true;
+      } else {
+        this.closeMyUserProfile();
+      }
+    });
+    this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe((welcomeChannelStatus) => {
+      this.afterLoginSheet = welcomeChannelStatus; 
+    });
+  }
+
+
+  ngOnDestroy(): void {
+    if (this.welcomeChannelSubscription) {
+      this.welcomeChannelSubscription.unsubscribe();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
       this.checkProfileType();
       this.global.clearCurrentChannel();
+      this.afterLoginSheet = false;
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.fetchChannelMembers();
@@ -188,7 +198,7 @@ export class StartScreenComponent implements OnInit, OnChanges {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        console.log('userdata',this.global.currentUserData )
+        console.log('userdata', this.global.currentUserData);
         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
         });
@@ -197,7 +207,6 @@ export class StartScreenComponent implements OnInit, OnChanges {
       console.error('Fehler beim Abruf s Benutzers:', error);
     }
   }
-
 
   resetProfileSelection() {
     this.currentUserwasSelected = false;

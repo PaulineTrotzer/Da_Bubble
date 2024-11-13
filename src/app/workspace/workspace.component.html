@@ -63,15 +63,8 @@
               <h3>Channels</h3>
             </div>
           </div>
-          <div class="logo-container" (click)="openDialog()" >
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="icon"
-            >
+          <div class="logo-container" (click)="openDialog()">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
               <g clip-path="url(#clip0_84021_10666)">
                 <mask id="mask0_84021_10666" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="24"
                   height="24">
@@ -96,7 +89,7 @@
           }">
           <div class="channels">
             <div class="channel-row" *ngFor="let channel of allChannels" (click)="selectChannel(channel)">
-              <span>
+              <span [class.active]="selectedChannel === channel">
                 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">
                   <mask id="mask0_239_1574" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
@@ -109,29 +102,14 @@
                       fill="black" />
                   </g>
                 </svg>
-                {{channel.name}}</span
-              >
+                {{channel.name}}</span>
             </div>
           </div>
           <div class="add-channel-container">
-            <span (click)="openDialog()"
-              ><svg
-                width="24"
-                height="25"
-                viewBox="0 0 24 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-              >
-                <mask
-                  id="mask0_244_1431"
-                  style="mask-type: alpha"
-                  maskUnits="userSpaceOnUse"
-                  x="0"
-                  y="0"
-                  width="24"
-                  height="25"
-                >
+            <span (click)="openDialog()"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+                xmlns="http://www.w3.org/2000/svg" class="icon">
+                <mask id="mask0_244_1431" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
+                  height="25">
                   <rect y="0.5" width="24" height="24" fill="#D9D9D9" />
                 </mask>
                 <g mask="url(#mask0_244_1431)">
@@ -192,7 +170,8 @@
             <div class="contact" (click)="selectCurrentUser()">
               <img [src]="global.currentUserData.picture" class="avatar" />
               <div class="status-border">
-                <span [ngClass]="{'online': global.currentUserData.status === 'online', 'offline': global.currentUserData.status === 'offline'}"></span>
+                <span
+                  [ngClass]="{'online': global.currentUserData.status === 'online', 'offline': global.currentUserData.status === 'offline'}"></span>
               </div>
               <h4>{{global.currentUserData.name}} (Du)</h4>
             </div>

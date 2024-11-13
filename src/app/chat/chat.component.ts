@@ -29,6 +29,7 @@ import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat-component',
@@ -45,6 +46,8 @@ import { InputFieldComponent } from '../input-field/input-field.component';
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit {
+  afterLoginSheet = false;
+  welcomeChannelSubscription: Subscription | undefined;
   shouldScroll = true;
   global = inject(GlobalVariableService);
   chatMessage: string = '';
@@ -81,7 +84,8 @@ export class ChatComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   onUserNameClick() {
     const profileType =

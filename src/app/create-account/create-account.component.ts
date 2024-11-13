@@ -10,7 +10,6 @@ import {
 import { AvatarComponent } from '../avatar/avatar.component';
 import { Firestore, collection, addDoc, doc, setDoc } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
-import { UserComponent } from '../user/user.component';
 import { getAuth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 
 @Component({
@@ -23,7 +22,6 @@ import { getAuth, createUserWithEmailAndPassword } from '@angular/fire/auth';
     RouterOutlet,
     AvatarComponent,
     RouterModule,
-    UserComponent,
   ],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.scss',
