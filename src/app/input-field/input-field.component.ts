@@ -85,6 +85,7 @@ export class InputFieldComponent implements OnInit {
       this.messagesData.push(messageWithId);
       this.messageSent.emit();
       this.chatMessage = '';
+      this.formattedChatMessage=''
     } catch (error) {
       console.error('Error while sending message:', error);
     }
@@ -119,31 +120,34 @@ export class InputFieldComponent implements OnInit {
   }
 
 
-  formattedChatMessage: string = ''
-
+  formattedChatMessage: any = ''
+  color:string='red'
 
 
   handleMentionUser(mention: string) {
-    this.mentionUser = mention;
-    this.chatMessage += `@${this.mentionUser} `;
+    this.chatMessage += `@${mention + ' '} `;
+    this.formatMentions();
+  }
 
+  formatMentions() { 
+    const regex = /@([\w\s]+)/g;
+    this.formattedChatMessage = this.chatMessage.replace(
+      /@(\w+)/g,
+      `<span   class="mention"   contenteditable="false" >@$1</span>`
+    );
+  }
+
+  handleMentionClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('mention')) {
+      alert(`Mention clicked: ${target.innerText}`);
+    }
   }
 
 
 
 
-
-  formatMentions() { }
-
-
-
-
-
-
-
-
-
-
+  
 
 
 
