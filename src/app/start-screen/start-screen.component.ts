@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
@@ -28,6 +28,11 @@ import { ProfileContactCardComponent } from '../profile-contact-card/profile-con
 import { ChatComponent } from '../chat/chat.component';
 import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component';
 import { Subscription } from 'rxjs';
+
+interface ChannelData {
+  userIds: string[];
+}
+
 @Component({
   selector: 'app-start-screen',
   standalone: true,
@@ -164,26 +169,40 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async fetchChannelMembers() {
-    if (!this.selectedChannel?.userIds) {
+    if (!this.selectedChannel?.id) {
       this.channelMembers = [];
       return;
     }
+
     try {
-      const membersPromises = this.selectedChannel.userIds.map(
-        async (userId: string) => {
-          const userRef = doc(this.firestore, 'users', userId);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            return {
-              id: userSnap.id,
-              ...userSnap.data(),
-            };
-          }
-          return null;
-        }
+      const channelRef = doc(
+        this.firestore,
+        'channels',
+        this.selectedChannel.id
       );
-      const members = await Promise.all(membersPromises);
-      this.channelMembers = members.filter((member) => member !== null);
+      onSnapshot(channelRef, async (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data() as ChannelData;
+          const userIds = data['userIds'];
+          const membersPromises = userIds.map(async (userId: string) => {
+            const userRef = doc(this.firestore, 'users', userId);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              return {
+                id: userSnap.id,
+                ...userSnap.data(),
+              };
+            }
+            return null;
+          });
+
+          const members = await Promise.all(membersPromises);
+          this.channelMembers = members.filter(
+            (member: any) => member !== null
+          );
+          this.cdr.detectChanges();
+        }
+      });
     } catch (error) {
       console.error('Error fetching channel members:', error);
     }
