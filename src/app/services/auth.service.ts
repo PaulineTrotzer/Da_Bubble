@@ -35,12 +35,17 @@ export class AuthService {
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
+      if(currentUser?.isAnonymous){
+        this.deleteGuest(currentUser.uid)
+      }
       if (currentUser) {
         await this.updateStatus(currentUser.uid, 'offline');
-  
-        
       }
     });
+  }
+
+  async deleteGuest(userId: any) {
+    await deleteDoc(doc(this.firestore, 'users', userId))
   }
 
   async updateStatus(userId: string, status: 'online' | 'offline') {
