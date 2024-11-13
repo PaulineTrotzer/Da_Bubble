@@ -58,7 +58,7 @@
                 <div class="button-flex-box">
                     <button class="btn-primary-disabled" type="submit" value="submit"
                         [disabled]="loginForm.invalid">Anmelden</button>
-                    <button class="btn-secondary">Gäste-Login</button>
+                    <button (click)="guestLogin()" class="btn-secondary">Gäste-Login</button>
                 </div>
             </form>
 
