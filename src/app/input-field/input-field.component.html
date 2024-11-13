@@ -1,18 +1,22 @@
 <div class="msg-input-ct">
+    <!-- <div
+    
+    contenteditable="true" 
+     class="input-area" 
+     [innerHTML]="formattedChatMessage"
+   >
  
+    </div>   -->
 
  
 
     <div  style="position: relative; width: 100%;">
         <label for="msg-input"></label>
-        <div
-    
-        contenteditable="true" 
-         class="input-area" 
-       [innerHTML]="formattedChatMessage"
-       >
-     
-        </div>   
+        <div class="formatted-preview" 
+        [innerHTML]="formattedChatMessage" 
+        (click)="handleMentionClick($event)">
+      </div>
+
         <textarea  
     id="msg-input" 
     placeholder="Nachricht an #Entwicklerteam" 

@@ -14,10 +14,11 @@
     font-size: 18px !important;
     font-family: 'Nunito';
     background: none;
-    color: black; /* Unsichtbarer Text */
+    color: transparent;
     caret-color: black;
     width: 100%;
     white-space: pre-wrap;
+    // z-index: 26;
 
     &:focus {
       border-color: #444df2;
@@ -121,20 +122,16 @@
     }
   }
 
-  .mention {
-    color: blue;
-    font-weight: bold;
-    cursor: pointer;
-  }
 
 
-  .input-area{
+
+  .formatted-preview{
     position: absolute;
     top: 0;
     left: 0;
     font-size: 18px;
     padding: 20px 8px 8px 17px;
     color: black;
-    width: 100%;
     white-space: pre-wrap;
+    z-index: 1;
   }
