@@ -61,7 +61,7 @@
       </div>
     </mat-card-header>
     <div *ngIf="!afterLoginSheet">
-      <app-chat-component [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
+      <app-chat-component (threadOpened)="onThreadOpened()" [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
         [selectedUser]="selectedUser"></app-chat-component>
     </div>
   </mat-card>

@@ -7,6 +7,8 @@ import {
   SimpleChanges,
   OnInit,
   ViewChild,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -30,6 +32,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { Subscription } from 'rxjs';
+import { ThreadComponent } from "../thread/thread.component";
 
 @Component({
   selector: 'app-chat-component',
@@ -41,11 +44,13 @@ import { Subscription } from 'rxjs';
     FormsModule,
     MatCardModule,
     InputFieldComponent,
-  ],
+    ThreadComponent
+],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit {
+  clickOnThread = false;
   afterLoginSheet = false;
   welcomeChannelSubscription: Subscription | undefined;
   shouldScroll = true;
@@ -72,6 +77,8 @@ export class ChatComponent implements OnInit {
   showWelcomeChatText = false;
   showTwoPersonConversationTxt = false;
   @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
+  @Output() threadOpened = new EventEmitter<void>();
+
 
   commentStricker: string[] = [
     '../../assets/img/comment/face.png',
@@ -404,5 +411,9 @@ export class ChatComponent implements OnInit {
         this.scrollAutoDown();
       }
     });
+  }
+
+  openThread(){
+    this.threadOpened.emit(); 
   }
 }

@@ -7,9 +7,9 @@ mat-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 96px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  height: 110px;
+  border-top-left-radius: 100px;
+  border-top-right-radius: 100px;
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
   width: 100%;
   position: absolute;
@@ -28,6 +28,7 @@ mat-card {
 
 .mat-mdc-card {
   border-style: none;
+  border-radius: 30px;
 }
 
 .btn-text-img {

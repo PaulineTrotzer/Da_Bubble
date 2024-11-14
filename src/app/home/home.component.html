@@ -7,10 +7,12 @@
     <app-start-screen 
     [selectedUser]="selectedUser"  [mentionUser]="mentionUser"
     [selectedChannel]="selectedChannel"
+    (threadOpened)="onThreadOpened()"
      >
      </app-start-screen>
+     <app-thread *ngIf="isThreadOpen" (closeThread)="onThreadClosed()"></app-thread>
 </div>
 
-<!-- <app-thread></app-thread> -->
+
 
 <!-- [currentUser]="currentUser" -->

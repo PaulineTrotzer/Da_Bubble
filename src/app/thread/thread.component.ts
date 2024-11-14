@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import {
   trigger,
-  state,
   style,
   animate,
   transition,
@@ -48,13 +47,15 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class ThreadComponent {
-  constructor() {}
 
+  @Output() closeThread = new EventEmitter<void>();
   showTopicBubble: boolean = false;
   showMessageBubble: boolean = false;
   showUserBubble: boolean = false;
   showMessagePopup: boolean = false;
   showUserPopup: boolean = false;
+
+  constructor() {}
 
   toggleTopicBubble() {
     this.showTopicBubble = !this.showTopicBubble;
@@ -70,5 +71,9 @@ export class ThreadComponent {
   }
   toggleUserPopup(){
     this.showUserPopup = !this.showUserPopup
+  }
+
+  onClose() {
+    this.closeThread.emit();
   }
 }

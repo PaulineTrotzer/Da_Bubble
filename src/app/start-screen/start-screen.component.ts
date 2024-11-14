@@ -7,6 +7,7 @@ import {
   inject,
   ChangeDetectorRef,
   OnDestroy,
+  Output, EventEmitter
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -92,6 +93,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   isiconShow: any;
   selectFiles: any[] = [];
   cdr = inject(ChangeDetectorRef);
+  @Output() threadOpened = new EventEmitter<void>();
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -251,4 +253,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.openMyProfile = false;
     this.overlayStatusService.setOverlayStatus(false);
   }
+
+  onThreadOpened() {
+    this.threadOpened.emit();
+}
 }

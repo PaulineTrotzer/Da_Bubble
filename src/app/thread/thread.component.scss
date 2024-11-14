@@ -3,6 +3,7 @@
   box-shadow: 0px 2px 10px 0px #00000014;
   border-radius: 30px;
   height: 100%;
+  position: relative;
 }
 
 header {
@@ -20,13 +21,6 @@ header {
       font-family: "Nunito";
       font-size: 24px;
     }
-
-    span {
-      font-family: "Nunito";
-      color: #797ef3;
-      font-size: 14px;
-      font-weight: 400;
-    }
   }
   .img-container {
     display: flex;
@@ -40,6 +34,21 @@ header {
   height: 4px;
   box-shadow: 0 4px 3px 0px rgba(0, 0, 0, 0.258);
   margin-bottom: 8px;
+}
+
+.avatar-container {
+  img{
+    width: 50px;
+    object-fit: cover;
+    border-radius: 50px;
+  }
+}
+
+.hashtag{
+  font-family: "Nunito";
+  color: #797ef3;
+  font-size: 21px;
+  font-weight: 600;
 }
 
 .background {
@@ -121,6 +130,7 @@ header {
   align-items: center;
   gap: 20px;
   padding: 0 40px;
+  width: 600px;
   span {
     color: #adb0d9;
     font-family: Nunito;
@@ -165,8 +175,8 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  position: relative;
-
+  position: absolute;
+  bottom: 0;
   textarea {
     resize: none;
     border-radius: 20px;
@@ -185,7 +195,7 @@ header {
   align-items: center;
   position: absolute;
   justify-content: space-between;
-  left: 48px;
+  left: 72px;
   right: 64px;
   bottom: 42px;
   .left-side,
