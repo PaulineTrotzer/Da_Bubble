@@ -1,0 +1,21 @@
+<div class="chat-box">
+    <div [ngClass]="{
+        'message-from-user' : message.senderId !== global.currentUserData.id,
+        'message-from-current' : message.senderId === global.currentUserData.id
+    }" *ngFor="let message of messagesData">
+        <img class="sender-img" [src]="message.senderPicture" alt="">
+        <div class="text-container">
+            <div class="heading">
+                <h3> {{message.senderName}} </h3>
+                <span> {{message.timestamp | date: 'HH:MM'}} Uhr</span>
+            </div>
+            <div class="text-content">
+                <p> {{message.text}} </p>
+            </div>
+            <div class="thread-info-box" *ngIf="showThreadInfo">
+                answers
+                lastanswer
+            </div>
+        </div>
+    </div>
+</div>
