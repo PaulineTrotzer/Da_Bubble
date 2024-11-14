@@ -15,6 +15,8 @@ import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
 import { Channel } from '../models/channel.class';
+import { LoginAuthService } from '../services/login-auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-workspace',
@@ -41,8 +43,36 @@ export class WorkspaceComponent implements OnInit {
   @Output() channelSelected = new EventEmitter<Channel>();
   readonly dialog = inject(MatDialog);
   private channelsUnsubscribe: Unsubscribe | undefined;
+  logInAuth=inject(LoginAuthService);
+  isGuestLogin = false;
+  private guestLoginStatusSub: Subscription | undefined;
 
   constructor(public global: GlobalVariableService) {}
+
+  async ngOnInit(): Promise<void> {
+    this.getAllUsers();
+    this.userId = this.route.snapshot.paramMap.get('id');
+    if (this.userId) {
+      this.getUserById(this.userId);
+      this.userService.observingUserChanges(
+        this.userId,
+        (updatedUser: User) => {
+          this.global.currentUserData.name = updatedUser.name;
+        }
+      );
+    }
+    this.subscribeToGuestLoginStatus();
+    await this.getAllChannels();
+  }
+
+  subscribeToGuestLoginStatus(): void {
+    this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe(
+      (status) => {
+        this.isGuestLogin = status;
+        console.log('Guest login status:', status); 
+      }
+    );
+  }
 
   selectUser(user: any) {
     this.userSelected.emit(user);
@@ -65,21 +95,6 @@ export class WorkspaceComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       this.getAllChannels();
     });
-  }
-
-  async ngOnInit(): Promise<void> {
-    this.getAllUsers();
-    this.userId = this.route.snapshot.paramMap.get('id');
-    if (this.userId) {
-      this.getUserById(this.userId);
-      this.userService.observingUserChanges(
-        this.userId,
-        (updatedUser: User) => {
-          this.global.currentUserData.name = updatedUser.name;
-        }
-      );
-    }
-    await this.getAllChannels();
   }
 
   findWelcomeChannel() {
