@@ -61,8 +61,17 @@
       </div>
     </mat-card-header>
     <div *ngIf="!afterLoginSheet">
-      <app-chat-component (threadOpened)="onThreadOpened()" [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
-        [selectedUser]="selectedUser"></app-chat-component>
+      <app-chat-component (threadOpened)="onThreadOpened()" [selectedChannel]="selectedChannel"
+        (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
     </div>
   </mat-card>
+
+  <mat-card *ngIf="loginSuccessful" appearance="outlined" class="login-sended-info"
+  [ngClass]="{'visible': loginSuccessful, 'hidden': !loginSuccessful}">
+<mat-card-content class="success-login-content">
+  <span class="sended-text">
+    Login als <span class="guest-or-mail"><b>{{ isGuestLogin ? 'Gast' : global.currentUserData.email }}</b></span>
+  </span>
+</mat-card-content>
+</mat-card>
 </div>

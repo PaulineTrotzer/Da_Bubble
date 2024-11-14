@@ -19,8 +19,7 @@
                     <input autocomplete="off" class="input-styling" name="email" type="email"
                         placeholder="beispielname@email.com" id="email" #email="ngModel" [(ngModel)]="loginData.email"
                         pattern="^(http(s){0,1}:\/\/.){0,1}[\-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([\-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)$"
-                        (input)="onEmailChange()"
-                        required>
+                        (input)="onEmailChange()" required>
                     <span class="error-message" *ngIf="!email.valid && email.touched">
                         *Die E-Mail-Adresse ist erforderlich.
                     </span>
@@ -35,7 +34,8 @@
                     <img src="./../../assets/img/lock.svg">
                     <label for="password"></label>
                     <input autocomplete="off" class="input-styling" type="password" placeholder="Passwort"
-                        name="password" [(ngModel)]="loginData.password" #password="ngModel"  (input)="onPasswordChange()" required>
+                        name="password" [(ngModel)]="loginData.password" #password="ngModel"
+                        (input)="onPasswordChange()" required>
                     <span class="error-message" *ngIf="!password.valid && password.touched">*Das Passwort ist
                         erforderlich.</span>
                 </div>
@@ -70,5 +70,4 @@
 
         <button class="grey-border-btn"><a routerLink="/privacy-policy">Datenschutz</a></button>
     </div>
-
 </div>

@@ -18,6 +18,7 @@ import {
 } from '@angular/fire/firestore';
 import { OverlayStatusService } from './overlay-status.service';
 import { GlobalService } from '../global.service';
+import { LoginAuthService } from './login-auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,13 +31,14 @@ export class AuthService {
   guestUser: User = new User();
   overlayStatusService = inject(OverlayStatusService);
   globalservice = inject(GlobalService);
+  LogInAuth =inject(LoginAuthService);
 
   constructor() {
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
-      if(currentUser?.isAnonymous){
-        this.deleteGuest(currentUser.uid)
+      if (currentUser?.isAnonymous) {
+        this.deleteGuest(currentUser.uid);
       }
       if (currentUser) {
         await this.updateStatus(currentUser.uid, 'offline');
@@ -45,7 +47,7 @@ export class AuthService {
   }
 
   async deleteGuest(userId: any) {
-    await deleteDoc(doc(this.firestore, 'users', userId))
+    await deleteDoc(doc(this.firestore, 'users', userId));
   }
 
   async updateStatus(userId: string, status: 'online' | 'offline') {
@@ -61,25 +63,31 @@ export class AuthService {
     }
   }
 
-  googleLogIn() {
+
+  async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then(async (result) => {
-        this.user = new User({
-          uid: result.user.uid,
-          name: result.user.displayName,
-          email: result.user.email,
-          picture: result.user.photoURL,
-        });
-        await this.addGoogleUserToFirestore(this.user);
-        this.globalservice.googleAccountLogIn = true;
-        this.router.navigate(['/welcome', this.user.uid]);
-      })
-      .catch((error) => {
-        console.error('fehler beim Google log:', error);
+    try {
+      const result = await signInWithPopup(auth, provider);
+      this.user = new User({
+        uid: result.user.uid,
+        name: result.user.displayName,
+        email: result.user.email,
+        picture: result.user.photoURL,
       });
+      await this.addGoogleUserToFirestore(this.user);
+      this.LogInAuth.setLoginSuccessful(true);
+      this.LogInAuth.setIsGuestLogin(false);
+      this.router.navigate(['/welcome', this.user.uid]);
+
+      setTimeout(() => {
+        this.LogInAuth.setLoginSuccessful(false);
+      }, 1500);
+    } catch (error) {
+      console.error('Fehler beim Google Login:', error);
+    }
   }
+
 
   async addGoogleUserToFirestore(user: User) {
     const userRef = doc(this.firestore, 'users', user.uid);
@@ -113,19 +121,18 @@ export class AuthService {
     const auth = getAuth();
     try {
       const result = await signInAnonymously(auth);
-      this.guestUser = new User({
+      const guestUser = new User({
         uid: result.user.uid,
-        name: 'Guest',
+        name: 'Gast',
         email: `guest_${result.user.uid}@anonymous.com`,
         picture: './assets/img/picture_frame.png',
         status: 'online',
       });
-      await setDoc(
-        doc(this.firestore, 'users', this.guestUser.uid),
-        this.guestUser.toJSON()
-      );
-      this.router.navigate(['/welcome', this.guestUser.uid]);
-      console.log(auth)
+      await setDoc(doc(this.firestore, 'users', guestUser.uid), guestUser.toJSON());
+      this.LogInAuth.setIsGuestLogin(true);
+      this.LogInAuth.setLoginSuccessful(true);
+      setTimeout(() => this.LogInAuth.setLoginSuccessful(false), 1500);
+      this.router.navigate(['/welcome', guestUser.uid]);
     } catch (error) {
       console.error('Error during anonymous sign-in:', error);
     }
