@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter, Input } from '@angular/core';
 import { User } from '../models/user.class';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
@@ -24,6 +24,7 @@ export class DialogEditUserComponent implements OnInit {
   firestore = inject(Firestore);
   overlayStatusService = inject(OverlayStatusService);
   @Output() closeEditDialog= new EventEmitter<void>();
+  @Input() guestAccount: boolean = false; 
 
 
   constructor(private route: ActivatedRoute) {}

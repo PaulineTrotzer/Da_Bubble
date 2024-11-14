@@ -10,7 +10,7 @@
     </div>
     <div class="name-edit-flex">
         <div class="edit-option-title">
-            <span *ngIf="noGuestAccount" (click)="editOwnProfileCard()">Bearbeiten</span>
+            <span (click)="editOwnProfileCard()">Bearbeiten</span>
         </div>
         <div class="name-status-flex">
             <h2>{{user.name}}</h2>
@@ -28,5 +28,5 @@
 </div>
 
 <div *ngIf="openEdit">
-    <app-dialog-edit-user (closeEditDialog)="closeProfileCard()"></app-dialog-edit-user>
+    <app-dialog-edit-user [guestAccount]="guestAccount" (closeEditDialog)="closeProfileCard()"></app-dialog-edit-user>
   </div>
