@@ -9,13 +9,7 @@ import {
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnInit,
-  inject,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
@@ -89,8 +83,10 @@ export class WorkspaceComponent implements OnInit {
   }
 
   findWelcomeChannel() {
-    const willkommenChannel = this.allChannels.find(channel => channel.name == 'Willkommen');
-    if(willkommenChannel){
+    const willkommenChannel = this.allChannels.find(
+      (channel) => channel.name == 'Willkommen'
+    );
+    if (willkommenChannel) {
       this.selectChannel(willkommenChannel);
     }
   }
@@ -104,8 +100,17 @@ export class WorkspaceComponent implements OnInit {
   async getAllChannels() {
     const colRef = collection(this.firestore, 'channels');
     this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
-      this.allChannels = snapshot.docs.map(doc => new Channel(doc.data()));
+      this.allChannels = snapshot.docs.map((doc) => new Channel(doc.data()));
+      this.sortChannels();
       this.findWelcomeChannel();
+    });
+  }
+
+  sortChannels() {
+    this.allChannels.sort((a, b) => {
+      if (a.name === 'Willkommen') return -1;
+      if (b.name === 'Willkommen') return 1;
+      return 0; 
     });
   }
 

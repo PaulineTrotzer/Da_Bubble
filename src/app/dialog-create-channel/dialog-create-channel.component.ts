@@ -52,9 +52,13 @@ export class DialogCreateChannelComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log(`Dialog result: ${result}`);
-      this.selectedChannel = this.channel;
-      this.global.setCurrentChannel(this.channel);
+      this.openNewChannelDirectly(this.channel);
     });
+  }
+
+  openNewChannelDirectly(channel: Channel){
+    this.selectedChannel = channel;
+    this.global.setCurrentChannel(channel);
   }
 
   closeDialog() {
