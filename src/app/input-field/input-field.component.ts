@@ -137,6 +137,7 @@ export class InputFieldComponent implements OnInit {
     );
   }
 
+
   handleMentionClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (target.classList.contains('mention')) {
