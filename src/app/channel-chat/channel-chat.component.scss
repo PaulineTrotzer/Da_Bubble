@@ -1,5 +1,4 @@
 .chat-box {
-  padding: 40px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -8,6 +7,14 @@
 .message-from-user {
   display: flex;
   gap: 30px;
+  cursor: pointer;
+  padding: 10px 0 10px 45px;
+  &:hover {
+    background-color: #eceefe;
+    .text-container > .text-content {
+      background-color: white;
+    }
+  }
   img {
     height: 70px;
     border-radius: 100%;
@@ -29,50 +36,55 @@
       }
     }
     .text-content {
-        padding: 15px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 30px;
-        border-bottom-right-radius: 30px;
-        border-bottom-left-radius: 30px;
-        background: #ECEEFE;
+      padding: 15px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 30px;
+      border-bottom-right-radius: 30px;
+      border-bottom-left-radius: 30px;
+      background: #eceefe;
     }
   }
 }
 
 .message-from-current {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: 30px;
+  cursor: pointer;
+  padding: 10px 45px 10px 0px;
+  &:hover {
+    background-color: #eceefe;
+  }
+  img {
+    height: 70px;
+    border-radius: 100%;
+  }
+  .text-container {
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
-    gap: 30px;
-    img {
-      height: 70px;
-      border-radius: 100%;
-    }
-    .text-container {
+    flex-direction: column;
+    gap: 8px;
+    .heading {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      .heading {
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        gap: 20px;
-        span {
-          font-family: Nunito;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 19.1px;
-          color: #686868;
-        }
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 20px;
+      span {
+        font-family: Nunito;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 19.1px;
+        color: #686868;
       }
-      .text-content {
-          padding: 15px;
-          border-top-left-radius: 0;
-          border-top-right-radius: 30px;
-          border-bottom-right-radius: 30px;
-          border-bottom-left-radius: 30px;
-          background: #797EF3;
-          color: white;
-      }
+    }
+    .text-content {
+      padding: 15px;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 30px;
+      border-bottom-left-radius: 30px;
+      background: #797ef3;
+      color: white;
     }
   }
+}
