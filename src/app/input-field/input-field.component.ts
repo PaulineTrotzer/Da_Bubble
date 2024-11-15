@@ -62,7 +62,7 @@ export class InputFieldComponent implements OnInit {
     if(this.selectedChannel){
       this.sendChannelMessage()
     }
-    if (!this.selectedUser || !this.selectedChannel) {
+    if (!this.selectedUser && !this.selectedChannel) {
       console.error('Selected user or channel is not defined');
       return;
     }

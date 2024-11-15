@@ -10,11 +10,12 @@ import {
   query,
 } from '@angular/fire/firestore';
 import { GlobalVariableService } from '../services/global-variable.service';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 @Component({
   selector: 'app-channel-chat',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PickerComponent],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
 })
@@ -28,6 +29,7 @@ export class ChannelChatComponent implements OnInit {
 
   messagesData: any[] = [];
   showThreadInfo: boolean = false;
+  hoveredMessageId: string | null = null;
 
   unsubscribe: (() => void) | undefined;
 
