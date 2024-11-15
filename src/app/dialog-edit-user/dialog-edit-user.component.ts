@@ -7,6 +7,7 @@ import { Firestore } from '@angular/fire/firestore';
 import { updateDoc, doc } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { GlobalService } from '../global.service';
 
 @Component({
   selector: 'app-dialog-edit-user',
@@ -25,6 +26,7 @@ export class DialogEditUserComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   @Output() closeEditDialog= new EventEmitter<void>();
   @Input() guestAccount: boolean = false; 
+  global=inject(GlobalService);
 
 
   constructor(private route: ActivatedRoute) {}
@@ -37,6 +39,7 @@ export class DialogEditUserComponent implements OnInit {
         if (userResult) {
           this.user = userResult;
         }
+        console.log('aaand' ,this.global.googleAccountLogIn);
       }
     });
   }
@@ -58,5 +61,9 @@ export class DialogEditUserComponent implements OnInit {
     } catch (error) {
       console.error('error updating user:', error);
     }
+  }
+
+  showEditableInput(): boolean {
+    return !this.guestAccount && !this.global.googleAccountLogIn;
   }
 }

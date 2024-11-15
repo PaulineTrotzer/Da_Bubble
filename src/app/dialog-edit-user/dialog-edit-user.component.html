@@ -20,15 +20,15 @@
 
     <div class="mail-flex-column">
         <div>
-          <img src="./assets/img/mail.svg">
-          <h3 class="email-title">E-Mail-Adresse</h3>
+            <img src="./assets/img/mail.svg">
+            <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
 
-        <input *ngIf="!guestAccount" class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
-      
-        <input *ngIf="guestAccount" class="user-mail-input" [value]="user.email" readonly />
+        <input *ngIf="!guestAccount && !global.googleAccountLogIn" class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
+
+        <input *ngIf="guestAccount || global.googleAccountLogIn" class="user-mail-input" [value]="user.email" readonly />
         <span *ngIf="guestAccount" class="error-msg">Kein Zugriff als Gast</span>
-      </div>
+    </div>
 
     <div class="button-flex">
         <button (click)="closeEditModus()" class="btn-secondary">Abbrechen</button>

@@ -20,6 +20,7 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { GlobalService } from '../global.service';
 
 @Component({
   selector: 'app-login',
@@ -51,6 +52,7 @@ export class LoginComponent implements OnInit {
   loginSuccessful = false;
   loginAuthService = inject(LoginAuthService);
   overlayStatusService = inject(OverlayStatusService);
+  global=inject(GlobalService);
 
   constructor() {}
 

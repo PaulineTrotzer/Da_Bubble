@@ -32,6 +32,7 @@ export class AuthService {
   overlayStatusService = inject(OverlayStatusService);
   globalservice = inject(GlobalService);
   LogInAuth =inject(LoginAuthService);
+  global=inject(GlobalService);
 
   constructor() {
     window.addEventListener('beforeunload', async (event) => {
@@ -77,6 +78,7 @@ export class AuthService {
       });
       await this.addGoogleUserToFirestore(this.user);
       this.LogInAuth.setLoginSuccessful(true);
+      this.global.googleAccountLogIn = true;
       this.LogInAuth.setIsGuestLogin(false);
       this.router.navigate(['/welcome', this.user.uid]);
       setTimeout(() => {
