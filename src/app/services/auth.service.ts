@@ -79,12 +79,11 @@ export class AuthService {
       this.LogInAuth.setLoginSuccessful(true);
       this.LogInAuth.setIsGuestLogin(false);
       this.router.navigate(['/welcome', this.user.uid]);
-
       setTimeout(() => {
         this.LogInAuth.setLoginSuccessful(false);
       }, 1500);
     } catch (error) {
-      console.error('Fehler beim Google Login:', error);
+      console.error('fehler gLogin:', error);
     }
   }
 
@@ -130,8 +129,11 @@ export class AuthService {
       });
       await setDoc(doc(this.firestore, 'users', guestUser.uid), guestUser.toJSON());
       this.LogInAuth.setIsGuestLogin(true);
+      this.overlayStatusService.setOverlayStatus(true)
       this.LogInAuth.setLoginSuccessful(true);
-      setTimeout(() => this.LogInAuth.setLoginSuccessful(false), 1500);
+      setTimeout(() => {
+        this.LogInAuth.setLoginSuccessful(false);
+      }, 1500);
       this.router.navigate(['/welcome', guestUser.uid]);
     } catch (error) {
       console.error('Error during anonymous sign-in:', error);

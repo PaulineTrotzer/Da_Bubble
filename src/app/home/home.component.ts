@@ -5,6 +5,9 @@ import { StartScreenComponent } from '../start-screen/start-screen.component';
 import { ThreadComponent } from '../thread/thread.component';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { CommonModule } from '@angular/common';
+import { LoginAuthService } from '../services/login-auth.service';
+import { MatCardModule } from '@angular/material/card';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +18,7 @@ import { CommonModule } from '@angular/common';
     StartScreenComponent,
     ThreadComponent,
     CommonModule,
+    MatCardModule,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -25,12 +29,34 @@ export class HomeComponent implements OnInit {
   mentionUser: any;
   globalService = inject(GlobalVariableService);
   isThreadOpen = false;
+  successfullyLogged = false;
+  LogInAuth = inject(LoginAuthService);
+  private loginStatusSub: Subscription | undefined;
+  global = inject(GlobalVariableService);
+  isGuestLogin = false;
+  private guestLoginStatusSub: Subscription | undefined;
 
   ngOnInit(): void {
-    
+    this.subscribeToLoginStatus();
+    this.subscribeToGuestLoginStatus();
   }
 
+  subscribeToLoginStatus(): void {
+    this.loginStatusSub = this.LogInAuth.loginSuccessful$.subscribe(
+      (status) => {
+        this.successfullyLogged = status;
+      }
+    );
+  }
 
+  subscribeToGuestLoginStatus(): void {
+    this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
+      (status) => {
+        this.isGuestLogin = status;
+        console.log('Guest login status:', status);
+      }
+    );
+  }
 
   onUserSelected(user: any) {
     this.selectedUser = user;
