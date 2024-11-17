@@ -1,6 +1,6 @@
 <div class="chat-box">
   <div
-    class="message"
+    class="message-container"
     [ngClass]="{
       'message-from-user': message.senderId !== global.currentUserData.id,
       'message-from-current': message.senderId === global.currentUserData.id
@@ -18,12 +18,13 @@
           message.senderId === global.currentUserData.id
       }"
     >
-      <emoji-mart [set]="'apple'" (emojiClick)="addEmoji($event, message.id)"></emoji-mart>
+      <emoji-mart
+        [set]="'apple'"
+        [emojiSize]="32"
+        (emojiClick)="addEmoji($event, message.id)"
+      ></emoji-mart>
     </div>
-    <div
-      class="reaction-bar"
-      *ngIf="hoveredMessageId === message.id || showReaction"
-    >
+    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
       <div class="used-emojis">
         <span *ngFor="let emoji of currentUserLastEmojis" class="emoji">
           {{ emoji }}
@@ -103,18 +104,33 @@
         </svg>
       </div>
     </div>
-    <img class="sender-img" [src]="message.senderPicture" alt="" />
-    <div class="text-container">
-      <div class="heading">
-        <h3>{{ message.senderName }}</h3>
-        <span> {{ message.timestamp | date : "HH:MM" }} Uhr</span>
+    <div class="message">
+      <div class="message-content">
+        <img class="sender-img" [src]="message.senderPicture" alt="" />
+        <div class="text-container">
+          <div class="heading">
+            <h3>{{ message.senderName }}</h3>
+            <span> {{ message.timestamp | date : "HH:MM" }} Uhr</span>
+          </div>
+          <div class="text-content">
+            <div class="text">
+              <p>{{ message.text }}</p>
+            </div>
+            <div class="reaction-info">
+              <span
+                *ngFor="let reaction of message.reactions | keyvalue"
+                class="reaction"
+              >
+                {{ reaction.key }} {{ reaction.value }}
+              </span>
+            </div>
+          </div>
+          <div class="thread-info-box" *ngIf="showThreadInfo">
+            answers lastanswer
+          </div>
+        </div>
       </div>
-      <div class="text-content">
-        <p>{{ message.text }}</p>
-      </div>
-      <div class="thread-info-box" *ngIf="showThreadInfo">
-        answers lastanswer
-      </div>
+      
     </div>
   </div>
 </div>

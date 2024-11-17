@@ -104,10 +104,6 @@ export class InputFieldComponent implements OnInit {
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
       timestamp: new Date(),
-      senderSticker: '',
-      senderStickerCount: this.senderStickerCount,
-      recipientSticker: '',
-      recipientStickerCount: this.recipientStickerCount,
       selectedFiles: this.selectFiles,
       editedTextShow: false
     };

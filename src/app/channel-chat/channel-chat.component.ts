@@ -35,7 +35,6 @@ export class ChannelChatComponent implements OnInit {
   showThreadInfo: boolean = false;
   hoveredMessageId: string | null = null;
   isPickerVisible: string | null = null;
-  showReaction: boolean = true;
   currentUserLastEmojis: string [] = [];
 
   unsubscribe: (() => void) | undefined;
@@ -87,9 +86,10 @@ export class ChannelChatComponent implements OnInit {
   }
 
   addEmoji(event: any, messageId: string) {
-    const emoji = event.emoji.native;
+    const emoji = event.emoji;
     this.isPickerVisible = null;
-    this.addLastUsedEmoji(emoji)
+    this.addLastUsedEmoji(emoji);
+    this.addToReactionInfo(emoji, messageId);
   }
 
   togglePicker(messageId: string) {
@@ -102,7 +102,7 @@ export class ChannelChatComponent implements OnInit {
     if(currentUserId) {
       const docRef = doc(this.firestore, 'users', currentUserId);
       await updateDoc(docRef, {
-        lastEmojis: [emoji, ...(await this.getExistingEmojis(docRef))].slice(0, 2),
+        lastEmojis: [emoji.native, ...(await this.getExistingEmojis(docRef))].slice(0, 2),
       })
     }
   }
@@ -130,4 +130,26 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No current user logged in');
     }
   }
+
+  async addToReactionInfo(emoji: any, messageId: string) {
+    const messageDocRef = doc(this.firestore, 'channels', this.selectedChannel.id, 'messages', messageId);
+  
+    try {
+      const messageSnapshot = await getDoc(messageDocRef);
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+  
+      const updatedReactions = {
+        ...reactions,
+        [emoji.native]: (reactions[emoji.native] || 0) + 1,
+      };
+  
+      await updateDoc(messageDocRef, { reactions: updatedReactions });
+  
+      console.log(`Updated reactions for message ${messageId}:`, updatedReactions);
+    } catch (error) {
+      console.error('Error updating reactions:', error);
+    }
+  }
+  
 }
