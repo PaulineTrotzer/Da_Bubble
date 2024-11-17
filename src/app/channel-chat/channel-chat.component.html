@@ -9,8 +9,27 @@
     (mouseenter)="hoveredMessageId = message.id"
     (mouseleave)="hoveredMessageId = null"
   >
-    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
-      <div class="img-container">
+    <div
+      class="emoji-container"
+      *ngIf="isPickerVisible === message.id"
+      [ngClass]="{
+        'emoji-container-user': message.senderId !== global.currentUserData.id,
+        'emoji-container-current':
+          message.senderId === global.currentUserData.id
+      }"
+    >
+      <emoji-mart [set]="'apple'" (emojiClick)="addEmoji($event, message.id)"></emoji-mart>
+    </div>
+    <div
+      class="reaction-bar"
+      *ngIf="hoveredMessageId === message.id || showReaction"
+    >
+      <div class="used-emojis">
+        <span *ngFor="let emoji of currentUserLastEmojis" class="emoji">
+          {{ emoji }}
+        </span>
+      </div>
+      <div class="img-container" (click)="togglePicker(message.id)">
         <svg
           width="25"
           height="24"
@@ -66,7 +85,10 @@
           </g>
         </svg>
       </div>
-      <div class="img-container" *ngIf="message.senderId === global.currentUserData.id">
+      <div
+        class="img-container"
+        *ngIf="message.senderId === global.currentUserData.id"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24px"
