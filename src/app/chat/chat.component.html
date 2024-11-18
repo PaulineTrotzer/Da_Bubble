@@ -1,4 +1,14 @@
 <div class="full-app-content">
+     
+   <app-mention-message-box  *ngIf="global.openMentionMessageBox" >
+
+   </app-mention-message-box>
+
+
+
+    
+
+
     <div class="main-current-messagebox" #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
             <div *ngIf="displayDayInfo(i)" class="new-day-info">
@@ -6,6 +16,7 @@
                     <div class="line"></div>
                     <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
                 </div>
+                
             </div>
             <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
               'main-message-info-user':message.senderId !== global.currentUserData.id, 
@@ -135,8 +146,21 @@
                     
                   'card-content-user':
                     message.senderId !== global.currentUserData.id
-                }">{{ message.text }}</mat-card-content>
-              
+                }">   
+        <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+        <span
+            *ngIf="isMention(mentionName)"
+            class="mention-message"
+            (click)="handleMentionClick(mentionName)"
+           >
+          {{ mentionName }}
+          </span>
+       <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+     </ng-container>
+
+            
+            </mat-card-content>
+                            
                         </mat-card>
                        
                     </div>

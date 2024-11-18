@@ -7,6 +7,9 @@ import {
   SimpleChanges,
   OnInit,
   ViewChild,
+  OnChanges,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -30,6 +33,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { Subscription } from 'rxjs';
+import { MentionMessageBoxComponent } from "../mention-message-box/mention-message-box.component";
 
 @Component({
   selector: 'app-chat-component',
@@ -41,11 +45,12 @@ import { Subscription } from 'rxjs';
     FormsModule,
     MatCardModule,
     InputFieldComponent,
-  ],
+    MentionMessageBoxComponent
+],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnChanges {
   afterLoginSheet = false;
   welcomeChannelSubscription: Subscription | undefined;
   shouldScroll = true;
@@ -82,9 +87,10 @@ export class ChatComponent implements OnInit {
     '../../assets/img/comment/celebration.png',
   ];
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
+    this.getAllUsersname()
   }
 
   onUserNameClick() {
@@ -192,7 +198,7 @@ export class ChatComponent implements OnInit {
   clearInput() {
     this.messagesData = [];
   }
-  
+
 
   saveOrDeleteMessage(message: any) {
     const messageRef = doc(this.firestore, 'messages', message.id);
@@ -201,9 +207,9 @@ export class ChatComponent implements OnInit {
         this.editMessageId = null;
       });
     } else {
-      const editMessage = { text: this.editableMessageText,editedTextShow:true };
+      const editMessage = { text: this.editableMessageText, editedTextShow: true };
       updateDoc(messageRef, editMessage).then(() => {
-         
+
         this.editMessageId = null;
       });
     }
@@ -273,7 +279,7 @@ export class ChatComponent implements OnInit {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
-      
+
     };
   }
 
@@ -405,4 +411,60 @@ export class ChatComponent implements OnInit {
       }
     });
   }
+
+
+  splitMessage(text: string) {
+    const regex = /(@[\w]+(?:\s[\w]+)?)/g;
+    return text.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  }
+
+
+
+  @Output() userMention = new EventEmitter<any>();
+
+  handleMentionClick(mention: string) {
+   this.global.openMentionMessageBox=false
+    const cleanName=mention.substring(1);
+    const userRef=collection(this.firestore,'users')
+    onSnapshot(userRef,(querySnapshot)=>{
+     this.global.getUserByName={};
+     querySnapshot.forEach((doc)=>{
+      const dataUser=doc.data();
+      const dataUserName=dataUser['name']
+      if(dataUserName===cleanName){
+          this.global.getUserByName={id:doc.id, ...dataUser}  
+      }
+      this.global.openMentionMessageBox=true
+     })  
+    })
+  }
+
+  getAllUsersName: any[] = [];
+
+  getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName=[]
+      querySnapshot.forEach((doc)=>{
+        const dataUser=doc.data()
+        const userName=dataUser['name']
+        this.getAllUsersName.push({userName})
+      })
+
+      console.log(this.getAllUsersName)
+    })
+  }
+
+
+
 }
+
+

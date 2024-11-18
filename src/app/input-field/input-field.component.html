@@ -1,25 +1,26 @@
 <div class="msg-input-ct">
-    <label for="msg-input"></label>
+    
  
     
 
     <div  style="position: relative; width: 100%;">
         <label for="msg-input"></label>
-        <div class="formatted-preview" 
-        [innerHTML]="formattedChatMessage" 
-        (click)="handleMentionClick($event)">
-       
+        <div   class="formatted-preview" 
+        [innerHTML]="formattedChatMessage">
+        
       </div>
 
-        <textarea  
+        <textarea   
+      
     id="msg-input" 
     placeholder="Schreib etwas..." 
     class="chat-input" 
     contenteditable="true"
     type="text" 
-    [(ngModel)]="chatMessage" 
+    [(ngModel)]="chatMessage"
      (input)="formatMentions()" >
     >
+   
    
   </textarea>
 

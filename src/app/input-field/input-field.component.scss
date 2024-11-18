@@ -129,9 +129,15 @@
     position: absolute;
     top: 0;
     left: 0;
-    font-size: 18px;
+     font-size: 18px;
     padding: 20px 8px 8px 17px;
     color: black;
     white-space: pre-wrap;
     z-index: 1;
+    pointer-events: none;
+    word-wrap: break-word;
+    pointer-events: none;
   }
+
+
+ 

@@ -14,7 +14,7 @@ app-input-field {
   margin-bottom: 52px;
 }
 
-.you{
+.you {
   position: relative;
   left: -14px;
 }
@@ -44,22 +44,22 @@ app-input-field {
   margin-left: 32px;
 }
 
-.two-chat-opener-ct{
+.two-chat-opener-ct {
   display: flex;
   flex-direction: column;
   gap: 24px;
   margin-bottom: 52px;
 }
 
-.img-and-name{
-  display: flex; 
+.img-and-name {
+  display: flex;
   align-items: end;
   gap: 22px;
   font-size: 24px;
   font-weight: 700;
 }
 
-.two-chat-txt{
+.two-chat-txt {
   font-size: 20px;
   color: grey;
   padding: 0 42px;
@@ -78,9 +78,11 @@ app-input-field {
   display: flex;
   position: relative;
   bottom: 64px;
+
   img {
     width: 100%;
   }
+
   div {
     width: fit-content;
     padding-left: 12px;
@@ -146,17 +148,21 @@ app-input-field {
   padding: 5px 0;
   top: -13px;
   margin-top: 37px;
+
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
+
     .comment-box-current {
       left: 50px;
       opacity: 1;
       cursor: pointer;
     }
+
     .show-comment-stricker {
       background-color: #ffffff;
     }
+
     .show-stricker-svgbox {
       background-color: #ffffff;
       border-radius: 100%;
@@ -180,20 +186,25 @@ app-input-field {
   padding: 5px 0;
   top: -13px;
   margin-top: 37px;
+
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
+
     .comment-box-user {
       right: 50px;
       opacity: 1;
       cursor: pointer;
     }
+
     .message-card-user {
       background-color: #ffffff;
     }
+
     .show-comment-stricker {
       background-color: #ffffff;
     }
+
     .show-stricker-svgbox {
       background-color: #ffffff;
       border-radius: 100%;
@@ -288,6 +299,7 @@ app-input-field {
   align-items: center;
   gap: 21px;
   position: relative;
+
   img {
     width: 23px;
     height: 21px;
@@ -302,12 +314,15 @@ app-input-field {
   width: 40px;
   height: 40px;
   cursor: pointer;
+
   &:hover {
     background-color: unset !important;
     border-radius: unset !important;
+
     .show-sticker-card {
       opacity: 1;
     }
+
     svg {
       path {
         fill: #444df2;
@@ -352,6 +367,7 @@ app-input-field {
   display: flex;
   align-items: center;
   justify-content: center;
+
   &:hover {
     background-color: #ffffff;
     border-radius: 100%;
@@ -361,6 +377,7 @@ app-input-field {
 .show-sticker-box.backColor-current {
   background-color: #ffffff;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -369,6 +386,7 @@ app-input-field {
 .show-sticker-box.backColor-user {
   background-color: #ffffff;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -437,6 +455,7 @@ app-input-field {
   display: flex;
   justify-content: center;
   align-items: center;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
@@ -446,6 +465,7 @@ app-input-field {
 .comment-stricker.backColor-current {
   background-color: #eceefe;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -454,6 +474,7 @@ app-input-field {
 .comment-stricker.backColor-user {
   background-color: #eceefe;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -462,9 +483,11 @@ app-input-field {
 .add-reaction {
   width: 40px;
   height: 40px;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
+
     svg {
       path {
         fill: #444df2;
@@ -480,9 +503,11 @@ app-input-field {
 .open-thread {
   width: 40px;
   height: 40px;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
+
     svg {
       path {
         fill: #444df2;
@@ -502,12 +527,15 @@ app-input-field {
 .edit-icon {
   width: 40px;
   height: 40px;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
+
     .edit-messages-card {
       opacity: 1;
     }
+
     svg {
       path {
         fill: #444df2;
@@ -539,9 +567,11 @@ app-input-field {
 .edit-message-content {
   color: #000000;
   width: 100%;
+
   span {
     padding: 7px;
   }
+
   &:hover {
     span {
       color: #444df2;
@@ -567,6 +597,7 @@ app-input-field {
   border-radius: 20px;
   font-family: Nunito, "Helvetica Neue";
   font-size: 18px;
+
   &:focus {
     border-color: #444df2;
     outline: none;
@@ -587,6 +618,7 @@ app-input-field {
   display: flex;
   justify-content: center;
   align-items: center;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
@@ -596,6 +628,7 @@ app-input-field {
 .comment-icon-box.backColor-current {
   background-color: #eceefe;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -604,6 +637,7 @@ app-input-field {
 .comment-icon-box.backColor-user {
   background-color: #eceefe;
   border-radius: 100%;
+
   &:hover {
     background-color: #444df2;
   }
@@ -616,6 +650,7 @@ app-input-field {
   border-radius: 16px;
   padding: 5px;
   gap: 6px;
+
   &:hover {
     border-color: #444df2;
   }
@@ -700,7 +735,28 @@ app-input-field {
 }
 
 
-.text-info-edit{
+.text-info-edit {
   position: relative;
-  
+
+}
+
+
+.mention-message {
+  color: blue;
+  cursor: pointer;
+
+  &:hover {
+    color: red;
+  }
+}
+
+
+app-mention-message-box {
+  z-index: 35;
+  position: absolute;
+  top: 141px;
+  bottom: 0;
+  width: 350px;
+  height: 50px;
+  right: 33%;
 }

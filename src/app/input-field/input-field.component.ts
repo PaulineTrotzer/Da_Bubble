@@ -10,14 +10,15 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  Renderer2
-
+  Renderer2,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { FormsModule } from '@angular/forms';
-import { Firestore, addDoc, collection } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection, onSnapshot } from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 
@@ -28,7 +29,7 @@ import { UserService } from '../services/user.service';
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
 })
-export class InputFieldComponent implements OnInit {
+export class InputFieldComponent implements OnInit, OnChanges {
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -46,15 +47,20 @@ export class InputFieldComponent implements OnInit {
   messagesData: any[] = [];
 
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedUser'] && this.selectedUser?.id) {
+      this.formattedChatMessage = '';
+      this.chatMessage = '';
+    }
 
-  constructor(private renderer: Renderer2) { }
-
-  ngOnChanges() { }
+  }
 
   ngOnInit(): void {
-    this.userService.selectedUser$.subscribe((user) => {
-      this.selectedUser = user;
-    });
+    // this.userService.selectedUser$.subscribe((user) => {
+    //   this.selectedUser = user; 
+    //   console.log(this.selectedUser)
+    // });
+    this.getByUserName()
   }
 
 
@@ -85,7 +91,7 @@ export class InputFieldComponent implements OnInit {
       this.messagesData.push(messageWithId);
       this.messageSent.emit();
       this.chatMessage = '';
-      this.formattedChatMessage=''
+      this.formattedChatMessage = ''
     } catch (error) {
       console.error('Error while sending message:', error);
     }
@@ -120,39 +126,47 @@ export class InputFieldComponent implements OnInit {
   }
 
 
-  formattedChatMessage: any = ''
-  color:string='red'
+  formattedChatMessage: any
+  changecolorCheck: boolean = false
+  name: any
+  mentionUserName: any[] = []
+
+
 
 
   handleMentionUser(mention: string) {
-    this.chatMessage += `@${mention + ' '} `;
-    this.formatMentions();
-  }
-
-  formatMentions() { 
-    const regex = /@([\w\s]+)/g;
-    this.formattedChatMessage = this.chatMessage.replace(
-      /@(\w+)/g,
-      `<span   class="mention"   contenteditable="false" >@$1</span>`
-    );
-  }
-
-
-  handleMentionClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains('mention')) {
-      alert(`Mention clicked: ${target.innerText}`);
+    const mentionTag = `@${mention}`;
+    if (!this.chatMessage.includes(mentionTag)) {
+      this.chatMessage += `${mentionTag} `;
+      this.formatMentions();
     }
   }
 
+  formatMentions() {
+    const regex = /@\w+(?:\s\w+)?/g;
+    this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+      const mentionName = match.substring(1).trim();
+      if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+        return `<span class="mention">${match}</span>`;
+      }
+      return `<span class="normal-text">${match}</span>`;
+    });
+  }
 
+  getByUserName() {
+    const docRef = collection(this.firestore, 'users')
+    onSnapshot(docRef, (querySnapshot) => {
+      this.mentionUserName = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const userName = data['name']
+        this.mentionUserName.push(userName)
+      })
+      console.log(this.mentionUserName)
+    })
+  }
 
-
-  
-
-
-
-
+    
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
     this.cdr.detectChanges();
