@@ -85,7 +85,15 @@
     }
     .reaction-info {
       display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      align-items: center;
       gap: 10px;
+    }
+
+    .img-container {
+      display: flex;
+      align-items: center;
     }
   }
 }
@@ -162,7 +170,13 @@
     .reaction-info {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       gap: 10px;
+    }
+
+    .img-container {
+      display: flex;
+      align-items: center;
     }
   }
 }
@@ -182,14 +196,16 @@
 }
 
 .used-emojis {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .emoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
   display: flex;
   height: 32px;
   width: 32px;
@@ -202,7 +218,7 @@
 
 .reaction {
   padding: 5px 10px;
-  border: 1px solid #ADB0D9;
+  border: 1px solid #adb0d9;
   border-radius: 20px;
 }
 

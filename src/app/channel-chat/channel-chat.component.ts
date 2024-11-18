@@ -16,6 +16,16 @@ import { GlobalVariableService } from '../services/global-variable.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 
+interface Message {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: Date;
+  senderName: string;
+  senderPicture: string;
+  reactions: { [emoji: string]: string[] };
+}
+
 @Component({
   selector: 'app-channel-chat',
   standalone: true,
@@ -31,7 +41,7 @@ export class ChannelChatComponent implements OnInit {
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
 
-  messagesData: any[] = [];
+  messagesData: Message[] = [];
   showThreadInfo: boolean = false;
   hoveredMessageId: string | null = null;
   isPickerVisible: string | null = null;
@@ -132,6 +142,61 @@ export class ChannelChatComponent implements OnInit {
   }
 
   async addToReactionInfo(emoji: any, messageId: string) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (!currentUserId) {
+      console.warn('No current user logged in');
+      return;
+    }
+  
+    const messageDocRef = doc(
+      this.firestore,
+      'channels',
+      this.selectedChannel.id,
+      'messages',
+      messageId
+    );
+  
+    try {
+      const messageSnapshot = await getDoc(messageDocRef);
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+  
+      const hasReacted = Object.values(reactions).some((userIds) =>
+        (userIds as string[]).includes(currentUserId)
+      );
+  
+      if (hasReacted) {
+        console.warn('User has already reacted to this message');
+        return;
+      }
+  
+      if (!reactions[emoji.native]) {
+        reactions[emoji.native] = [];
+      }
+      reactions[emoji.native].push(currentUserId);
+  
+      await updateDoc(messageDocRef, { reactions });
+  
+      console.log(`Updated reactions for message ${messageId}:`, reactions);
+    } catch (error) {
+      console.error('Error updating reactions:', error);
+    }
+  }
+  
+  
+  
+
+  async removeReaction(emoji: string, messageId: string) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (!currentUserId) {
+      console.warn('No current user logged in');
+      return;
+    }
+  
     const messageDocRef = doc(this.firestore, 'channels', this.selectedChannel.id, 'messages', messageId);
   
     try {
@@ -139,17 +204,29 @@ export class ChannelChatComponent implements OnInit {
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
   
-      const updatedReactions = {
-        ...reactions,
-        [emoji.native]: (reactions[emoji.native] || 0) + 1,
-      };
+      if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
+        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
   
-      await updateDoc(messageDocRef, { reactions: updatedReactions });
+        if (reactions[emoji].length === 0) {
+          delete reactions[emoji];
+        }
   
-      console.log(`Updated reactions for message ${messageId}:`, updatedReactions);
+        await updateDoc(messageDocRef, { reactions });
+  
+        console.log(`Updated reactions for message ${messageId}:`, reactions);
+      }
     } catch (error) {
-      console.error('Error updating reactions:', error);
+      console.error('Error removing reaction:', error);
     }
+  }
+  
+  addEmojiToMessage(emoji: string, messageId: string) {
+    const emojiEvent = { emoji: { native: emoji } };
+    this.addToReactionInfo(emojiEvent.emoji, messageId);
+  }
+
+  hasReactions(reactions: { [emoji: string]: string[] }): boolean {
+    return reactions && Object.keys(reactions).length > 0;
   }
   
 }

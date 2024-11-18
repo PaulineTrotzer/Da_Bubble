@@ -59,35 +59,43 @@ export class InputFieldComponent implements OnInit {
   }
 
   async sendMessage() {
-    if(this.selectedChannel){
-      this.sendChannelMessage()
-    }
-    if (!this.selectedUser && !this.selectedChannel) {
+    if (!this.selectedChannel && !this.selectedUser) {
       console.error('Selected user or channel is not defined');
       return;
     }
+  
     if (this.chatMessage.trim() === '') {
       console.warn('Cannot send an empty message.');
       return;
     }
+  
     try {
-      const messageData = this.messageData(
-        this.chatMessage,
-        this.senderStickerCount,
-        this.recipientStickerCount
-      );
-      const messagesRef = collection(this.firestore, 'messages');
-      const docRef = await addDoc(messagesRef, messageData);
-      const messageWithId = { ...messageData, id: docRef.id };
-      console.log('Message successfully sent with ID:', messageWithId);
-      this.messagesData.push(messageWithId);
-      this.messageSent.emit();
+      if (this.selectedChannel) {
+        await this.sendChannelMessage();
+      } else {
+        const messageData = this.messageData(
+          this.chatMessage,
+          this.senderStickerCount,
+          this.recipientStickerCount
+        );
+  
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+        const messageWithId = { ...messageData, id: docRef.id };
+  
+        console.log('Message successfully sent with ID:', messageWithId);
+  
+        this.messagesData.push(messageWithId);
+        this.messageSent.emit();
+      }
+  
       this.chatMessage = '';
-      this.formattedChatMessage=''
+      this.formattedChatMessage = '';
     } catch (error) {
       console.error('Error while sending message:', error);
     }
   }
+  
 
   async sendChannelMessage(){
 
@@ -113,6 +121,7 @@ export class InputFieldComponent implements OnInit {
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
+    console.log(this.chatMessage)
   }
 
   messageData(
