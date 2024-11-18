@@ -9,6 +9,9 @@
     (mouseenter)="hoveredMessageId = message.id"
     (mouseleave)="hoveredMessageId = null"
   >
+  <div class="message-edit">
+    <span>Nachricht bearbeiten</span>
+  </div>
     <div
       class="emoji-container"
       *ngIf="isPickerVisible === message.id"
@@ -24,7 +27,7 @@
         (emojiClick)="addEmoji($event, message.id)"
       ></emoji-mart>
     </div>
-    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
+    <div class="reaction-bar" gIf="hoveredMessageId === message.id">
       <div class="used-emojis">
         <span
           *ngFor="let emoji of currentUserLastEmojis"
@@ -128,7 +131,7 @@
               >
                 {{ reaction.key }} {{ reaction.value.length }}
               </span>
-              <div class="img-container" *ngIf="hasReactions(message.reactions)">
+              <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
                 <svg
                   width="25"
                   height="24"
