@@ -43,6 +43,7 @@ export class ChannelChatComponent implements OnInit {
 
   messagesData: Message[] = [];
   showThreadInfo: boolean = false;
+  showEditMessage: boolean = false;
   hoveredMessageId: string | null = null;
   isPickerVisible: string | null = null;
   currentUserLastEmojis: string [] = [];
