@@ -136,30 +136,33 @@
                     </div>
                     <div class="message-area">
                         <mat-card [ngClass]="{
-                'message-card-current':
-                  message.senderId === global.currentUserData.id,
-                'message-card-user':
-                  message.senderId !== global.currentUserData.id
-              }" appearance="outlined">
-                            <mat-card-content [ngClass]="{
-                  'card-content-current':
-                    message.senderId === global.currentUserData.id,
-                    
-                  'card-content-user':
-                    message.senderId !== global.currentUserData.id
-                }">{{ message.text }}</mat-card-content>
-                    
-                    <!-- <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                        <span
-                            *ngIf="isMention(mentionName)"
-                            class="mention-message"
-                            (click)="handleMentionClick(mentionName)"
-                           >
-                          {{ mentionName }}
-                          </span>
-                       <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
-                     </ng-container> -->
-                        </mat-card>
+                            'message-card-current':
+                              message.senderId === global.currentUserData.id,
+                            'message-card-user':
+                              message.senderId !== global.currentUserData.id
+                          }" appearance="outlined">
+                                        <mat-card-content [ngClass]="{
+                              'card-content-current':
+                                message.senderId === global.currentUserData.id,
+                                
+                              'card-content-user':
+                                message.senderId !== global.currentUserData.id
+                            }">   
+                    <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                    <span
+                        *ngIf="isMention(mentionName)"
+                        class="mention-message"
+                        (click)="handleMentionClick(mentionName)"
+                       >
+                      {{ mentionName }}
+                      </span>
+                   <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                 </ng-container>
+            
+                        
+                        </mat-card-content>
+                                        
+                                    </mat-card>
 
                     </div>
                     <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
