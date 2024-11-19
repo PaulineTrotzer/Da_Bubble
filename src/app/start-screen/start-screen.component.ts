@@ -167,7 +167,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.checkProfileType();
       this.global.clearCurrentChannel();
       this.afterLoginSheet = false;
-    }
+      }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.selectedChannel);
@@ -262,7 +262,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        console.log('userdata', this.global.currentUserData);
         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
         });

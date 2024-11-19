@@ -13,7 +13,8 @@ export class GlobalVariableService {
   channelSelected: boolean = false;
   currentChannel: any = null;
   welcomeChannel: boolean = false;
-
+  openMentionMessageBox:boolean=false;
+  getUserByName:any={}
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
 
