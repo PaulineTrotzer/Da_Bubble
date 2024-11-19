@@ -148,7 +148,17 @@
                   'card-content-user':
                     message.senderId !== global.currentUserData.id
                 }">{{ message.text }}</mat-card-content>
-              
+                    
+                    <!-- <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                        <span
+                            *ngIf="isMention(mentionName)"
+                            class="mention-message"
+                            (click)="handleMentionClick(mentionName)"
+                           >
+                          {{ mentionName }}
+                          </span>
+                       <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                     </ng-container> -->
                         </mat-card>
 
                     </div>
