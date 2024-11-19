@@ -17,7 +17,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { FormsModule } from '@angular/forms';
-import { Firestore, addDoc, collection } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection, doc } from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 
@@ -32,6 +32,7 @@ export class InputFieldComponent implements OnInit {
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
+  @Input() selectedChannel: any;
   isEmojiPickerVisible: boolean = false;
   chatMessage: string = '';
   global = inject(GlobalVariableService);
@@ -57,38 +58,70 @@ export class InputFieldComponent implements OnInit {
     });
   }
 
-
-
-
-
-
-
   async sendMessage() {
-    if (!this.selectedUser) {
-      console.error('Selected user is not defined');
+    if (!this.selectedChannel && !this.selectedUser) {
+      console.error('Selected user or channel is not defined');
       return;
     }
+  
     if (this.chatMessage.trim() === '') {
       console.warn('Cannot send an empty message.');
       return;
     }
+  
     try {
-      const messageData = this.messageData(
-        this.chatMessage,
-        this.senderStickerCount,
-        this.recipientStickerCount
-      );
-      const messagesRef = collection(this.firestore, 'messages');
-      const docRef = await addDoc(messagesRef, messageData);
-      const messageWithId = { ...messageData, id: docRef.id };
-      console.log('Message successfully sent with ID:', messageWithId);
-      this.messagesData.push(messageWithId);
-      this.messageSent.emit();
+      if (this.selectedChannel) {
+        await this.sendChannelMessage();
+      } else {
+        const messageData = this.messageData(
+          this.chatMessage,
+          this.senderStickerCount,
+          this.recipientStickerCount
+        );
+  
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+        const messageWithId = { ...messageData, id: docRef.id };
+  
+        console.log('Message successfully sent with ID:', messageWithId);
+  
+        this.messagesData.push(messageWithId);
+        this.messageSent.emit();
+      }
+  
       this.chatMessage = '';
-      this.formattedChatMessage=''
+      this.formattedChatMessage = '';
     } catch (error) {
       console.error('Error while sending message:', error);
     }
+  }
+  
+
+  async sendChannelMessage(){
+
+    if (!this.selectedChannel || this.chatMessage.trim() === '') {
+      console.warn('Channel is not selected or message is empty');
+      return;
+    }
+
+    const channelMessagesRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages');
+
+    const messageData = {
+      text: this.chatMessage,
+      senderId: this.global.currentUserData.id,
+      senderName: this.global.currentUserData.name,
+      senderPicture: this.global.currentUserData.picture || '',
+      timestamp: new Date(),
+      selectedFiles: this.selectFiles,
+      editedTextShow: false
+    };
+
+    const docRef = await addDoc(channelMessagesRef, messageData);
+
+    this.chatMessage = '';
+    this.selectFiles = [];
+    this.messageSent.emit();
+    console.log(this.chatMessage)
   }
 
   messageData(
@@ -144,13 +177,6 @@ export class InputFieldComponent implements OnInit {
       alert(`Mention clicked: ${target.innerText}`);
     }
   }
-
-
-
-
-  
-
-
 
 
   updateSelectedUser(newUser: any) {

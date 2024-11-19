@@ -1,5 +1,5 @@
 <div class="full-app-content">
-    <div class="main-current-messagebox" #scrollContainer>
+    <div *ngIf="selectedUser" class="main-current-messagebox" #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
             <div *ngIf="displayDayInfo(i)" class="new-day-info">
                 <div class="day-info">
@@ -298,6 +298,7 @@
                 </div>
             </div>
         </div>
+        <app-channel-chat *ngIf="selectedChannel" [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText">
         <div class="self-name-and-img">
@@ -321,5 +322,5 @@
             <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser.name}}</span> und dir statt
         </div>
     </div>
-    <app-input-field [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
+    <app-input-field [selectedChannel]="selectedChannel" [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 </div>

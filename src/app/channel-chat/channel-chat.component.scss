@@ -1,0 +1,247 @@
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 16px 0;
+}
+
+.img-container {
+  padding: 4px;
+  border-radius: 100%;
+  &:hover {
+    background-color: #eceefe;
+  }
+  &:hover .icon path {
+    fill: #444df2;
+  }
+}
+
+.message-from-user {
+  display: flex;
+  gap: 30px;
+  cursor: pointer;
+  padding: 10px 0 10px 45px;
+  position: relative;
+  &:hover {
+    background-color: #eceefe;
+    .text-container > .text-content > .text {
+      background-color: white;
+    }
+  }
+  img {
+    height: 70px;
+    border-radius: 100%;
+  }
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .heading {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      span {
+        font-family: Nunito;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 19.1px;
+        color: #686868;
+      }
+    }
+    .text {
+      padding: 15px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 30px;
+      border-bottom-right-radius: 30px;
+      border-bottom-left-radius: 30px;
+      background: #eceefe;
+    }
+  }
+  .reaction-bar {
+    position: absolute;
+    top: -20px;
+    right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border: 1px solid #adb0d9;
+    padding: 3px 15px 3px 20px;
+    background-color: white;
+    .img-container {
+      display: flex;
+    }
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .message-content {
+      display: flex;
+      gap: 16px;
+    }
+    .reaction-info {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .img-container {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.message-from-current {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: 30px;
+  cursor: pointer;
+  padding: 10px 45px 10px 0px;
+  position: relative;
+  &:hover {
+    background-color: #eceefe;
+  }
+  img {
+    height: 70px;
+    border-radius: 100%;
+  }
+  
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .heading {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 20px;
+      span {
+        font-family: Nunito;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 19.1px;
+        color: #686868;
+      }
+    }
+    .text {
+      padding: 15px;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 30px;
+      border-bottom-left-radius: 30px;
+      background: #797ef3;
+      color: white;
+    }
+  }
+  .reaction-bar {
+    position: absolute;
+    top: -20px;
+    left: 48px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border: 1px solid #adb0d9;
+    padding: 3px 15px 3px 20px;
+    background-color: white;
+    .img-container {
+      display: flex;
+    }
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .message-content {
+      display: flex;
+      flex-direction: row-reverse;
+      gap: 16px;
+    }
+    .reaction-info {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .img-container {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.emoji-container-user {
+  position: absolute;
+  right: 136px;
+  top: -11px;
+  z-index: 10;
+}
+
+.emoji-container-current {
+  position: absolute;
+  z-index: 10;
+  left: 180px;
+  top: -11px;
+}
+
+.used-emojis {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  display: flex;
+  height: 32px;
+  width: 32px;
+  padding: 4px;
+  border-radius: 100%;
+  &:hover {
+    background-color: #eceefe;
+  }
+}
+
+.reaction {
+  padding: 5px 10px;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+}
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+.message-edit {
+  position: absolute;
+  padding: 10px 20px;
+  box-shadow: 0px 6px 14px 0px #00000033;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  background-color: white;
+  max-width: 269px;
+  text-align: center;
+  width: 100%;
+  left: 178px;
+  bottom: 70px;
+  z-index: 5;
+}

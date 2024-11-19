@@ -21,7 +21,10 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, DialogCreateChannelComponent],
+  imports: [
+    CommonModule, 
+    MatDialogModule, 
+    DialogCreateChannelComponent],
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })

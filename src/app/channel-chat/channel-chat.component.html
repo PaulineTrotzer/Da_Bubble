@@ -9,7 +9,7 @@
     (mouseenter)="hoveredMessageId = message.id"
     (mouseleave)="hoveredMessageId = null"
   >
-  <div class="message-edit">
+  <div class="message-edit" *ngIf="showEditMessage">
     <span>Nachricht bearbeiten</span>
   </div>
     <div
@@ -27,7 +27,7 @@
         (emojiClick)="addEmoji($event, message.id)"
       ></emoji-mart>
     </div>
-    <div class="reaction-bar" gIf="hoveredMessageId === message.id">
+    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
       <div class="used-emojis">
         <span
           *ngFor="let emoji of currentUserLastEmojis"

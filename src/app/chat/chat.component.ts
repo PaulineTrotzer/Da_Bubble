@@ -33,6 +33,7 @@ import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { Subscription } from 'rxjs';
 import { ThreadComponent } from "../thread/thread.component";
+import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 
 @Component({
   selector: 'app-chat-component',
@@ -44,7 +45,8 @@ import { ThreadComponent } from "../thread/thread.component";
     FormsModule,
     MatCardModule,
     InputFieldComponent,
-    ThreadComponent
+    ThreadComponent,
+    ChannelChatComponent
 ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -92,6 +94,7 @@ export class ChatComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    
   }
 
   onUserNameClick() {
