@@ -1,16 +1,27 @@
-<app-header></app-header>
-<div class="full-page-content">
-    <app-workspace 
-    (userSelected)="onUserSelected($event)"
-    (channelSelected)="onChannelSelected($event)"
-    ></app-workspace> 
-    <app-start-screen 
-    [selectedUser]="selectedUser"  [mentionUser]="mentionUser"
-    [selectedChannel]="selectedChannel"
-     >
-     </app-start-screen>
+<div [ngClass]="{'page-content-plus-header': successfullyLogged}">
+    <app-header></app-header>
+    <div class="full-page-content">
+        <app-workspace (userSelected)="onUserSelected($event)"
+            (channelSelected)="onChannelSelected($event)"></app-workspace>
+        <app-start-screen [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
+            (threadOpened)="onThreadOpened()">
+        </app-start-screen>
+        <app-thread *ngIf="isThreadOpen" (closeThread)="onThreadClosed()"></app-thread>
+    </div>
+    <div *ngIf="successfullyLogged" class="overlay"></div>
 </div>
+<mat-card *ngIf="successfullyLogged" appearance="outlined" class="login-sended-info"
+[ngClass]="{'visible': successfullyLogged, 'hidden': !successfullyLogged}">
+<mat-card-content class="success-login-content">
+    <span class="sended-text">
+        Login als <span class="guest-or-mail"><b>{{ isGuestLogin ? 'Gast' : global.currentUserData.email
+                }}</b></span>
+    </span>
+</mat-card-content>
+</mat-card>
 
-<!-- <app-thread></app-thread> -->
+
+
+
 
 <!-- [currentUser]="currentUser" -->

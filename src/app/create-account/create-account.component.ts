@@ -8,9 +8,20 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { AvatarComponent } from '../avatar/avatar.component';
-import { Firestore, collection, addDoc, doc, setDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+} from '@angular/fire/firestore';
 import { User } from '../models/user.class';
-import { getAuth, createUserWithEmailAndPassword,sendEmailVerification } from '@angular/fire/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from '@angular/fire/auth';
+import { MatCardModule, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-create-account',
@@ -22,6 +33,7 @@ import { getAuth, createUserWithEmailAndPassword,sendEmailVerification } from '@
     RouterOutlet,
     AvatarComponent,
     RouterModule,
+    MatCardModule,
   ],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.scss',
@@ -40,6 +52,7 @@ export class CreateAccountComponent implements OnInit {
     privacyPolicy: false,
   };
   newUser: User = new User();
+  linkWasSend = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -65,9 +78,9 @@ export class CreateAccountComponent implements OnInit {
       email: authUser.email || email,
       picture: '',
       password: '',
-      status: 'offline'
+      status: 'offline',
     });
-      
+
     const docRef = await this.addUserToFirestore(this.newUser);
     await sendEmailVerification(authUser);
     // this.router.navigate(['/avatar', authUser.uid]);
@@ -96,5 +109,12 @@ export class CreateAccountComponent implements OnInit {
 
   toggleHover() {
     this.isHovered = !this.isHovered;
+  }
+
+  openLinkSend() {
+    this.linkWasSend = true;
+    setTimeout(() => {
+      this.linkWasSend = false;
+    }, 1500);
   }
 }

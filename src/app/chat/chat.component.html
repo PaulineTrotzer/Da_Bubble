@@ -17,7 +17,8 @@
                     <textarea class="edit-input" [(ngModel)]="editableMessageText"></textarea>
                     <div class="button-box">
                         <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
-                        <button class="btn-primary" (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
+                        <button class="btn-primary"
+                            (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
                     </div>
                 </div>
                 <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
@@ -58,7 +59,7 @@
                                 <img [src]="stricker">
                             </div>
                         </div>
-                        <div class="open-thread">
+                        <div (click)="openThread()" class="open-thread">
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <mask id="mask0_489_4322" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -136,9 +137,9 @@
                   'card-content-user':
                     message.senderId !== global.currentUserData.id
                 }">{{ message.text }}</mat-card-content>
-              
+
                         </mat-card>
-                       
+
                     </div>
                     <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
                     <div class="avatar-box">

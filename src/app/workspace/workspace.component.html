@@ -176,7 +176,7 @@
               <h4>{{global.currentUserData.name}} (Du)</h4>
             </div>
 
-            <div *ngIf="checkUsersExsists" class="all-user-contacts">
+            <div *ngIf="checkUsersExsists && !isGuestLogin" class="all-user-contacts">
               <div class="all-user" *ngFor="let user of allUsers" (click)="selectUser(user)">
                 <img [src]="user.picture">
                 <div class="status-border">

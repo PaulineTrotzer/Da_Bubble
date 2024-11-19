@@ -5,10 +5,9 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { DialogEditUserComponent } from '../dialog-edit-user/dialog-edit-user.component';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import {
-  Firestore,
-} from '@angular/fire/firestore';
+import { Firestore } from '@angular/fire/firestore';
 import { GlobalService } from '../global.service';
+import { LoginAuthService } from '../services/login-auth.service';
 @Component({
   selector: 'app-dialog-header-profil-card',
   standalone: true,
@@ -29,7 +28,9 @@ export class DialogHeaderProfilCardComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   firestore = inject(Firestore);
   globalService = inject(GlobalService);
+  loginAuthService = inject(LoginAuthService);
   clicked = true;
+  guestAccount = false;
   @Output() closeProfile = new EventEmitter<void>();
 
   constructor(private route: ActivatedRoute) {}
@@ -41,15 +42,20 @@ export class DialogHeaderProfilCardComponent implements OnInit {
         const userResult = await this.userservice.getUser(this.userID);
         if (userResult) {
           this.user = userResult;
-          this.checkGuestUser(userResult);
+          this.checkLoginStatus(userResult);
         }
       }
     });
+    this.loginAuthService.isGuestLogin$.subscribe((status) => {
+      this.guestLogin = status;
+      console.log('aha',this.guestLogin);
+    });
+
   }
-  async checkGuestUser(userResult: User) {
-    const guestEmail = 'guest@account.de';
-    if (userResult.email === guestEmail) {
-      this.guestLogin = true;
+
+  async checkLoginStatus(userResult: User) {
+    if (this.guestLogin) {
+      this.guestAccount = true;
     } else if (this.globalService.googleAccountLogIn) {
       this.googleAccount = true;
     } else {
@@ -67,4 +73,5 @@ export class DialogHeaderProfilCardComponent implements OnInit {
     this.openEdit = true;
     this.profileCardopen = false;
   }
+
 }

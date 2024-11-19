@@ -11,7 +11,7 @@ export class User {
         this.name = obj?.name || '';
         this.email = obj?.email || '';
         this.password = obj?.password || '';
-        this.picture = obj?.picture || '';
+        this.picture = obj?.picture || 'assets/img/picture_frame.png';
         this.status = obj?.status || '';
     }
 

@@ -7,6 +7,8 @@ import {
   inject,
   ChangeDetectorRef,
   OnDestroy,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +30,7 @@ import { ProfileContactCardComponent } from '../profile-contact-card/profile-con
 import { ChatComponent } from '../chat/chat.component';
 import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component';
 import { Subscription } from 'rxjs';
+import { LoginAuthService } from '../services/login-auth.service';
 
 interface ChannelData {
   userIds: string[];
@@ -53,8 +56,11 @@ interface ChannelData {
   styleUrl: './start-screen.component.scss',
 })
 export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
+  user: any;
   constructor(public global: GlobalVariableService) {}
   afterLoginSheet: boolean = false;
+  loginSuccessful = false;
+  isGuestLogin = false;
   welcomeChannelSubscription: Subscription | undefined;
   currentUserwasSelected = false;
   contactWasSelected = false;
@@ -92,10 +98,34 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   isiconShow: any;
   selectFiles: any[] = [];
   cdr = inject(ChangeDetectorRef);
+  LogInAuth = inject(LoginAuthService);
+  @Output() threadOpened = new EventEmitter<void>();
+  private loginStatusSub: Subscription | undefined;
+  private guestLoginStatusSub: Subscription | undefined;
+  loginAuthService = inject(LoginAuthService);
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
     this.getcurrentUserById(this.userId);
+    this.subscribeToProfileSelection();
+    this.subscribeToWelcomeChannel();
+    this.subscribeToLoginStatus();
+    this.subscribeToGuestLoginStatus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.loginStatusSub) {
+      this.loginStatusSub.unsubscribe(); 
+    }
+    if (this.guestLoginStatusSub) {
+      this.guestLoginStatusSub.unsubscribe(); 
+    }
+    if (this.welcomeChannelSubscription) {
+      this.welcomeChannelSubscription.unsubscribe();
+    }
+  }
+
+  private subscribeToProfileSelection(): void {
     this.userservice.profileSelection$.subscribe((profileType) => {
       if (profileType) {
         this.resetProfileSelection();
@@ -105,16 +135,31 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
         this.closeMyUserProfile();
       }
     });
-    this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe((welcomeChannelStatus) => {
-      this.afterLoginSheet = welcomeChannelStatus; 
-    });
   }
 
+  private subscribeToWelcomeChannel(): void {
+    this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe(
+      (welcomeChannelStatus) => {
+        this.afterLoginSheet = welcomeChannelStatus;
+      }
+    );
+  }
 
-  ngOnDestroy(): void {
-    if (this.welcomeChannelSubscription) {
-      this.welcomeChannelSubscription.unsubscribe();
-    }
+  subscribeToLoginStatus(): void {
+    this.loginStatusSub = this.loginAuthService.loginSuccessful$.subscribe(
+      (status) => {
+        this.loginSuccessful = status;
+      }
+    );
+  }
+
+  subscribeToGuestLoginStatus(): void {
+    this.guestLoginStatusSub = this.loginAuthService.isGuestLogin$.subscribe(
+      (status) => {
+        this.isGuestLogin = status;
+        console.log('Guest login status:', status); // Debugging hinzugefügt
+      }
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -250,5 +295,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   closeMyUserProfile() {
     this.openMyProfile = false;
     this.overlayStatusService.setOverlayStatus(false);
+  }
+
+  onThreadOpened() {
+    this.threadOpened.emit();
   }
 }

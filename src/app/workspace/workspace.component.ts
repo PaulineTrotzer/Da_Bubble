@@ -9,18 +9,14 @@ import {
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnInit,
-  inject,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
 import { Channel } from '../models/channel.class';
+import { LoginAuthService } from '../services/login-auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-workspace',
@@ -47,8 +43,36 @@ export class WorkspaceComponent implements OnInit {
   @Output() channelSelected = new EventEmitter<Channel>();
   readonly dialog = inject(MatDialog);
   private channelsUnsubscribe: Unsubscribe | undefined;
+  logInAuth=inject(LoginAuthService);
+  isGuestLogin = false;
+  private guestLoginStatusSub: Subscription | undefined;
 
   constructor(public global: GlobalVariableService) {}
+
+  async ngOnInit(): Promise<void> {
+    this.getAllUsers();
+    this.userId = this.route.snapshot.paramMap.get('id');
+    if (this.userId) {
+      this.getUserById(this.userId);
+      this.userService.observingUserChanges(
+        this.userId,
+        (updatedUser: User) => {
+          this.global.currentUserData.name = updatedUser.name;
+        }
+      );
+    }
+    this.subscribeToGuestLoginStatus();
+    await this.getAllChannels();
+  }
+
+  subscribeToGuestLoginStatus(): void {
+    this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe(
+      (status) => {
+        this.isGuestLogin = status;
+        console.log('guest log status:', status); 
+      }
+    );
+  }
 
   selectUser(user: any) {
     this.userSelected.emit(user);
@@ -73,24 +97,11 @@ export class WorkspaceComponent implements OnInit {
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    this.getAllUsers();
-    this.userId = this.route.snapshot.paramMap.get('id');
-    if (this.userId) {
-      this.getUserById(this.userId);
-      this.userService.observingUserChanges(
-        this.userId,
-        (updatedUser: User) => {
-          this.global.currentUserData.name = updatedUser.name;
-        }
-      );
-    }
-    await this.getAllChannels();
-  }
-
   findWelcomeChannel() {
-    const willkommenChannel = this.allChannels.find(channel => channel.name == 'Willkommen');
-    if(willkommenChannel){
+    const willkommenChannel = this.allChannels.find(
+      (channel) => channel.name == 'Willkommen'
+    );
+    if (willkommenChannel) {
       this.selectChannel(willkommenChannel);
     }
   }
@@ -104,8 +115,17 @@ export class WorkspaceComponent implements OnInit {
   async getAllChannels() {
     const colRef = collection(this.firestore, 'channels');
     this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
-      this.allChannels = snapshot.docs.map(doc => new Channel(doc.data()));
+      this.allChannels = snapshot.docs.map((doc) => new Channel(doc.data()));
+      this.sortChannels();
       this.findWelcomeChannel();
+    });
+  }
+
+  sortChannels() {
+    this.allChannels.sort((a, b) => {
+      if (a.name === 'Willkommen') return -1;
+      if (b.name === 'Willkommen') return 1;
+      return 0; 
     });
   }
 

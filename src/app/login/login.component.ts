@@ -16,11 +16,22 @@ import { signInWithEmailAndPassword } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { AuthService } from '../services/auth.service';
 import { updateDoc } from '@firebase/firestore';
+import { MatCardModule, MatCardContent } from '@angular/material/card';
+import { Subscription } from 'rxjs';
+import { LoginAuthService } from '../services/login-auth.service';
+import { OverlayStatusService } from '../services/overlay-status.service';
+import { GlobalService } from '../global.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatButtonModule, CommonModule, FormsModule, RouterModule],
+  imports: [
+    MatButtonModule,
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    MatCardModule,
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -37,7 +48,11 @@ export class LoginComponent implements OnInit {
   router = inject(Router);
   emailLoginFailed = false;
   formFailed = false;
- 
+  isGuestLogin = false;
+  loginSuccessful = false;
+  loginAuthService = inject(LoginAuthService);
+  overlayStatusService = inject(OverlayStatusService);
+  global=inject(GlobalService);
 
   constructor() {}
 
@@ -55,6 +70,7 @@ export class LoginComponent implements OnInit {
   }
 
   async logIn() {
+    this.isGuestLogin = false;
     const auth = getAuth();
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -62,14 +78,20 @@ export class LoginComponent implements OnInit {
         this.loginData.email,
         this.loginData.password
       );
+      this.loginAuthService.setLoginSuccessful(true);
+      setTimeout(() => {
+        this.loginAuthService.setLoginSuccessful(false); // Setze den Status nach 2500ms zurück
+      }, 2500);
       const user = userCredential.user;
       const userID = await this.userDocId(user.uid);
-      this.auth.currentUser = auth.currentUser
+      this.auth.currentUser = auth.currentUser;
       this.router.navigate(['/welcome', userID]);
+
       if (userID) {
         this.auth.updateStatus(userID, 'online');
       }
     } catch (error) {
+      console.error('Login error: ', error);
       this.formFailed = true;
     }
   }
@@ -104,8 +126,7 @@ export class LoginComponent implements OnInit {
     this.auth.SignGuestIn();
   }
 
-
-  googleLogIn() {
+  async googleLogIn() {
     this.auth.googleLogIn();
   }
 }

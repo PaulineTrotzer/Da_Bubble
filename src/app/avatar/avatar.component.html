@@ -27,9 +27,10 @@
 
                 <div class="main-picture-box">
                     <div class="picture-frame">
-                        <img  [src]="previewUrl ? previewUrl : (choosePicture ? choosePicture : '../../assets/img/picture_frame.png')">
+                        <img
+                            [src]="previewUrl ? previewUrl : (choosePicture ? choosePicture : '../../assets/img/picture_frame.png')">
                     </div>
-                    <div *ngIf="chooseOwnPicture"class="picture-frame">
+                    <div *ngIf="chooseOwnPicture" class="picture-frame">
                         <img path="/my-images/image">
                     </div>
                     <div class="user-name">
@@ -51,20 +52,19 @@
                     </div>
                 </div>
             </mat-card-content>
-        </mat-card> 
+        </mat-card>
 
         <mat-card appearance="outlined" class="email-sended-info" [ngClass]="{'visible': sendInfo,'hidden':!sendInfo}">
             <mat-card-content class="email-card-content">
-                <img src="../../assets/img/send.png">
-                <span>Konto Erfolgreich erstellt</span>
+                <span class="sended-text">Avatar wurde erstellt</span>
             </mat-card-content>
         </mat-card>
-        <mat-card appearance="outlined" class="email-sended-info" [ngClass]="{'visible': sendInfo,'hidden':!sendInfo}">
+        <!--         <mat-card appearance="outlined" class="email-sended-info" [ngClass]="{'visible': sendInfo,'hidden':!sendInfo}">
             <mat-card-content class="email-card-content">
                 <img src="../../assets/img/send.png">
                 <span>Konto Erfolgreich erstellt</span>
             </mat-card-content>
-        </mat-card>
+        </mat-card> -->
 
         <div class="impressum-privacy-box">
             <a routerLink="/impressum">Impressum</a>
