@@ -45,7 +45,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
   senderStickerCount: number = 0;
   recipientStickerCount: number = 0;
   messagesData: any[] = [];
-
+  formattedChatMessage: any
+  mentionUserName: any[] = []
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -56,17 +57,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    // this.userService.selectedUser$.subscribe((user) => {
-    //   this.selectedUser = user; 
-    //   console.log(this.selectedUser)
-    // });
     this.getByUserName()
   }
-
-
-
-
-
 
 
   async sendMessage() {
@@ -120,37 +112,35 @@ export class InputFieldComponent implements OnInit, OnChanges {
       recipientChoosedStickerBackColor: '',
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
-      selectedFiles: [],
+      selectedFiles: this.selectFiles,
       editedTextShow: false
     };
   }
-
-
-  formattedChatMessage: any
-  changecolorCheck: boolean = false
-  name: any
-  mentionUserName: any[] = []
-
-
 
 
   handleMentionUser(mention: string) {
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
       this.chatMessage += `${mentionTag} `;
-      this.formatMentions();
+      // this.formatMentions();
     }
   }
 
   formatMentions() {
-    const regex = /@\w+(?:\s\w+)?/g;
-    this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim();
-      if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-        return `<span class="mention">${match}</span>`;
-      }
-      return `<span class="normal-text">${match}</span>`;
-    });
+  //   const regex = /@\w+(?:\s\w+)?/g;
+  //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+  //     const mentionName = match.substring(1).trim();
+  //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+  //       return `<span class="mention">${match}</span>`;
+  //     }
+  //     return `<span class="normal-text">${match}</span>`;
+  //   }); 
+   
+  }
+
+  onInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.scrollTop = textarea.scrollHeight;
   }
 
   getByUserName() {
@@ -162,7 +152,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         const userName = data['name']
         this.mentionUserName.push(userName)
       })
-      console.log(this.mentionUserName)
     })
   }
 
@@ -252,4 +241,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       input.value = '';
     }
   }
+
+
+ 
 }
+

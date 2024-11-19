@@ -458,8 +458,6 @@ export class ChatComponent implements OnInit, OnChanges {
         const userName=dataUser['name']
         this.getAllUsersName.push({userName})
       })
-
-      console.log(this.getAllUsersName)
     })
   }
 

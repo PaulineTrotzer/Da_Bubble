@@ -3,55 +3,58 @@
  
     
 
-    <div  style="position: relative; width: 100%;">
+    <!-- <div class="main-input-area"> -->
         <label for="msg-input"></label>
-        <div   class="formatted-preview" 
-        [innerHTML]="formattedChatMessage">
-        
-      </div>
 
-        <textarea   
-      
+        <!-- <div   class="formatted-preview" 
+        [innerHTML]="formattedChatMessage"></div> -->
+   
+   <textarea  
     id="msg-input" 
     placeholder="Schreib etwas..." 
     class="chat-input" 
-    contenteditable="true"
+   
     type="text" 
     [(ngModel)]="chatMessage"
-     (input)="formatMentions()" >
-    >
-   
-   
+    (input)="formatMentions(); onInput($event)" 
+     rows="3" 
+    
+      >
   </textarea>
 
-    </div>
+<!-- </div> -->
+<!-- contenteditable="true" -->
 
-    <div class="interactions-send-msg-ct">
-        <div class="only-interactions-bottom-ct">
-            <div class="plus-separator-flex">
+  <div class="interactions-send-msg-ct">
+    <div class="only-interactions-bottom-ct">
+        <div class="plus-separator-flex">
+            <div>
                 <div>
-                    <div>
-                        <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
-                        <label for="upload"> <img class="plus" src="./assets/img/add_reaction.png"></label>
-                    </div>
+                    <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
+                    <label for="upload"> <img class="plus" src="./assets/img/add_reaction.png"></label>
                 </div>
-
             </div>
-            <img src="./assets/img/vector_4.svg">
 
-            <div class="emoji-at-ct">
-                <div class="emoji-picker-container">
-                    <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
-                        size="18"></emoji-mart>
-                    <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
-                </div>
-                <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
-            </div>
-            <app-people-mention class="people-mention-card" *ngIf="global.openMentionPeopleCard"
-                (mentionUser)="handleMentionUser($event)"></app-people-mention>
         </div>
+        <img src="./assets/img/vector_4.svg">
 
-        <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessage()">
-
+        <div class="emoji-at-ct">
+            <div class="emoji-picker-container">
+                <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
+                    size="18"></emoji-mart>
+                <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
+            </div>
+            <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
+        </div>
+        <app-people-mention class="people-mention-card" *ngIf="global.openMentionPeopleCard"
+            (mentionUser)="handleMentionUser($event)"></app-people-mention>
     </div>
+
+    <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessage()">
+
+</div>
+
+
+    
+
 </div>

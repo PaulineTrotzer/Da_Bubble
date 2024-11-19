@@ -217,7 +217,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        console.log('userdata', this.global.currentUserData);
         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
         });

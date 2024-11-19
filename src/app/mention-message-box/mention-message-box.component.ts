@@ -21,10 +21,7 @@ export class MentionMessageBoxComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.global.getUserByName) {
-      console.log(this.global.getUserByName?.name)
     }
-
-    console.log(this.global.getUserByName?.id)
   }
 
 
