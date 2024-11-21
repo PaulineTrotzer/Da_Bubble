@@ -1,3 +1,4 @@
+
 <div class="chat-box">
   <div
     class="message-container"
@@ -15,7 +16,7 @@
         <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
       </div>
     </div>
-    <div class="message-edit" *ngIf="showEditMessage">
+    <div class="message-edit" *ngIf="showEditDialog === message.id" (click)="toggleEditArea(message.id, message.text)">
       <span>Nachricht bearbeiten</span>
     </div>
     <div
@@ -102,6 +103,7 @@
       <div
         class="img-container"
         *ngIf="message.senderId === global.currentUserData.id"
+        (click)="toggleEditDialog(message.id)"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -176,6 +178,16 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="edit-message-container" *ngIf="showEditArea === message.id">
+      <form>
+        <textarea cols="80" rows="5" name="message" id="message" [(ngModel)]="messageToEdit"> {{message.text}} </textarea>
+        <div class="button-row">
+          <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
+          <button class="btn-primary" (click)="saveEditedMessage(message.id)">Speichern</button>
+        </div>
+      </form>
+      <img [src]="message.senderPicture">
     </div>
   </div>
 </div>
