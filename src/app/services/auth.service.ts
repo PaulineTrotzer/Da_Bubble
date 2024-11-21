@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { getAuth, signInWithPopup, signOut } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
+import { GoogleAuthProvider, signInAnonymously, linkWithCredential } from 'firebase/auth';
 import { User } from '../models/user.class';
 import {
   Firestore,
@@ -19,6 +19,7 @@ import {
 import { OverlayStatusService } from './overlay-status.service';
 import { GlobalService } from '../global.service';
 import { LoginAuthService } from './login-auth.service';
+import { onAuthStateChanged } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -31,18 +32,39 @@ export class AuthService {
   guestUser: User = new User();
   overlayStatusService = inject(OverlayStatusService);
   globalservice = inject(GlobalService);
-  LogInAuth =inject(LoginAuthService);
-  global=inject(GlobalService);
+  LogInAuth = inject(LoginAuthService);
+  global = inject(GlobalService);
+  loggedOut = false;
 
   constructor() {
+    this.initAuthListener();
+
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
-      if (currentUser?.isAnonymous) {
-        this.deleteGuest(currentUser.uid);
-      }
       if (currentUser) {
         await this.updateStatus(currentUser.uid, 'offline');
+      }
+    });
+  }
+
+  initAuthListener() {
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        this.currentUser = user;
+        console.log('Aktueller Nutzer:', user);
+        await this.updateStatus(user.uid, 'online');
+        if (user.isAnonymous) {
+          console.log('Gast-Login erkannt');
+          this.LogInAuth.setIsGuestLogin(true);
+        } else {
+          this.LogInAuth.setIsGuestLogin(false);
+        }
+      } else {
+        this.currentUser = null;
+        console.log('Kein Nutzer angemeldet');
       }
     });
   }
@@ -54,51 +76,75 @@ export class AuthService {
   async updateStatus(userId: string, status: 'online' | 'offline') {
     if (!userId) return;
     const docRef = doc(this.firestore, 'users', userId);
+    const docSnap = await getDoc(docRef);
 
-    try {
-      await updateDoc(docRef, {
-        status: status,
-      });
-    } catch (err) {
-      console.error('Error updating user status: ', err);
+    if (docSnap.exists()) {
+      try {
+        await updateDoc(docRef, { status: status });
+      } catch (err) {
+        console.error('Fehler beim Aktualisieren des Benutzerstatus: ', err);
+      }
+    } else {
+      console.warn(
+        `Dokument für Benutzer ${userId} existiert nicht. Wird übersprungen.`
+      );
     }
   }
 
-
+ 
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
+
     try {
       const result = await signInWithPopup(auth, provider);
+
+      // 2. Überprüfen, ob der Benutzer bereits existiert und mit einer anderen Methode angemeldet ist
+      const currentUser = auth.currentUser;
+
+      if (currentUser && currentUser.email !== result.user.email) {
+        // 3. Verknüpfen des bestehenden Kontos mit dem Google-Konto
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+
+        if (credential) {
+          // 4. Verknüpfen des Kontos mit linkWithCredential, wenn credential nicht null ist
+          await linkWithCredential(currentUser, credential);
+          console.log('Konto erfolgreich verknüpft');
+        } else {
+          console.error('Keine Anmeldeinformationen für das Google-Konto gefunden');
+        }
+      } else {
+        console.log('Google Login erfolgreich');
+      }
       this.user = new User({
+        picture: result.user.photoURL,
         uid: result.user.uid,
         name: result.user.displayName,
         email: result.user.email,
-        picture: result.user.photoURL,
       });
       await this.addGoogleUserToFirestore(this.user);
+
       this.LogInAuth.setLoginSuccessful(true);
-      this.global.googleAccountLogIn = true;
-      this.LogInAuth.setIsGuestLogin(false);
       this.router.navigate(['/welcome', this.user.uid]);
+
       setTimeout(() => {
         this.LogInAuth.setLoginSuccessful(false);
       }, 1500);
+
     } catch (error) {
-      console.error('fehler gLogin:', error);
+      console.error('Fehler beim Google Login:', error);
     }
   }
-
 
   async addGoogleUserToFirestore(user: User) {
     const userRef = doc(this.firestore, 'users', user.uid);
-    const docSnap = await getDoc(userRef);
-    if (!docSnap.exists()) {
-      await setDoc(userRef, user.toJSON());
-    } else {
-      console.log('Benutzer existiert bereits in der Datenbank.');
-    }
+    await setDoc(userRef, {
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+    });
   }
+
 
   async logOut() {
     const auth = getAuth();
@@ -108,6 +154,9 @@ export class AuthService {
         await this.updateStatus(currentUser.uid, 'offline');
         if (currentUser.isAnonymous) {
           await deleteDoc(doc(this.firestore, 'users', currentUser.uid));
+        }
+        if (currentUser?.isAnonymous) {
+          this.deleteGuest(currentUser.uid);
         }
         await signOut(auth);
       }
@@ -129,9 +178,15 @@ export class AuthService {
         picture: './assets/img/picture_frame.png',
         status: 'online',
       });
-      await setDoc(doc(this.firestore, 'users', guestUser.uid), guestUser.toJSON());
+      const userRef = doc(this.firestore, 'users', guestUser.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(userRef, guestUser.toJSON());
+      }
+
       this.LogInAuth.setIsGuestLogin(true);
-      this.overlayStatusService.setOverlayStatus(true)
+      this.overlayStatusService.setOverlayStatus(true);
       this.LogInAuth.setLoginSuccessful(true);
       setTimeout(() => {
         this.LogInAuth.setLoginSuccessful(false);

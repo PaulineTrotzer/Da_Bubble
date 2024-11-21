@@ -12,6 +12,7 @@ export class LoginAuthService {
   private isGuestLoginSubject = new BehaviorSubject<boolean>(false);
   isGuestLogin$ = this.isGuestLoginSubject.asObservable();
 
+
   setLoginSuccessful(status: boolean) {
     this.loginSuccessfulSubject.next(status);
   }

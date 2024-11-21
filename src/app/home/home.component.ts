@@ -19,6 +19,7 @@ import { Subscription } from 'rxjs';
     ThreadComponent,
     CommonModule,
     MatCardModule,
+  
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

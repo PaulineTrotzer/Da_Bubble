@@ -57,6 +57,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       }
     });
+    this.subscribeOverlayService();
+  }
+
+  subscribeOverlayService(){
     this.overlayStatusSub = this.overlayStatusService.overlayStatus$.subscribe(
       (status) => {
         this.overlayOpen = status;
