@@ -222,12 +222,101 @@ export class ChannelChatComponent implements OnInit {
   }
   
   addEmojiToMessage(emoji: string, messageId: string) {
-    const emojiEvent = { emoji: { native: emoji } };
-    this.addToReactionInfo(emojiEvent.emoji, messageId);
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (!currentUserId) {
+      console.warn('No current user logged in');
+      return;
+    }
+  
+    const messageDocRef = doc(this.firestore, 'channels', this.selectedChannel.id, 'messages', messageId);
+  
+    getDoc(messageDocRef).then((messageSnapshot) => {
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+  
+      let oldReaction: string | null = null;
+      for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
+        if ((userIds as string[]).includes(currentUserId)) {
+          oldReaction = reactionEmoji;
+          break;
+        }
+      }
+  
+      if (oldReaction === emoji) {
+        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
+        if (reactions[emoji].length === 0) {
+          delete reactions[emoji];
+        }
+        console.log(`Removed reaction "${emoji}" by user ${currentUserId}`);
+      } else {
+        if (oldReaction) {
+          reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
+          if (reactions[oldReaction].length === 0) {
+            delete reactions[oldReaction];
+          }
+          console.log(`Replaced reaction "${oldReaction}" with "${emoji}" by user ${currentUserId}`);
+        }
+  
+        if (!reactions[emoji]) {
+          reactions[emoji] = [];
+        }
+        reactions[emoji].push(currentUserId);
+      }
+  
+      updateDoc(messageDocRef, { reactions })
+        .then(() => {
+          console.log(`Updated reactions for message ${messageId}:`, reactions);
+        })
+        .catch((error) => {
+          console.error('Error updating reactions:', error);
+        });
+    });
   }
+  
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {
     return reactions && Object.keys(reactions).length > 0;
   }
   
+  displayDayInfo(index: number): boolean {
+    if (index === 0) return true;
+    const currentMessage = this.messagesData[index];
+    const previousMessage = this.messagesData[index - 1];
+    return !this.isSameDay(
+      new Date(currentMessage.timestamp),
+      new Date(previousMessage.timestamp)
+    );
+  }
+
+  isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  }
+
+  getDayInfoForMessage(index: number): string {
+    const messageDate = new Date(this.messagesData[index].timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (this.isSameDay(messageDate, today)) {
+      return 'Heute';
+    } else if (this.isSameDay(messageDate, yesterday)) {
+      return 'Gestern';
+    } else {
+      return this.formatDate(messageDate);
+    }
+  }
+
+  formatDate(date: Date): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
 }

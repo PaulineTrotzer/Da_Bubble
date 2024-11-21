@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  margin: 16px 0;
+  margin: 32px 0;
+  position: relative;
 }
 
 .img-container {
@@ -244,4 +245,32 @@
   left: 178px;
   bottom: 70px;
   z-index: 5;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-day-info {
+  position: absolute;
+  right: 45px;
+  left: 45px;
+  top: -8px;
+}
+
+.line {
+  width: 100%;
+  border: 1px solid #adb0d9;
+}
+
+.day-span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -16px;
+  border-radius: 30px;
+  border: 1px solid #adb0d9;
+  padding: 5px 15px;
+  background-color: #ffffff;
 }
