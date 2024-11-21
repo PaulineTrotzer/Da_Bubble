@@ -16,6 +16,7 @@ import { GlobalVariableService } from '../services/global-variable.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 interface Message {
   id: string;
@@ -33,6 +34,12 @@ interface Message {
   imports: [CommonModule, PickerComponent, FormsModule],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [style({opacity: 0, transform: 'translateX(-50%)'}), animate('150ms ease-in-out', style({opacity: 100, transform: 'translateX(0)'}))]),
+      transition(':enter', [style({opacity: 100, transform: 'translateX(0)'}), animate('150ms ease-in-out', style({opacity: 0, transform: 'translateX(-50%)'}))])
+    ])
+  ]
 })
 export class ChannelChatComponent implements OnInit {
   constructor() {}

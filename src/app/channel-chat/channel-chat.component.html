@@ -34,7 +34,7 @@
         (emojiClick)="addEmoji($event, message.id)"
       ></emoji-mart>
     </div>
-    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
+    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id" @slideIn>
       <div class="used-emojis">
         <span
           *ngFor="let emoji of currentUserLastEmojis"
