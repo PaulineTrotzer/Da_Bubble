@@ -86,7 +86,6 @@ export class LoginComponent implements OnInit {
       const userID = await this.userDocId(user.uid);
       this.auth.currentUser = auth.currentUser;
       this.router.navigate(['/welcome', userID]);
-
       if (userID) {
         this.auth.updateStatus(userID, 'online');
       }

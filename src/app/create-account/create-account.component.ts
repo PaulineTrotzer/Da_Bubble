@@ -8,13 +8,7 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { AvatarComponent } from '../avatar/avatar.component';
-import {
-  Firestore,
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-} from '@angular/fire/firestore';
+import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import {
   getAuth,
@@ -39,6 +33,7 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
   styleUrl: './create-account.component.scss',
 })
 export class CreateAccountComponent implements OnInit {
+  userError = false;
   isHovered: boolean = false;
   isClicked: boolean = false;
   isChecked: boolean = false;
@@ -65,25 +60,33 @@ export class CreateAccountComponent implements OnInit {
   }
 
   async createAuthUser(email: string, password: string) {
-    const userCredential = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password
-    );
-    const authUser = userCredential.user;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+      const authUser = userCredential.user;
 
-    this.newUser = new User({
-      uid: authUser.uid,
-      name: this.userData.name,
-      email: authUser.email || email,
-      picture: '',
-      password: '',
-      status: 'offline',
-    });
-
-    const docRef = await this.addUserToFirestore(this.newUser);
-    await sendEmailVerification(authUser);
-    // this.router.navigate(['/avatar', authUser.uid]);
+      this.newUser = new User({
+        uid: authUser.uid,
+        name: this.userData.name,
+        email: authUser.email || email,
+        picture: '',
+        password: '',
+        status: 'offline',
+      });
+      this.openLinkSend();
+      const docRef = await this.addUserToFirestore(this.newUser);
+      await sendEmailVerification(authUser);
+      // this.router.navigate(['/avatar', authUser.uid]);
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        this.userError = true;
+      } else {
+        console.error('Fehler beim Erstellen des Benutzers:', error);
+      }
+    }
   }
 
   async addUserToFirestore(user: User) {
@@ -116,5 +119,9 @@ export class CreateAccountComponent implements OnInit {
     setTimeout(() => {
       this.linkWasSend = false;
     }, 1500);
+  }
+
+  resetUserError(){
+    this.userError = false;
   }
 }

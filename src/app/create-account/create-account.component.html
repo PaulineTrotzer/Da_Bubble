@@ -27,12 +27,15 @@
       <span>Mit deinem Namen und deiner E-mail-Adresse hast du dein neues
         DABubble-Konto</span>
     </div>
+
+    <div *ngIf="userError" class="err-user-exists">Ein User mit dieser Email existiert bereits</div>
+
     <form (ngSubmit)="onSubmit(userForm)" #userForm="ngForm">
       <div class="form-row">
         <label for="name"></label>
         <input type="text" [(ngModel)]="userData.name" id="name" name="displayName" #name="ngModel"
           placeholder="Name und Nachname" (focus)="nameIcon.src = './assets/img/person_filled_black.svg'"
-          (blur)="nameIcon.src = './assets/img/person_filled.svg'" required />
+          (blur)="nameIcon.src = './assets/img/person_filled.svg'" (input)="resetUserError()" required />
         <img #nameIcon class="icon" #person src="./assets/img/person_filled.svg" alt="" />
         <span class="error-message" *ngIf="!name.valid && name.touched">
           <span>*Der Name ist erforderlich.</span>
@@ -43,7 +46,7 @@
         <input pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" id="mail" type="email" name=email
           placeholder="beispielname@email.com" #email="ngModel" [(ngModel)]="userData.email"
           (focus)="emailIcon.src = './assets/img/email_filled_black.svg'"
-          (blur)="emailIcon.src = './assets/img/mail.svg'" required />
+          (blur)="emailIcon.src = './assets/img/mail.svg'" (input)="resetUserError()" required />
         <img #emailIcon class="icon" #email src="./assets/img/mail.svg" alt="" />
         <span class="error-message" *ngIf="!email.valid && email.touched">*Eine Mail ist erforderlich.</span>
       </div>
@@ -51,7 +54,7 @@
         <label for="password"></label>
         <input name=password [(ngModel)]="userData.password" #password="ngModel" type="password" id="password"
           placeholder="Passwort" (focus)="passwordIcon.src = './assets/img/lock_filled_black.svg'"
-          (blur)="passwordIcon.src = './assets/img/lock.svg'" required />
+          (blur)="passwordIcon.src = './assets/img/lock.svg'"  (input)="resetUserError()"required />
         <img #passwordIcon class="icon" #password src="./assets/img/lock.svg" alt="" />
         <span class="error-message" *ngIf="!password.valid && password.touched">*Ein Passwort ist erforderlich.</span>
       </div>
@@ -68,7 +71,7 @@
           *Bitte Datenschutzerklärung akzeptieren</span>
       </div>
       <div class="button-container">
-        <button (click)="openLinkSend()" type="submit" value="submit" [disabled]="userForm.invalid"
+        <button type="submit" value="submit" [disabled]="userForm.invalid"
           (mouseenter)="toggleHover()" (mouseleave)="toggleHover()" [ngClass]="{
             'btn-primary': userForm.valid,
             'btn-primary-disabled': userForm.invalid,
