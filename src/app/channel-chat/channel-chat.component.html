@@ -7,7 +7,7 @@
     }"
     *ngFor="let message of messagesData; let i = index"
     (mouseenter)="hoveredMessageId = message.id"
-    (mouseleave)="hoveredMessageId = null"
+    (mouseleave)="hoveredMessageId = null; showEditDialog = null"
   >
     <div *ngIf="displayDayInfo(i)" class="new-day-info">
       <div class="day-info">
@@ -17,7 +17,7 @@
     </div>
     <div
       class="message-edit"
-      *ngIf="showEditDialog === message.id"
+      *ngIf="showEditDialog === message.id && hoveredMessageId === showEditDialog"
       (click)="toggleEditArea(message.id, message.text)"
     >
       <span>Nachricht bearbeiten</span>
@@ -37,7 +37,7 @@
         (emojiClick)="addEmoji($event, message.id)"
       ></emoji-mart>
     </div>
-    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id" @slideIn>
+    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" @slideIn>
       <div class="used-emojis">
         <span
           *ngFor="let emoji of currentUserLastEmojis"
