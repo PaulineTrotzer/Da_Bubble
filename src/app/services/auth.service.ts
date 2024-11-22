@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { getAuth, signInWithPopup, signOut } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { GoogleAuthProvider, signInAnonymously, linkWithCredential } from 'firebase/auth';
+import { GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { User } from '../models/user.class';
 import {
   Firestore,
@@ -20,6 +20,7 @@ import { OverlayStatusService } from './overlay-status.service';
 import { GlobalService } from '../global.service';
 import { LoginAuthService } from './login-auth.service';
 import { onAuthStateChanged } from '@angular/fire/auth';
+import { GlobalVariableService } from './global-variable.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,10 +32,10 @@ export class AuthService {
   currentUser: any;
   guestUser: User = new User();
   overlayStatusService = inject(OverlayStatusService);
-  globalservice = inject(GlobalService);
   LogInAuth = inject(LoginAuthService);
   global = inject(GlobalService);
   loggedOut = false;
+  globalVariable = inject(GlobalVariableService);
 
   constructor() {
     this.initAuthListener();
@@ -54,17 +55,14 @@ export class AuthService {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        console.log('Aktueller Nutzer:', user);
         await this.updateStatus(user.uid, 'online');
         if (user.isAnonymous) {
-          console.log('Gast-Login erkannt');
           this.LogInAuth.setIsGuestLogin(true);
         } else {
           this.LogInAuth.setIsGuestLogin(false);
         }
       } else {
         this.currentUser = null;
-        console.log('Kein Nutzer angemeldet');
       }
     });
   }
@@ -91,48 +89,28 @@ export class AuthService {
     }
   }
 
- 
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-
     try {
       const result = await signInWithPopup(auth, provider);
-
-      // 2. Überprüfen, ob der Benutzer bereits existiert und mit einer anderen Methode angemeldet ist
       const currentUser = auth.currentUser;
-
-      if (currentUser && currentUser.email !== result.user.email) {
-        // 3. Verknüpfen des bestehenden Kontos mit dem Google-Konto
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-
-        if (credential) {
-          // 4. Verknüpfen des Kontos mit linkWithCredential, wenn credential nicht null ist
-          await linkWithCredential(currentUser, credential);
-          console.log('Konto erfolgreich verknüpft');
-        } else {
-          console.error('Keine Anmeldeinformationen für das Google-Konto gefunden');
-        }
-      } else {
-        console.log('Google Login erfolgreich');
+      if (currentUser) {
+        this.globalVariable.googleAccountLogIn = true;
+        this.user = new User({
+          picture: result.user.photoURL,
+          uid: result.user.uid,
+          name: result.user.displayName,
+          email: result.user.email,
+        });
+        this.LogInAuth.setLoginSuccessful(true);
+        this.router.navigate(['/welcome', this.user.uid]);
+        setTimeout(() => {
+          this.LogInAuth.setLoginSuccessful(false);
+        }, 1500);
       }
-      this.user = new User({
-        picture: result.user.photoURL,
-        uid: result.user.uid,
-        name: result.user.displayName,
-        email: result.user.email,
-      });
-      await this.addGoogleUserToFirestore(this.user);
-
-      this.LogInAuth.setLoginSuccessful(true);
-      this.router.navigate(['/welcome', this.user.uid]);
-
-      setTimeout(() => {
-        this.LogInAuth.setLoginSuccessful(false);
-      }, 1500);
-
     } catch (error) {
-      console.error('Fehler beim Google Login:', error);
+      console.error('fehler Login:', error);
     }
   }
 
@@ -144,7 +122,6 @@ export class AuthService {
       picture: user.picture,
     });
   }
-
 
   async logOut() {
     const auth = getAuth();

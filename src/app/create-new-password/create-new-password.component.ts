@@ -113,6 +113,7 @@ export class CreateNewPasswordComponent {
 
   
   async verifyEmail() {
+    debugger;
     const auth = getAuth();
     if (!this.oobCode) {
       return;

@@ -80,7 +80,7 @@ export class LoginComponent implements OnInit {
       );
       this.loginAuthService.setLoginSuccessful(true);
       setTimeout(() => {
-        this.loginAuthService.setLoginSuccessful(false); // Setze den Status nach 2500ms zurück
+        this.loginAuthService.setLoginSuccessful(false);
       }, 2500);
       const user = userCredential.user;
       const userID = await this.userDocId(user.uid);

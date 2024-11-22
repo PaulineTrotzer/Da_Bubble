@@ -88,15 +88,12 @@ export class CreateAccountComponent implements OnInit {
 
   async addUserToFirestore(user: User) {
     try {
-      debugger;
       const userDocRef = doc(this.firestore, 'users', user.uid);
       await setDoc(userDocRef, user.toJSON());
       console.log('Benutzer in Firestore hinzugefügt mit UID:', user.uid);
       return userDocRef;
     } catch (error) {
-      if(this.newUser.email == user.email){
-        console.log('user existiert bereits');
-      }
+      console.error('Error adding user to Firestore:', error);
       throw error;
     }
   }

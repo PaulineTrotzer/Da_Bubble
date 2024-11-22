@@ -17,13 +17,14 @@ export class GlobalVariableService {
   getUserByName:any={}
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
+  googleAccountLogIn: boolean = false;
 
   createNewPassword:boolean=false;
   verifyEmail:boolean=true;
 
   constructor() { }
 
-  setCurrentUserData(userData: any) {
+  async setCurrentUserData(userData: any) {
     this.currentUserData = userData;
     this.statusCheck = true;  
   }

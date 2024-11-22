@@ -7,7 +7,7 @@ import { Firestore } from '@angular/fire/firestore';
 import { updateDoc, doc } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { GlobalService } from '../global.service';
+import { GlobalVariableService } from '../services/global-variable.service';
 
 @Component({
   selector: 'app-dialog-edit-user',
@@ -26,7 +26,7 @@ export class DialogEditUserComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   @Output() closeEditDialog= new EventEmitter<void>();
   @Input() guestAccount: boolean = false; 
-  global=inject(GlobalService);
+  global=inject(GlobalVariableService);
 
 
   constructor(private route: ActivatedRoute) {}
