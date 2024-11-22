@@ -37,6 +37,9 @@ header {
 }
 
 .avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   img{
     width: 50px;
     object-fit: cover;
@@ -51,23 +54,12 @@ header {
   font-weight: 600;
 }
 
-.background {
-  position: relative;
-  &:hover {
-    background-color: #eceefe;
-  }
-  &:hover > .thread-topic-container > .topic-container > .topic-text {
-    background-color: white;
-  }
-  &:hover > .thread-message-container > .message-container > .message-text {
-    background-color: white;
-  }
-}
 
 .thread-topic-container,
 .thread-message-container,
 .thread-user-message-container {
   display: flex;
+  flex-direction: column;
   gap: 16px;
   padding: 10px 30px;
 }
@@ -175,8 +167,6 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  position: absolute;
-  bottom: 0;
   textarea {
     resize: none;
     border-radius: 20px;
@@ -329,3 +319,5 @@ header {
   left: unset;
   right: -50px;
 }
+
+
