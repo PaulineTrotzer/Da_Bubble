@@ -760,3 +760,30 @@ app-mention-message-box {
   height: 50px;
   right: 33%;
 }
+
+// .show-selected-files{
+
+
+// }
+
+.show-selected-files{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+
+.file-info{
+  
+  img{
+     width: 100px;
+     height: 100px; 
+  }
+  &:hover{
+    img{
+      transform: scale(1.2);
+    }
+  }
+}

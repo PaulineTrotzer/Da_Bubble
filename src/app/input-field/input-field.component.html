@@ -25,6 +25,49 @@
 <!-- </div> -->
 <!-- contenteditable="true" -->
 
+
+   <div class="show-selected-files" > 
+      <div *ngFor="let file of selectFiles; let i=index">
+
+        <div class="file-info" *ngIf="file.type.startsWith('image/')" >
+           <div class="file-box">
+           <img [src]="file.data">
+           <div class="delet-box"  (click)="deleteFile(i)">
+           <span class="delete-span">x</span>   
+        </div>    
+        </div>
+        </div>
+          <div class="file-info" *ngIf="file.type==='application/pdf' "> 
+            <div class="file-box">
+            <img src="../../assets/img/pdf.png"> 
+            <div class="delet-box"  (click)="deleteFile(i)">
+                <span class="delete-span">x</span>   
+             </div>   
+        </div>
+          </div>
+          <div class="file-info" *ngIf="file.type==='text/plain'">
+            <div class="file-box">
+                <img src="../../assets/img/textfile.png"  > 
+                <div  class="delet-box"  (click)="deleteFile(i)" >
+                    <span class="delete-span">x</span>   
+                 </div>   
+            </div>
+          </div>
+
+          <div class="file-info-mix" 
+          *ngIf="!file.type.startsWith('image/')
+           &&  file.type !== 'application/pdf' && file.type!=='text/plain'">
+             <div class="file-box">
+                <img src="../../assets/img/alldatei.png"> 
+                <div   class="mix-file" >
+                    <span class="delete-span"  (click)="deleteFile(i)">x</span>  
+                    <span >{{file.type}}</span>
+                 </div>   
+            </div>
+          </div>
+      </div>  
+   </div>
+
   <div class="interactions-send-msg-ct">
     <div class="only-interactions-bottom-ct">
         <div class="plus-separator-flex">

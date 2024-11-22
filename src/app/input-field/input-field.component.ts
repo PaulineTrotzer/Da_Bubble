@@ -22,6 +22,15 @@ import { Firestore, addDoc, collection, onSnapshot } from '@angular/fire/firesto
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 
+import {
+  Storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  uploadString
+} from '@angular/fire/storage';
+
+
 @Component({
   selector: 'app-input-field',
   standalone: true,
@@ -48,6 +57,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   messagesData: any[] = [];
   formattedChatMessage: any
   mentionUserName: any[] = []
+  storage=inject(Storage)
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -72,37 +82,52 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Cannot send an empty message.');
       return;
     }
-  
     try {
       if (this.selectedChannel) {
         await this.sendChannelMessage();
       } else {
+          
+        const fileData  = await this.uploadFilesToFirebaseStorage();
+             
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
-  
+       
+        messageData.selectedFiles = fileData;
+        console.log( messageData.selectedFiles)
+
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
-  
         console.log('Message successfully sent with ID:', messageWithId);
-  
         this.messagesData.push(messageWithId);
         this.messageSent.emit();
       }
-  
       this.chatMessage = '';
       this.formattedChatMessage = '';
+      this.selectFiles=[];
     } catch (error) {
       console.error('Error while sending message:', error);
     }
   }
-  
+     
+
+  async uploadFilesToFirebaseStorage(): Promise<{ url: string; type: string }[]> {
+    const storage = this.storage;
+    const uploadPromises = this.selectFiles.map(async (file, index) => {
+      const filePath = `uploads/${new Date().getTime()}_${index}_${file.type.split('/')[1]}`;
+      const fileRef = ref(storage, filePath);
+      await uploadString(fileRef, file.data, 'data_url'); // Upload file as Base64
+      const url = await getDownloadURL(fileRef); 
+      return { url, type: file.type, data:file.data }; 
+    });
+    return await Promise.all(uploadPromises);
+  } 
+
 
   async sendChannelMessage(){
-
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
@@ -272,6 +297,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
           this.selectFiles.push({
             type: file.type,
             data: reader.result as string,
+            preview:reader.result as string,
           });
           console.log(this.selectFiles);
         };
@@ -281,7 +307,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-
+  deleteFile(index:number){
+    this.selectFiles.splice(index,1)
+  }
  
 }
 
