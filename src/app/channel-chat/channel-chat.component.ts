@@ -391,7 +391,7 @@ export class ChannelChatComponent implements OnInit {
       if(userId === currentUserId) return 'Du';
       const userDoc = await getDoc(doc(this.firestore, 'users', userId));
       const userData = userDoc.data();
-      return userData?.['name'];
+      return `<span class="other-user">${userData?.['name']}</span>`;
     };
   
     if (currentUserReacted && reactors.length === 1) {
