@@ -387,7 +387,12 @@ export class ChannelChatComponent implements OnInit {
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter(userId => userId !== currentUserId);
   
-    const getUserName = (userId: string) => userId === currentUserId ? 'Du' : `User ${userId}`; // Replace with actual username logic
+    const getUserName = async (userId: string) => {
+      if(userId === currentUserId) return 'Du';
+      const userDoc = await getDoc(doc(this.firestore, 'users', userId));
+      const userData = userDoc.data();
+      return userData?.['name'];
+    };
   
     if (currentUserReacted && reactors.length === 1) {
       return `Du hast reagiert.`;
@@ -400,6 +405,4 @@ export class ChannelChatComponent implements OnInit {
     return `${getUserName(reactors[0])} hat reagiert.`;
   }
   
-  
-
 }
