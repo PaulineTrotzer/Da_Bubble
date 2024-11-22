@@ -54,6 +54,8 @@ export class ChannelChatComponent implements OnInit {
   showEditDialog: string | null = null;
   showEditArea: string | null = null;
   hoveredMessageId: string | null = null;
+  hoveredReactionMessageId: string | null = null;
+  hoveredEmoji: string | null = null;
   isPickerVisible: string | null = null;
   currentUserLastEmojis: string [] = [];
 
@@ -259,6 +261,7 @@ export class ChannelChatComponent implements OnInit {
         reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
+          this.hoveredReactionMessageId = null;
         }
         console.log(`Removed reaction "${emoji}" by user ${currentUserId}`);
       } else {
@@ -371,5 +374,32 @@ export class ChannelChatComponent implements OnInit {
     this.showEditArea = null;
     this.messageToEdit = '';
   }
+
+  getReactionText(message: Message, emoji: string | null): string {
+    if (!emoji || !message.reactions) return '';
+  
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid || '';
+    const reactors = message.reactions[emoji] || [];
+  
+    if (reactors.length === 0) return '';
+  
+    const currentUserReacted = reactors.includes(currentUserId);
+    const otherReactors = reactors.filter(userId => userId !== currentUserId);
+  
+    const getUserName = (userId: string) => userId === currentUserId ? 'Du' : `User ${userId}`; // Replace with actual username logic
+  
+    if (currentUserReacted && reactors.length === 1) {
+      return `Du hast reagiert.`;
+    }
+  
+    if (currentUserReacted && otherReactors.length > 0) {
+      return `${getUserName(otherReactors[0])} und Du haben reagiert.`;
+    }
+  
+    return `${getUserName(reactors[0])} hat reagiert.`;
+  }
+  
+  
 
 }

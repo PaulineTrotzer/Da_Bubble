@@ -1,4 +1,3 @@
-
 <div class="chat-box">
   <div
     class="message-container"
@@ -16,7 +15,11 @@
         <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
       </div>
     </div>
-    <div class="message-edit" *ngIf="showEditDialog === message.id" (click)="toggleEditArea(message.id, message.text)">
+    <div
+      class="message-edit"
+      *ngIf="showEditDialog === message.id"
+      (click)="toggleEditArea(message.id, message.text)"
+    >
       <span>Nachricht bearbeiten</span>
     </div>
     <div
@@ -132,9 +135,28 @@
               <p>{{ message.text }}</p>
             </div>
             <div class="reaction-info">
+              <div
+                *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji"
+                class="reaction-from-container"
+                [ngClass]="{
+                  'reaction-on-user':
+                    message.senderId !== global.currentUserData.id,
+                  'reaction-on-current':
+                    message.senderId === global.currentUserData.id
+                }"
+              >
+               <span class="emoji-from">{{hoveredEmoji}}</span> <span>{{ getReactionText(message, hoveredEmoji) }}</span>
+              </div>
               <span
                 *ngFor="let reaction of message.reactions | keyvalue"
                 class="reaction"
+                (mouseenter)="
+                  hoveredReactionMessageId = message.id;
+                  hoveredEmoji = reaction.key
+                "
+                (mouseleave)="
+                  hoveredReactionMessageId = null; hoveredEmoji = null
+                "
                 (click)="addEmojiToMessage(reaction.key, message.id)"
               >
                 {{ reaction.key }} {{ reaction.value.length }}
@@ -181,13 +203,25 @@
     </div>
     <div class="edit-message-container" *ngIf="showEditArea === message.id">
       <form>
-        <textarea cols="80" rows="5" name="message" id="message" [(ngModel)]="messageToEdit"> {{message.text}} </textarea>
+        <textarea
+          cols="80"
+          rows="5"
+          name="message"
+          id="message"
+          [(ngModel)]="messageToEdit"
+        >
+ {{ message.text }} </textarea
+        >
         <div class="button-row">
-          <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
-          <button class="btn-primary" (click)="saveEditedMessage(message.id)">Speichern</button>
+          <button class="btn-secondary" (click)="cancelEdit()">
+            Abbrechen
+          </button>
+          <button class="btn-primary" (click)="saveEditedMessage(message.id)">
+            Speichern
+          </button>
         </div>
       </form>
-      <img [src]="message.senderPicture">
+      <img [src]="message.senderPicture" />
     </div>
   </div>
 </div>

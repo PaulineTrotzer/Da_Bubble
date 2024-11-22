@@ -300,3 +300,39 @@ textarea {
   justify-content: flex-end;
   gap: 32px;
 }
+
+.reaction-from-container {
+  max-width: 158px;
+  width: 100%;
+  max-height: 112px;
+  height: 100%;
+  padding: 15px 10px;
+  background-color: #444df2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: absolute;
+  color: white;
+}
+
+.reaction-on-user {
+  top: -8px;
+  left: 198px;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+.reaction-on-current {
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  top: -8px;
+  right: 202px;
+}
+
+.emoji-from {
+  font-size: 24px;
+}
