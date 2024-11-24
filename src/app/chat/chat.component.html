@@ -9,7 +9,7 @@
     
 
 
-    <div *ngIf="selectedUser" class="main-current-messagebox" #scrollContainer>
+    <div *ngIf="selectedUser || selectedChannel" class="main-current-messagebox" #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
             <div *ngIf="displayDayInfo(i)" class="new-day-info">
                 <div class="day-info">

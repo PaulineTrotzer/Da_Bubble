@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  margin: 16px 0;
+  margin: 32px 0;
+  position: relative;
 }
 
 .img-container {
@@ -113,7 +114,7 @@
     height: 70px;
     border-radius: 100%;
   }
-  
+
   .text-container {
     display: flex;
     flex-direction: column;
@@ -229,7 +230,6 @@
   gap: 8px;
 }
 
-
 .message-edit {
   position: absolute;
   padding: 10px 20px;
@@ -241,7 +241,102 @@
   max-width: 269px;
   text-align: center;
   width: 100%;
-  left: 178px;
+  left: 248px;
   bottom: 70px;
   z-index: 5;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-day-info {
+  position: absolute;
+  right: 45px;
+  left: 45px;
+  top: -8px;
+}
+
+.line {
+  width: 100%;
+  border: 1px solid #adb0d9;
+}
+
+.day-span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -16px;
+  border-radius: 30px;
+  border: 1px solid #adb0d9;
+  padding: 5px 15px;
+  background-color: #ffffff;
+}
+
+textarea {
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #adb0d9;
+  resize: none;
+  outline: none;
+  font-family: Nunito;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24.55px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+}
+
+.edit-message-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32px;
+}
+
+.reaction-from-container {
+  max-width: 158px;
+  width: 100%;
+  max-height: 112px;
+  height: 100%;
+  padding: 15px 10px;
+  background-color: #444df2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: absolute;
+  color: white;
+}
+
+.reaction-on-user {
+  top: -8px;
+  left: 198px;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+.reaction-on-current {
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  top: -8px;
+  right: 202px;
+}
+
+.emoji-from {
+  font-size: 24px;
+}
+
+.reaction-text {
+  text-align: center;
 }
