@@ -499,7 +499,7 @@ export class ChatComponent implements OnInit, OnChanges {
     const height=textarea.scrollTop = textarea.scrollHeight;
     this.scrollHeightInput=height;
     console.log(this.scrollHeightInput)
-  }
+  }  
 }
 
 
