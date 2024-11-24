@@ -55,6 +55,7 @@ export class ChannelChatComponent implements OnInit {
   showEditArea: string | null = null;
   hoveredMessageId: string | null = null;
   hoveredReactionMessageId: string | null = null;
+  reactionUserNames: { [userId: string]: string } = {};
   hoveredEmoji: string | null = null;
   isPickerVisible: string | null = null;
   currentUserLastEmojis: string [] = [];
@@ -66,6 +67,28 @@ export class ChannelChatComponent implements OnInit {
   ngOnInit(): void {
     this.loadChannelMessages();
     this.loadCurrentUserEmojis();
+    this.loadUserNames(); 
+  }
+
+  async loadUserNames() {
+    const auth = getAuth();
+    const userDocs = await Promise.all(
+      this.messagesData
+        .flatMap(message => 
+          Object.values(message.reactions || {})
+            .flat()
+            .filter(userId => userId !== auth.currentUser?.uid)
+        )
+        .filter((userId, index, self) => self.indexOf(userId) === index)
+        .map(userId => getDoc(doc(this.firestore, 'users', userId)))
+    );
+
+    userDocs.forEach(doc => {
+      const userData = doc.data();
+      if (userData?.['name']) {
+        this.reactionUserNames[doc.id] = userData['name'];
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -377,32 +400,50 @@ export class ChannelChatComponent implements OnInit {
 
   getReactionText(message: Message, emoji: string | null): string {
     if (!emoji || !message.reactions) return '';
-  
+
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid || '';
     const reactors = message.reactions[emoji] || [];
-  
+
     if (reactors.length === 0) return '';
-  
+
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter(userId => userId !== currentUserId);
-  
-    const getUserName = async (userId: string) => {
-      if(userId === currentUserId) return 'Du';
-      const userDoc = await getDoc(doc(this.firestore, 'users', userId));
-      const userData = userDoc.data();
-      return `<span class="other-user">${userData?.['name']}</span>`;
-    };
-  
+
     if (currentUserReacted && reactors.length === 1) {
-      return `Du hast reagiert.`;
+      return 'Du hast reagiert.';
     }
-  
+
     if (currentUserReacted && otherReactors.length > 0) {
-      return `${getUserName(otherReactors[0])} und Du haben reagiert.`;
+      const otherUserName = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+      return `${otherUserName} und Du haben reagiert.`;
     }
-  
-    return `${getUserName(reactors[0])} hat reagiert.`;
+
+    const firstReactorName = this.reactionUserNames[reactors[0]] || 'Jemand';
+    return `${firstReactorName} hat reagiert.`;
+  }
+
+  onReactionHover(message: Message, emoji: string) {
+    this.hoveredReactionMessageId = message.id;
+    this.hoveredEmoji = emoji;
+    
+    const auth = getAuth();
+    const reactors = message.reactions[emoji] || [];
+    const unknownUsers = reactors
+      .filter(userId => userId !== auth.currentUser?.uid)
+      .filter(userId => !this.reactionUserNames[userId]);
+    
+    if (unknownUsers.length > 0) {
+      Promise.all(
+        unknownUsers.map(async userId => {
+          const userDoc = await getDoc(doc(this.firestore, 'users', userId));
+          const userData = userDoc.data();
+          if (userData?.['name']) {
+            this.reactionUserNames[userId] = userData['name'];
+          }
+        })
+      );
+    }
   }
   
 }

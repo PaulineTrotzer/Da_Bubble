@@ -145,18 +145,13 @@
                     message.senderId === global.currentUserData.id
                 }"
               >
-               <span class="emoji-from">{{hoveredEmoji}}</span> <span>{{ getReactionText(message, hoveredEmoji) }}</span>
+               <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message, hoveredEmoji) }}</span>
               </div>
               <span
                 *ngFor="let reaction of message.reactions | keyvalue"
                 class="reaction"
-                (mouseenter)="
-                  hoveredReactionMessageId = message.id;
-                  hoveredEmoji = reaction.key
-                "
-                (mouseleave)="
-                  hoveredReactionMessageId = null; hoveredEmoji = null
-                "
+                (mouseenter)="onReactionHover(message, reaction.key)"
+                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
                 (click)="addEmojiToMessage(reaction.key, message.id)"
               >
                 {{ reaction.key }} {{ reaction.value.length }}
