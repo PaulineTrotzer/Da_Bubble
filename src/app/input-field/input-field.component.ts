@@ -12,13 +12,18 @@ import {
   EventEmitter,
   Renderer2,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { FormsModule } from '@angular/forms';
-import { Firestore, addDoc, collection, onSnapshot } from '@angular/fire/firestore';
+import {
+  Firestore,
+  addDoc,
+  collection,
+  onSnapshot,
+} from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 
@@ -27,9 +32,8 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
-  uploadString
+  uploadString,
 } from '@angular/fire/storage';
-
 
 @Component({
   selector: 'app-input-field',
@@ -55,85 +59,110 @@ export class InputFieldComponent implements OnInit, OnChanges {
   senderStickerCount: number = 0;
   recipientStickerCount: number = 0;
   messagesData: any[] = [];
-  formattedChatMessage: any
-  mentionUserName: any[] = []
-  storage=inject(Storage)
+  formattedChatMessage: any;
+  mentionUserName: any[] = [];
+  storage = inject(Storage);
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
       this.formattedChatMessage = '';
       this.chatMessage = '';
     }
-
   }
 
   ngOnInit(): void {
-    this.getByUserName()
+    this.getByUserName();
   }
 
-
-  async sendMessage() {
-    if (!this.selectedChannel && !this.selectedUser) {
-      console.error('Selected user or channel is not defined');
-      return;
+  async sendMessage(event: KeyboardEvent): Promise<void> {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      await this.processSendMessage();
     }
+  }
   
-    if (this.chatMessage.trim() === '') {
-      console.warn('Cannot send an empty message.');
+  sendMessageClick(): void {
+    if (this.chatMessage.trim() === '' && this.selectFiles.length === 0) {
+      console.warn('Keine Nachricht und keine Dateien zum Senden.');
       return;
     }
-    try {
-      if (this.selectedChannel) {
-        await this.sendChannelMessage();
-      } else {
-          
-        const fileData  = await this.uploadFilesToFirebaseStorage();
-             
-        const messageData = this.messageData(
-          this.chatMessage,
-          this.senderStickerCount,
-          this.recipientStickerCount
-        );
-       
-        messageData.selectedFiles = fileData;
-        console.log( messageData.selectedFiles)
+    if (!this.selectedChannel && !this.selectedUser) {
+      console.error('Kein Benutzer oder Kanal ausgewählt.');
+      return;
+    }
+    this.processSendMessage();
+  }
 
-        const messagesRef = collection(this.firestore, 'messages');
-        const docRef = await addDoc(messagesRef, messageData);
-        const messageWithId = { ...messageData, id: docRef.id };
-        console.log('Message successfully sent with ID:', messageWithId);
-        this.messagesData.push(messageWithId);
-        this.messageSent.emit();
-      }
+  shouldSendMessage(event: KeyboardEvent): boolean {
+    if (event.shiftKey && event.key === 'Enter') {
+      return false;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      return true;
+    }
+    return false;
+  }
+
+  private async processSendMessage(): Promise<void> {
+    try {
+      const fileData = await this.uploadFilesToFirebaseStorage();
+  
+      const messageData = this.messageData(
+        this.chatMessage,
+        this.senderStickerCount,
+        this.recipientStickerCount
+      );
+  
+      messageData.selectedFiles = fileData;
+  
+      const messagesRef = collection(this.firestore, 'messages');
+      const docRef = await addDoc(messagesRef, messageData);
+      const messageWithId = { ...messageData, id: docRef.id };
+      console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
+  
+      this.messagesData.push(messageWithId);
+      this.messageSent.emit();
+  
       this.chatMessage = '';
       this.formattedChatMessage = '';
-      this.selectFiles=[];
+      this.selectFiles = [];
     } catch (error) {
-      console.error('Error while sending message:', error);
+      console.error('Fehler beim Senden der Nachricht:', error);
     }
   }
-     
+  
 
-  async uploadFilesToFirebaseStorage(): Promise<{ url: string; type: string }[]> {
+
+  async uploadFilesToFirebaseStorage(): Promise<
+    { url: string; type: string }[]
+  > {
     const storage = this.storage;
     const uploadPromises = this.selectFiles.map(async (file, index) => {
-      const filePath = `uploads/${new Date().getTime()}_${index}_${file.type.split('/')[1]}`;
+      const filePath = `uploads/${new Date().getTime()}_${index}_${
+        file.type.split('/')[1]
+      }`;
       const fileRef = ref(storage, filePath);
       await uploadString(fileRef, file.data, 'data_url'); // Upload file as Base64
-      const url = await getDownloadURL(fileRef); 
-      return { url, type: file.type, data:file.data }; 
+      const url = await getDownloadURL(fileRef);
+      return { url, type: file.type, data: file.data };
     });
     return await Promise.all(uploadPromises);
-  } 
+  }
 
-
-  async sendChannelMessage(){
+  async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
     }
 
-    const channelMessagesRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages');
+    const channelMessagesRef = collection(
+      this.firestore,
+      'channels',
+      this.selectedChannel.id,
+      'messages'
+    );
 
     const messageData = {
       text: this.chatMessage,
@@ -142,7 +171,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       senderPicture: this.global.currentUserData.picture || '',
       timestamp: new Date(),
       selectedFiles: this.selectFiles,
-      editedTextShow: false
+      editedTextShow: false,
     };
 
     const docRef = await addDoc(channelMessagesRef, messageData);
@@ -150,7 +179,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
-    console.log(this.chatMessage)
+    console.log(this.chatMessage);
   }
 
   messageData(
@@ -177,10 +206,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: this.selectFiles,
-      editedTextShow: false
+      editedTextShow: false,
     };
   }
-
 
   handleMentionUser(mention: string) {
     const mentionTag = `@${mention}`;
@@ -191,15 +219,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   formatMentions() {
-  //   const regex = /@\w+(?:\s\w+)?/g;
-  //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-  //     const mentionName = match.substring(1).trim();
-  //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-  //       return `<span class="mention">${match}</span>`;
-  //     }
-  //     return `<span class="normal-text">${match}</span>`;
-  //   }); 
-   
+    //   const regex = /@\w+(?:\s\w+)?/g;
+    //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+    //     const mentionName = match.substring(1).trim();
+    //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+    //       return `<span class="mention">${match}</span>`;
+    //     }
+    //     return `<span class="normal-text">${match}</span>`;
+    //   });
   }
 
   onInput(event: Event): void {
@@ -208,18 +235,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   getByUserName() {
-    const docRef = collection(this.firestore, 'users')
+    const docRef = collection(this.firestore, 'users');
     onSnapshot(docRef, (querySnapshot) => {
       this.mentionUserName = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const userName = data['name']
-        this.mentionUserName.push(userName)
-      })
-    })
+        const userName = data['name'];
+        this.mentionUserName.push(userName);
+      });
+    });
   }
 
-    
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
     this.cdr.detectChanges();
@@ -297,7 +323,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
           this.selectFiles.push({
             type: file.type,
             data: reader.result as string,
-            preview:reader.result as string,
+            preview: reader.result as string,
           });
           console.log(this.selectFiles);
         };
@@ -307,9 +333,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  deleteFile(index:number){
-    this.selectFiles.splice(index,1)
+  deleteFile(index: number) {
+    this.selectFiles.splice(index, 1);
   }
- 
 }
-

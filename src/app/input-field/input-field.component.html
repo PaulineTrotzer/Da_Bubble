@@ -18,7 +18,7 @@
     [(ngModel)]="chatMessage"
     (input)="formatMentions(); onInput($event)" 
      rows="3" 
-    
+     (keydown)="sendMessage($event)"
       >
   </textarea>
 
@@ -93,7 +93,7 @@
             (mentionUser)="handleMentionUser($event)"></app-people-mention>
     </div>
 
-    <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessage()">
+    <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
 
 </div>
 
