@@ -7,11 +7,21 @@
     }"
     *ngFor="let message of messagesData; let i = index"
     (mouseenter)="hoveredMessageId = message.id"
-    (mouseleave)="hoveredMessageId = null"
+    (mouseleave)="hoveredMessageId = null; showEditDialog = null"
   >
-  <div class="message-edit" *ngIf="showEditMessage">
-    <span>Nachricht bearbeiten</span>
-  </div>
+    <div *ngIf="displayDayInfo(i)" class="new-day-info">
+      <div class="day-info">
+        <div class="line"></div>
+        <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+      </div>
+    </div>
+    <div
+      class="message-edit"
+      *ngIf="showEditDialog === message.id && hoveredMessageId === showEditDialog"
+      (click)="toggleEditArea(message.id, message.text)"
+    >
+      <span>Nachricht bearbeiten</span>
+    </div>
     <div
       class="emoji-container"
       *ngIf="isPickerVisible === message.id"
@@ -27,7 +37,7 @@
         (emojiClick)="addEmoji($event, message.id)"
       ></emoji-mart>
     </div>
-    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id">
+    <div class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" @slideIn>
       <div class="used-emojis">
         <span
           *ngFor="let emoji of currentUserLastEmojis"
@@ -96,6 +106,7 @@
       <div
         class="img-container"
         *ngIf="message.senderId === global.currentUserData.id"
+        (click)="toggleEditDialog(message.id)"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -124,14 +135,32 @@
               <p>{{ message.text }}</p>
             </div>
             <div class="reaction-info">
+              <div
+                *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji"
+                class="reaction-from-container"
+                [ngClass]="{
+                  'reaction-on-user':
+                    message.senderId !== global.currentUserData.id,
+                  'reaction-on-current':
+                    message.senderId === global.currentUserData.id
+                }"
+              >
+               <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message, hoveredEmoji) }}</span>
+              </div>
               <span
                 *ngFor="let reaction of message.reactions | keyvalue"
                 class="reaction"
-                (click)="removeReaction(reaction.key, message.id)"
+                (mouseenter)="onReactionHover(message, reaction.key)"
+                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
+                (click)="addEmojiToMessage(reaction.key, message.id)"
               >
                 {{ reaction.key }} {{ reaction.value.length }}
               </span>
-              <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
+              <div
+                class="img-container"
+                *ngIf="hasReactions(message.reactions)"
+                (click)="togglePicker(message.id)"
+              >
                 <svg
                   width="25"
                   height="24"
@@ -166,6 +195,28 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="edit-message-container" *ngIf="showEditArea === message.id">
+      <form>
+        <textarea
+          cols="80"
+          rows="5"
+          name="message"
+          id="message"
+          [(ngModel)]="messageToEdit"
+        >
+ {{ message.text }} </textarea
+        >
+        <div class="button-row">
+          <button class="btn-secondary" (click)="cancelEdit()">
+            Abbrechen
+          </button>
+          <button class="btn-primary" (click)="saveEditedMessage(message.id)">
+            Speichern
+          </button>
+        </div>
+      </form>
+      <img [src]="message.senderPicture" />
     </div>
   </div>
 </div>
