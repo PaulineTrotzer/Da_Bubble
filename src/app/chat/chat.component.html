@@ -25,11 +25,13 @@
                 }" (mouseleave)="resetIcon(message);">
                 <div *ngIf="editMessageId === message.id" class="edit-mesage-box">
 
-                    <textarea class="edit-input" [(ngModel)]="editableMessageText"></textarea>
+                    <textarea    #editableTextarea (input)="onInput($event)" rows="3" class="edit-input" [(ngModel)]="editableMessageText"></textarea>
                     <div class="button-box">
+                         
                         <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
                         <button class="btn-primary"
                             (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
+                        
                     </div>
                 </div>
                 <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
@@ -84,8 +86,11 @@
                                 </g>
                             </svg>
                         </div>
-                        <div class="edit-message" *ngIf="message.senderId===global.currentUserData.id">
-                            <div class="edit-icon">
+                        <div  
+                                  class="edit-message" *ngIf="message.senderId===global.currentUserData.id">
+                            <div  
+                                   (mouseenter)="checkEditbox=true" 
+                                   (mouseleave)="checkEditbox=false"     class="edit-icon">
                                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
@@ -98,15 +103,15 @@
                                             fill="#1C1B1F" />
                                     </g>
                                 </svg>
-                            </div>
-
-                            <mat-card [ngClass]="{'position-edit':isiconShow===message.id}" class="edit-messages-card"
+                                <mat-card *ngIf="checkEditbox"   [ngClass]="{'position-edit':isiconShow===message.id}" class="edit-messages-card"
                                 appearance="outlined">
                                 <mat-card-content class="edit-message-content">
                                     <span (click)="editMessages(message)">Nachricht bearbeiten</span>
                                 </mat-card-content>
-                            </mat-card>
-                        </div>
+                              </mat-card>
+                            </div>
+                        </div> 
+                        
 
                     </mat-card-content>
                 </mat-card>

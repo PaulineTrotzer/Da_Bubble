@@ -526,7 +526,14 @@ app-input-field {
       opacity: 1;
     }
   }
+
+
 }
+
+.edit-messages-card.opacity{
+  opacity: 1;
+} 
+
 
 .edit-icon {
   width: 40px;
@@ -536,9 +543,9 @@ app-input-field {
     background-color: #eceefe;
     border-radius: 100%;
 
-    .edit-messages-card {
-      opacity: 1;
-    }
+    // .edit-messages-card {
+    //   opacity: 1;
+    // }
 
     svg {
       path {
@@ -558,7 +565,7 @@ app-input-field {
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
   border-top-right-radius: 30px;
-  opacity: 0;
+  opacity: 1;
   max-width: max-content;
   width: 100%;
   box-shadow: 0px 2px 10px 0px #00000014;
@@ -595,12 +602,17 @@ app-input-field {
 .edit-input {
   width: 88%;
   height: 148px;
-  padding: 16px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
   resize: none;
   border: 1px solid #adb0d9;
   border-radius: 20px;
   font-family: Nunito, "Helvetica Neue";
   font-size: 18px;
+  overflow-y: auto;
+  
 
   &:focus {
     border-color: #444df2;
@@ -609,11 +621,15 @@ app-input-field {
 }
 
 .button-box {
-  position: absolute;
-  left: 58%;
-  top: 90px;
+  position: relative;
+  top: -60px;
+  left: 5px;
   display: flex;
-  gap: 10px;
+  gap: 11px;
+  justify-content: flex-end;
+  width: 86%;
+  background: #FFFFFF;
+  border-radius: 63px;
 }
 
 .comment-icon-box {

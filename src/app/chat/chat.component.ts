@@ -86,8 +86,8 @@ export class ChatComponent implements OnInit, OnChanges {
   showTwoPersonConversationTxt = false;
   @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
   @Output() threadOpened = new EventEmitter<void>();
-
-
+  checkEditbox:boolean=false
+  @ViewChild('editableTextarea') editableTextarea!: ElementRef<HTMLTextAreaElement>;
   commentStricker: string[] = [
     '../../assets/img/comment/face.png',
     '../../assets/img/comment/rocket.png',
@@ -96,6 +96,7 @@ export class ChatComponent implements OnInit, OnChanges {
     '../../assets/img/comment/hand.png',
     '../../assets/img/comment/celebration.png',
   ];
+  isFirstClick: boolean = true;
 
   constructor() { }
 
@@ -119,6 +120,16 @@ export class ChatComponent implements OnInit, OnChanges {
   editMessages(message: any) {
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
+    if (this.isFirstClick) {
+      setTimeout(() => {
+        if (this.editableTextarea) {
+          const textarea = this.editableTextarea.nativeElement;
+          textarea.scrollTop = textarea.scrollHeight;
+          textarea.focus(); 
+        }
+      },20);
+      this.isFirstClick = false; 
+    }
   }
 
   displayDayInfo(index: number): boolean {
@@ -134,6 +145,9 @@ export class ChatComponent implements OnInit, OnChanges {
   cancelEdit() {
     this.editMessageId = null;
     this.editableMessageText = '';
+    this.checkEditbox=false;
+    this.isFirstClick=true;
+    console.log(this.isFirstClick)
   }
 
   resetIcon(message: any) {
@@ -217,12 +231,15 @@ export class ChatComponent implements OnInit, OnChanges {
       deleteDoc(messageRef).then(() => {
         this.editMessageId = null;
       });
+      this.isFirstClick=true;
+      this.checkEditbox=false
     } else {
       const editMessage = { text: this.editableMessageText, editedTextShow: true };
       updateDoc(messageRef, editMessage).then(() => {
-
         this.editMessageId = null;
-      });
+      }); 
+      this.checkEditbox=false;
+      this.isFirstClick=true;
     }
   }
 
@@ -475,8 +492,14 @@ export class ChatComponent implements OnInit, OnChanges {
     })
   }
 
-
-
+  scrollHeightInput:any
+ 
+  onInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const height=textarea.scrollTop = textarea.scrollHeight;
+    this.scrollHeightInput=height;
+    console.log(this.scrollHeightInput)
+  }
 }
 
 
