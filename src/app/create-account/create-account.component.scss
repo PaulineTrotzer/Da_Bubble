@@ -266,25 +266,38 @@ input[type="checkbox"] {
 }
 
 .link-sended-info.show {
-  transform: translateX(0); 
+  transform: translateX(0);
 }
 
-.link-card-content{
+.link-card-content {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.link-img{
+.link-img {
   width: 25px;
 }
 
-.link-sended-text{
+.link-sended-text {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Nunito';
+  font-family: "Nunito";
   font-size: 17px;
+}
+
+.err-user-exists {
+  background-color: red;
+  height: fit-content;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+  margin: 20px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 @media (min-width: 1024px) {

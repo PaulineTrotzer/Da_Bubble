@@ -11,13 +11,22 @@
     <div *ngIf="successfullyLogged" class="overlay"></div>
 </div>
 <mat-card *ngIf="successfullyLogged" appearance="outlined" class="login-sended-info"
-[ngClass]="{'visible': successfullyLogged, 'hidden': !successfullyLogged}">
-<mat-card-content class="success-login-content">
-    <span class="sended-text">
-        Login als <span class="guest-or-mail"><b>{{ isGuestLogin ? 'Gast' : global.currentUserData.email
-                }}</b></span>
-    </span>
-</mat-card-content>
+    [ngClass]="{'visible': successfullyLogged, 'hidden': !successfullyLogged}">
+    <mat-card-content class="success-login-content">
+        <span class="sended-text">
+            Login als <span class="guest-or-mail">
+                <b>
+                    {{
+                    isGuestLogin
+                    ? 'Gast'
+                    : global.googleAccountLogIn
+                    ? (global.currentUserData.email || 'Google Nutzer')
+                    : global.currentUserData.email
+                    }}
+                </b>
+            </span>
+        </span>
+    </mat-card-content>
 </mat-card>
 
 

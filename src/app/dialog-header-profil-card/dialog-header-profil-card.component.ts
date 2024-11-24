@@ -6,8 +6,8 @@ import { UserService } from '../services/user.service';
 import { DialogEditUserComponent } from '../dialog-edit-user/dialog-edit-user.component';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Firestore } from '@angular/fire/firestore';
-import { GlobalService } from '../global.service';
 import { LoginAuthService } from '../services/login-auth.service';
+import { GlobalVariableService } from '../services/global-variable.service';
 @Component({
   selector: 'app-dialog-header-profil-card',
   standalone: true,
@@ -27,7 +27,7 @@ export class DialogHeaderProfilCardComponent implements OnInit {
   profileCardopen = true;
   overlayStatusService = inject(OverlayStatusService);
   firestore = inject(Firestore);
-  globalService = inject(GlobalService);
+  globalService = inject(GlobalVariableService);
   loginAuthService = inject(LoginAuthService);
   clicked = true;
   guestAccount = false;
