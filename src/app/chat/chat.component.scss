@@ -261,13 +261,14 @@ app-input-field {
 }
 
 .message-card-current {
-  max-height: 105px;
   background-color: #797ef3;
   border-top-right-radius: 0;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-  max-width: max-content;
+  max-width: 770px;
+  overflow-wrap: break-word;
+  max-height: max-content;
 }
 
 .message-card-user {
@@ -277,7 +278,10 @@ app-input-field {
   border-top-left-radius: 0;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-  max-width: max-content;
+  max-width: 770px;
+  overflow-wrap: break-word;
+  max-height: max-content;
+
 }
 
 .card-content-current {

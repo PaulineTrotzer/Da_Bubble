@@ -8,7 +8,12 @@ import { updateDoc, doc } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { GlobalService } from '../global.service';
-
+import {
+  Storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from '@angular/fire/storage';
 @Component({
   selector: 'app-dialog-edit-user',
   standalone: true,
@@ -27,6 +32,18 @@ export class DialogEditUserComponent implements OnInit {
   @Output() closeEditDialog= new EventEmitter<void>();
   @Input() guestAccount: boolean = false; 
   global=inject(GlobalService);
+  chossePicture:string='';
+  previewUrl: string | undefined;
+  selectedFile: File | null = null;
+  avatarBox: string[] = [
+    '../../assets/img/avatar/avatar1.png',
+    '../../assets/img/avatar/avatar2.png',
+    '../../assets/img/avatar/avatar3.png',
+    '../../assets/img/avatar/avatar4.png',
+    '../../assets/img/avatar/avatar5.png',
+    '../../assets/img/avatar/avatar6.png',
+  ];
+  storage=inject(Storage)
 
 
   constructor(private route: ActivatedRoute) {}
@@ -50,9 +67,35 @@ export class DialogEditUserComponent implements OnInit {
     this.closeEditDialog.emit();
   }
 
+  selectAvatar(picture:string){
+    this.chossePicture=picture;
+    this.selectedFile=null;
+
+    console.log(this.chossePicture);
+  }
+ 
+  onFileSelected(event:Event){
+    const input=event.target as HTMLInputElement;
+    if(input.files && input.files.length > 0){
+       this.selectedFile=input.files[0] 
+       console.log(input.files[0])
+       this.chossePicture='';
+       this.user.picture= '';
+       const reader=new FileReader()
+       reader.onload=()=>{
+        this.previewUrl = reader.result as string;
+       }
+       reader.readAsDataURL(this.selectedFile);
+       input.value = '';
+    }
+  }
+
+
   async saveUser() {
+    const edititingAvatar=await this.editAvatar()
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
+
       await updateDoc(userRef, {
         name: this.user.name,
         email: this.user.email,
@@ -61,8 +104,27 @@ export class DialogEditUserComponent implements OnInit {
     } catch (error) {
       console.error('error updating user:', error);
     }
-  }
+  }  
 
+
+   async  editAvatar(){
+        if(this.selectedFile){
+          const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
+          const storageRef = ref(this.storage, filePath);
+          await uploadBytes(storageRef, this.selectedFile);
+          const downloadURL = await getDownloadURL(storageRef); 
+          await this.updateUserAvatar(downloadURL);  
+        }else if(this.chossePicture){
+          await this.updateUserAvatar(this.chossePicture);
+        }
+     }
+     
+   async updateUserAvatar(avatarUrl: string){
+      const docRef=doc(this.firestore,'users',this.userID);
+      const updateAvatar={picture:avatarUrl};
+      updateDoc(docRef,updateAvatar);
+   }
+      
   showEditableInput(): boolean {
     return !this.guestAccount && !this.global.googleAccountLogIn;
   }

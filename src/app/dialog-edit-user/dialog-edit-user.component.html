@@ -6,8 +6,22 @@
         </div>
     </div>
     <div class="img-frame">
-        <img src={{user.picture}}>
+        <img  [src]="chossePicture || user.picture || previewUrl">
     </div>
+
+     <div class="avatar-box">
+    <div  *ngFor="let avatar of avatarBox">
+      <img [src]="avatar"   (click)="selectAvatar(avatar)">   
+    </div>        
+    </div>
+    <div class="added-avatar">
+        <div class="picture-info-text">oder Bild</div>
+        <div>
+            <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
+            <label for="upload">Datei hochladen</label>
+        </div>
+    </div>
+
     <div class="name-edit-flex">
         <div class="description-input">
             <img src="assets/img/account_circle.svg">

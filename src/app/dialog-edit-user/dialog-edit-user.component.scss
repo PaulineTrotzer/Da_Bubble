@@ -1,7 +1,7 @@
 .profile-card-ct {
   position: absolute;
   z-index: 25;
-  height: 700px;
+  // height: 700px;
   background-color: white;
   top: 0px;
   width: 650px;
@@ -149,6 +149,7 @@ h3 {
   margin-top: 12px;
   width: 500px;
   gap: 50px;
+  margin-bottom: 40px;
 }
 
 .btn-primary {
@@ -165,4 +166,58 @@ h3 {
   background-color: #535af1;
   color: white;
   transform: scale(1.05);
+}
+
+.avatar-box{
+  display: flex;
+  gap: 8px;
+  padding: 48px 0 0 36px;
+  img {
+    height: 64px;
+    width: 64px;
+    border-radius: 100%;
+    &:hover {
+      box-sizing: border-box;
+      outline: 3px solid #e6e6e6;
+      outline-offset: 0;
+      border-radius: 100%;
+      cursor: pointer;
+    }
+  }
+ } 
+
+ .added-avatar {
+  display: flex;
+  padding: 42px 0 0 36px;
+  gap: 24px;
+}
+
+.picture-info-text {
+  font-weight: 400;
+  font-size: 20px;
+  color: #000000;
+  line-height: 27px;
+  cursor: default;
+}
+
+
+ label {
+  font-family: "Nunito";
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 25px;
+  border: 1px solid #797ef3;
+  color: #797ef3;
+  padding: 12px 25px;
+  background-color: white;
+
+  &:hover {
+    font-family: "Nunito";
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 25px;
+    background-color: #535af1;
+    color: white;
+    cursor: pointer;
+  }
 }
