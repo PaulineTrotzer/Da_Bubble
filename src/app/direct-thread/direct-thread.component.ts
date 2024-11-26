@@ -177,4 +177,13 @@ export class DirectThreadComponent implements OnInit{
   onClose() {
     this.closeThread.emit();
   }
+
+  showMessagesFromSelectedUser(): boolean {
+
+    return this.messagesData.some(message => message.senderName === this.selectedUser.name);
+  }
+
+  showMessagesFromCurrentUser() : boolean {
+    return this.messagesData.some(message => message.senderName === this.currentUser.name);
+  }
 }

@@ -167,6 +167,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    position: relative;
     textarea {
       resize: none;
       border-radius: 20px;
@@ -188,17 +189,28 @@
     left: 72px;
     right: 64px;
     bottom: 42px;
-    .left-side,
-    .right-side {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
     .text-seperator {
       height: 32px;
       border: 1px solid rgba(0, 0, 0, 0.277);
       width: 1px;
     }
+  }
+
+  .right-side{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .left-side{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    bottom: 0;
   }
   
   .img-container {
