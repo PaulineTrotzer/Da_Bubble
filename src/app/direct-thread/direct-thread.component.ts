@@ -1,7 +1,22 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { User } from '../models/user.class';
-import { collection, doc, Firestore, getDoc, onSnapshot, query, where } from '@angular/fire/firestore';
+import {
+  collection,
+  doc,
+  Firestore,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { SendMessageInfo } from '../models/send-message-info.interface';
@@ -41,10 +56,9 @@ import { CommonModule } from '@angular/common';
     ]),
   ],
 })
-export class DirectThreadComponent implements OnInit{
-
+export class DirectThreadComponent implements OnInit {
   [x: string]: any;
-  @Output() closeThread = new EventEmitter<void>();
+  @Output() closeDirectThread = new EventEmitter<void>();
   chatMessage: string = '';
   showTopicBubble: boolean = false;
   showMessageBubble: boolean = false;
@@ -126,10 +140,8 @@ export class DirectThreadComponent implements OnInit{
           this.messagesData.push({ id: doc.id, ...messageData });
         }
       });
-      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp)
-
+      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
     });
-  
   }
 
   messageData(
@@ -155,7 +167,6 @@ export class DirectThreadComponent implements OnInit{
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
-
     };
   }
   toggleTopicBubble() {
@@ -175,15 +186,18 @@ export class DirectThreadComponent implements OnInit{
   }
 
   onClose() {
-    this.closeThread.emit();
+    this.closeDirectThread.emit();
   }
 
   showMessagesFromSelectedUser(): boolean {
-
-    return this.messagesData.some(message => message.senderName === this.selectedUser.name);
+    return this.messagesData.some(
+      (message) => message.senderName === this.selectedUser.name
+    );
   }
 
-  showMessagesFromCurrentUser() : boolean {
-    return this.messagesData.some(message => message.senderName === this.currentUser.name);
+  showMessagesFromCurrentUser(): boolean {
+    return this.messagesData.some(
+      (message) => message.senderName === this.currentUser.name
+    );
   }
 }

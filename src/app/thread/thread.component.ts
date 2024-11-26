@@ -25,8 +25,14 @@ import { DirectThreadComponent } from '../direct-thread/direct-thread.component'
 })
 
 export class ThreadComponent {
+  @Output() closeThread = new EventEmitter<void>();
 
   constructor(){}
 
   @Input() selectedUser: any;
+
+  onDirectThreadClosed() {
+    this.closeThread.emit(); 
+  }
+
 }
