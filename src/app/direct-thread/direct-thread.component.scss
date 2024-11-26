@@ -2,8 +2,14 @@
   background-color: white;
   box-shadow: 0px 2px 10px 0px #00000014;
   border-radius: 30px;
-  height: 100%;
   position: relative;
+}
+
+
+.overflow-container {
+  height: fit-content;
+  overflow: scroll;
+  max-height: 730px;
 }
 
 .sticker-hover-ct {
@@ -11,14 +17,23 @@
 }
 
 .show-set {
-  background-color: green;
+  position: absolute;
+  right: 20px;
+  border: 1px solid #adb0d9;
+  background-color: white;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0;
+  top: -22px;
+  transition: right 0.3s ease, opacity 0.3s ease;
+  color: white;
 }
 
-.overflow-container {
-  height: fit-content;
-  overflow: scroll;
-  max-height: 970px;
+.img-flex-bar-options{
+  display: flex;
 }
+
 
 header {
   display: flex;
@@ -84,7 +99,6 @@ h3 {
 .chatpartner-msg-ct {
 }
 
-
 .cu-msg-text {
   max-height: 105px;
   background-color: #797ef3;
@@ -110,13 +124,14 @@ h3 {
 }
 
 .color-separator {
+  position: relative;
   cursor: pointer;
   &:hover {
     background-color: #eceefe;
   }
 }
 
-.message-content-bubble{
+.message-content-bubble {
   background-color: white;
   max-width: 278px;
   padding: 15px;
@@ -125,6 +140,14 @@ h3 {
   border-bottom-right-radius: 20px;
 }
 
+.static-bubble {
+  background-color: #eceefe;
+  max-width: 278px;
+  padding: 15px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
 
 .cu-message-container {
   display: flex;
@@ -191,6 +214,7 @@ h3 {
   display: flex;
   justify-content: center;
   position: relative;
+  overflow: hidden;
   textarea {
     resize: none;
     border-radius: 20px;

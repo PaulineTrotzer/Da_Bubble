@@ -22,11 +22,12 @@ import { ActivatedRoute } from '@angular/router';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 @Component({
   selector: 'app-direct-thread',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PickerComponent],
   templateUrl: './direct-thread.component.html',
   styleUrl: './direct-thread.component.scss',
   animations: [
@@ -74,6 +75,13 @@ export class DirectThreadComponent implements OnInit {
   messagesData: any[] = [];
   showOptionBar = false;
   isHovered = false;
+  currentSrc? : string;
+  icons: { [key: string]: string } = {
+    iconMore: 'assets/img/more_vertical.svg',
+    iconAddReaction: 'assets/img/comment/add_reaction.svg',
+    iconThird: 'assets/img/third.svg',
+  };
+  
 
   constructor(private route: ActivatedRoute) {}
 
@@ -89,6 +97,10 @@ export class DirectThreadComponent implements OnInit {
       console.log('suser', this.selectedUser);
       this.getMessages();
     });
+  }
+
+  onHover(iconKey: string, newSrc: string): void {
+    this.icons[iconKey] = newSrc;
   }
 
   async getcurrentUserById(userId: string) {
