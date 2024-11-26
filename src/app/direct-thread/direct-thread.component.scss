@@ -6,10 +6,18 @@
   position: relative;
 }
 
+.sticker-hover-ct {
+  height: fit-content;
+}
+
+.show-set {
+  background-color: green;
+}
+
 .overflow-container {
   height: fit-content;
   overflow: scroll;
-  max-height: 720px;
+  max-height: 970px;
 }
 
 header {
@@ -76,6 +84,7 @@ h3 {
 .chatpartner-msg-ct {
 }
 
+
 .cu-msg-text {
   max-height: 105px;
   background-color: #797ef3;
@@ -99,6 +108,23 @@ h3 {
   padding: 10px 30px;
   margin: 16px 0;
 }
+
+.color-separator {
+  cursor: pointer;
+  &:hover {
+    background-color: #eceefe;
+  }
+}
+
+.message-content-bubble{
+  background-color: white;
+  max-width: 278px;
+  padding: 15px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
 
 .cu-message-container {
   display: flex;

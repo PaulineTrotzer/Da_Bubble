@@ -72,6 +72,8 @@ export class DirectThreadComponent implements OnInit {
   @Input() selectedUser: any;
   userID: any | null = null;
   messagesData: any[] = [];
+  showOptionBar = false;
+  isHovered = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -183,6 +185,14 @@ export class DirectThreadComponent implements OnInit {
   }
   toggleUserPopup() {
     this.showUserPopup = !this.showUserPopup;
+  }
+
+  onMouseEnter(message: any) {
+    message.isHovered = true;
+  }
+  
+  onMouseLeave(message: any) {
+    message.isHovered = false;
   }
 
   onClose() {
