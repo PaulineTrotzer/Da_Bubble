@@ -31,11 +31,41 @@
 
 .img-flex-bar-options {
   display: flex;
-  padding:3px 12px;
+  padding: 3px 12px;
   gap: 3px;
 }
 
-.show-set-reverse{
+.render-reaction-ct {
+  display: flex;
+  padding: 5px;
+  gap: 14px;
+}
+
+.full-reaction-flex {
+  display: flex;
+}
+
+.selected-emojis {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  border: 1px solid #adb0d9;
+  border-radius: 16px;
+  padding: 5px;
+  gap: 6px;
+  &:hover {
+    border-color: #444df2;
+  }
+}
+
+
+.single-emoji {
+}
+
+.reaction-counter {
+}
+
+.show-set-reverse {
   position: absolute;
   left: -8px;
   border: 1px solid #adb0d9;

@@ -24,6 +24,10 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
+interface Reaction {
+  emoji: string;
+  count: number;
+}
 
 @Component({
   selector: 'app-direct-thread',
@@ -58,6 +62,7 @@ import { OverlayStatusService } from '../services/overlay-status.service';
     ]),
   ],
 })
+
 export class DirectThreadComponent implements OnInit {
   [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
@@ -84,6 +89,8 @@ export class DirectThreadComponent implements OnInit {
     iconThird: 'assets/img/third.svg',
   };
   overlayStatusService = inject(OverlayStatusService);
+  reactions: { [messageId: string]: Reaction[] } = {};
+  
 
   constructor(private route: ActivatedRoute) {}
 
@@ -115,11 +122,26 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-  addEmoji(event: any) {
+  addEmoji(event: any, messageId: string) {
     const emoji = event.emoji.native;
-    this.chatMessage += emoji;
+    if (!this.reactions[messageId]) {
+      this.reactions[messageId] = [];
+    }
+    const existingReaction = this.reactions[messageId].find(reaction => reaction.emoji === emoji);
+  
+    if (existingReaction) {
+      existingReaction.count += 1;
+    } else {
+      this.reactions[messageId].push({ emoji, count: 1 });
+    }
+    console.log('Reactions after adding emoji:', this.reactions);
     this.isEmojiPickerVisible = false;
     this.overlayStatusService.setOverlayStatus(false);
+  }
+  
+
+  addingEmojiToMessage(emoji: any) {
+    console.log('emoji added');
   }
 
   async getcurrentUserById(userId: string) {
