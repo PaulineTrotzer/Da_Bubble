@@ -23,6 +23,7 @@ import { SendMessageInfo } from '../models/send-message-info.interface';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { OverlayStatusService } from '../services/overlay-status.service';
 
 @Component({
   selector: 'app-direct-thread',
@@ -75,13 +76,14 @@ export class DirectThreadComponent implements OnInit {
   messagesData: any[] = [];
   showOptionBar = false;
   isHovered = false;
-  currentSrc? : string;
+  isEmojiPickerVisible = false;
+  currentSrc?: string;
   icons: { [key: string]: string } = {
     iconMore: 'assets/img/more_vertical.svg',
     iconAddReaction: 'assets/img/comment/add_reaction.svg',
     iconThird: 'assets/img/third.svg',
   };
-  
+  overlayStatusService = inject(OverlayStatusService);
 
   constructor(private route: ActivatedRoute) {}
 
@@ -101,6 +103,23 @@ export class DirectThreadComponent implements OnInit {
 
   onHover(iconKey: string, newSrc: string): void {
     this.icons[iconKey] = newSrc;
+  }
+
+  openEmojiPicker() {
+    this.isEmojiPickerVisible = true;
+    this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  closePicker() {
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isEmojiPickerVisible = false;
+  }
+
+  addEmoji(event: any) {
+    const emoji = event.emoji.native;
+    this.chatMessage += emoji;
+    this.isEmojiPickerVisible = false;
+    this.overlayStatusService.setOverlayStatus(false);
   }
 
   async getcurrentUserById(userId: string) {
@@ -202,7 +221,7 @@ export class DirectThreadComponent implements OnInit {
   onMouseEnter(message: any) {
     message.isHovered = true;
   }
-  
+
   onMouseLeave(message: any) {
     message.isHovered = false;
   }

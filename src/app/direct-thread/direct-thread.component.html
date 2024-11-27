@@ -88,19 +88,18 @@
               <div class="show-set">
                 <h2>test</h2>
                 <div class="img-flex-bar-options">
-                  <img 
-                  class="icon-more" 
-                  [src]="icons['iconMore']" 
-                  (mouseenter)="onHover('iconMore', 'assets/img/dots.png')" 
-                  (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" 
-                  alt="default">
-                
-                <img 
-                  class="icon-add-reaction" 
-                  [src]="icons['iconAddReaction']" 
-                  (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')" 
-                  (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" 
-                  alt="default">
+                  <img class="icon-more" [src]="icons['iconMore']"
+                    (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
+                    (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default">
+
+                  <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
+                    (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
+                    (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default">
+                  <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                    <div class="emoji-picker">
+                      <emoji-mart (emojiClick)="addEmoji($event)" class="emoji-picker" size="18"></emoji-mart>
+                    </div>
+                  </div>
                   <img>
                 </div>
               </div>
