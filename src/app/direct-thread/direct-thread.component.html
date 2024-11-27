@@ -39,11 +39,6 @@
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
               <p>{{ message.text }}</p>
             </div>
-            <div class="sticker-hover-ct">
-              <div *ngIf="message.isHovered" class="show-set">
-                <h2>test</h2>
-              </div>
-            </div>
 
             <!--             <div class="chatpartner-reaction-bar">
               <div class="reaction-popup" *ngIf="showMessagePopup" @fadeIn>
@@ -67,7 +62,27 @@
                 </svg>
               </div>
             </div>-->
+            <div class="sticker-hover-ct">
+              <div class="show-set">
+                <div class="img-flex-bar-options">
+                  <img class="icon-more" [src]="icons['iconMore']"
+                    (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
+                    (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default">
+
+                  <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
+                    (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
+                    (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default">
+                  <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                    <div class="emoji-picker">
+                      <emoji-mart (emojiClick)="addEmoji($event)" class="emoji-picker" size="18"></emoji-mart>
+                    </div>
+                  </div>
+                  <img>
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
 
         <div class="color-separator">
@@ -85,8 +100,7 @@
             </div>
 
             <div class="sticker-hover-ct">
-              <div class="show-set">
-                <h2>test</h2>
+              <div class="show-set-reverse">
                 <div class="img-flex-bar-options">
                   <img class="icon-more" [src]="icons['iconMore']"
                     (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"

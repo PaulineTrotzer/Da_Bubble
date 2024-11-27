@@ -31,6 +31,22 @@
 
 .img-flex-bar-options {
   display: flex;
+  padding:3px 12px;
+  gap: 3px;
+}
+
+.show-set-reverse{
+  position: absolute;
+  left: -8px;
+  border: 1px solid #adb0d9;
+  background-color: white;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0;
+  top: 0;
+  transition: right 0.3s ease, opacity 0.3s ease;
+  color: white;
 }
 
 header {
@@ -293,11 +309,11 @@ h3 {
 }
 
 .emoji-picker {
-  width: 300px; 
-  height: 400px; 
+  width: 300px;
+  height: 400px;
   background-color: #fff;
-  border-radius: 8px; 
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .emoji-bubble {
