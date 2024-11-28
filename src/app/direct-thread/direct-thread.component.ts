@@ -69,14 +69,9 @@ interface Reaction {
 })
 export class DirectThreadComponent implements OnInit {
   subscription?: Subscription;
-  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   chatMessage: string = '';
-  showTopicBubble: boolean = false;
-  showMessageBubble: boolean = false;
   showUserBubble: boolean = false;
-  showMessagePopup: boolean = false;
-  showUserPopup: boolean = false;
   global = inject(GlobalVariableService);
   currentUser: User = new User();
   firestore = inject(Firestore);
@@ -102,6 +97,7 @@ export class DirectThreadComponent implements OnInit {
     senderPicture?: string;
     timestamp?: Date | { seconds: number; nanoseconds: number };
     senderId?: string;
+    isHovered?: boolean; 
   } = {};
   firstMessageId: string = '';
   firstThreadMessage = false;
@@ -126,17 +122,13 @@ export class DirectThreadComponent implements OnInit {
     if (!this.currentThreadMessage?.timestamp) {
       return null;
     }
-  
     const timestamp = this.currentThreadMessage.timestamp;
-  
     if (timestamp instanceof Date) {
       return timestamp;
     }
-  
     if (typeof timestamp === 'object' && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
       return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000);
     }
-  
     return null;
   }
   
@@ -157,7 +149,6 @@ export class DirectThreadComponent implements OnInit {
 
   async createThreadMessages(messageId: any) {
     try {
-      // Referenz zum bestehenden Dokument
       const docRef = doc(this.firestore, 'messages', messageId);
       const docSnapshot = await getDoc(docRef);
 
@@ -166,10 +157,7 @@ export class DirectThreadComponent implements OnInit {
         console.log('Aktuelle Nachricht:', this.currentThreadMessage);
         this.firstThreadMessage = true;
         const messageData = this.messageData(1, 1);
-        // Collection 'directThreadMessages' referenzieren
         const messagesRef = collection(this.firestore, 'directThreadMessages');
-
-        // Prüfen, ob ein Dokument mit dieser Kombination von Sender und Empfänger existiert
         const querySnapshot = await getDocs(
           query(
             messagesRef,
@@ -177,15 +165,10 @@ export class DirectThreadComponent implements OnInit {
             where('recipientId', '==', messageData.recipientId)
           )
         );
-
         if (querySnapshot.empty) {
-          // Dokument existiert noch nicht: Neues erstellen
           const newDocRef = await addDoc(messagesRef, messageData);
-
           const messageWithId = { ...messageData, id: newDocRef.id };
           this.messagesData.push(messageWithId);
-
-          console.log('Neues Dokument erstellt mit ID:', newDocRef.id);
         } else {
           console.log(
             'Dokument existiert bereits. Es wird kein neues erstellt.'

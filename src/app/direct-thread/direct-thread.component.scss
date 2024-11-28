@@ -237,6 +237,13 @@ h3 {
   border-bottom-right-radius: 20px;
 }
 
+.message-time {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.1px;
+  color: #686868;
+}
+
 .partner-message-header {
   display: flex;
   align-items: center;
@@ -266,6 +273,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-direction: row-reverse;
   h4 {
     font-family: Nunito;
     font-size: 18px;
