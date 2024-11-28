@@ -16,6 +16,9 @@ import {
   onSnapshot,
   query,
   where,
+  updateDoc,
+  addDoc,
+  getDocs,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -24,6 +27,8 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { Subscription } from 'rxjs';
+
 interface Reaction {
   emoji: string;
   count: number;
@@ -62,8 +67,8 @@ interface Reaction {
     ]),
   ],
 })
-
 export class DirectThreadComponent implements OnInit {
+  subscription?: Subscription;
   [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   chatMessage: string = '';
@@ -90,7 +95,16 @@ export class DirectThreadComponent implements OnInit {
   };
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: Reaction[] } = {};
-  
+  currentThreadMessage: {
+    senderName?: string;
+    recipientName?: string;
+    text?: string;
+    senderPicture?: string;
+    timestamp?: Date | { seconds: number; nanoseconds: number };
+    senderId?: string;
+  } = {};
+  firstMessageId: string = '';
+  firstThreadMessage = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -103,8 +117,122 @@ export class DirectThreadComponent implements OnInit {
           this.currentUser = userResult;
         }
       }
-      console.log('suser', this.selectedUser);
-      this.getMessages();
+      await this.subscribeToChosenMessage();
+      await this.getThreadMessages();
+    });
+  }
+
+  getFormattedTimestamp(): Date | null {
+    if (!this.currentThreadMessage?.timestamp) {
+      return null;
+    }
+  
+    const timestamp = this.currentThreadMessage.timestamp;
+  
+    if (timestamp instanceof Date) {
+      return timestamp;
+    }
+  
+    if (typeof timestamp === 'object' && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
+      return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000);
+    }
+  
+    return null;
+  }
+  
+
+  async subscribeToChosenMessage() {
+    this.subscription = this.global.currentThreadMessage$.subscribe(
+      async (message) => {
+        await this.createThreadMessages(message);
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  async createThreadMessages(messageId: any) {
+    try {
+      // Referenz zum bestehenden Dokument
+      const docRef = doc(this.firestore, 'messages', messageId);
+      const docSnapshot = await getDoc(docRef);
+
+      if (docSnapshot.exists()) {
+        this.currentThreadMessage = docSnapshot.data();
+        console.log('Aktuelle Nachricht:', this.currentThreadMessage);
+        this.firstThreadMessage = true;
+        const messageData = this.messageData(1, 1);
+        // Collection 'directThreadMessages' referenzieren
+        const messagesRef = collection(this.firestore, 'directThreadMessages');
+
+        // Prüfen, ob ein Dokument mit dieser Kombination von Sender und Empfänger existiert
+        const querySnapshot = await getDocs(
+          query(
+            messagesRef,
+            where('senderId', '==', messageData.senderId),
+            where('recipientId', '==', messageData.recipientId)
+          )
+        );
+
+        if (querySnapshot.empty) {
+          // Dokument existiert noch nicht: Neues erstellen
+          const newDocRef = await addDoc(messagesRef, messageData);
+
+          const messageWithId = { ...messageData, id: newDocRef.id };
+          this.messagesData.push(messageWithId);
+
+          console.log('Neues Dokument erstellt mit ID:', newDocRef.id);
+        } else {
+          console.log(
+            'Dokument existiert bereits. Es wird kein neues erstellt.'
+          );
+        }
+      } else {
+        console.error('Das Dokument existiert nicht.');
+      }
+    } catch (error) {
+      console.error('Fehler beim Erstellen der Thread-Nachricht:', error);
+    }
+  }
+
+  async getThreadMessages() {
+    const docRef = collection(this.firestore, 'directThreadMessages');
+    const q = query(
+      docRef,
+      where('recipientId', 'in', [
+        this.selectedUser.id,
+        this.global.currentUserData.id,
+      ]),
+      where('senderId', 'in', [
+        this.selectedUser.id,
+        this.global.currentUserData.id,
+      ])
+    );
+    onSnapshot(q, (querySnapshot) => {
+      console.log('Messages retrieved:', querySnapshot);
+      this.messagesData = [];
+      querySnapshot.forEach((doc) => {
+        const messageData = doc.data();
+        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+          messageData['timestamp'] = messageData['timestamp'].toDate();
+        }
+        if (
+          (messageData['senderId'] === this.global.currentUserData.id &&
+            messageData['recipientId'] === this.selectedUser.id) ||
+          (messageData['senderId'] === this.selectedUser.id &&
+            messageData['recipientId'] === this.global.currentUserData.id) ||
+          (this.global.statusCheck &&
+            messageData['senderId'] === this.global.currentUserData.id &&
+            messageData['recipientId'] === this.global.currentUserData.id)
+        ) {
+          this.messagesData.push({ id: doc.id, ...messageData });
+        }
+      });
+      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
     });
   }
 
@@ -122,26 +250,45 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-  addEmoji(event: any, messageId: string) {
+  async addEmoji(event: any, messageId: string) {
     const emoji = event.emoji.native;
     if (!this.reactions[messageId]) {
       this.reactions[messageId] = [];
     }
-    const existingReaction = this.reactions[messageId].find(reaction => reaction.emoji === emoji);
-  
+    const existingReaction = this.reactions[messageId].find(
+      (reaction) => reaction.emoji === emoji
+    );
     if (existingReaction) {
       existingReaction.count += 1;
     } else {
       this.reactions[messageId].push({ emoji, count: 1 });
     }
-    console.log('Reactions after adding emoji:', this.reactions);
+    await this.addingEmojiToMessage(messageId, emoji);
     this.isEmojiPickerVisible = false;
     this.overlayStatusService.setOverlayStatus(false);
   }
-  
 
-  addingEmojiToMessage(emoji: any) {
-    console.log('emoji added');
+  async addingEmojiToMessage(messageId: string, emoji: string) {
+    if (messageId) {
+      this.updateMessageInDatabase(emoji, messageId);
+    }
+  }
+
+  async updateMessageInDatabase(emoji: any, messageId: any) {
+    const emojiRef = doc(this.firestore, 'messages', messageId);
+    updateDoc(emojiRef, {
+      senderSticker: emoji,
+      senderStickerCount:
+        messageId.senderSticker === emoji
+          ? messageId.senderStickerCount + 1
+          : 1,
+    })
+      .then(() => {
+        console.log('Nachricht erfolgreich aktualisiert');
+      })
+      .catch((error) => {
+        console.error('Fehler beim Aktualisieren der Nachricht:', error);
+      });
   }
 
   async getcurrentUserById(userId: string) {
@@ -224,21 +371,6 @@ export class DirectThreadComponent implements OnInit {
       selectedFiles: [],
     };
   }
-  toggleTopicBubble() {
-    this.showTopicBubble = !this.showTopicBubble;
-  }
-  toggleMessageBubble() {
-    this.showMessageBubble = !this.showMessageBubble;
-  }
-  toggleUserBubble() {
-    this.showUserBubble = !this.showUserBubble;
-  }
-  toggleMessagePopup() {
-    this.showMessagePopup = !this.showMessagePopup;
-  }
-  toggleUserPopup() {
-    this.showUserPopup = !this.showUserPopup;
-  }
 
   onMouseEnter(message: any) {
     message.isHovered = true;
@@ -250,17 +382,5 @@ export class DirectThreadComponent implements OnInit {
 
   onClose() {
     this.closeDirectThread.emit();
-  }
-
-  showMessagesFromSelectedUser(): boolean {
-    return this.messagesData.some(
-      (message) => message.senderName === this.selectedUser.name
-    );
-  }
-
-  showMessagesFromCurrentUser(): boolean {
-    return this.messagesData.some(
-      (message) => message.senderName === this.currentUser.name
-    );
   }
 }

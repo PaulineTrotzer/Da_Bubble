@@ -1,12 +1,12 @@
 <div class="full-app-content">
-     
-   <app-mention-message-box  *ngIf="global.openMentionMessageBox" >
 
-   </app-mention-message-box>
+    <app-mention-message-box *ngIf="global.openMentionMessageBox">
+
+    </app-mention-message-box>
 
 
 
-    
+
 
 
     <div *ngIf="selectedUser" class="main-current-messagebox" #scrollContainer>
@@ -16,7 +16,7 @@
                     <div class="line"></div>
                     <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
                 </div>
-                
+
             </div>
             <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
               'main-message-info-user':message.senderId !== global.currentUserData.id, 
@@ -70,7 +70,7 @@
                                 <img [src]="stricker">
                             </div>
                         </div>
-                        <div (click)="openThread()" class="open-thread">
+                        <div (click)="openThread(message.id)" class="open-thread">
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <mask id="mask0_489_4322" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -141,28 +141,25 @@
                             'message-card-user':
                               message.senderId !== global.currentUserData.id
                           }" appearance="outlined">
-                                        <mat-card-content [ngClass]="{
+                            <mat-card-content [ngClass]="{
                               'card-content-current':
                                 message.senderId === global.currentUserData.id,
                                 
                               'card-content-user':
                                 message.senderId !== global.currentUserData.id
-                            }">   
-                    <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                    <span
-                        *ngIf="isMention(mentionName)"
-                        class="mention-message"
-                        (click)="handleMentionClick(mentionName)"
-                       >
-                      {{ mentionName }}
-                      </span>
-                   <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
-                 </ng-container>
-            
-                        
-                        </mat-card-content>
-                                        
-                                    </mat-card>
+                            }">
+                                <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                                    <span *ngIf="isMention(mentionName)" class="mention-message"
+                                        (click)="handleMentionClick(mentionName)">
+                                        {{ mentionName }}
+                                    </span>
+                                    <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                                </ng-container>
+
+
+                            </mat-card-content>
+
+                        </mat-card>
 
                     </div>
                     <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
@@ -346,5 +343,6 @@
             <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser.name}}</span> und dir statt
         </div>
     </div>
-    <app-input-field [selectedChannel]="selectedChannel" [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
+    <app-input-field [selectedChannel]="selectedChannel" [selectedUser]="selectedUser"
+        (messageSent)="onMessageSent()"></app-input-field>
 </div>

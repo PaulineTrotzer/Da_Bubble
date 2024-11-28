@@ -9,10 +9,7 @@ import {
   OnInit,
   ViewChild,
   Output,
-  EventEmitter
-  
-  
-  
+  EventEmitter,
 } from '@angular/core';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -36,9 +33,9 @@ import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { Subscription } from 'rxjs';
-import { ThreadComponent } from "../thread/thread.component";
+import { ThreadComponent } from '../thread/thread.component';
 import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
-import { MentionMessageBoxComponent } from "../mention-message-box/mention-message-box.component";
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 
 @Component({
   selector: 'app-chat-component',
@@ -52,12 +49,11 @@ import { MentionMessageBoxComponent } from "../mention-message-box/mention-messa
     InputFieldComponent,
     ThreadComponent,
     ChannelChatComponent,
-    MentionMessageBoxComponent
-],
+    MentionMessageBoxComponent,
+  ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-
 export class ChatComponent implements OnInit, OnChanges {
   afterLoginSheet = false;
   welcomeChannelSubscription: Subscription | undefined;
@@ -86,7 +82,7 @@ export class ChatComponent implements OnInit, OnChanges {
   showTwoPersonConversationTxt = false;
   @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
   @Output() threadOpened = new EventEmitter<void>();
-
+  chosenThreadMessage: any;
 
   commentStricker: string[] = [
     '../../assets/img/comment/face.png',
@@ -97,11 +93,10 @@ export class ChatComponent implements OnInit, OnChanges {
     '../../assets/img/comment/celebration.png',
   ];
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
-    
-    this.getAllUsersname()
+    this.getAllUsersname();
   }
 
   onUserNameClick() {
@@ -210,7 +205,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData = [];
   }
 
-
   saveOrDeleteMessage(message: any) {
     const messageRef = doc(this.firestore, 'messages', message.id);
     if (this.editableMessageText.trim() === '') {
@@ -218,9 +212,11 @@ export class ChatComponent implements OnInit, OnChanges {
         this.editMessageId = null;
       });
     } else {
-      const editMessage = { text: this.editableMessageText, editedTextShow: true };
+      const editMessage = {
+        text: this.editableMessageText,
+        editedTextShow: true,
+      };
       updateDoc(messageRef, editMessage).then(() => {
-
         this.editMessageId = null;
       });
     }
@@ -290,7 +286,6 @@ export class ChatComponent implements OnInit, OnChanges {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: [],
-
     };
   }
 
@@ -423,8 +418,11 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  openThread(){
-    this.threadOpened.emit(); 
+  openThread(messageId: any) {
+    this.threadOpened.emit();
+    this.chosenThreadMessage = messageId;
+    this.global.setCurrentThreadMessage(messageId);
+    console.log('chosen msg', this.chosenThreadMessage);
   }
 
   splitMessage(text: string) {
@@ -440,25 +438,23 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
-
-
   @Output() userMention = new EventEmitter<any>();
 
   handleMentionClick(mention: string) {
-   this.global.openMentionMessageBox=false
-    const cleanName=mention.substring(1);
-    const userRef=collection(this.firestore,'users')
-    onSnapshot(userRef,(querySnapshot)=>{
-     this.global.getUserByName={};
-     querySnapshot.forEach((doc)=>{
-      const dataUser=doc.data();
-      const dataUserName=dataUser['name']
-      if(dataUserName===cleanName){
-          this.global.getUserByName={id:doc.id, ...dataUser}  
-      }
-      this.global.openMentionMessageBox=true
-     })  
-    })
+    this.global.openMentionMessageBox = false;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
   }
 
   getAllUsersName: any[] = [];
@@ -466,17 +462,12 @@ export class ChatComponent implements OnInit, OnChanges {
   getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
-      this.getAllUsersName=[]
-      querySnapshot.forEach((doc)=>{
-        const dataUser=doc.data()
-        const userName=dataUser['name']
-        this.getAllUsersName.push({userName})
-      })
-    })
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
   }
-
-
-
 }
-
-
