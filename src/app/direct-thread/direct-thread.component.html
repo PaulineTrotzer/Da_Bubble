@@ -24,39 +24,38 @@
   <div class="overflow-container">
     <div class="all-thread-message-container">
 
+      <div class="color-separator" (mouseenter)="onMouseEnter(currentThreadMessage)"
+      (mouseleave)="onMouseLeave(currentThreadMessage)" *ngIf="firstThreadMessage">
+      <div [ngClass]="{
+          'cu-message-container': currentThreadMessage.senderName === currentUser.name,
+          'chatpartner-message-container': currentThreadMessage.senderName === selectedUser.name
+        }">
+        <div [ngClass]="{
+            'cu-message-header': currentThreadMessage.senderName === currentUser.name,
+            'partner-message-header': currentThreadMessage.senderName === selectedUser.name
+          }">
+          <div class="avatar-container">
+            <img [src]="currentThreadMessage.senderPicture" alt="{{ currentThreadMessage.senderName }}" />
+          </div>
+          <h4>{{ currentThreadMessage.senderName }}</h4>
+          <span class="message-time">{{ getFormattedTimestamp() | date: 'shortTime' }}</span>
+        </div>
+        <div [ngClass]="{
+            'cu-msg-text': currentThreadMessage.senderName === currentUser.name,
+            'message-content-bubble': currentThreadMessage.senderName === selectedUser.name && currentThreadMessage.isHovered,
+            'static-bubble': currentThreadMessage.senderName === selectedUser.name && !currentThreadMessage.isHovered
+          }">
+          <p>{{ currentThreadMessage.text }}</p>
+        </div>
+      </div>
+    </div>
+
 
       <div *ngFor="let message of messagesData" class="message-bubble">
 
-        <div class="color-separator" (mouseenter)="onMouseEnter(currentThreadMessage)"
-          (mouseleave)="onMouseLeave(currentThreadMessage)" *ngIf="firstThreadMessage">
-          <div [ngClass]="{
-              'cu-message-container': currentThreadMessage.senderName === currentUser.name,
-              'chatpartner-message-container': currentThreadMessage.senderName === selectedUser.name
-            }">
-            <div [ngClass]="{
-                'cu-message-header': currentThreadMessage.senderName === currentUser.name,
-                'partner-message-header': currentThreadMessage.senderName === selectedUser.name
-              }">
-              <div class="avatar-container">
-                <img [src]="currentThreadMessage.senderPicture" alt="{{ currentThreadMessage.senderName }}" />
-              </div>
-              <h4>{{ currentThreadMessage.senderName }}</h4>
-              <span class="message-time">{{ getFormattedTimestamp() | date: 'shortTime' }}</span>
-            </div>
-            <div [ngClass]="{
-                'cu-msg-text': currentThreadMessage.senderName === currentUser.name,
-                'message-content-bubble': currentThreadMessage.senderName === selectedUser.name && currentThreadMessage.isHovered,
-                'static-bubble': currentThreadMessage.senderName === selectedUser.name && !currentThreadMessage.isHovered
-              }">
-              <p>{{ currentThreadMessage.text }}</p>
-            </div>
-          </div>
-        </div>
-
-
         <div class="color-separator" (mouseenter)="onMouseEnter(message)" (mouseleave)="onMouseLeave(message)">
           <div
-            *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name && !firstThreadMessage"
+            *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name"
             class="chatpartner-message-container">
             <div class="partner-message-header">
               <div class="avatar-container">
@@ -117,7 +116,7 @@
 
         <div class="color-separator">
           <div
-            *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name && !firstThreadMessage"
+            *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
             class="cu-message-container">
             <div class="cu-message-header">
               <div class="avatar-container">
@@ -188,6 +187,6 @@
     </div>
   </div>
   <div class="input-holder">
-    <app-input-field [selectedUser]="currentUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+    <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
   </div>
 </div>

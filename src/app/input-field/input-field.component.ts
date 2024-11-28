@@ -35,6 +35,7 @@ import { UserService } from '../services/user.service';
   styleUrl: './input-field.component.scss',
 })
 export class InputFieldComponent implements OnInit, OnChanges {
+  currentThreadMessageId: string | null = null;
   @Input() isDirectThreadOpen: boolean = false;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
@@ -64,6 +65,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getByUserName();
+    this.global.currentThreadMessage$.subscribe((messageId) => {
+      this.currentThreadMessageId = messageId;
+      console.log('Aktuelle Thread-Nachricht ID:', this.currentThreadMessageId);
+    });
   }
 
   async sendMessage() {
@@ -105,27 +110,40 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   async sendDirectThreadMessage() {
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
-      console.warn('thread is not opened or message is empty');
+      console.warn('Thread is not open or message is empty');
       return;
     }
-    const directThreadMessagesRef = collection(
-      this.firestore,
-      'directThreadMessages'
-    );
-    const messageData = {
-      text: this.chatMessage,
-      senderId: this.global.currentUserData.id,
-      senderName: this.global.currentUserData.name,
-      senderPicture: this.global.currentUserData.picture || '',
-      timestamp: new Date(),
-      selectedFiles: this.selectFiles,
-      editedTextShow: false,
-    };
-    const docRef = await addDoc(directThreadMessagesRef, messageData);
-    this.chatMessage = '';
-    this.selectFiles = [];
-    this.messageSent.emit();
+    if (!this.currentThreadMessageId) {
+      console.error('Es wurde keine aktuelle Nachricht ausgewählt.');
+      return;
+    }
+    try {
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${this.currentThreadMessageId}/threadMessages`
+      );
+      const messageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles,
+        editedTextShow: false,
+        recipientId: this.selectedUser.uid,
+        recipientName: this.selectedUser.name,
+      };
+      await addDoc(threadMessagesRef, messageData);
+      this.chatMessage = '';
+      this.selectFiles = [];
+      this.messageSent.emit();
+      console.log('Nachricht erfolgreich gesendet und in Subcollection gespeichert.');
+    } catch (error) {
+      console.error('Fehler beim Senden der Nachricht:', error);
+    }
   }
+
+  
 
   async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {

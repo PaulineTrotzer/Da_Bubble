@@ -19,6 +19,7 @@ import {
   updateDoc,
   addDoc,
   getDocs,
+  orderBy,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -93,6 +94,7 @@ export class DirectThreadComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: Reaction[] } = {};
   currentThreadMessage: {
+    id?: string | undefined;
     senderName?: string;
     recipientName?: string;
     text?: string;
@@ -103,6 +105,7 @@ export class DirectThreadComponent implements OnInit {
   } = {};
   firstMessageId: string = '';
   firstThreadMessage = false;
+  selectFiles: any[] = [];
 
   constructor(private route: ActivatedRoute) {}
 
@@ -117,7 +120,6 @@ export class DirectThreadComponent implements OnInit {
       }
       console.log('selectedUser is', this.selectedUser);
       await this.subscribeToChosenMessage();
-      await this.getThreadMessages();
       this.toggleThreadStatus(true);
     });
   }
@@ -149,7 +151,8 @@ export class DirectThreadComponent implements OnInit {
   async subscribeToChosenMessage() {
     this.subscription = this.global.currentThreadMessage$.subscribe(
       async (message) => {
-        await this.createThreadMessages(message);
+        await this.handleFirstThreadMessageAndPush(message);
+        await this.getThreadMessages(message);
       }
     );
   }
@@ -159,77 +162,82 @@ export class DirectThreadComponent implements OnInit {
       this.subscription.unsubscribe();
     }
   }
-
-  async createThreadMessages(messageId: any) {
+  async handleFirstThreadMessageAndPush(messageId: string) {
     try {
       const docRef = doc(this.firestore, 'messages', messageId);
       const docSnapshot = await getDoc(docRef);
-
-      if (docSnapshot.exists()) {
-        this.currentThreadMessage = docSnapshot.data();
-        console.log('Aktuelle Nachricht:', this.currentThreadMessage);
-        this.firstThreadMessage = true;
-        const messageData = this.messageData(1, 1);
-        const messagesRef = collection(this.firestore, 'directThreadMessages');
-        const querySnapshot = await getDocs(
-          query(
-            messagesRef,
-            where('senderId', '==', messageData.senderId),
-            where('recipientId', '==', messageData.recipientId)
-          )
-        );
-        if (querySnapshot.empty) {
-          const newDocRef = await addDoc(messagesRef, messageData);
-          const messageWithId = { ...messageData, id: newDocRef.id };
-          this.messagesData.push(messageWithId);
-        } else {
-          console.log(
-            'Dokument existiert bereits. Es wird kein neues erstellt.'
-          );
-        }
-      } else {
+  
+      if (!docSnapshot.exists()) {
         console.error('Das Dokument existiert nicht.');
+        return;
       }
+  
+      this.currentThreadMessage = docSnapshot.data();
+      console.log('Aktuelle Nachricht:', this.currentThreadMessage);
+      this.firstThreadMessage = true;
+  
+      // Erstelle Subcollection für die Thread-Nachrichten
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${messageId}/threadMessages`
+      );
+  
+      const messageData = {
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles || [],
+        editedTextShow: false,
+        recipientId: this.selectedUser.uid,
+        recipientName: this.selectedUser.name,
+        text: this.currentThreadMessage.text || '', // Nachrichtentext
+      };
+  
+      await addDoc(threadMessagesRef, messageData);
+      console.log('Neue Nachricht hinzugefügt.');
+  
+      // Eingabefelder zurücksetzen
+      this.chatMessage = '';
+      this.selectFiles = [];
+  
+      // Nach dem Hinzufügen Nachrichten abrufen
+      await this.getThreadMessages(messageId);
     } catch (error) {
-      console.error('Fehler beim Erstellen der Thread-Nachricht:', error);
+      console.error('Fehler beim Verarbeiten der Thread-Nachricht:', error);
     }
   }
+  
 
-  async getThreadMessages() {
-    const docRef = collection(this.firestore, 'directThreadMessages');
-    const q = query(
-      docRef,
-      where('recipientId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
-      ]),
-      where('senderId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
-      ])
-    );
-    onSnapshot(q, (querySnapshot) => {
-      console.log('Messages retrieved:', querySnapshot);
-      this.messagesData = [];
-      querySnapshot.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
+  async getThreadMessages(messageId: string) {
+    try {
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${messageId}/threadMessages`
+      );
+      const q = query(threadMessagesRef, orderBy('timestamp', 'asc')); // Nachrichten sortieren nach Zeitstempel
+
+      onSnapshot(q, (querySnapshot) => {
+        if (querySnapshot.empty) {
+          console.log('Keine Thread-Nachrichten gefunden.');
+          this.messagesData = [];
+          return;
         }
-        if (
-          (messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.selectedUser.id) ||
-          (messageData['senderId'] === this.selectedUser.id &&
-            messageData['recipientId'] === this.global.currentUserData.id) ||
-          (this.global.statusCheck &&
-            messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.global.currentUserData.id)
-        ) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
+
+        console.log('Thread-Nachrichten abgerufen:', querySnapshot.size);
+        this.messagesData = querySnapshot.docs.map((doc) => {
+          const messageData = doc.data();
+          if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+            messageData['timestamp'] = messageData['timestamp'].toDate();
+          }
+          return { id: doc.id, ...messageData };
+        });
+
+        console.log('Thread-Nachrichten:', this.messagesData);
       });
-      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-    });
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Thread-Nachrichten:', error);
+    }
   }
 
   onHover(iconKey: string, newSrc: string): void {
@@ -303,43 +311,6 @@ export class DirectThreadComponent implements OnInit {
     } catch (error) {
       console.error('Fehler beim Abruf s Benutzers:', error);
     }
-  }
-
-  async getMessages() {
-    const docRef = collection(this.firestore, 'messages');
-    const q = query(
-      docRef,
-      where('recipientId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
-      ]),
-      where('senderId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
-      ])
-    );
-    onSnapshot(q, (querySnapshot) => {
-      console.log('Messages retrieved:', querySnapshot);
-      this.messagesData = [];
-      querySnapshot.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
-        }
-        if (
-          (messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.selectedUser.id) ||
-          (messageData['senderId'] === this.selectedUser.id &&
-            messageData['recipientId'] === this.global.currentUserData.id) ||
-          (this.global.statusCheck &&
-            messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.global.currentUserData.id)
-        ) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
-      });
-      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-    });
   }
 
   messageData(
