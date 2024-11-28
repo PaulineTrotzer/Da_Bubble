@@ -28,6 +28,7 @@ import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Subscription } from 'rxjs';
+import { InputFieldComponent } from '../input-field/input-field.component';
 
 interface Reaction {
   emoji: string;
@@ -37,7 +38,7 @@ interface Reaction {
 @Component({
   selector: 'app-direct-thread',
   standalone: true,
-  imports: [CommonModule, PickerComponent],
+  imports: [CommonModule, PickerComponent, InputFieldComponent],
   templateUrl: './direct-thread.component.html',
   styleUrl: './direct-thread.component.scss',
   animations: [
@@ -88,6 +89,7 @@ export class DirectThreadComponent implements OnInit {
     iconAddReaction: 'assets/img/comment/add_reaction.svg',
     iconThird: 'assets/img/third.svg',
   };
+  isDirectThreadOpen: boolean = false;
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: Reaction[] } = {};
   currentThreadMessage: {
@@ -97,7 +99,7 @@ export class DirectThreadComponent implements OnInit {
     senderPicture?: string;
     timestamp?: Date | { seconds: number; nanoseconds: number };
     senderId?: string;
-    isHovered?: boolean; 
+    isHovered?: boolean;
   } = {};
   firstMessageId: string = '';
   firstThreadMessage = false;
@@ -113,9 +115,15 @@ export class DirectThreadComponent implements OnInit {
           this.currentUser = userResult;
         }
       }
+      console.log('selectedUser is', this.selectedUser);
       await this.subscribeToChosenMessage();
       await this.getThreadMessages();
+      this.toggleThreadStatus(true);
     });
+  }
+
+  toggleThreadStatus(status: boolean) {
+    this.isDirectThreadOpen = status;
   }
 
   getFormattedTimestamp(): Date | null {
@@ -126,12 +134,17 @@ export class DirectThreadComponent implements OnInit {
     if (timestamp instanceof Date) {
       return timestamp;
     }
-    if (typeof timestamp === 'object' && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
-      return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000);
+    if (
+      typeof timestamp === 'object' &&
+      'seconds' in timestamp &&
+      'nanoseconds' in timestamp
+    ) {
+      return new Date(
+        timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000
+      );
     }
     return null;
   }
-  
 
   async subscribeToChosenMessage() {
     this.subscription = this.global.currentThreadMessage$.subscribe(
@@ -364,6 +377,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   onClose() {
+    this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
   }
 }

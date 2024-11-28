@@ -72,7 +72,6 @@ export class WorkspaceComponent implements OnInit {
     this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
-        console.log('guest log status:', status); 
       }
     );
   }

@@ -157,7 +157,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.guestLoginStatusSub = this.loginAuthService.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
-        console.log('Guest login status:', status); 
       }
     );
   }
