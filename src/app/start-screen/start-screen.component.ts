@@ -72,6 +72,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
   @Input() mentionUser: string = '';
+  @Input() onHeaderUser:any
+  
   channelMembers: any[] = [];
   messagesData: any = [];
   commentImages: string[] = [
@@ -111,8 +113,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
-  }
+  } 
 
+  
   ngOnDestroy(): void {
     if (this.loginStatusSub) {
       this.loginStatusSub.unsubscribe(); 
@@ -161,6 +164,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       }
     );
   }
+  
+  @Input() onHeaderChannel:any
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -171,7 +176,21 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.selectedChannel);
-    }
+    } 
+      
+     if(changes['onHeaderUser']&&this.onHeaderUser){
+      this.afterLoginSheet = false;
+      this.selectedUser=this.onHeaderUser
+      this.checkProfileType();
+      this.global.clearCurrentChannel();
+     } 
+
+      if(changes['onHeaderChannel'] && this.onHeaderChannel){
+        this.afterLoginSheet = false;
+        this.selectedChannel=this.onHeaderChannel;
+        this.fetchChannelMembers();
+        this.global.setCurrentChannel(this.selectedChannel);
+      }
   }
 
   onMessageForwarded(data: any) {

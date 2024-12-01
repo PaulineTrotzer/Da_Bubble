@@ -1,9 +1,9 @@
 <div [ngClass]="{'page-content-plus-header': successfullyLogged}">
-    <app-header></app-header>
+    <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"  (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
     <div class="full-page-content">
         <app-workspace (userSelected)="onUserSelected($event)"
             (channelSelected)="onChannelSelected($event)"></app-workspace>
-        <app-start-screen [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
+        <app-start-screen  [onHeaderChannel]="onHeaderChannel"  [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
         <app-thread *ngIf="isThreadOpen" (closeThread)="onThreadClosed()"></app-thread>

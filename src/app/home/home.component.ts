@@ -36,7 +36,8 @@ export class HomeComponent implements OnInit {
   global = inject(GlobalVariableService);
   isGuestLogin = false;
   private guestLoginStatusSub: Subscription | undefined;
-
+  onHeaderUser:any
+  onHeaderChannel:any
   ngOnInit(): void {
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
@@ -57,6 +58,18 @@ export class HomeComponent implements OnInit {
         console.log('Guest login status:', status);
       }
     );
+  } 
+
+  onHeaderUserSelected(user:any){
+    this.onHeaderUser=user;
+    this.selectedChannel = null;
+    this.globalService.clearCurrentChannel();
+  } 
+
+  onHeaderchannelSelected(channel:any){
+    this.onHeaderChannel=channel;
+    this.selectedUser = null;
+    this.globalService.setCurrentChannel(channel);
   }
 
   onUserSelected(user: any) {

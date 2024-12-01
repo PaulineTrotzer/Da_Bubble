@@ -26,6 +26,7 @@ interface Message {
   senderName: string;
   senderPicture: string;
   reactions: { [emoji: string]: string[] };
+  selectedFiles?:any[]
 }
 
 @Component({
@@ -59,7 +60,7 @@ export class ChannelChatComponent implements OnInit {
   hoveredEmoji: string | null = null;
   isPickerVisible: string | null = null;
   currentUserLastEmojis: string [] = [];
-
+  
   messageToEdit: string = '';
 
   unsubscribe: (() => void) | undefined;

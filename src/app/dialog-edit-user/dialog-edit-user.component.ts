@@ -14,6 +14,8 @@ import {
   uploadBytes,
   getDownloadURL,
 } from '@angular/fire/storage';
+import { LoginAuthService } from '../services/login-auth.service';
+
 @Component({
   selector: 'app-dialog-edit-user',
   standalone: true,
@@ -44,9 +46,12 @@ export class DialogEditUserComponent implements OnInit {
     '../../assets/img/avatar/avatar6.png',
   ];
   storage=inject(Storage)
+ 
+  
+  
 
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(async (paramMap) => {
@@ -56,10 +61,10 @@ export class DialogEditUserComponent implements OnInit {
         if (userResult) {
           this.user = userResult;
         }
-        console.log('aaand' ,this.global.googleAccountLogIn);
       }
-    });
+    }); 
   }
+  
 
   closeEditModus(){
     this.editCardOpen = false;

@@ -2,6 +2,7 @@
   <mat-card class="big-chat-card" appearance="outlined">
     <div class="welcome-sheet" *ngIf="afterLoginSheet"><app-welcome-sheet></app-welcome-sheet></div>
     <mat-card-header class="header">
+
       <div *ngIf="!afterLoginSheet" class="drop-down-div">
         <button *ngIf="global.channelSelected" class="drop-down-button" mat-button (click)="openDialog()">
           <span class="btn-text-img"># {{ global.currentChannel?.name }}
@@ -22,6 +23,8 @@
           </h4>
         </div>
       </div>
+
+      <!-- <div *ngIf="global.enterChatfromHeadre"> Hallo</div> -->
 
       <div>
         <div *ngIf="openMyProfile">

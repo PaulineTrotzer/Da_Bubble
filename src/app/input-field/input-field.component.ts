@@ -119,7 +119,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     const uploadPromises = this.selectFiles.map(async (file, index) => {
       const filePath = `uploads/${new Date().getTime()}_${index}_${file.type.split('/')[1]}`;
       const fileRef = ref(storage, filePath);
-      await uploadString(fileRef, file.data, 'data_url'); // Upload file as Base64
+      await uploadString(fileRef, file.data, 'data_url'); 
       const url = await getDownloadURL(fileRef); 
       return { url, type: file.type, data:file.data }; 
     });
@@ -132,9 +132,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Channel is not selected or message is empty');
       return;
     }
-
+     
     const channelMessagesRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages');
-
+    const fileData  = await this.uploadFilesToFirebaseStorage();
     const messageData = {
       text: this.chatMessage,
       senderId: this.global.currentUserData.id,
@@ -143,7 +143,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
       timestamp: new Date(),
       selectedFiles: this.selectFiles,
       editedTextShow: false
-    };
+    }; 
+    messageData.selectedFiles = fileData;
+
 
     const docRef = await addDoc(channelMessagesRef, messageData);
 
@@ -177,7 +179,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
       selectedFiles: this.selectFiles,
-      editedTextShow: false
+      editedTextShow: false,
     };
   }
 

@@ -36,9 +36,7 @@
                     <div *ngIf="user.picture === '' " class="noImage-status">
                         <span [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span>  
                     </div>
-                     
                 </div> 
-               
             </div> 
             <div *ngIf="noUserFound" class="no-user-found">
                 Keine User gefunden.

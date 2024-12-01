@@ -423,6 +423,7 @@ app-input-field {
   border-bottom-right-radius: 0;
   top: -22px;
   transition: left 0.3s ease, opacity 0.3s ease;
+  background-color: #ffffff;
 }
 
 .comment-box-current.position {
@@ -441,6 +442,7 @@ app-input-field {
   border-bottom-right-radius: 0;
   top: -22px;
   transition: right 0.3s ease, opacity 0.3s ease;
+  background-color: #ffffff;
 }
 
 .comment-box-user.position-user {
@@ -536,14 +538,11 @@ app-input-field {
 .edit-icon {
   width: 40px;
   height: 40px;
+  position: relative;
 
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-
-    // .edit-messages-card {
-    //   opacity: 1;
-    // }
 
     svg {
       path {
@@ -553,10 +552,10 @@ app-input-field {
   }
 }
 
-.edit-messages-card {
+.edit-messages-card{
   position: absolute;
-  left: 109px;
-  top: 24px;
+  left: 25px;
+  top: 22px;
   max-width: max-content;
   background-color: #ffffff;
   border-top-left-radius: 0;
@@ -568,7 +567,6 @@ app-input-field {
   width: 250px;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.0784313725);
 }
-
 
 .edit-messages-card.position-edit {
   left: 232px;
@@ -620,15 +618,18 @@ app-input-field {
 }
 
 .button-box {
-  position: relative;
-  top: -60px;
+  position: absolute;
+  top: 94px;
   left: 5px;
   display: flex;
+
+  align-items: center;
   gap: 11px;
   justify-content: flex-end;
   width: 86%;
   background: #FFFFFF;
   border-radius: 63px;
+  gap: 10px;
 }
 
 .comment-icon-box {
@@ -830,16 +831,59 @@ app-mention-message-box {
 
 
 .emoji-picker {
-  position: absolute;
-  z-index: 500;
-  left: 48px;
-  top: 13px;
+   position: absolute;
+    z-index: 500;
+    left: 38px;
+    top: 13px;
 }
-
 
 .emoji-picker-user{
   position: absolute;
   z-index: 500;
-  left: -343px;
-  top: 20px;
-}
+  left: -340px;
+  top: 14px; 
+} 
+
+
+.comment-senderSticker-box{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+
+  &:hover{
+     border-radius: 40px;
+      background-color: #eceefe;
+       cursor: pointer;  
+  }
+ } 
+
+ .comment-recipientSticker-box{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+
+  &:hover{
+     border-radius: 40px;
+      background-color: #eceefe;
+       cursor: pointer;  
+  }
+ }
+
+ .edit-emoji-main{
+  position: relative;
+  top: -52px;
+  left: 1%;
+  z-index: 40;
+  width: 40px;
+  height: 40px;
+ } 
+
+ .emoji-picker-edit{
+  position: absolute;
+  left: 37px;
+  top: 5px;
+ }

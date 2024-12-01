@@ -5,16 +5,18 @@
             <img (click)="closeEditModus()" src="./assets/img/close.svg">
         </div>
     </div>
+
+
     <div class="img-frame">
         <img  [src]="chossePicture || user.picture || previewUrl">
     </div>
 
-     <div class="avatar-box">
+     <div *ngIf="!guestAccount && !global.googleAccountLogIn" class="avatar-box">
     <div  *ngFor="let avatar of avatarBox">
       <img [src]="avatar"   (click)="selectAvatar(avatar)">   
     </div>        
     </div>
-    <div class="added-avatar">
+    <div *ngIf="!guestAccount && !global.googleAccountLogIn"   class="added-avatar">
         <div class="picture-info-text">oder Bild</div>
         <div>
             <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
