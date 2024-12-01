@@ -1,1 +1,2 @@
-<app-direct-thread (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser"></app-direct-thread>
+<app-direct-thread (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser" *ngIf="directThreadId"></app-direct-thread>
+<app-channel-thread *ngIf="channelThreadId" [channelThreadId]="channelThreadId" [selectedChannel]="selectedChannel"></app-channel-thread>

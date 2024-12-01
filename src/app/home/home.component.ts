@@ -35,10 +35,26 @@ export class HomeComponent implements OnInit {
   global = inject(GlobalVariableService);
   isGuestLogin = false;
   private guestLoginStatusSub: Subscription | undefined;
+  directThreadId: string | null = null;
+  channelThreadId: string | null = null;
 
   ngOnInit(): void {
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
+    this.setDirectThread();
+    this.setChannelThread();
+  }
+
+  setDirectThread() {
+    this.global.currentThreadMessage$.subscribe((messageId) => {
+      this.directThreadId = messageId;
+    })
+  }
+
+  setChannelThread() {
+    this.global.channelThread$.subscribe((messageId) => {
+      this.channelThreadId = messageId;
+    })
   }
 
   subscribeToLoginStatus(): void {

@@ -229,5 +229,9 @@ export class ChannelChatComponent implements OnInit {
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {
     return reactions && Object.keys(reactions).length > 0;
   }
+
+  openThread(messageId: string){
+    this.global.setChannelThread(messageId)
+  }
   
 }
