@@ -1,3 +1,10 @@
+.card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 header {
   display: flex;
   align-items: center;
@@ -29,6 +36,15 @@ header {
 .topic {
   display: flex;
   gap: 20px;
+}
+
+.topic-from-current {
+    flex-direction: row-reverse;
+    padding: 10px 40px 10px 0;
+}
+
+.topic-from-user {
+    padding: 10px 0px 10px 40px;
 }
 
 .sender-info {
@@ -65,4 +81,24 @@ header {
   border: 1px solid #adb0d9;
   max-width: 296px;
   width: 100%;
+}
+
+.message {
+    padding: 15px;
+}
+
+.message-from-user {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background-color: #ECEEFE;
+    color: black;
+}
+
+.message-from-current {
+    border-top-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background-color: #797EF3;
+    color: white;
 }
