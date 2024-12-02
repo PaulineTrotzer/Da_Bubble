@@ -71,7 +71,7 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
   selectUser(user: any) { 
     const mention =  user.name;
     this.mentionUser.emit(mention);
-    console.log( this.mentionUser);
+    // console.log( this.mentionUser);
     this.global.openMentionPeopleCard=false;
   }
   

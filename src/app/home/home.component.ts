@@ -90,5 +90,8 @@ export class HomeComponent implements OnInit {
 
   onThreadClosed() {
     this.isThreadOpen = false;
-  }
+  } 
+
+    
+
 }

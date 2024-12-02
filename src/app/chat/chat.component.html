@@ -1,6 +1,6 @@
 <div class="full-app-content">
      
-   <app-mention-message-box  *ngIf="global.openMentionMessageBox" >
+   <app-mention-message-box  *ngIf="global.openMentionMessageBox" (enterChatUser)="enterChatByUserName($event)" >
 
    </app-mention-message-box>
 
@@ -45,8 +45,6 @@
                         </div>
                     </div>
                     <div class="button-box">
-                    
-                        
                         <div>
                         <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
                         <button class="btn-primary"

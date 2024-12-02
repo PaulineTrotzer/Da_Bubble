@@ -105,6 +105,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   private loginStatusSub: Subscription | undefined;
   private guestLoginStatusSub: Subscription | undefined;
   loginAuthService = inject(LoginAuthService);
+  enterChatByUser:any
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -190,7 +191,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedChannel=this.onHeaderChannel;
         this.fetchChannelMembers();
         this.global.setCurrentChannel(this.selectedChannel);
-      }
+      } 
+       
+      
+       
   }
 
   onMessageForwarded(data: any) {
@@ -318,4 +322,14 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   onThreadOpened() {
     this.threadOpened.emit();
   }
+   
+  enterByUsername(user:any){
+    this.enterChatByUser=user;
+    this.selectedUser=this.enterChatByUser;
+    this.global.openMentionMessageBox=false
+    this.checkProfileType();
+    this.global.clearCurrentChannel();
+   } 
+   
+
 }

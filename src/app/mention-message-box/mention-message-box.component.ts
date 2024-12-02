@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges, } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges,inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { CommonModule } from '@angular/common';
@@ -14,20 +14,20 @@ import { CommonModule } from '@angular/common';
 
 export class MentionMessageBoxComponent implements OnInit {
 
-  constructor(public global: GlobalVariableService) {
-
-  }
-
+  global=inject(GlobalVariableService);
+  @Output() enterChatUser=new EventEmitter<any>();
 
   ngOnInit(): void {
     if (this.global.getUserByName) {
     }
   }
 
-
-
   cancelCard() {
     this.global.openMentionMessageBox = false
+  }
+  
+  enterChat(user:any){
+     this.enterChatUser.emit(user)
   }
 
 }
