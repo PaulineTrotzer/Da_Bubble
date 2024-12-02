@@ -36,6 +36,7 @@ import { UserService } from '../services/user.service';
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
+  currentChannelThreadId: string | null = null;
   @Input() isDirectThreadOpen: boolean = false;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
@@ -67,11 +68,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.getByUserName();
     this.global.currentThreadMessage$.subscribe((messageId) => {
       this.currentThreadMessageId = messageId;
-      console.log('Aktuelle Thread-Nachricht ID:', this.currentThreadMessageId);
     });
+    this.global.channelThread$.subscribe((messageId) => {
+      this.currentChannelThreadId = messageId;
+    })
+    this.selectedChannel = this.global.currentChannel;
   }
 
   async sendMessage() {
+
     if (!this.selectedChannel && !this.selectedUser) {
       console.error('Selected user or channel is not defined');
       return;
@@ -81,10 +86,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     try {
-      if (this.selectedChannel) {
-        await this.sendChannelMessage();
+      if (this.currentChannelThreadId) {
+        await this.sendChannelThreadMessage();
       } else if (this.isDirectThreadOpen) {
         await this.sendDirectThreadMessage();
+      } else if (this.selectedChannel) {
+        await this.sendChannelMessage();
       } else {
         const messageData = this.messageData(
           this.chatMessage,
@@ -106,6 +113,31 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Error while sending message:', error);
     }
+  }
+
+  async sendChannelThreadMessage() {
+    if(!this.currentChannelThreadId || this.chatMessage.trim() === '') {
+      console.warn('Thread is not open or message is empty');
+      return;
+    }
+    try {
+      const threadRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages', this.currentChannelThreadId, 'thread');
+      const messageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles,
+        editedTextShow: false,
+        recipientId: this.selectedUser.uid,
+        recipientName: this.selectedUser.name,
+      };
+      await addDoc(threadRef, messageData)
+    } catch (err) {
+      console.error(err);
+    }
+    
   }
 
   async sendDirectThreadMessage() {

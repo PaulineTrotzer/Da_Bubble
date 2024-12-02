@@ -26,10 +26,15 @@ header {
   &:hover {
     background-color: #eceefe;
   }
+  &:hover > .topic > .topic-content > .message-from-user {
+    background-color: white;
+    color: black;
+  }
 }
 
 .avatar-container img {
   height: 70px;
+  width: 70px;
   border-radius: 100%;
 }
 

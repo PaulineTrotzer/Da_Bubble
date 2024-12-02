@@ -16,7 +16,7 @@ export class ChannelThreadComponent implements OnInit{
 
   constructor(){}
 
-  @Input() channelThreadId: any;
+  channelThreadId: any;
   @Input() selectedChannel: any;
 
   db = inject(Firestore);
@@ -39,7 +39,6 @@ export class ChannelThreadComponent implements OnInit{
     onSnapshot(docRef, (doc) => {
       const data = doc.data();
       if (data) {
-        // Convert Firestore timestamp to Date
         if (data['timestamp']?.seconds) {
           data['timestamp'] = new Date(data['timestamp'].seconds * 1000);
         }
@@ -47,5 +46,4 @@ export class ChannelThreadComponent implements OnInit{
       }
     });
   }
-
 }

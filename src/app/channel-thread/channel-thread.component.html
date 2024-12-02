@@ -60,6 +60,27 @@
       <h3>0 Antworten</h3>
       <div class="line"></div>
     </div>
+    <div class="answers-container">
+      <div class="answer" [ngClass]="{
+        'message-from-current': topicMessage.senderId === global.currentUserData.id,
+        'message-from-user': topicMessage.senderId !== global.currentUserData.id
+      }">
+        <div class="avatar-container">
+          <img [src]="" alt="">
+        </div>
+        <div class="answer-content">
+          <div class="sender-info">
+            <h3>sendername</h3>
+            <p>timestamp</p>
+          </div>
+          <div class="message" [ngClass]="{
+            'message-from-current': topicMessage.senderId === global.currentUserData.id,
+            'message-from-user': topicMessage.senderId !== global.currentUserData.id
+          }"> message
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <app-input-field></app-input-field>
 </div>
