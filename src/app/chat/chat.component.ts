@@ -25,6 +25,8 @@ import {
   where,
   deleteDoc,
   getDoc,
+  setDoc,
+  getDocs,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import { SendMessageInfo } from '../models/send-message-info.interface';
@@ -36,6 +38,7 @@ import { Subscription } from 'rxjs';
 import { ThreadComponent } from '../thread/thread.component';
 import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
+import { ThreadControlService } from '../services/thread-control.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -55,6 +58,7 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit, OnChanges {
+  threadControlService = inject(ThreadControlService);
   afterLoginSheet = false;
   welcomeChannelSubscription: Subscription | undefined;
   shouldScroll = true;
@@ -418,11 +422,27 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  openThread(messageId: any) {
-    this.threadOpened.emit();
-    this.chosenThreadMessage = messageId;
-    this.global.setCurrentThreadMessage(messageId);
-    console.log('chosen msg', this.chosenThreadMessage);
+  async openThread(messageId: any) {
+    try {
+      this.threadOpened.emit();
+      this.threadControlService.setDirectThreadStatus(true);
+      this.chosenThreadMessage = messageId;
+      this.threadControlService.setFirstThreadMessageId(messageId);
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${messageId}/threadMessages`
+      );
+      const snapshot = await getDocs(threadMessagesRef);
+      if (snapshot.empty) {
+        console.log(
+          'k Nachrichten im Thread. setz firstMessageCreated zurück'
+        );
+        const docRef = doc(this.firestore, 'messages', messageId);
+        await setDoc(docRef, { firstMessageCreated: false }, { merge: true });
+      }
+    } catch (error) {
+      console.error('Fehler beim Öffnen des Threads:', error);
+    }
   }
 
   splitMessage(text: string) {

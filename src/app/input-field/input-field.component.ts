@@ -26,6 +26,8 @@ import {
 } from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
+import { ThreadControlService } from '../services/thread-control.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-input-field',
@@ -36,7 +38,7 @@ import { UserService } from '../services/user.service';
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
-  @Input() isDirectThreadOpen: boolean = false;
+  @Input() isDirectThreadOpen : boolean | undefined;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -55,6 +57,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
   messagesData: any[] = [];
   formattedChatMessage: any;
   mentionUserName: any[] = [];
+  threadControlService =inject(ThreadControlService);
+  private subscription: Subscription = new Subscription();
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -65,10 +69,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getByUserName();
-    this.global.currentThreadMessage$.subscribe((messageId) => {
-      this.currentThreadMessageId = messageId;
-      console.log('Aktuelle Thread-Nachricht ID:', this.currentThreadMessageId);
-    });
+    this.subscription.add(
+      this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
+        this.currentThreadMessageId = messageId;
+      })
+    );
   }
 
   async sendMessage() {
@@ -109,6 +114,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
+    debugger;
+    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
       console.warn('Thread is not open or message is empty');
       return;

@@ -20,6 +20,7 @@ import {
   addDoc,
   getDocs,
   orderBy,
+  setDoc
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -30,6 +31,8 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Subscription } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
+import { ThreadControlService } from '../services/thread-control.service';
+import { FirstMessageThreadComponent } from '../first-message-thread/first-message-thread.component';
 
 interface Reaction {
   emoji: string;
@@ -39,7 +42,12 @@ interface Reaction {
 @Component({
   selector: 'app-direct-thread',
   standalone: true,
-  imports: [CommonModule, PickerComponent, InputFieldComponent],
+  imports: [
+    CommonModule,
+    PickerComponent,
+    InputFieldComponent,
+    FirstMessageThreadComponent,
+  ],
   templateUrl: './direct-thread.component.html',
   styleUrl: './direct-thread.component.scss',
   animations: [
@@ -70,7 +78,6 @@ interface Reaction {
   ],
 })
 export class DirectThreadComponent implements OnInit {
-  subscription?: Subscription;
   @Output() closeDirectThread = new EventEmitter<void>();
   chatMessage: string = '';
   showUserBubble: boolean = false;
@@ -90,7 +97,7 @@ export class DirectThreadComponent implements OnInit {
     iconAddReaction: 'assets/img/comment/add_reaction.svg',
     iconThird: 'assets/img/third.svg',
   };
-  isDirectThreadOpen: boolean = false;
+  isDirectThreadOpen: boolean = true;
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: Reaction[] } = {};
   currentThreadMessage: {
@@ -106,6 +113,9 @@ export class DirectThreadComponent implements OnInit {
   firstMessageId: string = '';
   firstThreadMessage = false;
   selectFiles: any[] = [];
+  threadControlService = inject(ThreadControlService);
+  @Output() firstThreadMessageId: string | null = null;
+  private subscription = new Subscription();
 
   constructor(private route: ActivatedRoute) {}
 
@@ -118,11 +128,21 @@ export class DirectThreadComponent implements OnInit {
           this.currentUser = userResult;
         }
       }
-      console.log('selectedUser is', this.selectedUser);
-      await this.subscribeToChosenMessage();
-      this.toggleThreadStatus(true);
+      console.log('isOpened' ,this.isDirectThreadOpen);
+      this.threadControlService.firstThreadMessageId$.subscribe(
+        async (messageId) => {
+            messageId &&
+            (!this.currentThreadMessage ||
+              this.currentThreadMessage.id !== messageId)
+            await this.handleFirstThreadMessageAndPush(messageId);
+            await this.getThreadMessages(messageId);
+       
+        }
+      );
     });
   }
+
+  ngOnChanges(): void {}
 
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
@@ -148,13 +168,20 @@ export class DirectThreadComponent implements OnInit {
     return null;
   }
 
-  async subscribeToChosenMessage() {
-    this.subscription = this.global.currentThreadMessage$.subscribe(
-      async (message) => {
-        await this.handleFirstThreadMessageAndPush(message);
-        await this.getThreadMessages(message);
-      }
-    );
+  shouldDisplayMessage(message: any, isFirstThreadMessage: boolean): boolean {
+    if (
+      isFirstThreadMessage &&
+      message.senderName === this.currentThreadMessage.senderName
+    ) {
+      return true;
+    }
+    if (
+      !isFirstThreadMessage &&
+      message.senderName === this.selectedUser.name
+    ) {
+      return true;
+    }
+    return false;
   }
 
   ngOnDestroy(): void {
@@ -162,26 +189,27 @@ export class DirectThreadComponent implements OnInit {
       this.subscription.unsubscribe();
     }
   }
-  async handleFirstThreadMessageAndPush(messageId: string) {
+  async handleFirstThreadMessageAndPush(messageId: any) {
+    debugger;
     try {
       const docRef = doc(this.firestore, 'messages', messageId);
       const docSnapshot = await getDoc(docRef);
-  
-      if (!docSnapshot.exists()) {
-        console.error('Das Dokument existiert nicht.');
-        return;
+      if (docSnapshot.exists()) {
+        const docData = docSnapshot.data();
+        if (docData?.['firstMessageCreated']) {
+          console.log('Die erste Nachricht wurde bereits erstellt.');
+          return;
+        }
       }
-  
-      this.currentThreadMessage = docSnapshot.data();
-      console.log('Aktuelle Nachricht:', this.currentThreadMessage);
-      this.firstThreadMessage = true;
-  
-      // Erstelle Subcollection für die Thread-Nachrichten
+
+      this.currentThreadMessage = {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      };
       const threadMessagesRef = collection(
         this.firestore,
         `messages/${messageId}/threadMessages`
       );
-  
       const messageData = {
         senderId: this.global.currentUserData.id,
         senderName: this.global.currentUserData.name,
@@ -191,25 +219,36 @@ export class DirectThreadComponent implements OnInit {
         editedTextShow: false,
         recipientId: this.selectedUser.uid,
         recipientName: this.selectedUser.name,
-        text: this.currentThreadMessage.text || '', // Nachrichtentext
+        text: this.currentThreadMessage.text || '',
       };
-  
-      await addDoc(threadMessagesRef, messageData);
-      console.log('Neue Nachricht hinzugefügt.');
-  
-      // Eingabefelder zurücksetzen
+        await addDoc(threadMessagesRef, messageData);
+        console.log('Neue Nachricht hinzugefügt.');
+        await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
       this.chatMessage = '';
       this.selectFiles = [];
-  
-      // Nach dem Hinzufügen Nachrichten abrufen
+      this.monitorThreadMessages(messageId);
       await this.getThreadMessages(messageId);
     } catch (error) {
       console.error('Fehler beim Verarbeiten der Thread-Nachricht:', error);
     }
   }
-  
 
-  async getThreadMessages(messageId: string) {
+  private monitorThreadMessages(messageId: string): void {
+    const threadMessagesRef = collection(
+      this.firestore,
+      `messages/${messageId}/threadMessages`
+    );
+  
+    onSnapshot(threadMessagesRef, async (snapshot) => {
+      if (snapshot.empty) {
+        console.log('Alle Nachrichten wurden gelöscht. Setze `firstMessageCreated` zurück.');
+        const docRef = doc(this.firestore, 'messages', messageId);
+        await setDoc(docRef, { firstMessageCreated: false }, { merge: true });
+      }
+    });
+  }
+
+  async getThreadMessages(messageId: any) {
     try {
       const threadMessagesRef = collection(
         this.firestore,
