@@ -87,6 +87,7 @@ export class ChatComponent implements OnInit, OnChanges {
   @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
   @Output() threadOpened = new EventEmitter<void>();
   chosenThreadMessage: any;
+  currentThreadMessageId: string | null = null;
 
   commentStricker: string[] = [
     '../../assets/img/comment/face.png',
@@ -96,11 +97,28 @@ export class ChatComponent implements OnInit, OnChanges {
     '../../assets/img/comment/hand.png',
     '../../assets/img/comment/celebration.png',
   ];
+  replyCounts: Map<string, number> = new Map();
+  replyCountValue: number = 0;
 
   constructor() {}
 
   ngOnInit(): void {
     this.getAllUsersname();
+  }
+
+  subscribeToThreadAnswers() {
+    this.messagesData.forEach((message) => {
+      this.threadControlService.getReplyCount(message.id).subscribe((count) => {
+        this.replyCounts.set(message.id, count);
+        if (this.currentThreadMessageId === message.id) {
+          this.replyCountValue = count;
+        }
+      });
+    });
+  }
+
+  getReplyCountValue(messageId: string): number {
+    return this.replyCounts.get(messageId) ?? 0;
   }
 
   onUserNameClick() {
@@ -413,6 +431,7 @@ export class ChatComponent implements OnInit, OnChanges {
           this.messagesData.push({ id: doc.id, ...messageData });
         }
       });
+      this.subscribeToThreadAnswers();
       this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
       this.checkForSelfChat();
 
@@ -425,7 +444,6 @@ export class ChatComponent implements OnInit, OnChanges {
   async openThread(messageId: any) {
     try {
       this.threadOpened.emit();
-      this.threadControlService.setDirectThreadStatus(true);
       this.chosenThreadMessage = messageId;
       this.threadControlService.setFirstThreadMessageId(messageId);
       const threadMessagesRef = collection(
@@ -434,9 +452,6 @@ export class ChatComponent implements OnInit, OnChanges {
       );
       const snapshot = await getDocs(threadMessagesRef);
       if (snapshot.empty) {
-        console.log(
-          'k Nachrichten im Thread. setz firstMessageCreated zurück'
-        );
         const docRef = doc(this.firestore, 'messages', messageId);
         await setDoc(docRef, { firstMessageCreated: false }, { merge: true });
       }

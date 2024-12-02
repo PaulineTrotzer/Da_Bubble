@@ -1,12 +1,7 @@
 <div class="full-app-content">
 
     <app-mention-message-box *ngIf="global.openMentionMessageBox">
-
     </app-mention-message-box>
-
-
-
-
 
 
     <div *ngIf="selectedUser" class="main-current-messagebox" #scrollContainer>
@@ -160,8 +155,14 @@
                             </mat-card-content>
 
                         </mat-card>
-
                     </div>
+                    <ng-container *ngIf="getReplyCountValue(message.id) as replyCount">
+                        <div *ngIf="replyCount > 0" class="thread-answer-display">
+                            <span class="answer-counter">{{ replyCount }}</span>
+                            <span class="answers">{{ replyCount === 1 ? 'Antwort' : 'Antworten' }}</span>
+                        </div>
+                    </ng-container>
+
                     <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
                     <div class="avatar-box">
                         <mat-card *ngIf="messageIdHovered === message.id" [class]="{

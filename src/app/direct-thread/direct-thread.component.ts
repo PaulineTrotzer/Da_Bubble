@@ -15,10 +15,8 @@ import {
   getDoc,
   onSnapshot,
   query,
-  where,
   updateDoc,
   addDoc,
-  getDocs,
   orderBy,
   setDoc
 } from '@angular/fire/firestore';
@@ -128,21 +126,14 @@ export class DirectThreadComponent implements OnInit {
           this.currentUser = userResult;
         }
       }
-      console.log('isOpened' ,this.isDirectThreadOpen);
       this.threadControlService.firstThreadMessageId$.subscribe(
         async (messageId) => {
-            messageId &&
-            (!this.currentThreadMessage ||
-              this.currentThreadMessage.id !== messageId)
             await this.handleFirstThreadMessageAndPush(messageId);
             await this.getThreadMessages(messageId);
-       
         }
       );
     });
   }
-
-  ngOnChanges(): void {}
 
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
@@ -190,7 +181,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
   async handleFirstThreadMessageAndPush(messageId: any) {
-    debugger;
     try {
       const docRef = doc(this.firestore, 'messages', messageId);
       const docSnapshot = await getDoc(docRef);
@@ -201,7 +191,6 @@ export class DirectThreadComponent implements OnInit {
           return;
         }
       }
-
       this.currentThreadMessage = {
         id: docSnapshot.id,
         ...docSnapshot.data(),
@@ -226,44 +215,27 @@ export class DirectThreadComponent implements OnInit {
         await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
       this.chatMessage = '';
       this.selectFiles = [];
-      this.monitorThreadMessages(messageId);
       await this.getThreadMessages(messageId);
     } catch (error) {
-      console.error('Fehler beim Verarbeiten der Thread-Nachricht:', error);
+      console.error('fehler der Thread-Nachricht:', error);
     }
   }
 
-  private monitorThreadMessages(messageId: string): void {
-    const threadMessagesRef = collection(
-      this.firestore,
-      `messages/${messageId}/threadMessages`
-    );
-  
-    onSnapshot(threadMessagesRef, async (snapshot) => {
-      if (snapshot.empty) {
-        console.log('Alle Nachrichten wurden gelöscht. Setze `firstMessageCreated` zurück.');
-        const docRef = doc(this.firestore, 'messages', messageId);
-        await setDoc(docRef, { firstMessageCreated: false }, { merge: true });
-      }
-    });
-  }
 
   async getThreadMessages(messageId: any) {
     try {
+      this.threadControlService.getReplyCount(messageId);
       const threadMessagesRef = collection(
         this.firestore,
         `messages/${messageId}/threadMessages`
       );
-      const q = query(threadMessagesRef, orderBy('timestamp', 'asc')); // Nachrichten sortieren nach Zeitstempel
-
+      const q = query(threadMessagesRef, orderBy('timestamp', 'asc')); 
       onSnapshot(q, (querySnapshot) => {
         if (querySnapshot.empty) {
-          console.log('Keine Thread-Nachrichten gefunden.');
+          console.log('keine thread-Nachrichten gefunden');
           this.messagesData = [];
           return;
         }
-
-        console.log('Thread-Nachrichten abgerufen:', querySnapshot.size);
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
@@ -271,11 +243,9 @@ export class DirectThreadComponent implements OnInit {
           }
           return { id: doc.id, ...messageData };
         });
-
-        console.log('Thread-Nachrichten:', this.messagesData);
       });
     } catch (error) {
-      console.error('Fehler beim Abrufen der Thread-Nachrichten:', error);
+      console.error('fehler getMessagws', error);
     }
   }
 

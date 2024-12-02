@@ -734,12 +734,9 @@ app-input-field {
   padding: 0 35px;
 }
 
-
 .text-info-edit {
   position: relative;
-
 }
-
 
 .mention-message {
   color: blue;
@@ -750,7 +747,6 @@ app-input-field {
   }
 }
 
-
 app-mention-message-box {
   z-index: 35;
   position: absolute;
@@ -759,4 +755,15 @@ app-mention-message-box {
   width: 350px;
   height: 50px;
   right: 33%;
+}
+
+.thread-answer-display {
+  display: flex;
+  gap: 6px;
+  font-size: 16px;
+  color: grey;
+}
+
+.answer-counter {
+  font-weight: 700;
 }

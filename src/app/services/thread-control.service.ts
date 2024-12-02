@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { collection, getDocs, query, where,  } from '@firebase/firestore';
+import { Firestore, onSnapshot } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -10,20 +12,34 @@ export class ThreadControlService {
   );
   firstThreadMessageId$ = this.firstThreadMessageIdSubject.asObservable();
 
-  directThreadOpened = false;
+  private replyCountSubject = new BehaviorSubject<number>(0);
+  replyCount$ = this.replyCountSubject.asObservable();
+  firestore = inject(Firestore);
+
 
   constructor() {}
 
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);
-    console.log('First thread message ID set:', id);
   }
 
   getFirstThreadMessageId(): string | null {
     return this.firstThreadMessageIdSubject.value;
   }
 
-  setDirectThreadStatus(status: boolean) {
-    return (this.directThreadOpened = status);
+  getReplyCount(messageId: string): Observable<number> {
+    return new Observable<number>((observer) => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, `messages/${messageId}/threadMessages`),
+        (snapshot) => {
+          const replyCount = snapshot.size - 1;
+          console.log(`Reply count for message ID ${messageId}:`, replyCount);
+          observer.next(replyCount);
+        }
+      );
+      return () => {
+        unsubscribe();
+      };
+    });
   }
 }

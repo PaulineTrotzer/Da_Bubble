@@ -10,7 +10,6 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  Renderer2,
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
@@ -38,7 +37,7 @@ import { Subscription } from 'rxjs';
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
-  @Input() isDirectThreadOpen : boolean | undefined;
+  @Input() isDirectThreadOpen: boolean | undefined;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -57,7 +56,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   messagesData: any[] = [];
   formattedChatMessage: any;
   mentionUserName: any[] = [];
-  threadControlService =inject(ThreadControlService);
+  threadControlService = inject(ThreadControlService);
   private subscription: Subscription = new Subscription();
 
   ngOnChanges(changes: SimpleChanges) {
@@ -88,8 +87,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
     try {
       if (this.selectedChannel) {
         await this.sendChannelMessage();
+
       } else if (this.isDirectThreadOpen) {
         await this.sendDirectThreadMessage();
+
       } else {
         const messageData = this.messageData(
           this.chatMessage,
@@ -105,7 +106,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.messagesData.push(messageWithId);
         this.messageSent.emit();
       }
-
       this.chatMessage = '';
       this.formattedChatMessage = '';
     } catch (error) {
@@ -114,21 +114,16 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
-    debugger;
-    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
-      console.warn('Thread is not open or message is empty');
+      console.warn('t is not open or msg is empty');
       return;
     }
     if (!this.currentThreadMessageId) {
-      console.error('Es wurde keine aktuelle Nachricht ausgewählt.');
+      console.error(' keine aktuelle msg ausgewählt.');
       return;
     }
     try {
-      const threadMessagesRef = collection(
-        this.firestore,
-        `messages/${this.currentThreadMessageId}/threadMessages`
-      );
+      const threadMessagesRef = collection(this.firestore, `messages/${this.currentThreadMessageId}/threadMessages`);
       const messageData = {
         text: this.chatMessage,
         senderId: this.global.currentUserData.id,
@@ -144,27 +139,27 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.selectFiles = [];
       this.messageSent.emit();
-      console.log('Nachricht erfolgreich gesendet und in Subcollection gespeichert.');
     } catch (error) {
       console.error('Fehler beim Senden der Nachricht:', error);
     }
   }
-
   
+
+  increaseMessageCounter(){
+
+  }
 
   async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
     }
-
     const channelMessagesRef = collection(
       this.firestore,
       'channels',
       this.selectedChannel.id,
       'messages'
     );
-
     const messageData = {
       text: this.chatMessage,
       senderId: this.global.currentUserData.id,
@@ -174,9 +169,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       selectedFiles: this.selectFiles,
       editedTextShow: false,
     };
-
     const docRef = await addDoc(channelMessagesRef, messageData);
-
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
