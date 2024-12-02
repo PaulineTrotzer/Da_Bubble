@@ -38,45 +38,38 @@
     </header>
     <div class="topic-container">
       <div class="topic" [ngClass]="{
-        'topic-from-current': topicMessage.senderId === global.currentUserData.id,
-        'topic-from-user': topicMessage.senderId !== global.currentUserData.id
+        'from-current': topicMessage.senderId === global.currentUserData.id
       }">
         <div class="avatar-container">
           <img [src]="topicMessage.senderPicture" />
         </div>
         <div class="topic-content">
-          <div class="sender-info">
+          <div class="sender-info" [ngClass]="{
+            'reverse': topicMessage.senderId === global.currentUserData.id
+          }">
             <h3>{{ topicMessage.senderName }}</h3>
-            <p> {{ topicMessage.timestamp | date : "HH:MM" }} Uhr</p>
+            <p class="time"> {{ topicMessage.timestamp | date : "HH:MM" }} Uhr</p>
           </div>
-          <p class="message" [ngClass]="{
-            'message-from-current': topicMessage.senderId === global.currentUserData.id,
-            'message-from-user': topicMessage.senderId !== global.currentUserData.id
-          }">{{ topicMessage.text }}</p>
+          <p class="message">{{ topicMessage.text }}</p>
         </div>
       </div>
     </div>
     <div class="seperator">
-      <h3>0 Antworten</h3>
+      <h3 *ngIf="messages.length === 1"> {{messages.length}} Antwort</h3>
+      <h3 *ngIf="messages.length > 1"> {{messages.length}} Antworten</h3>
       <div class="line"></div>
     </div>
-    <div class="answers-container">
-      <div class="answer" [ngClass]="{
-        'message-from-current': topicMessage.senderId === global.currentUserData.id,
-        'message-from-user': topicMessage.senderId !== global.currentUserData.id
-      }">
+    <div class="answers-container" *ngFor="let message of messages">
+      <div class="answer">
         <div class="avatar-container">
-          <img [src]="" alt="">
+          <img [src]="message.senderPicture" alt="">
         </div>
         <div class="answer-content">
           <div class="sender-info">
-            <h3>sendername</h3>
-            <p>timestamp</p>
+            <h3> {{message.senderName}} </h3>
+            <p class="time"> {{message.timestamp | date: "HH:MM"}} Uhr</p>
           </div>
-          <div class="message" [ngClass]="{
-            'message-from-current': topicMessage.senderId === global.currentUserData.id,
-            'message-from-user': topicMessage.senderId !== global.currentUserData.id
-          }"> message
+          <div class="answer-message"> {{message.text}}
           </div>
         </div>
       </div>

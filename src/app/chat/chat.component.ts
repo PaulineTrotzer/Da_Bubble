@@ -42,12 +42,9 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
   standalone: true,
   imports: [
     CommonModule,
-    PeopleMentionComponent,
-    PickerComponent,
     FormsModule,
     MatCardModule,
     InputFieldComponent,
-    ThreadComponent,
     ChannelChatComponent,
     MentionMessageBoxComponent,
   ],

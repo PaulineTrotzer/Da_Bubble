@@ -129,9 +129,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         senderPicture: this.global.currentUserData.picture || '',
         timestamp: new Date(),
         selectedFiles: this.selectFiles,
-        editedTextShow: false,
-        recipientId: this.selectedUser.uid,
-        recipientName: this.selectedUser.name,
       };
       await addDoc(threadRef, messageData)
     } catch (err) {
