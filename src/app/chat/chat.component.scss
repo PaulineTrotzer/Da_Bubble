@@ -759,11 +759,21 @@ app-mention-message-box {
 
 .thread-answer-display {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 3px;
   font-size: 16px;
   color: grey;
+  pointer-events: all;
+  width: fit-content;
+  height: 22px;
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.1);
+    color: #444df2;
+  }
 }
 
 .answer-counter {
   font-weight: 700;
+  pointer-events: all;
 }

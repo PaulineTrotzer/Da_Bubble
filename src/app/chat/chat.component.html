@@ -150,14 +150,12 @@
                                     </span>
                                     <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
                                 </ng-container>
-
-
                             </mat-card-content>
 
                         </mat-card>
                     </div>
                     <ng-container *ngIf="getReplyCountValue(message.id) as replyCount">
-                        <div *ngIf="replyCount > 0" class="thread-answer-display">
+                        <div *ngIf="replyCount > 0" class="thread-answer-display" (click)="openThread(message.id)">
                             <span class="answer-counter">{{ replyCount }}</span>
                             <span class="answers">{{ replyCount === 1 ? 'Antwort' : 'Antworten' }}</span>
                         </div>

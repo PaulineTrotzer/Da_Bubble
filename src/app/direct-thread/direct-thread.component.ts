@@ -1,10 +1,13 @@
 import {
+  ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
   OnInit,
   Output,
+  ViewChild,
 } from '@angular/core';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { User } from '../models/user.class';
@@ -18,7 +21,7 @@ import {
   updateDoc,
   addDoc,
   orderBy,
-  setDoc
+  setDoc,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -77,6 +80,7 @@ interface Reaction {
 })
 export class DirectThreadComponent implements OnInit {
   @Output() closeDirectThread = new EventEmitter<void>();
+  @ViewChild('messageContainer') messageContainer!: ElementRef;
   chatMessage: string = '';
   showUserBubble: boolean = false;
   global = inject(GlobalVariableService);
@@ -113,9 +117,10 @@ export class DirectThreadComponent implements OnInit {
   selectFiles: any[] = [];
   threadControlService = inject(ThreadControlService);
   @Output() firstThreadMessageId: string | null = null;
-  private subscription = new Subscription();
+  subscription = new Subscription();
+  shouldScrollToBottom = false;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(async (paramMap) => {
@@ -128,11 +133,26 @@ export class DirectThreadComponent implements OnInit {
       }
       this.threadControlService.firstThreadMessageId$.subscribe(
         async (messageId) => {
-            await this.handleFirstThreadMessageAndPush(messageId);
-            await this.getThreadMessages(messageId);
+          await this.handleFirstThreadMessageAndPush(messageId);
+          await this.getThreadMessages(messageId);
         }
       );
     });
+    this.scrollToBottom();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
+    }
+  }
+
+  scrollToBottom() {
+    if (this.messageContainer) {
+      const element = this.messageContainer.nativeElement;
+      element.scrollTop = element.scrollHeight;
+    }
   }
 
   toggleThreadStatus(status: boolean) {
@@ -210,9 +230,9 @@ export class DirectThreadComponent implements OnInit {
         recipientName: this.selectedUser.name,
         text: this.currentThreadMessage.text || '',
       };
-        await addDoc(threadMessagesRef, messageData);
-        console.log('Neue Nachricht hinzugefügt.');
-        await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
+      await addDoc(threadMessagesRef, messageData);
+      console.log('Neue Nachricht hinzugefügt.');
+      await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
       this.chatMessage = '';
       this.selectFiles = [];
       await this.getThreadMessages(messageId);
@@ -221,7 +241,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-
   async getThreadMessages(messageId: any) {
     try {
       this.threadControlService.getReplyCount(messageId);
@@ -229,7 +248,7 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${messageId}/threadMessages`
       );
-      const q = query(threadMessagesRef, orderBy('timestamp', 'asc')); 
+      const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
       onSnapshot(q, (querySnapshot) => {
         if (querySnapshot.empty) {
           console.log('keine thread-Nachrichten gefunden');
@@ -243,6 +262,8 @@ export class DirectThreadComponent implements OnInit {
           }
           return { id: doc.id, ...messageData };
         });
+        this.shouldScrollToBottom = true;
+        this.cdr.detectChanges();
       });
     } catch (error) {
       console.error('fehler getMessagws', error);
