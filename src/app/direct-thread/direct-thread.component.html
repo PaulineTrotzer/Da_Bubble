@@ -72,26 +72,29 @@
             <div class="sticker-hover-ct">
               <div class="show-set">
                 <div class="img-flex-bar-options">
-                  <img class="icon-more" [src]="icons['iconMore']"
-                    (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
-                    (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default">
-
                   <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
                     (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
                     (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default">
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmoji($event, message.id)" class="emoji-picker"
+                      <emoji-mart (emojiClick)="addEmoji($event, message.id, selectedUser.uid)" class="emoji-picker"
                         size="18"></emoji-mart>
                     </div>
                   </div>
                   <img>
                 </div>
               </div>
+              <div class="render-reaction-ct">
+                <div *ngFor="let reaction of reactions[message.id]" class="selected-emojis">
+                  <span class="single-emoji">{{ reaction.emoji }}</span>
+                  <span class="reaction-counter" *ngIf="reaction.count >= 1">{{ reaction.count }}</span>
+                </div>
+              </div>
             </div>
-
           </div>
         </div>
+
+        
 
 
         <div class="color-separator">
@@ -120,7 +123,7 @@
                     (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default">
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmoji($event, message.id)" class="emoji-picker"
+                      <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
                         size="18"></emoji-mart>
                     </div>
                   </div>
@@ -128,12 +131,11 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="reactions[message.id]?.length" class="render-reaction-ct">
 
+            <div class="render-reaction-ct">
               <div *ngFor="let reaction of reactions[message.id]" class="selected-emojis">
                 <span class="single-emoji">{{ reaction.emoji }}</span>
                 <span class="reaction-counter" *ngIf="reaction.count >= 1">{{ reaction.count }}</span>
-
               </div>
             </div>
           </div>

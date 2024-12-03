@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { collection, getDocs, query, where,  } from '@firebase/firestore';
+import { collection, getDocs, query, where } from '@firebase/firestore';
 import { Firestore, onSnapshot } from '@angular/fire/firestore';
 
 @Injectable({
@@ -16,6 +16,11 @@ export class ThreadControlService {
   replyCount$ = this.replyCountSubject.asObservable();
   firestore = inject(Firestore);
 
+  private currentThreadMessageIdSubject = new BehaviorSubject<string | null>(
+    null
+  );
+  currentThreadMessageId$ = this.currentThreadMessageIdSubject.asObservable();
+
 
   constructor() {}
 
@@ -25,6 +30,10 @@ export class ThreadControlService {
 
   getFirstThreadMessageId(): string | null {
     return this.firstThreadMessageIdSubject.value;
+  }
+
+  setCurrentThreadMessageId(id: string) {
+    this.currentThreadMessageIdSubject.next(id);
   }
 
   getReplyCount(messageId: string): Observable<number> {

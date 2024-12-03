@@ -114,6 +114,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
+    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
       console.warn('t is not open or msg is empty');
       return;
@@ -135,7 +136,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
         recipientId: this.selectedUser.uid,
         recipientName: this.selectedUser.name,
       };
-      await addDoc(threadMessagesRef, messageData);
+      const docRef = await addDoc(threadMessagesRef, messageData);
+      const newThreadMessageId = docRef.id;
+      this.handleNewThreadMessage(newThreadMessageId);
       this.chatMessage = '';
       this.selectFiles = [];
       this.messageSent.emit();
@@ -145,7 +148,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
   
 
-  increaseMessageCounter(){
+  handleNewThreadMessage(threadMessageId : string){
+    debugger;
+    this.currentThreadMessageId = threadMessageId;
+    this.threadControlService.setCurrentThreadMessageId(threadMessageId);
+    
+    console.log('Neue Thread-Nachricht-ID:', threadMessageId);
 
   }
 
