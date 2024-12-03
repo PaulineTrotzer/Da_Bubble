@@ -41,6 +41,10 @@ export class ChannelThreadComponent implements OnInit {
 
   topicMessage: any;
   messages: Message[] = [];
+  isChannelThreadOpen: boolean = false;
+  isPickerVisible: string | null = null;
+  hoveredMessageId: string | null = null;
+  hoveredTopic: boolean = false;
 
   unsubscribe: (() => void) | undefined;
 
@@ -52,10 +56,15 @@ export class ChannelThreadComponent implements OnInit {
       }
     });
     this.loadThreadMessages();
-    console.log(this.messages)
+    this.toggleChannelThread(true);
   }
 
-  getTopic() {
+  toggleChannelThread(status: boolean) {
+    this.isChannelThreadOpen = status;
+  }
+
+  async getTopic() {
+    this.messages = [];
     const docRef = doc(
       this.db,
       'channels',
@@ -63,7 +72,7 @@ export class ChannelThreadComponent implements OnInit {
       'messages',
       this.channelThreadId
     );
-    onSnapshot(docRef, (doc) => {
+    onSnapshot(docRef, async (doc) => {
       const data = doc.data();
       if (data) {
         if (data['timestamp']?.seconds) {
@@ -103,5 +112,9 @@ export class ChannelThreadComponent implements OnInit {
         return { id: doc.id, ...data };
       });
     });
+  }
+
+  closeThread() {
+    this.global.channelThreadSubject.next(null);
   }
 }

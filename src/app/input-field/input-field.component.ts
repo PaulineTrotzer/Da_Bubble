@@ -38,6 +38,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
   currentChannelThreadId: string | null = null;
   @Input() isDirectThreadOpen: boolean = false;
+  @Input() isChannelThreadOpen: boolean = false;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -86,7 +87,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     try {
-      if (this.currentChannelThreadId) {
+      if (this.isChannelThreadOpen) {
         await this.sendChannelThreadMessage();
       } else if (this.isDirectThreadOpen) {
         await this.sendDirectThreadMessage();
