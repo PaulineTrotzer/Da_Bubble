@@ -107,12 +107,6 @@ export class DirectThreadComponent implements OnInit {
     timestamp?: Date | { seconds: number; nanoseconds: number };
     senderId?: string;
     isHovered?: boolean;
-    reactions?: {
-      [emoji: string]: {
-        count: number;
-        userIds: string[];
-      };
-    };
   } = {};
   selectFiles: any[] = [];
   threadControlService = inject(ThreadControlService);
@@ -259,7 +253,7 @@ export class DirectThreadComponent implements OnInit {
       recipientStickerCount: 0,
       recipientSticker: '',
       text: this.currentThreadMessage.text || '',
-      reactions: { counter: 0, emoji: '', userId: '' },
+      reactions: ''
     };
     setTimeout(async () => {
       await addDoc(threadMessagesRef, messageData);
@@ -346,22 +340,8 @@ export class DirectThreadComponent implements OnInit {
       }
     } else {
       // Wenn die Reaktion neu ist, setze sie auf die aktuelle Emoji-Reaktion
-      await updateDoc(threadMessageRef, {
-        reactions: {
-          counter: 1,
-          emoji: emoji,
-          userId: [userId],
-        }
-      });
+      await this.updateMessageInDatabase(firstInitialisedThreadMsg, currentThreadMessageId, this.currentUser.uid, emoji);
     }
-  
-    // Eventuell das Emoji zur Nachricht hinzufügen (speichern)
-    await this.addingEmojiToMessage(
-      firstInitialisedThreadMsg,
-      currentThreadMessageId,
-      emoji
-    );
-  
     this.isEmojiPickerVisible = false;
     this.overlayStatusService.setOverlayStatus(false);
   }
@@ -389,13 +369,6 @@ export class DirectThreadComponent implements OnInit {
       userReaction.userIds = userReaction.userIds.filter(
         (id: string) => id !== userId
       );
-
-      // Entferne die Reaktion, wenn der Zähler 0 erreicht
-      if (userReaction.count === 0) {
-        this.reactions[threadMessageId] = this.reactions[
-          threadMessageId
-        ].filter((reaction) => reaction !== userReaction);
-      }
     } else {
       const newReaction = {
         emoji,
@@ -403,24 +376,6 @@ export class DirectThreadComponent implements OnInit {
         userIds: [userId],
       };
       this.reactions[threadMessageId].push(newReaction);
-    }
-  }
-
-
-  async addingEmojiToMessage(
-    parentMessageId: string,
-    threadMessageId: string,
-    emoji: string
-  ) {
-    try {
-      if (parentMessageId && threadMessageId) {
-        await this.updateMessageInDatabase(parentMessageId, threadMessageId, this.currentUser.uid, emoji);
-        console.log('Emoji wurde erfolgreich hinzugefügt und in der Datenbank aktualisiert.');
-      } else {
-        console.error('Fehlende Nachrichten-IDs.');
-      }
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
   }
 
