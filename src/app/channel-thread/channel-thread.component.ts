@@ -2,15 +2,20 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import {
   collection,
   doc,
+  DocumentReference,
   Firestore,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { InputFieldComponent } from '../input-field/input-field.component';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { getAuth } from '@angular/fire/auth';
 
 interface Message {
   id: string;
@@ -25,21 +30,21 @@ interface Message {
 @Component({
   selector: 'app-channel-thread',
   standalone: true,
-  imports: [CommonModule, InputFieldComponent],
+  imports: [CommonModule, InputFieldComponent, PickerComponent],
   templateUrl: './channel-thread.component.html',
   styleUrl: './channel-thread.component.scss',
 })
 export class ChannelThreadComponent implements OnInit {
   constructor() {}
 
-  channelThreadId: any;
+  channelMessageId: any;
   @Input() selectedChannel: any;
 
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
 
-  topicMessage: any;
+  topicMessage: Message | null = null;
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
   isPickerVisible: string | null = null;
@@ -49,14 +54,14 @@ export class ChannelThreadComponent implements OnInit {
   unsubscribe: (() => void) | undefined;
 
   ngOnInit(): void {
-    this.global.channelThread$.subscribe((threadId) => {
+    this.global.channelThread$.subscribe(async (threadId) => {
       if (threadId) {
-        this.channelThreadId = threadId;
-        this.getTopic();
+        this.channelMessageId = threadId;
+        await this.getTopic();
+        this.loadThreadMessages();
+        this.toggleChannelThread(true);
       }
     });
-    this.loadThreadMessages();
-    this.toggleChannelThread(true);
   }
 
   toggleChannelThread(status: boolean) {
@@ -64,27 +69,30 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   async getTopic() {
-    this.messages = [];
-    const docRef = doc(
-      this.db,
-      'channels',
-      this.selectedChannel.id,
-      'messages',
-      this.channelThreadId
-    );
-    onSnapshot(docRef, async (doc) => {
-      const data = doc.data();
-      if (data) {
-        if (data['timestamp']?.seconds) {
-          data['timestamp'] = new Date(data['timestamp'].seconds * 1000);
+    return new Promise<void>((resolve) => {
+      const docRef = doc(
+        this.db,
+        'channels',
+        this.selectedChannel.id,
+        'messages', 
+        this.channelMessageId
+      );
+      
+      onSnapshot(docRef, (doc) => {
+        const data = doc.data();
+        if (data) {
+          if (data['timestamp']?.seconds) {
+            data['timestamp'] = new Date(data['timestamp'].seconds * 1000);
+          }
+          this.topicMessage = { ...data, id: this.channelMessageId } as Message;
+          resolve();
         }
-        this.topicMessage = data;
-      }
+      });
     });
   }
 
   async loadThreadMessages() {
-    if (!this.channelThreadId) {
+    if (!this.channelMessageId) {
       console.log('No message selected!');
       return;
     }
@@ -98,7 +106,7 @@ export class ChannelThreadComponent implements OnInit {
       'channels',
       this.selectedChannel.id,
       'messages',
-      this.channelThreadId,
+      this.channelMessageId,
       'thread'
     );
 
@@ -116,5 +124,115 @@ export class ChannelThreadComponent implements OnInit {
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
+  }
+
+  addEmoji(event: any, messageId: string) {
+    console.log(messageId)
+    const emoji = event.emoji;
+    this.isPickerVisible = null;
+    this.addLastUsedEmoji(emoji);
+    this.addToReactionInfo(emoji, messageId);
+  }
+
+  async addLastUsedEmoji(emoji: any) {
+    const auth = getAuth()
+    const currentUserId = auth.currentUser?.uid
+    if(currentUserId) {
+      const docRef = doc(this.db, 'users', currentUserId);
+      await updateDoc(docRef, {
+        lastEmojis: [emoji.native, ...(await this.getExistingEmojis(docRef))].slice(0, 2),
+      })
+    }
+  }
+
+  async addToReactionInfo(emoji: any, messageId: string) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (!currentUserId) {
+      console.warn('No current user logged in');
+      return;
+    }
+  
+    const messageDocRef = doc(
+      this.db,
+      'channels',
+      this.selectedChannel.id,
+      'messages',
+      messageId
+    );
+  
+    try {
+      const messageSnapshot = await getDoc(messageDocRef);
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+  
+      const hasReacted = Object.values(reactions).some((userIds) =>
+        (userIds as string[]).includes(currentUserId)
+      );
+  
+      if (hasReacted) {
+        console.warn('User has already reacted to this message');
+        return;
+      }
+  
+      if (!reactions[emoji.native]) {
+        reactions[emoji.native] = [];
+      }
+      reactions[emoji.native].push(currentUserId);
+  
+      await updateDoc(messageDocRef, { reactions });
+  
+      console.log(`Updated reactions for message ${messageId}:`, reactions);
+    } catch (error) {
+      console.error('Error updating reactions:', error);
+    }
+  }
+
+  async getExistingEmojis(userDocRef: DocumentReference): Promise<string[]> {
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data();
+    return userData?.['lastEmojis'] || [];
+  }
+
+  togglePicker(messageId: string) {
+    this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+  }
+
+  async removeReaction(emoji: string, messageId: string) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (!currentUserId) {
+      console.warn('No current user logged in');
+      return;
+    }
+  
+    const messageDocRef = doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId);
+  
+    try {
+      const messageSnapshot = await getDoc(messageDocRef);
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+  
+      if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
+        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
+  
+        if (reactions[emoji].length === 0) {
+          delete reactions[emoji];
+        }
+  
+        await updateDoc(messageDocRef, { reactions });
+  
+        console.log(`Updated reactions for message ${messageId}:`, reactions);
+      }
+    } catch (error) {
+      console.error('Error removing reaction:', error);
+    }
+  }
+  
+
+  hasReactions(reactions: { [emoji: string]: string[] }): boolean {
+    return reactions && Object.keys(reactions).length > 0;
   }
 }

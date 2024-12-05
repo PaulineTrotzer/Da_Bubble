@@ -68,4 +68,5 @@ export class GlobalVariableService {
       setTimeout(() => this.channelThreadSubject.next(messageId), 0);
     }
   }
+
 }

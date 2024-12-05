@@ -180,3 +180,23 @@ header {
   border-top-left-radius: 25px;
   border-bottom-right-radius: 25px;
 }
+
+.reaction {
+  padding: 5px 10px;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+}
+
+.reaction-info {
+  display: flex;
+  align-items: center;
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.emoji-container {
+  position: relative;
+  z-index: 10;
+}
