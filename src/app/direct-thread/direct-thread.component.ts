@@ -330,7 +330,7 @@ export class DirectThreadComponent implements OnInit {
     const threadMessageData = threadMessageDoc.data();
   
     // Überprüfe, ob die Reaktion für dieses Emoji bereits vorhanden ist
-    if (threadMessageData['reactions'] && threadMessageData['reactions'].emoji === emoji) {
+    if (threadMessageData['reactions'].userId && threadMessageData['reactions'].emoji === emoji) {
       // Falls die Reaktion vorhanden ist, aktualisiere den Zähler und füge die Benutzer-ID hinzu
       if (!threadMessageData['reactions'].userId.includes(userId)) {
         // Benutzer-ID hinzufügen und Zähler erhöhen
@@ -346,7 +346,6 @@ export class DirectThreadComponent implements OnInit {
     this.overlayStatusService.setOverlayStatus(false);
   }
   
-
   handlingExistingUserReaction(
     threadMessageId: string,
     userId: string,
@@ -400,7 +399,7 @@ export class DirectThreadComponent implements OnInit {
         // Wenn der Benutzer bereits eine Reaktion hat, aktualisiere den Emoji und den Zähler
         if (reactions[userId]) {
           reactions[userId].emoji = emoji;
-          reactions[userId].counter = (reactions[userId].counter || 0) + 1;
+          reactions[userId].counter = (reactions[userId].counter || 0);
         } else {
           // Wenn der Benutzer noch keine Reaktion hat, füge eine neue hinzu
           reactions[userId] = {
