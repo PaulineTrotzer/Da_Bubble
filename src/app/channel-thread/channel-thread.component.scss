@@ -76,7 +76,8 @@ header {
   flex-direction: row-reverse;
 }
 
-.topic-content {
+.topic-content,
+.answer-content {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -185,11 +186,34 @@ header {
   padding: 5px 10px;
   border: 1px solid #adb0d9;
   border-radius: 20px;
+  cursor: pointer;
+}
+
+.used-emojis {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  display: flex;
+  height: 32px;
+  width: 32px;
+  padding: 4px;
+  border-radius: 100%;
+  &:hover {
+    background-color: #eceefe;
+  }
 }
 
 .reaction-info {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .flex-end {
@@ -199,4 +223,5 @@ header {
 .emoji-container {
   position: relative;
   z-index: 10;
+  top: 12px;
 }

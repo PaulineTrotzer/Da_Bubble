@@ -50,6 +50,8 @@ export class ChannelThreadComponent implements OnInit {
   isPickerVisible: string | null = null;
   hoveredMessageId: string | null = null;
   hoveredTopic: boolean = false;
+  currentUserLastEmojis: string [] = [];
+  hoveredReactionMessageId: string | null = null;
 
   unsubscribe: (() => void) | undefined;
 
@@ -60,6 +62,7 @@ export class ChannelThreadComponent implements OnInit {
         await this.getTopic();
         this.loadThreadMessages();
         this.toggleChannelThread(true);
+        this.loadCurrentUserEmojis();
       }
     });
   }
@@ -127,11 +130,11 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   addEmoji(event: any, messageId: string) {
-    console.log(messageId)
     const emoji = event.emoji;
     this.isPickerVisible = null;
     this.addLastUsedEmoji(emoji);
     this.addToReactionInfo(emoji, messageId);
+
   }
 
   async addLastUsedEmoji(emoji: any) {
@@ -148,46 +151,37 @@ export class ChannelThreadComponent implements OnInit {
   async addToReactionInfo(emoji: any, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
-    if (!currentUserId) {
-      console.warn('No current user logged in');
-      return;
-    }
-  
-    const messageDocRef = doc(
-      this.db,
-      'channels',
-      this.selectedChannel.id,
-      'messages',
-      messageId
-    );
-  
+    
+    if (!currentUserId) return;
+   
+    const messageDocRef = messageId === this.topicMessage?.id 
+      ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
+      : doc(this.db, 'channels', this.selectedChannel.id, 'messages', this.channelMessageId, 'thread', messageId);
+   
     try {
       const messageSnapshot = await getDoc(messageDocRef);
+      if (!messageSnapshot.exists()) return;
+   
       const messageData = messageSnapshot.data();
-      const reactions = messageData?.['reactions'] || {};
-  
-      const hasReacted = Object.values(reactions).some((userIds) =>
+      let reactions = messageData?.['reactions'] || {};
+   
+      const hasReacted = Object.values(reactions).some(userIds => 
         (userIds as string[]).includes(currentUserId)
       );
-  
-      if (hasReacted) {
-        console.warn('User has already reacted to this message');
-        return;
-      }
-  
+   
+      if (hasReacted) return;
+   
       if (!reactions[emoji.native]) {
         reactions[emoji.native] = [];
       }
+   
       reactions[emoji.native].push(currentUserId);
-  
       await updateDoc(messageDocRef, { reactions });
-  
-      console.log(`Updated reactions for message ${messageId}:`, reactions);
+   
     } catch (error) {
       console.error('Error updating reactions:', error);
     }
-  }
+   }
 
   async getExistingEmojis(userDocRef: DocumentReference): Promise<string[]> {
     const userDoc = await getDoc(userDocRef);
@@ -202,37 +196,126 @@ export class ChannelThreadComponent implements OnInit {
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
-    if (!currentUserId) {
-      console.warn('No current user logged in');
-      return;
-    }
-  
-    const messageDocRef = doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId);
-  
+   
+    if (!currentUserId) return;
+   
+    const messageDocRef = messageId === this.topicMessage?.id 
+      ? doc(
+          this.db, 
+          'channels',
+          this.selectedChannel.id,
+          'messages',
+          messageId
+        )
+      : doc(
+          this.db,
+          'channels', 
+          this.selectedChannel.id,
+          'messages',
+          this.channelMessageId,
+          'thread',
+          messageId
+        );
+   
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
-  
+   
       if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
         reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
-  
+   
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
         }
-  
+   
         await updateDoc(messageDocRef, { reactions });
-  
-        console.log(`Updated reactions for message ${messageId}:`, reactions);
       }
     } catch (error) {
       console.error('Error removing reaction:', error);
     }
-  }
+   }
   
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {
     return reactions && Object.keys(reactions).length > 0;
   }
+
+  loadCurrentUserEmojis() {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+  
+    if (currentUserId) {
+      const userDocRef = doc(this.db, 'users', currentUserId);
+  
+      onSnapshot(userDocRef, (docSnapshot) => {
+        const userData = docSnapshot.data();
+        if (userData?.['lastEmojis']) {
+          this.currentUserLastEmojis = userData['lastEmojis'];
+        }
+      });
+    } else {
+      console.warn('No current user logged in');
+    }
+  }
+
+  addEmojiToMessage(emoji: string, messageId: string) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+   
+    if (!currentUserId) return;
+   
+    const messageDocRef = messageId === this.topicMessage?.id 
+      ? doc(
+          this.db,
+          'channels',
+          this.selectedChannel.id,
+          'messages',
+          messageId
+        )
+      : doc(
+          this.db,
+          'channels',
+          this.selectedChannel.id,
+          'messages',
+          this.channelMessageId,
+          'thread',
+          messageId
+        );
+   
+    getDoc(messageDocRef).then((messageSnapshot) => {
+      const messageData = messageSnapshot.data();
+      const reactions = messageData?.['reactions'] || {};
+   
+      let oldReaction: string | null = null;
+      for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
+        if ((userIds as string[]).includes(currentUserId)) {
+          oldReaction = reactionEmoji;
+          break;
+        }
+      }
+   
+      if (oldReaction === emoji) {
+        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
+        if (reactions[emoji].length === 0) {
+          delete reactions[emoji];
+          this.hoveredReactionMessageId = null;
+        }
+      } else {
+        if (oldReaction) {
+          reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
+          if (reactions[oldReaction].length === 0) {
+            delete reactions[oldReaction];
+          }
+        }
+   
+        if (!reactions[emoji]) {
+          reactions[emoji] = [];
+        }
+        reactions[emoji].push(currentUserId);
+      }
+   
+      updateDoc(messageDocRef, { reactions });
+    });
+   }
 }
