@@ -71,7 +71,8 @@
   display: flex;
 }
 
-.selected-emojis {
+.emoji-holder {
+  background-color: #00000014;
   display: flex;
   gap: 6px;
   align-items: baseline;
@@ -82,6 +83,12 @@
   &:hover {
     border-color: #444df2;
   }
+}
+
+.all-emojis-container-flex{
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .single-emoji {

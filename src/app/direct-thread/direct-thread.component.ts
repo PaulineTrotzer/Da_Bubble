@@ -75,6 +75,7 @@ interface Reaction {
   ],
 })
 export class DirectThreadComponent implements OnInit {
+  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -99,6 +100,7 @@ export class DirectThreadComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: any[] } = {};
   currentThreadMessage: {
+    recipientId?: any;
     id?: string | undefined;
     senderName?: string;
     recipientName?: string;
@@ -113,6 +115,7 @@ export class DirectThreadComponent implements OnInit {
   subscription = new Subscription();
   shouldScrollToBottom = false;
   firstInitialisedThreadMsg: string | null = null;
+  twoSameReactions = false;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
@@ -122,7 +125,9 @@ export class DirectThreadComponent implements OnInit {
     this.scrollToBottom();
   }
 
-  getUserIds(reactions: { [key: string]: { emoji: string, counter: number } }): string[] {
+  getUserIds(reactions: {
+    [key: string]: { emoji: string; counter: number };
+  }): string[] {
     return Object.keys(reactions);
   }
 
@@ -130,6 +135,18 @@ export class DirectThreadComponent implements OnInit {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  getSenderReaction(reactions: any): any {
+    const senderId = this.currentThreadMessage?.senderId;
+    return senderId && reactions[senderId] ? reactions[senderId] : null;
+  }
+
+  getRecipientReaction(reactions: any): any {
+    const recipientId = this.currentThreadMessage?.recipientId;
+    return recipientId && reactions[recipientId]
+      ? reactions[recipientId]
+      : null;
   }
 
   initializeUser() {
@@ -142,6 +159,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async loadCurrentUser(userID: string) {
+    debugger;
     try {
       const userResult = await this.userService.getUser(userID);
       if (userResult) {
@@ -253,7 +271,7 @@ export class DirectThreadComponent implements OnInit {
       recipientStickerCount: 0,
       recipientSticker: '',
       text: this.currentThreadMessage.text || '',
-      reactions: ''
+      reactions: '',
     };
     setTimeout(async () => {
       await addDoc(threadMessagesRef, messageData);
@@ -319,7 +337,10 @@ export class DirectThreadComponent implements OnInit {
     }
   
     // Lese die aktuelle Nachricht aus der Datenbank
-    const threadMessageRef = doc(this.firestore, `messages/${firstInitialisedThreadMsg}/threadMessages/${currentThreadMessageId}`);
+    const threadMessageRef = doc(
+      this.firestore,
+      `messages/${firstInitialisedThreadMsg}/threadMessages/${currentThreadMessageId}`
+    );
     const threadMessageDoc = await getDoc(threadMessageRef);
   
     if (!threadMessageDoc.exists()) {
@@ -329,29 +350,73 @@ export class DirectThreadComponent implements OnInit {
   
     const threadMessageData = threadMessageDoc.data();
   
-    // Überprüfe, ob die Reaktion für dieses Emoji bereits vorhanden ist
-    if (threadMessageData['reactions'].userId && threadMessageData['reactions'].emoji === emoji) {
-      // Falls die Reaktion vorhanden ist, aktualisiere den Zähler und füge die Benutzer-ID hinzu
-      if (!threadMessageData['reactions'].userId.includes(userId)) {
-        // Benutzer-ID hinzufügen und Zähler erhöhen
-        // Benutzer-ID hinzufügen und Zähler erhöhen
-        threadMessageData['reactions'].counter++;
-        threadMessageData['reactions'].userId.push(userId);
-      }
-    } else {
-      // Wenn die Reaktion neu ist, setze sie auf die aktuelle Emoji-Reaktion
-      await this.updateMessageInDatabase(firstInitialisedThreadMsg, currentThreadMessageId, this.currentUser.uid, emoji);
+    // Initialisiere die Reaktionen, falls nicht vorhanden
+    if (!threadMessageData['reactions']) {
+      threadMessageData['reactions'] = {};
     }
-    this.isEmojiPickerVisible = false;
-    this.overlayStatusService.setOverlayStatus(false);
+  
+    const userReaction = threadMessageData['reactions'][userId];
+  
+    // Prüfe die aktuelle Reaktion des Benutzers
+    if (userReaction && userReaction.emoji === emoji) {
+      // Wenn der gleiche Emoji ausgewählt ist, toggle den Counter zwischen 0 und 1
+      threadMessageData['reactions'][userId].counter =
+        userReaction.counter === 0 ? 1 : 0;
+    } else {
+      // Wenn ein anderer Emoji ausgewählt wurde oder keine Reaktion existiert
+      threadMessageData['reactions'][userId] = {
+        emoji: emoji,
+        counter: 1, 
+      };
+    }
+    await updateDoc(threadMessageRef, {
+      reactions: threadMessageData['reactions'],
+    });
   }
   
+
+  areEmojisSame(reactions: any): boolean {
+    const userIds = this.getUserIds(reactions);
+    if (userIds.length < 2) return false; // Prüfen, ob genug User-IDs vorhanden sind
+
+    const firstEmoji = reactions[userIds[0]]?.emoji;
+    const secondEmoji = reactions[userIds[1]]?.emoji;
+
+    return firstEmoji === secondEmoji;
+  }
+
+  getCounterFromFirstUser(reactions: any): number | null {
+    const userIds = this.getUserIds(reactions);
+    return userIds.length > 0 ? reactions[userIds[0]]?.counter : null;
+  }
+
+  getEmojiFromFirstUser(reactions: any): string | null {
+    const userIds = this.getUserIds(reactions);
+    return userIds.length > 0 ? reactions[userIds[0]]?.emoji : null;
+  }
+
+  getTotalCounterForSameEmoji(reactions: any): number {
+    if (!reactions) return 0;
+  
+    const userIds = this.getUserIds(reactions);
+    if (userIds.length < 2) return 0;
+  
+    // Emoji des ersten Benutzers holen
+    const firstEmoji = reactions[userIds[0]]?.emoji;
+  
+    // Counter aller Benutzer summieren, die dasselbe Emoji ausgewählt haben
+    return userIds.reduce((total, userId) => {
+      if (reactions[userId]?.emoji === firstEmoji) {
+        return total + (reactions[userId]?.counter || 0);
+      }
+      return total;
+    }, 0);
+  }
   handlingExistingUserReaction(
     threadMessageId: string,
     userId: string,
     emoji: Emoji
-  ) 
-  {
+  ) {
     debugger;
     const userReaction = this.reactions[threadMessageId].find((reaction) =>
       reaction.userIds.includes(userId)
@@ -377,8 +442,6 @@ export class DirectThreadComponent implements OnInit {
       this.reactions[threadMessageId].push(newReaction);
     }
   }
-
-  
   async updateMessageInDatabase(
     parentMessageId: string,
     threadMessageId: string,
@@ -390,37 +453,50 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${parentMessageId}/threadMessages/${threadMessageId}`
       );
-  
+
       const docSnapshot = await getDoc(emojiDocRef);
       if (docSnapshot.exists()) {
         const currentData = docSnapshot.data();
         const reactions = currentData?.['reactions'] || {};
-  
-        // Wenn der Benutzer bereits eine Reaktion hat, aktualisiere den Emoji und den Zähler
-        if (reactions[userId]) {
-          reactions[userId].emoji = emoji;
-          reactions[userId].counter = (reactions[userId].counter || 0);
-        } else {
-          // Wenn der Benutzer noch keine Reaktion hat, füge eine neue hinzu
-          reactions[userId] = {
-            emoji: emoji,
-            counter: 1,
-          };
+
+        // Aktuelle User-Reaktion
+        if (!reactions[userId]) {
+          reactions[userId] = { emoji: null, counter: 0 }; // Falls noch nicht vorhanden
         }
-        // Aktualisiere das Dokument mit den neuen Reaktionen
+
+        // Überprüfe, ob der andere User denselben Emoji gewählt hat
+        const otherUserId = Object.keys(reactions).find(
+          (id) => id !== userId && reactions[id]?.emoji === emoji
+        );
+
+        if (otherUserId) {
+          // Beide haben denselben Emoji gewählt -> Setze beide Counter auf 2
+          reactions[userId].emoji = emoji;
+          reactions[userId].counter = 2;
+          this.twoSameReactions = true;
+        } else {
+          // Andernfalls reguliere die Reaktion nur für den aktuellen User
+          reactions[userId].emoji = emoji;
+          reactions[userId].counter = 1;
+        }
+
+        // Aktualisiere die Datenbank
         await updateDoc(emojiDocRef, {
           reactions: reactions,
         });
-  
-        console.log('Reaktionen erfolgreich aktualisiert.');
       } else {
-        console.error(`Das Dokument für die Nachricht ${threadMessageId} existiert nicht.`);
+        console.error(
+          `Das Dokument für die Nachricht ${threadMessageId} existiert nicht.`
+        );
       }
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Reaktionen:', error);
     }
   }
-  
+
+  checkIfTwoSameReactions() {
+    this.twoSameReactions = true;
+  }
 
   onMouseEnter(message: any) {
     message.isHovered = true;
