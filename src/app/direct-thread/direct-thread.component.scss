@@ -91,12 +91,6 @@
   gap: 6px;
 }
 
-.single-emoji {
-}
-
-.reaction-counter {
-}
-
 .show-set-reverse {
   position: absolute;
   left: -8px;
@@ -136,9 +130,6 @@ h3 {
   align-items: center;
 }
 
-.img-container {
-}
-
 .header-seperator {
   width: 100%;
   height: 4px;
@@ -174,9 +165,6 @@ h3 {
   overflow-y: auto;
 }
 
-.chatpartner-msg-ct {
-}
-
 .cu-msg-text {
   max-height: 105px;
   background-color: #797ef3;
@@ -192,12 +180,24 @@ h3 {
   padding: 16px;
 }
 
+.both-user-flex-reactions {
+  display: flex;
+  position: absolute;
+  margin-top: -71px;
+  &.left-reactions {
+    left: 50px;
+  }
+  &.right-reactions {
+    right: 57px;
+  }
+}
+
 .chatpartner-message-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
-  padding: 10px 30px;
+  padding:10px 30px 42px 30px;
   margin: 16px 0;
 }
 
@@ -210,6 +210,7 @@ h3 {
 }
 
 .message-content-bubble {
+  position: relative;
   background-color: white;
   max-width: 278px;
   padding: 15px;
@@ -232,7 +233,7 @@ h3 {
   flex-direction: column;
   align-items: flex-end;
   gap: 16px;
-  padding: 10px 30px;
+  padding: 10px 30px 42px 30px;
   margin: 16px 0;
 }
 

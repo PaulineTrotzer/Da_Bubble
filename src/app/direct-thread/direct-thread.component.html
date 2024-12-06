@@ -25,12 +25,6 @@
     <div #messageContainer class="all-thread-message-container">
 
       <div *ngFor="let message of messagesData" class="message-bubble">
-        <!-- 
-        <div>
-          <app-first-message-thread [currentThreadMessage]="currentThreadMessage" [selectedUser]="selectedUser"
-            [firstMessageID]="firstMessageId"></app-first-message-thread>
-        </div>
- -->
 
         <div class="color-separator" (mouseenter)="onMouseEnter(message)" (mouseleave)="onMouseLeave(message)">
           <div *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name"
@@ -45,7 +39,6 @@
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
               <p>{{ message.text }}</p>
             </div>
-
 
             <!--             <div class="chatpartner-reaction-bar">
               <div class="reaction-popup" *ngIf="showMessagePopup" @fadeIn>
@@ -69,7 +62,6 @@
                 </svg>
               </div>
             </div>-->
-
             <div class="sticker-hover-ct">
               <div class="show-set">
                 <div class="img-flex-bar-options">
@@ -85,25 +77,9 @@
                   <img>
                 </div>
               </div>
-
-            </div>
-          </div>
-          <div class="render-reaction-ct">
-            <div class="all-emojis-container-flex">
-              <ng-container>
-                <div *ngIf="getRecipientReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)" class="emoji-holder">
-                  <span class="single-emoji">
-                    {{ getRecipientReaction(message.reactions)?.emoji }}
-                  </span>
-                  <span *ngIf="getRecipientReaction(message.reactions)?.counter >= 1" class="reaction-counter">
-                    {{ getRecipientReaction(message.reactions)?.counter }}
-                  </span>
-                </div>
-              </ng-container>
             </div>
           </div>
         </div>
-
 
         <div class="color-separator">
           <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
@@ -115,7 +91,7 @@
               <h4>{{ currentUser.name }}</h4>
               <span class="message-time">{{ message.timestamp | date: 'shortTime' }}</span>
             </div>
-            <div [class.hovered]="message.isHovered">
+            <div class="message-holder" [class.hovered]="message.isHovered">
               <p class="cu-msg-text">{{ message.text }}</p>
             </div>
 
@@ -140,10 +116,18 @@
               </div>
             </div>
           </div>
+        </div>
+
+
+        <div class="both-user-flex-reactions" class="both-user-flex-reactions" [ngClass]="{
+          'left-reactions': isLeftReactions(message),
+          'right-reactions': !isLeftReactions(message)
+        }">
           <div class="render-reaction-ct">
             <div class="all-emojis-container-flex">
               <ng-container>
-                <div *ngIf="getSenderReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)" class="emoji-holder">
+                <div *ngIf="getSenderReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)"
+                  class="emoji-holder">
                   <span class="single-emoji">
                     {{ getSenderReaction(message.reactions)?.emoji }}
                   </span>
@@ -154,28 +138,39 @@
               </ng-container>
             </div>
           </div>
-        </div>
 
-        <div class="render-reaction-ct">
-          <div class="all-emojis-container-flex">
-            <!-- Prüfen, ob Emojis der ersten beiden User-IDs gleich sind -->
-            <ng-container *ngIf="areEmojisSame(message.reactions)">
-              <div class="emoji-holder">
-                <!-- Zeigt das Emoji an -->
-                <span class="single-emoji">
-                  {{ getEmojiFromFirstUser(message.reactions) }}
-                </span>
-        
-                <!-- Zeigt den gesamten Zähler an -->
-                <span class="reaction-counter">
-                  {{ getTotalCounterForSameEmoji(message.reactions) }}
-                </span>
-              </div>
-            </ng-container>
+
+          <div class="render-reaction-ct">
+            <div class="all-emojis-container-flex">
+              <ng-container>
+                <div *ngIf="getRecipientReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)"
+                  class="emoji-holder">
+                  <span class="single-emoji">
+                    {{ getRecipientReaction(message.reactions)?.emoji }}
+                  </span>
+                  <span *ngIf="getRecipientReaction(message.reactions)?.counter >= 1" class="reaction-counter">
+                    {{ getRecipientReaction(message.reactions)?.counter }}
+                  </span>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="render-reaction-ct">
+            <div class="all-emojis-container-flex">
+              <ng-container *ngIf="areEmojisSame(message.reactions)">
+                <div class="emoji-holder">
+                  <span class="single-emoji">
+                    {{ getEmojiFromFirstUser(message.reactions) }}
+                  </span>
+                  <span class="reaction-counter">
+                    {{ getTotalCounterForSameEmoji(message.reactions) }}
+                  </span>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
-
-
 
 
         <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
