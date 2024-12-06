@@ -52,6 +52,8 @@ export class ChannelThreadComponent implements OnInit {
   hoveredTopic: boolean = false;
   currentUserLastEmojis: string [] = [];
   hoveredReactionMessageId: string | null = null;
+  hoveredEmoji: string | null = null;
+  reactionUserNames: { [userId: string]: string } = {};
 
   unsubscribe: (() => void) | undefined;
 
@@ -134,7 +136,6 @@ export class ChannelThreadComponent implements OnInit {
     this.isPickerVisible = null;
     this.addLastUsedEmoji(emoji);
     this.addToReactionInfo(emoji, messageId);
-
   }
 
   async addLastUsedEmoji(emoji: any) {
@@ -318,4 +319,52 @@ export class ChannelThreadComponent implements OnInit {
       updateDoc(messageDocRef, { reactions });
     });
    }
+   
+   onReactionHover(message: Message, emoji: string) {
+    this.hoveredReactionMessageId = message.id;
+    this.hoveredEmoji = emoji;
+    
+    const auth = getAuth();
+    const reactors = message.reactions[emoji] || [];
+    const unknownUsers = reactors
+      .filter(userId => userId !== auth.currentUser?.uid)
+      .filter(userId => !this.reactionUserNames[userId]);
+    
+    if (unknownUsers.length > 0) {
+      Promise.all(
+        unknownUsers.map(async userId => {
+          const userDoc = await getDoc(doc(this.db, 'users', userId));
+          const userData = userDoc.data();
+          if (userData?.['name']) {
+            this.reactionUserNames[userId] = userData['name'];
+          }
+        })
+      );
+    }
+  }
+  
+  getReactionText(message: Message, emoji: string | null): string {
+    if (!emoji || !message.reactions) return '';
+
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid || '';
+    const reactors = message.reactions[emoji] || [];
+
+    if (reactors.length === 0) return '';
+
+    const currentUserReacted = reactors.includes(currentUserId);
+    const otherReactors = reactors.filter(userId => userId !== currentUserId);
+
+    if (currentUserReacted && reactors.length === 1) {
+      return 'Du hast reagiert.';
+    }
+
+    if (currentUserReacted && otherReactors.length > 0) {
+      const otherUserName = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+      return `${otherUserName} und Du haben reagiert.`;
+    }
+
+    const firstReactorName = this.reactionUserNames[reactors[0]] || 'Jemand';
+    return `${firstReactorName} hat reagiert.`;
+  }
 }

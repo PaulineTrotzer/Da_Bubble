@@ -150,10 +150,16 @@
           <div class="reaction-info" [ngClass]="{
             'flex-end': topicMessage?.senderId === global.currentUserData.id
           }">
+            <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === topicMessage?.id && hoveredEmoji">
+              <span class="emoji-from"> {{ hoveredEmoji }} </span>
+              <p class="reaction-text">{{ getReactionText(topicMessage!, hoveredEmoji) }}</p>
+            </div>
             <span 
             *ngFor="let reaction of topicMessage?.reactions | keyvalue"
             class="reaction"
-            (click)="removeReaction(reaction.key, topicMessage?.id!)"
+            (mouseenter)="onReactionHover(topicMessage!, reaction.key)"
+            (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
+            (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)"
             > {{ reaction.key }} {{ reaction.value.length }}
             </span>
             <div class="img-container" *ngIf="hasReactions(topicMessage?.reactions!)" (click)="togglePicker(topicMessage?.id!)">
@@ -303,10 +309,16 @@
           <div class="reaction-info" [ngClass]="{
             'flex-end': message.senderId === global.currentUserData.id
           }">
+          <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji">
+            <span class="emoji-from"> {{ hoveredEmoji }} </span>
+            <p class="reaction-text">{{ getReactionText(topicMessage!, hoveredEmoji) }}</p>
+          </div>
             <span 
             *ngFor="let reaction of message.reactions | keyvalue"
             class="reaction"
-            (click)="removeReaction(reaction.key, message.id!)"
+            (mouseenter)="onReactionHover(message, reaction.key)"
+            (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
+            (click)="addEmojiToMessage(reaction.key, message.id!)"
             > {{ reaction.key }} {{ reaction.value.length }}
             </span>
             <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
