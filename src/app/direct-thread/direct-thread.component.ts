@@ -32,7 +32,11 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import { slideFromRight, fadeIn } from './../../assets/direct-thread.animations';
+import {
+  slideFromRight,
+  fadeIn,
+} from './../../assets/direct-thread.animations';
+import { currentThreadMessage } from '../models/threadMessage.class';
 
 @Component({
   selector: 'app-direct-thread',
@@ -43,7 +47,6 @@ import { slideFromRight, fadeIn } from './../../assets/direct-thread.animations'
   animations: [slideFromRight, fadeIn],
 })
 export class DirectThreadComponent implements OnInit {
-  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -67,23 +70,16 @@ export class DirectThreadComponent implements OnInit {
   isDirectThreadOpen: boolean = true;
   overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: any[] } = {};
-  currentThreadMessage: {
-    recipientId?: any;
-    id?: string | undefined;
-    senderName?: string;
-    recipientName?: string;
-    text?: string;
-    senderPicture?: string;
-    timestamp?: Date | { seconds: number; nanoseconds: number };
-    senderId?: string;
-    isHovered?: boolean;
-  } = {};
   selectFiles: any[] = [];
   threadControlService = inject(ThreadControlService);
   subscription = new Subscription();
   shouldScrollToBottom = false;
   firstInitialisedThreadMsg: string | null = null;
-  twoSameReactions = false;
+  currentThreadMessage!: currentThreadMessage;
+  showReactionPopUpSender = false;
+  showReactionPopUpRecipient = false;
+  showReactionPopUpBoth = false;
+  isMouseInside: any;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
@@ -91,6 +87,20 @@ export class DirectThreadComponent implements OnInit {
     this.initializeUser();
     this.subscribeToThreadMessages();
     this.scrollToBottom();
+  }
+
+  isCurrentUser(name: string): boolean {
+    return name === this.currentUser.name;
+  }
+
+  private subscribeToThreadMessages() {
+    this.threadControlService.firstThreadMessageId$.subscribe(
+      async (firstInitialisedThreadMsg) => {
+        if (firstInitialisedThreadMsg) {
+          await this.processThreadMessages(firstInitialisedThreadMsg);
+        }
+      }
+    );
   }
 
   getUserIds(reactions: {
@@ -106,20 +116,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   isLeftReactions(message: any): boolean {
-    // Wenn der Sender der Nachricht der `selectedUser` ist, sind die Reaktionen links
     return message.senderId === this.selectedUser?.id;
-  }
-
-  getSenderReaction(reactions: any): any {
-    const senderId = this.currentThreadMessage?.senderId;
-    return senderId && reactions[senderId] ? reactions[senderId] : null;
-  }
-
-  getRecipientReaction(reactions: any): any {
-    const recipientId = this.currentThreadMessage?.recipientId;
-    return recipientId && reactions[recipientId]
-      ? reactions[recipientId]
-      : null;
   }
 
   initializeUser() {
@@ -131,8 +128,28 @@ export class DirectThreadComponent implements OnInit {
     });
   }
 
+  toggleReactionInfo(id: string) {
+    if (id === 'sender') {
+      this.showReactionPopUpSender = !this.showReactionPopUpSender;
+    } else if (id === 'recipient') {
+      this.showReactionPopUpRecipient = !this.showReactionPopUpRecipient;
+    }
+  }
+
+
+  toggleBothReactionInfo(shouldShow: boolean) {
+    if (shouldShow) {
+      this.isMouseInside = true;
+      this.showReactionPopUpBoth = true;
+    } else {
+      if (this.isMouseInside) {
+        this.showReactionPopUpBoth = false;
+      }
+    }
+  }
+  
+
   async loadCurrentUser(userID: string) {
-    debugger;
     try {
       const userResult = await this.userService.getUser(userID);
       if (userResult) {
@@ -141,16 +158,6 @@ export class DirectThreadComponent implements OnInit {
     } catch (error) {
       console.error('Fehler beim Laden des Benutzers:', error);
     }
-  }
-
-  private subscribeToThreadMessages() {
-    this.threadControlService.firstThreadMessageId$.subscribe(
-      async (firstInitialisedThreadMsg) => {
-        if (firstInitialisedThreadMsg) {
-          await this.processThreadMessages(firstInitialisedThreadMsg);
-        }
-      }
-    );
   }
 
   async processThreadMessages(firstInitialisedThreadMsg: string) {
@@ -259,21 +266,16 @@ export class DirectThreadComponent implements OnInit {
       );
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
       onSnapshot(q, (querySnapshot) => {
-        console.log(
-          'ThreadMessages Snapshot:',
-          querySnapshot.docs.map((doc) => doc.data())
-        );
-        if (querySnapshot.empty) {
-          console.log('Keine Thread-Nachrichten gefunden');
-          this.messagesData = [];
-          return;
-        }
+        console.log(querySnapshot.docs.map((doc) => doc.data()));
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
             messageData['timestamp'] = messageData['timestamp'].toDate();
           }
-          return { id: doc.id, ...messageData };
+          return {
+            id: doc.id,
+            ...messageData,
+          };
         });
         this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
@@ -303,53 +305,51 @@ export class DirectThreadComponent implements OnInit {
     const firstInitialisedThreadMsg = await firstValueFrom(
       this.threadControlService.firstThreadMessageId$
     );
-  
-    if (!firstInitialisedThreadMsg) {
-      console.error('ParentMessageId ist nicht verfügbar.');
-      return;
-    }
-  
     const threadMessageRef = doc(
       this.firestore,
       `messages/${firstInitialisedThreadMsg}/threadMessages/${currentThreadMessageId}`
     );
     const threadMessageDoc = await getDoc(threadMessageRef);
-  
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
       return;
     }
-  
     const threadMessageData = threadMessageDoc.data();
-  
     if (!threadMessageData['reactions']) {
       threadMessageData['reactions'] = {};
     }
-  
     const userReaction = threadMessageData['reactions'][userId];
-  
     if (userReaction && userReaction.emoji === emoji) {
       threadMessageData['reactions'][userId].counter =
         userReaction.counter === 0 ? 1 : 0;
     } else {
       threadMessageData['reactions'][userId] = {
         emoji: emoji,
-        counter: 1, 
+        counter: 1,
       };
     }
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
   }
-  
+
+  getSenderReaction(reactions: any): any {
+    const senderId = this.currentThreadMessage?.senderId;
+    return senderId && reactions[senderId] ? reactions[senderId] : null;
+  }
+
+  getRecipientReaction(reactions: any): any {
+    const recipientId = this.currentThreadMessage?.recipientId;
+    return recipientId && reactions[recipientId]
+      ? reactions[recipientId]
+      : null;
+  }
 
   areEmojisSame(reactions: any): boolean {
     const userIds = this.getUserIds(reactions);
-    if (userIds.length < 2) return false; 
-
+    if (userIds.length < 2) return false;
     const firstEmoji = reactions[userIds[0]]?.emoji;
     const secondEmoji = reactions[userIds[1]]?.emoji;
-
     return firstEmoji === secondEmoji;
   }
 
@@ -365,7 +365,6 @@ export class DirectThreadComponent implements OnInit {
 
   getTotalCounterForSameEmoji(reactions: any): number {
     if (!reactions) return 0;
-  
     const userIds = this.getUserIds(reactions);
     if (userIds.length < 2) return 0;
     const firstEmoji = reactions[userIds[0]]?.emoji;
@@ -377,23 +376,16 @@ export class DirectThreadComponent implements OnInit {
     }, 0);
   }
 
-
   handlingExistingUserReaction(
     threadMessageId: string,
     userId: string,
     emoji: Emoji
   ) {
-    debugger;
     const userReaction = this.reactions[threadMessageId].find((reaction) =>
       reaction.userIds.includes(userId)
     );
-
     if (userReaction) {
-      if (userReaction.emoji === emoji) {
-        console.log('Benutzer hat bereits mit diesem Emoji reagiert.');
-        return; 
-      }
-      userReaction.count--; 
+      userReaction.count--;
       userReaction.userIds = userReaction.userIds.filter(
         (id: string) => id !== userId
       );
@@ -406,6 +398,7 @@ export class DirectThreadComponent implements OnInit {
       this.reactions[threadMessageId].push(newReaction);
     }
   }
+
   async updateMessageInDatabase(
     parentMessageId: string,
     threadMessageId: string,
@@ -417,24 +410,19 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${parentMessageId}/threadMessages/${threadMessageId}`
       );
-
       const docSnapshot = await getDoc(emojiDocRef);
       if (docSnapshot.exists()) {
         const currentData = docSnapshot.data();
         const reactions = currentData?.['reactions'] || {};
-
         if (!reactions[userId]) {
-          reactions[userId] = { emoji: null, counter: 0 }; 
+          reactions[userId] = { emoji: null, counter: 0 };
         }
-
         const otherUserId = Object.keys(reactions).find(
           (id) => id !== userId && reactions[id]?.emoji === emoji
         );
-
         if (otherUserId) {
           reactions[userId].emoji = emoji;
           reactions[userId].counter = 2;
-          this.twoSameReactions = true;
         } else {
           reactions[userId].emoji = emoji;
           reactions[userId].counter = 1;
@@ -442,10 +430,6 @@ export class DirectThreadComponent implements OnInit {
         await updateDoc(emojiDocRef, {
           reactions: reactions,
         });
-      } else {
-        console.error(
-          `Das Dokument für die Nachricht ${threadMessageId} existiert nicht.`
-        );
       }
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Reaktionen:', error);
