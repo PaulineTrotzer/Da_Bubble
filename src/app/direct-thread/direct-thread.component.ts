@@ -22,6 +22,7 @@ import {
   addDoc,
   orderBy,
   setDoc,
+  where,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -136,18 +137,9 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-
-  toggleBothReactionInfo(shouldShow: boolean) {
-    if (shouldShow) {
-      this.isMouseInside = true;
-      this.showReactionPopUpBoth = true;
-    } else {
-      if (this.isMouseInside) {
-        this.showReactionPopUpBoth = false;
-      }
-    }
+  toggleBothReactionInfo(show: boolean): void {
+    this.showReactionPopUpBoth = show;
   }
-  
 
   async loadCurrentUser(userID: string) {
     try {
@@ -300,7 +292,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async addEmoji(event: any, currentThreadMessageId: string, userId: string) {
-    debugger;
     const emoji = event.emoji.native;
     const firstInitialisedThreadMsg = await firstValueFrom(
       this.threadControlService.firstThreadMessageId$
@@ -331,6 +322,17 @@ export class DirectThreadComponent implements OnInit {
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
+  }
+
+  TwoReactionsTwoSameEmojis(recipientId: any, senderId: any): boolean {
+    if (
+      recipientId.counter > 0 &&
+      senderId.counter > 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   getSenderReaction(reactions: any): any {

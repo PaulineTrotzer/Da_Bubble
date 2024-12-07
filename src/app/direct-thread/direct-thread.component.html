@@ -96,6 +96,7 @@
           </div>
         </div>
 
+
         <div class="both-user-flex-reactions" [ngClass]="{
           'left-reactions': message.isLeftReaction,
           'right-reactions': !message.isLeftReaction
@@ -158,11 +159,15 @@
             </div>
           </div>
 
+
           <div class="render-reaction-ct">
             <div class="all-emojis-container-flex">
               <ng-container *ngIf="areEmojisSame(message.reactions)">
                 <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(true)"
-                  (mouseout)="toggleBothReactionInfo(false)">
+                  (mouseout)="toggleBothReactionInfo(false)"
+                  [class.emojis-holder-both-two-single]="!TwoReactionsTwoSameEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])"
+                  [class.both-reaction-right-emojis-holder]="message.senderName === currentUser.name"
+                  [class.both-reaction-left-emojis-holder]="message.recipientName === currentUser.name">
                   <span class="single-emoji">
                     {{ getEmojiFromFirstUser(message.reactions) }}
                   </span>
@@ -170,19 +175,29 @@
                     {{ getTotalCounterForSameEmoji(message.reactions) }}
                   </span>
                 </div>
-                <div class="reaction-name-info-ct-both">
-                  <div [style.visibility]="showReactionPopUpBoth ? 'visible' : 'hidden'" class="both-reaction-info-ct">
-                    <span class="reaction-info-txt-both">Du und {{ selectedUser.name }} haben mit</span>
+                <div class="both-reaction-info-ct" [ngClass]="{
+                  'both-reaction-right': message.senderName === currentUser.name,
+                  'both-reaction-left': message.recipientName === currentUser.name,
+                  'both-two-single': !TwoReactionsTwoSameEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
+                }" [style.visibility]="showReactionPopUpBoth ? 'visible' : 'hidden'">
+                  <span class="reaction-info-txt-both"
+                    *ngIf="TwoReactionsTwoSameEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
+                    Du und {{
+                    selectedUser.name }} haben mit
                     <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
-                    <span class="reaction-info-txt-both">reagiert</span>
-                  </div>
+                    reagiert</span>
+                  <span class="reaction-info-txt-both two-single"
+                    *ngIf="!TwoReactionsTwoSameEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
+                    {{selectedUser.name}} hat mit
+                    <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
+                    reagiert</span>
                 </div>
+
               </ng-container>
             </div>
           </div>
+
         </div>
-
-
 
         <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
           <div class="img-container">
@@ -206,9 +221,9 @@
             </svg>
           </div>
         </div>
+
+      </div>
+      <div class="input-holder">
+        <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
       </div>
     </div>
-    <div class="input-holder">
-      <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
-    </div>
-  </div>
