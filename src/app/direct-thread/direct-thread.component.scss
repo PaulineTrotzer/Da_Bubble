@@ -72,7 +72,7 @@
 }
 
 .emoji-holder {
-  position: absolute;
+  position: relative;
   display: flex;
   width: 46px;
   align-items: baseline;
@@ -87,16 +87,17 @@
 }
 
 .both-reaction-left-emojis-holder {
-  left: -34px;
-  bottom: 40px;
+  left: -20px;
+  bottom: 4px;
 }
 .both-reaction-right-emojis-holder {
-  right: 10px;
-  bottom: 40px;
+  position: absolute;
+  right: 16px;
+  bottom: 2px;
 }
 
 .emojis-holder-both-two-single {
-  bottom: 14px;
+  bottom: 4px;
 }
 .both-two-single {
   bottom: 48px !important;
@@ -105,6 +106,8 @@
 .all-emojis-container-flex {
   display: flex;
   align-items: center;
+  justify-content: start;
+  width: fit-content;
   gap: 6px;
 }
 
@@ -198,25 +201,25 @@ h3 {
 }
 
 .both-user-flex-reactions {
+  position: relative;
   display: flex;
-  position: absolute;
-  margin-top: -37px;
-  gap: 43px;
-  &.left-reactions {
-    left: 50px;
-  }
-  &.right-reactions {
-    right: 86px;
-  }
+  align-items: center;
+}
+.left-reactions {
+  left: 22px;
+  margin-top: -66px;
+  justify-content: start;
+}
+.right-reactions {
+  right: 67px;
+  margin-top: -53px;
+  justify-content: end;
 }
 
 .reaction-name-info-ct-sender {
   display: flex;
   position: absolute;
-  bottom: 27px;
-  text-align: center;
-  right: 4px;
-  margin-left: 13px;
+  bottom: 45px;
   background-color: #444df2;
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
@@ -225,7 +228,6 @@ h3 {
   width: fit-content;
   height: fit-content;
   padding: 7px 14px;
-  text-align: center;
   color: white;
 }
 
@@ -234,13 +236,15 @@ h3 {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 0px;
+  bottom: 30px;
 }
 
 .both-reaction-info-ct.both-reaction-left {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 0;
+  bottom: 35px;
 }
 
 .two-single {
@@ -253,7 +257,6 @@ h3 {
   align-items: center;
   gap: 5px;
   position: relative;
-  bottom: 70px;
   text-align: center;
   right: 27px;
   background-color: #444df2;
@@ -276,7 +279,6 @@ h3 {
   display: flex;
   position: absolute;
   bottom: 44px;
-  right: -72px;
   background-color: #444df2;
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;

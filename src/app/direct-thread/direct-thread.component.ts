@@ -82,6 +82,7 @@ export class DirectThreadComponent implements OnInit {
   showReactionPopUpBoth = false;
   isMouseInside: any;
 
+
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
@@ -117,7 +118,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   isLeftReactions(message: any): boolean {
-    return message.senderId === this.selectedUser?.id;
+    return message.senderId === this.selectedUser?.uid;
   }
 
   initializeUser() {
@@ -450,4 +451,6 @@ export class DirectThreadComponent implements OnInit {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
   }
+
+
 }

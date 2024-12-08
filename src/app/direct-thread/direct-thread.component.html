@@ -98,8 +98,8 @@
 
 
         <div class="both-user-flex-reactions" [ngClass]="{
-          'left-reactions': message.isLeftReaction,
-          'right-reactions': !message.isLeftReaction
+          'left-reactions': isLeftReactions(message),
+          'right-reactions': !isLeftReactions(message)
         }">
           <div class="render-reaction-ct">
             <div class="all-emojis-container-flex">
