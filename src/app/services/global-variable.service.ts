@@ -20,9 +20,11 @@ export class GlobalVariableService {
   googleAccountLogIn: boolean = false;
   createNewPassword:boolean=false;
   verifyEmail:boolean=true;
-
-
-
+   
+  checkoben:boolean=false
+  checkCountStatus:any
+  checkCountStatusUser:any
+  currentRoom:any
   constructor() { }
 
   async setCurrentUserData(userData: any) {

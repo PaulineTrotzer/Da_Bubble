@@ -65,6 +65,8 @@ export class ChatComponent implements OnInit, OnChanges {
   selectFiles: any[] = [];
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
+  @Input() onHeaderUser:any
+  @Input ()  onHeaderChannel:any
   messagesData: any[] = [];
   elementRef = inject(ElementRef);
   firestore = inject(Firestore);
@@ -100,6 +102,9 @@ export class ChatComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getAllUsersname();
+    console.log(this.selectedUser?.id)
+    console.log(this.selectedUser)
+     
   }
 
   onUserNameClick() {
@@ -176,22 +181,46 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser'] && this.selectedUser?.id) {
+    if (changes['selectedUser'] && this.selectedUser) {
+       
+       
+     
+
+      console.log(this.selectedUser?.id)
       this.getMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
+      this.showTwoPersonConversationTxt = false;
       this.getMessages().then(() => this.checkForSelfChat());
-    }
+    } 
+
+
     if (changes['selectedChannel'] && !changes['selectedChannel'].firstChange) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
+      console.log('changing')
       this.clearInput();
-    } 
+    }   
+    
+
+    // if (changes['onHeaderChannel'] && !changes['onHeaderChannel'].firstChange) {
+    //   this.showWelcomeChatText = false;
+    //   this.showTwoPersonConversationTxt = false;
+    //   console.log('changing on channel')
+    //   this.clearInput();
+    // }    
+
+    // if (changes['onHeaderUser'] && this.onHeaderUser) {
+    //   console.log('hallo on header User')
+    //   this.global.channelSelected = false;
+    //   this.chatMessage = '';
+    //   this.global.clearCurrentChannel();
+    // }
   }
 
   checkForSelfChat() {
     if (
-      this.selectedUser.id === this.global.currentUserData.id &&
+      this.selectedUser?.id === this.global.currentUserData?.id &&
       this.messagesData.length === 0
     ) {
       this.showWelcomeChatText = true;
@@ -204,7 +233,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   checkTwoPersonConversation() {
     if (
-      this.selectedUser.id !== this.global.currentUserData.id &&
+      this.selectedUser?.id !== this.global.currentUserData?.id &&
       this.messagesData.length === 0
     ) {
       this.showTwoPersonConversationTxt = true;
@@ -263,8 +292,10 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   scrollToBottom(): void {
+    if(this.scrollContainer){
     this.scrollContainer.nativeElement.scrollTop =
       this.scrollContainer.nativeElement.scrollHeight;
+    }
   }
 
   scrollAutoDown(): void {
@@ -320,12 +351,12 @@ export class ChatComponent implements OnInit, OnChanges {
     const q = query(
       docRef,
       where('recipientId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
+        this.selectedUser?.id,
+        this.global.currentUserData?.id,
       ]),
       where('senderId', 'in', [
-        this.selectedUser.id,
-        this.global.currentUserData.id,
+        this.selectedUser?.id,
+        this.global.currentUserData?.id,
       ])
     );
 
@@ -350,11 +381,11 @@ export class ChatComponent implements OnInit, OnChanges {
       });
       this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
       this.checkForSelfChat();
-
       if (this.shouldScroll) {
         this.scrollAutoDown();
       }
-    });
+    }); 
+    
   }
 
   openThread(){

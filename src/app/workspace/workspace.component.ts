@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  updateDoc
 } from '@angular/fire/firestore';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
@@ -57,6 +58,7 @@ export class WorkspaceComponent implements OnInit {
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.getUserById(this.userId);
+      this.getUserMessageCount(this.userId);
       this.userService.observingUserChanges(
         this.userId,
         (updatedUser: User) => {
@@ -65,7 +67,9 @@ export class WorkspaceComponent implements OnInit {
       );
     }
     this.subscribeToGuestLoginStatus();
-    await this.getAllChannels();
+    await this.getAllChannels(); 
+    console.log(this.messageCountsArr?.messageCount)
+     
   }
 
   subscribeToGuestLoginStatus(): void {
@@ -75,16 +79,52 @@ export class WorkspaceComponent implements OnInit {
         console.log('guest log status:', status); 
       }
     );
-  }
+  } 
 
-  selectUser(user: any) {
-    this.userSelected.emit(user);
-    this.global.statusCheck = false;
-  }
 
+
+ clickedUsers: string[] = []; // Array, um angeklickte Benutzer zu speichern
+ id:any;
+
+selectUser(user: any) {
+  this.userSelected.emit(user);
+  this.id = user.id;
+  const actuallyId = this.id; 
+    if(this.userId && actuallyId && this.messageCountsArr?.messageCount && !this.messageCountsArr?.messageCount[actuallyId]){
+      this.clickedUsers.push(actuallyId);
+    }
+    else if (this.userId && actuallyId && this.messageCountsArr?.messageCount && this.messageCountsArr.messageCount[actuallyId] > 0) {
+        this.clickedUsers.push(actuallyId);
+        this.global.checkCountStatus = true;
+      if (this.global.checkCountStatus) {
+        const docRef = doc(this.firestore, 'messageCounts', this.userId);
+        const resetMessageCount: any = {};
+        resetMessageCount[`messageCount.${actuallyId}`] = 0;
+        updateDoc(docRef, resetMessageCount);
+        console.log('arrays qaqs')
+      }
+      }
+  else { 
+      this.global.checkCountStatus = false;
+      this.global.statusCheck = false;
+      const arrFirstId=this.clickedUsers[0];
+       console.log(arrFirstId)
+      if(arrFirstId && arrFirstId!==actuallyId) {
+      const docRef = doc(this.firestore, 'messageCounts', this.userId);
+      const resetMessageCount: any = {};
+      resetMessageCount[`messageCount.${actuallyId}`] = 0;
+      updateDoc(docRef, resetMessageCount);
+      console.log('arrays qaqs')
+      console.log(actuallyId)  
+    }
+  }
+  this.global.statusCheck = false;
+} 
+      
+           
   selectCurrentUser() {
-    this.global.statusCheck = true;
     this.userSelected.emit(this.global.currentUserData);
+    this.global.statusCheck = true;
   }
 
   openDialog() {
@@ -142,6 +182,22 @@ export class WorkspaceComponent implements OnInit {
       };
     }
   }
+    
+    messageCountsArr:any={};
+
+   getUserMessageCount(userId:string){
+    const userDocRef=doc(this.firestore,'messageCounts',userId)
+     onSnapshot(userDocRef,(snapshot)=>{
+       if(snapshot.exists()  ){ 
+          // const data=snapshot.data()
+          this.messageCountsArr={...snapshot.data()}
+          console.log(this.messageCountsArr)
+       }else{
+        this.messageCountsArr={};
+       }
+     })
+   }  
+   
 
   async getAllUsers() {
     const usersCollection = collection(this.firestore, 'users');

@@ -397,8 +397,8 @@
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText">
         <div class="self-name-and-img">
-            <img class="self-chat-img" src={{selectedUser.picture}}>
-            <p>{{selectedUser.name }}</p>
+            <img class="self-chat-img" src={{selectedUser?.picture}}>
+            <p>{{selectedUser?.name }}</p>
             <p class="you">(Du)</p>
         </div>
         <span class="self-chat-txt">
@@ -406,15 +406,15 @@
             auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
             gerne Dinge mit dir selbst besprechen.
         </span>
-    </div>
+    </div>  
     <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt">
         <div class="img-and-name">
-            <img class="self-chat-img" src={{selectedUser.picture}}>
-            <p>{{selectedUser.name}}</p>
+            <img class="self-chat-img" src={{selectedUser?.picture}}>
+            <p>{{selectedUser?.name}}</p>
         </div>
         <div class="two-chat-txt">
             Diese Unterhaltung findet nur zwischen
-            <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser.name}}</span> und dir statt
+            <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und dir statt
         </div>
     </div>
     <app-input-field [selectedChannel]="selectedChannel" [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>

@@ -250,3 +250,20 @@
   width: 14px;
   border-radius: 100%;
 }
+
+
+.messages-counts{
+  width: 30px;
+  height: 30px;
+  background-color: #444df2;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  span{
+    color: #ffffff;
+    
+  }
+
+}

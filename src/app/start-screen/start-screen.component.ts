@@ -71,6 +71,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   route = inject(ActivatedRoute);
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
+  
   @Input() mentionUser: string = '';
   @Input() onHeaderUser:any
   
@@ -169,33 +170,40 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() onHeaderChannel:any
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser'] && this.selectedUser?.id) {
+    if (changes['selectedUser'] && this.selectedUser) {
       this.checkProfileType();
       this.global.clearCurrentChannel();
-      this.afterLoginSheet = false;
-      }
+      this.global.channelSelected = false;
+      this.afterLoginSheet = false; 
+      }   
+          
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.selectedChannel);
     } 
       
-     if(changes['onHeaderUser']&&this.onHeaderUser){
-      this.afterLoginSheet = false;
-      this.selectedUser=this.onHeaderUser
-      this.checkProfileType();
-      this.global.clearCurrentChannel();
-     } 
+    //  if(changes['onHeaderUser'] && this.onHeaderUser){       
+    //       this.selectedUser=this.onHeaderUser
+    //       this.checkProfileType();
+    //       this.global.clearCurrentChannel();
+    //       this.global.channelSelected = false;
+    //       this.afterLoginSheet=false;
+    //  } 
 
-      if(changes['onHeaderChannel'] && this.onHeaderChannel){
-        this.afterLoginSheet = false;
-        this.selectedChannel=this.onHeaderChannel;
-        this.fetchChannelMembers();
-        this.global.setCurrentChannel(this.selectedChannel);
-      } 
+      // if(changes['onHeaderChannel'] && this.onHeaderChannel){
+      //   this.global.channelSelected=true
+      //   this.selectedChannel=this.onHeaderChannel;
+      //   this.fetchChannelMembers();
+      //   this.global.setCurrentChannel(this.selectedChannel);
+      //   // this.afterLoginSheet=false;
+      // } 
        
       
        
-  }
+  }  
+
+  
+
 
   onMessageForwarded(data: any) {
     this.messagesData.push(data);
@@ -237,7 +245,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async fetchChannelMembers() {
-    if (!this.selectedChannel?.id) {
+    if (!this.selectedChannel?.id ) {
       this.channelMembers = [];
       return;
     }
@@ -307,12 +315,13 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   checkProfileType() {
-    if (this.selectedUser.uid === this.userId) {
+    if (this.selectedUser?.uid === this.userId) {
       this.currentUserwasSelected = true;
     } else {
       this.contactWasSelected = true;
     }
-  }
+  } 
+
 
   closeMyUserProfile() {
     this.openMyProfile = false;
@@ -326,7 +335,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   enterByUsername(user:any){
     this.enterChatByUser=user;
     this.selectedUser=this.enterChatByUser;
-    this.global.openMentionMessageBox=false
+    this.global.openMentionMessageBox=false;
     this.checkProfileType();
     this.global.clearCurrentChannel();
    } 

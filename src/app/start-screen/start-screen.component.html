@@ -10,13 +10,13 @@
         </button>
         <div (click)="showMyUserProfile()" class="user-chat-info" *ngIf="!global.channelSelected">
           <img [src]="
-              global.statusCheck
+              global.statusCheck 
                 ? global.currentUserData.picture
                 : selectedUser?.picture
             " />
           <h4>
             {{
-            global.statusCheck
+              global.statusCheck 
             ? global.currentUserData.name + "(Du)"
             : selectedUser?.name
             }}
@@ -64,6 +64,6 @@
       </div>
     </mat-card-header>
     <div *ngIf="!afterLoginSheet">
-      <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()" [selectedChannel]="selectedChannel"
+      <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()" [onHeaderChannel]="onHeaderChannel" [selectedChannel]="selectedChannel"  [onHeaderUser]="onHeaderUser"
         (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
     </div>

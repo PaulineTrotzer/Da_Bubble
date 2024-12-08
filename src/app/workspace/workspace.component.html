@@ -174,17 +174,28 @@
                   [ngClass]="{'online': global.currentUserData.status === 'online', 'offline': global.currentUserData.status === 'offline'}"></span>
               </div>
               <h4>{{global.currentUserData.name}} (Du)</h4>
+              
+             
             </div>
 
-            <div *ngIf="checkUsersExsists && !isGuestLogin" class="all-user-contacts">
+                <!-- <div class="message-notification" *ngIf="user.id && user.messageCount  && user.messageCount[userId] > 0">
+                  <span>{{user.messageCount[userId]}}</span>
+                </div> -->
+
+            <div *ngIf="checkUsersExsists && !isGuestLogin " class="all-user-contacts">
               <div class="all-user" *ngFor="let user of allUsers" (click)="selectUser(user)">
                 <img [src]="user.picture">
                 <div class="status-border">
                   <span [ngClass]="{'online': user.status === 'online', 'offline': user.status === 'offline'}"></span>
                 </div>
-                <h4>{{user.name}}</h4>
+                <h4>{{user.name}}</h4> 
+
+                <div class="messages-counts" *ngIf="messageCountsArr?.messageCount  && messageCountsArr.messageCount[user.id] > 0 && id !== user.id">
+                 <span> {{ messageCountsArr?.messageCount[user.id] }}</span>  
+                </div>   
               </div>
             </div>
+           
           </div>
         </div>
       </div>

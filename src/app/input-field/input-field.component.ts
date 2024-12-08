@@ -18,7 +18,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { FormsModule } from '@angular/forms';
-import { Firestore, addDoc, collection, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection, onSnapshot,doc,getDoc, updateDoc,setDoc, increment } from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 
@@ -29,6 +29,7 @@ import {
   getDownloadURL,
   uploadString
 } from '@angular/fire/storage';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -58,60 +59,96 @@ export class InputFieldComponent implements OnInit, OnChanges {
   formattedChatMessage: any
   mentionUserName: any[] = []
   storage=inject(Storage)
+  userId:any
+  route = inject(ActivatedRoute);
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser'] && this.selectedUser?.id) {
-      this.formattedChatMessage = '';
-      this.chatMessage = '';
+    if (changes['selectedUser'] &&  this.selectedUser?.id ){
+
     }
 
   }
 
   ngOnInit(): void {
-    this.getByUserName()
-  }
+    this.userId = this.route.snapshot.paramMap.get('id');
+    if(this.userId && this.selectedUser?.id){
+      console.log('user.id ist da ')
+    }
+    this.getByUserName();
+  } 
 
+
+    
 
   async sendMessage() {
-    if (!this.selectedChannel && !this.selectedUser) {
+    if (!this.selectedChannel && !this.selectedUser?.id) {
       console.error('Selected user or channel is not defined');
       return;
     }
-  
+
     if (this.chatMessage.trim() === '') {
       console.warn('Cannot send an empty message.');
       return;
     }
-    try {
+    try { 
       if (this.selectedChannel) {
         await this.sendChannelMessage();
       } else {
-          
         const fileData  = await this.uploadFilesToFirebaseStorage();
-             
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
-          this.recipientStickerCount
-        );
-       
+          this.recipientStickerCount,
+        ); 
         messageData.selectedFiles = fileData;
-        console.log( messageData.selectedFiles)
-
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
-        console.log('Message successfully sent with ID:', messageWithId);
         this.messagesData.push(messageWithId);
-        this.messageSent.emit();
-      }
+        await this.setMessageCount();  
+      } 
       this.chatMessage = '';
       this.formattedChatMessage = '';
       this.selectFiles=[];
     } catch (error) {
       console.error('Error while sending message:', error);
     }
+  }    
+  
+
+
+   
+
+  async setMessageCount() {
+    try {
+      if (!this.userId || !this.selectedUser?.id) {
+        console.error('User ID or selected user ID is missing.');
+        return;
+      }           
+        // if(this.global.checkCountStatus && this.userId && !this.selectedUser?.id ){
+        //   return
+        // } 
+      const messageCountDocRef = doc(this.firestore, 'messageCounts', this.selectedUser?.id);
+      const userUpdate: any = {};
+      userUpdate[`messageCount.${this.userId}`] = increment(1);
+      const docSnapshot = await getDoc(messageCountDocRef);
+      if (docSnapshot.exists() ) {
+        await updateDoc(messageCountDocRef, userUpdate);
+      } else {
+        await setDoc(messageCountDocRef, {
+          messageCount: {
+            [this.userId]: 1,
+          },
+        });
+      }
+      console.log('Message count updated successfully in messageCounts.');
+    } catch (error) {
+      console.error('Error updating message count:', error);
+    }
+
   }
+    
+  
      
 
   async uploadFilesToFirebaseStorage(): Promise<{ url: string; type: string }[]> {
@@ -145,10 +182,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       editedTextShow: false
     }; 
     messageData.selectedFiles = fileData;
-
-
     const docRef = await addDoc(channelMessagesRef, messageData);
-
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
@@ -158,17 +192,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
   messageData(
     chatMessage: string,
     senderStickerCount: number = 0,
-    recipientStickerCount: number = 0
+    recipientStickerCount: number = 0,
+    
   ): SendMessageInfo {
-    const recipientId = this.selectedUser.id;
-    const recipientName = this.selectedUser.name;
+    const recipientId = this.selectedUser?.id;
+    const recipientName = this.selectedUser?.name;
     return {
       text: chatMessage,
       senderId: this.global.currentUserData.id,
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
-      recipientId,
-      recipientName,
+      recipientId:recipientId,
+      recipientName:recipientName,
       timestamp: new Date(),
       senderSticker: '',
       senderStickerCount,
@@ -182,6 +217,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       editedTextShow: false,
     };
   }
+ 
+
+
+
 
 
   handleMentionUser(mention: string) {
@@ -192,21 +231,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  formatMentions() {
-  //   const regex = /@\w+(?:\s\w+)?/g;
-  //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-  //     const mentionName = match.substring(1).trim();
-  //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-  //       return `<span class="mention">${match}</span>`;
-  //     }
-  //     return `<span class="normal-text">${match}</span>`;
-  //   }); 
-   
-  }
+  // formatMentions() {
+  // //   const regex = /@\w+(?:\s\w+)?/g;
+  // //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+  // //     const mentionName = match.substring(1).trim();
+  // //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+  // //       return `<span class="mention">${match}</span>`;
+  // //     }
+  // //     return `<span class="normal-text">${match}</span>`;
+  // //   }); 
+  // }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.scrollTop = textarea.scrollHeight;
+    this.selectedUser?.id
   }
 
   getByUserName() {
@@ -284,11 +323,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     );
   }
 
-  getConversationId(): string {
-    const ids = [this.global.currentUserData?.id, this.selectedUser?.id];
-    ids.sort();
-    return ids.join('_');
-  }
+  // getConversationId(): string {
+  //   const ids = [this.global.currentUserData?.id, this.selectedUser?.id];
+  //   ids.sort();
+  //   return ids.join('_');
+  // }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -312,6 +351,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
   deleteFile(index:number){
     this.selectFiles.splice(index,1)
   }
+
+
+
+
+
  
 }
 

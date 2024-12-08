@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject,Output,EventEmitter,ElementRef,HostListener  } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { collection, Firestore, onSnapshot,getDocs, updateDoc,doc,arrayRemove,arrayUnion, deleteDoc} from '@angular/fire/firestore';
+import { collection, Firestore, onSnapshot,getDocs, updateDoc,doc,arrayRemove,arrayUnion, deleteDoc, setDoc} from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
@@ -53,7 +53,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.subscribe(async (paramMap) => {
       this.userID = paramMap.get('id');
-      if (this.userID) {
+      if (this.userID) { 
+        this.getUser(this.userID) 
         const userResult = await this.userservice.getUser(this.userID);
         if (userResult) {
           this.user = userResult;
@@ -69,7 +70,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscribeOverlayService();
     this.getAllUsers();
     this.getAllChannels();
-    this.getUser();
+   
      if(this.getSeperateUser){
       console.log(this.getSeperateUser['searchHeaderResult'])
      }
@@ -155,7 +156,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     onSnapshot(userRef,(querySnapshot)=>{
     this.getAllUsersCollection=[];
     querySnapshot.forEach((doc)=>{
-      if(this.userID !== doc.id){
+      if(this.userID !== doc.id) {
         const allUsers=doc.data();
         this.getAllUsersCollection.push({id:doc.id,...allUsers})
       }
@@ -178,17 +179,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
      
  
 
- async enterChatUser(user:any){
-      this.headerUserSelected.emit(user);
-      const channelRef=doc(this.firestore,'users',this.userID);
-      const lastResult={searchHeaderResult:arrayUnion(user)};
-      await updateDoc (channelRef,lastResult);
-      this.showUserList=false;
-      this.searcheNameOrChannel='';
-      this.listlastResultResult=false;
-      this.hoverResultnameId=''
-  } 
- 
+  async enterChatUser(user: any) {  
+     const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
+     await setDoc(channelRef, {searchHeaderResult: arrayUnion(user) }, { merge: true });
+     this.headerUserSelected.emit(user);  
+        this.showUserList = false;
+        this.searcheNameOrChannel = '';
+        this.listlastResultResult = false;
+        this.hoverResultnameId = '';
+}
+  
+
  
     getChannels:any[]=[];
     filterChannel:any[]=[];
@@ -209,7 +210,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           });
           this.getChannels.push(channel);
         });
-        console.log(this.getChannels); 
+      
       });
     }
   
@@ -238,27 +239,36 @@ export class HeaderComponent implements OnInit, OnDestroy {
     @Output() headerChannelSelcted = new EventEmitter<any>();
 
   async  enterChannel(channel:any){
+    console.log(channel.messages)
+      const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
+      await setDoc(channelRef, {searchHeaderResult: arrayUnion(channel)}, { merge: true });
       this.headerChannelSelcted.emit(channel);
-      const channelRef=doc(this.firestore,'users',this.userID);
-      const lastResult={searchHeaderResult:arrayUnion(channel)};
-      await updateDoc (channelRef,lastResult);
       this.showChannelList=false;
       this.searcheNameOrChannel='';
-      this.listlastResultResult=false
+      this.listlastResultResult=false;
+     
     }
+
+
+
+
 
     getSeperateUser:any={};
     
-    getUser(){
-      const docRef=doc(this.firestore,'users',this.userID);
+    getUser(currentId:any){
+      const docRef=doc(this.firestore,'searchHeaderResult',currentId);
+      if (!this.userID) {
+        console.error("UserID is undefined");
+        return;
+    }
       onSnapshot(docRef,(docSnapshot)=>{
          if(docSnapshot.exists()){
             const data=docSnapshot.data();
             const id = docSnapshot.id
             this.getSeperateUser={id:id,...data};
-            console.log(this.getSeperateUser)
          }else{
           this.getSeperateUser={}
+          console.log(this.getSeperateUser)
          }
       })
     }
@@ -284,9 +294,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
  
 
      deleteUser(user:any){
+        console.log(user)
         console.log('delete')
-        const docRef=doc(this.firestore,'users',this.userID)
+        const docRef=doc(this.firestore,'searchHeaderResult',this.userID)
         updateDoc(docRef,{searchHeaderResult:arrayRemove(user)})
      }
+
+
+
+
+
+
 
 }

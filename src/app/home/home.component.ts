@@ -60,11 +60,12 @@ export class HomeComponent implements OnInit {
     );
   } 
 
-  onHeaderUserSelected(user:any){
-    this.onHeaderUser=user;
+  onHeaderUserSelected(user: any) {
+    this.onHeaderUser = user;
     this.selectedChannel = null;
     this.globalService.clearCurrentChannel();
-  } 
+    
+}
 
   onHeaderchannelSelected(channel:any){
     this.onHeaderChannel=channel;
