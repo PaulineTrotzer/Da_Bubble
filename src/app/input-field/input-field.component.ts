@@ -33,7 +33,7 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
-  uploadString
+  uploadString,
 } from '@angular/fire/storage';
 import { ActivatedRoute } from '@angular/router';
 
@@ -83,7 +83,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if(this.userId && this.selectedUser?.id){
       console.log('user.id ist da ')
     }
-    this.getByUserName();;
+    this.getByUserName();;;
     this.subscription.add(
       this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
         this.currentThreadMessageId = messageId;
@@ -92,45 +92,62 @@ export class InputFieldComponent implements OnInit, OnChanges {
   } 
 
     
-
-  async sendMessage() {
+  async sendMessage(event: KeyboardEvent): Promise<void> {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      await this.processSendMessage();
+    }
+  }
+  
+  sendMessageClick(): void {
+    if (this.chatMessage.trim() === '' && this.selectFiles.length === 0) {
+      console.warn('Keine Nachricht und keine Dateien zum Senden.');
+      return;
+    }
     if (!this.selectedChannel && !this.selectedUser?.id) {
-      console.error('Selected user or channel is not defined');
+      console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
+    }
+    this.processSendMessage();
+  }
+
+  shouldSendMessage(event: KeyboardEvent): boolean {
+    if (event.shiftKey && event.key === 'Enter') {
+      return false;
     }
 
-    if (this.chatMessage.trim() === '') {
-      console.warn('Cannot send an empty message.');
-      return;
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      return true;
     }
-    try { 
-      if (this.selectedChannel) {
-        await this.sendChannelMessage();
-      } else if (this.isDirectThreadOpen) {
-        await this.sendDirectThreadMessage();
-      } else {
-        const fileData  = await this.uploadFilesToFirebaseStorage();
-        const messageData = this.messageData(
-          this.chatMessage,
-          this.senderStickerCount,
-          this.recipientStickerCount,
-        ); 
-        messageData.selectedFiles = fileData;
-        const messagesRef = collection(this.firestore, 'messages');
-        const docRef = await addDoc(messagesRef, messageData);
-        const messageWithId = { ...messageData, id: docRef.id };
+    return false;
+  }
+
+  private async processSendMessage(): Promise<void> {
+    try {
+      const fileData = await this.uploadFilesToFirebaseStorage();
   
-        console.log('Message successfully sent with ID:', messageWithId);
+      const messageData = this.messageData(
+        this.chatMessage,
+        this.senderStickerCount,
+        this.recipientStickerCount
+      );
   
-        this.messagesData.push(messageWithId);
-        await this.setMessageCount();  
-        this.messageSent.emit();
-      }
+      messageData.selectedFiles = fileData;
+  
+      const messagesRef = collection(this.firestore, 'messages');
+      const docRef = await addDoc(messagesRef, messageData);
+      const messageWithId = { ...messageData, id: docRef.id };
+      console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
+  
+      this.messagesData.push(messageWithId);
+      this.messageSent.emit();
+  
       this.chatMessage = '';
       this.formattedChatMessage = '';
-      this.selectFiles=[];
+      this.selectFiles = [];
     } catch (error) {
-      console.error('Error while sending message:', error);
+      console.error('Fehler beim Senden der Nachricht:', error);
     }
   }    
 
@@ -210,17 +227,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
   
      
 
-  async uploadFilesToFirebaseStorage(): Promise<{ url: string; type: string }[]> {
+
+  async uploadFilesToFirebaseStorage(): Promise<
+    { url: string; type: string }[]
+  > {
     const storage = this.storage;
     const uploadPromises = this.selectFiles.map(async (file, index) => {
-      const filePath = `uploads/${new Date().getTime()}_${index}_${file.type.split('/')[1]}`;
+      const filePath = `uploads/${new Date().getTime()}_${index}_${
+        file.type.split('/')[1]
+      }`;
       const fileRef = ref(storage, filePath);
       await uploadString(fileRef, file.data, 'data_url'); 
       const url = await getDownloadURL(fileRef); 
       return { url, type: file.type, data:file.data }; 
     });
     return await Promise.all(uploadPromises);
-  } 
+  }
 
 
   handleNewThreadMessage(threadMessageId: string) {
@@ -294,15 +316,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   formatMentions() {
-  //   const regex = /@\w+(?:\s\w+)?/g;
-  //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-  //     const mentionName = match.substring(1).trim();
-  //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-  //       return `<span class="mention">${match}</span>`;
-  //     }
-  //     return `<span class="normal-text">${match}</span>`;
-  //   }); 
-   
+    //   const regex = /@\w+(?:\s\w+)?/g;
+    //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+    //     const mentionName = match.substring(1).trim();
+    //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+    //       return `<span class="mention">${match}</span>`;
+    //     }
+    //     return `<span class="normal-text">${match}</span>`;
+    //   });
   }
 
   onInput(event: Event): void {
@@ -400,7 +421,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
           this.selectFiles.push({
             type: file.type,
             data: reader.result as string,
-            preview:reader.result as string,
+            preview: reader.result as string,
           });
           console.log(this.selectFiles);
         };
@@ -410,13 +431,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  deleteFile(index:number){
-    this.selectFiles.splice(index,1)
+  deleteFile(index: number) {
+    this.selectFiles.splice(index, 1);
   }
-
-
-
-
-
- 
 }
