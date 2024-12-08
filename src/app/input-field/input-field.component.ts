@@ -134,7 +134,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         editedTextShow: false,
         recipientId: this.selectedUser.uid,
         recipientName: this.selectedUser.name,
-        reactions: { counter: 0, emoji: '', userId: '' },
+        reactions: ''
       };
       const docRef = await addDoc(threadMessagesRef, messageData);
       const newThreadMessageId = docRef.id;

@@ -33,8 +33,17 @@ export class ThreadControlService {
   }
 
   setCurrentThreadMessageId(id: string) {
-    this.currentThreadMessageIdSubject.next(id);
+    if (id) {
+      this.currentThreadMessageIdSubject.next(id);
+    } else {
+      console.error('errr thread-Nachricht-ID übergeben.');
+    }
   }
+
+  getCurrentThreadMessageId(): string | null {
+    return this.currentThreadMessageIdSubject.value;
+  }
+
 
   getReplyCount(messageId: string): Observable<number> {
     return new Observable<number>((observer) => {
