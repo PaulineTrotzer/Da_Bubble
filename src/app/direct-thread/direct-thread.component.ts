@@ -252,6 +252,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
+    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -330,10 +331,18 @@ export class DirectThreadComponent implements OnInit {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
       return true;
     }
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 40e5e9ccfae4af506297b82c3a64e6c670d5473d
     // Falls einer oder beide counter-Werte 0 oder undefiniert sind
     if (!recipientId?.counter || !senderId?.counter) {
       return false;
     }
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 40e5e9ccfae4af506297b82c3a64e6c670d5473d
     // Standard-Fallback, falls keine der Bedingungen erfüllt ist
     return false;
   }

@@ -87,10 +87,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
     try {
       if (this.selectedChannel) {
         await this.sendChannelMessage();
-
       } else if (this.isDirectThreadOpen) {
         await this.sendDirectThreadMessage();
-
       } else {
         const messageData = this.messageData(
           this.chatMessage,
@@ -123,7 +121,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     try {
-      const threadMessagesRef = collection(this.firestore, `messages/${this.currentThreadMessageId}/threadMessages`);
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${this.currentThreadMessageId}/threadMessages`
+      );
       const messageData = {
         text: this.chatMessage,
         senderId: this.global.currentUserData.id,
@@ -146,13 +147,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  resetInputdata(){
+  resetInputdata() {
     this.chatMessage = '';
     this.selectFiles = [];
   }
-  
 
-  handleNewThreadMessage(threadMessageId : string){
+  handleNewThreadMessage(threadMessageId: string) {
     this.currentThreadMessageId = threadMessageId;
     this.threadControlService.setCurrentThreadMessageId(threadMessageId);
   }
