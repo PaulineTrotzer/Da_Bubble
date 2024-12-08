@@ -17,4 +17,8 @@ export interface SendMessageInfo {
   stickerBoxOpacity?: any;
   selectedFiles?: any[];
   editedTextShow?:boolean;
+<<<<<<< HEAD
+=======
+  reactions?: { [emoji: string]: any }; 
+>>>>>>> feature/fullThread
 }

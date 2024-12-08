@@ -10,17 +10,23 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  Renderer2,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { FormsModule } from '@angular/forms';
-import { Firestore, addDoc, collection, onSnapshot,doc,getDoc, updateDoc,setDoc, increment } from '@angular/fire/firestore';
+import {
+  Firestore,
+  addDoc,
+  collection,
+  onSnapshot,doc,getDoc, updateDoc,setDoc, increment,
+} from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
+import { ThreadControlService } from '../services/thread-control.service';
+import { Subscription } from 'rxjs';
 
 import {
   Storage,
@@ -40,6 +46,8 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './input-field.component.scss',
 })
 export class InputFieldComponent implements OnInit, OnChanges {
+  currentThreadMessageId: string | null = null;
+  @Input() isDirectThreadOpen: boolean | undefined;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -56,8 +64,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
   senderStickerCount: number = 0;
   recipientStickerCount: number = 0;
   messagesData: any[] = [];
-  formattedChatMessage: any
-  mentionUserName: any[] = []
+  formattedChatMessage: any;
+  mentionUserName: any[] = [];
+  threadControlService = inject(ThreadControlService);
+  private subscription: Subscription = new Subscription();
   storage=inject(Storage)
   userId:any
   route = inject(ActivatedRoute);
@@ -66,7 +76,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (changes['selectedUser'] &&  this.selectedUser?.id ){
 
     }
-
   }
 
   ngOnInit(): void {
@@ -74,9 +83,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if(this.userId && this.selectedUser?.id){
       console.log('user.id ist da ')
     }
-    this.getByUserName();
+    this.getByUserName();;
+    this.subscription.add(
+      this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
+        this.currentThreadMessageId = messageId;
+      })
+    );
   } 
-
 
     
 
@@ -93,6 +106,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
     try { 
       if (this.selectedChannel) {
         await this.sendChannelMessage();
+      } else if (this.isDirectThreadOpen) {
+        await this.sendDirectThreadMessage();
       } else {
         const fileData  = await this.uploadFilesToFirebaseStorage();
         const messageData = this.messageData(
@@ -104,9 +119,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
+  
+        console.log('Message successfully sent with ID:', messageWithId);
+  
         this.messagesData.push(messageWithId);
         await this.setMessageCount();  
-      } 
+        this.messageSent.emit();
+      }
       this.chatMessage = '';
       this.formattedChatMessage = '';
       this.selectFiles=[];
@@ -114,7 +133,47 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Error while sending message:', error);
     }
   }    
-  
+
+  async sendDirectThreadMessage() {
+    if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
+      console.warn('t is not open or msg is empty');
+      return;
+    }
+    if (!this.currentThreadMessageId) {
+      console.error(' keine aktuelle msg ausgewählt.');
+      return;
+    }
+    try {
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${this.currentThreadMessageId}/threadMessages`
+      );
+      const messageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles,
+        editedTextShow: false,
+        recipientId: this.selectedUser.uid,
+        recipientName: this.selectedUser.name,
+        reactions: ''
+      };
+      const docRef = await addDoc(threadMessagesRef, messageData);
+      const newThreadMessageId = docRef.id;
+      this.handleNewThreadMessage(newThreadMessageId);
+      this.resetInputdata();
+      this.messageSent.emit();
+    } catch (error) {
+      console.error('Fehler beim Senden der Nachricht:', error);
+    }
+  }
+
+  resetInputdata() {
+    this.chatMessage = '';
+    this.selectFiles = [];
+  }
 
 
    
@@ -164,7 +223,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
   } 
 
 
-  async sendChannelMessage(){
+  handleNewThreadMessage(threadMessageId: string) {
+    this.currentThreadMessageId = threadMessageId;
+    this.threadControlService.setCurrentThreadMessageId(threadMessageId);
+  }
+  async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
@@ -186,7 +249,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
-    console.log(this.chatMessage)
+    console.log(this.chatMessage);
   }
 
   messageData(
@@ -222,7 +285,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
 
 
-
   handleMentionUser(mention: string) {
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
@@ -231,16 +293,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  // formatMentions() {
-  // //   const regex = /@\w+(?:\s\w+)?/g;
-  // //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-  // //     const mentionName = match.substring(1).trim();
-  // //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-  // //       return `<span class="mention">${match}</span>`;
-  // //     }
-  // //     return `<span class="normal-text">${match}</span>`;
-  // //   }); 
-  // }
+  formatMentions() {
+  //   const regex = /@\w+(?:\s\w+)?/g;
+  //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
+  //     const mentionName = match.substring(1).trim();
+  //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
+  //       return `<span class="mention">${match}</span>`;
+  //     }
+  //     return `<span class="normal-text">${match}</span>`;
+  //   }); 
+   
+  }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
@@ -249,18 +312,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   getByUserName() {
-    const docRef = collection(this.firestore, 'users')
+    const docRef = collection(this.firestore, 'users');
     onSnapshot(docRef, (querySnapshot) => {
       this.mentionUserName = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const userName = data['name']
-        this.mentionUserName.push(userName)
-      })
-    })
+        const userName = data['name'];
+        this.mentionUserName.push(userName);
+      });
+    });
   }
 
-    
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
     this.cdr.detectChanges();
@@ -358,4 +420,3 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
  
 }
-

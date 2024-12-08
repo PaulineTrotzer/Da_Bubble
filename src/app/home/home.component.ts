@@ -19,7 +19,6 @@ import { Subscription } from 'rxjs';
     ThreadComponent,
     CommonModule,
     MatCardModule,
-  
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -55,7 +54,6 @@ export class HomeComponent implements OnInit {
     this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
-        console.log('Guest login status:', status);
       }
     );
   } 

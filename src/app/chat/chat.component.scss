@@ -754,12 +754,9 @@ app-input-field {
   padding: 0 35px;
 }
 
-
 .text-info-edit {
   position: relative;
-
 }
-
 
 .mention-message {
   color: blue;
@@ -769,7 +766,6 @@ app-input-field {
     color: red;
   }
 }
-
 
 app-mention-message-box {
   z-index: 35;
@@ -887,3 +883,24 @@ app-mention-message-box {
   left: 37px;
   top: 5px;
  }
+
+.thread-answer-display {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 16px;
+  color: grey;
+  pointer-events: all;
+  width: fit-content;
+  height: 22px;
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.1);
+    color: #444df2;
+  }
+}
+
+.answer-counter {
+  font-weight: 700;
+  pointer-events: all;
+}

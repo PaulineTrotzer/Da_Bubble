@@ -1,79 +1,38 @@
-import { Component, Output, EventEmitter } from '@angular/core';
 import {
-  trigger,
-  style,
-  animate,
-  transition,
-} from '@angular/animations';
+  Component,
+  Output,
+  EventEmitter,
+  inject,
+  OnInit,
+  Input,
+} from '@angular/core';
+import { trigger, style, animate, transition } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import { GlobalVariableService } from '../services/global-variable.service';
+import { User } from '../models/user.class';
+import { Firestore, doc, getDoc, collection, where, query, getDocs, limit, onSnapshot } from '@angular/fire/firestore';
+import { UserService } from '../services/user.service';
+import { ActivatedRoute } from '@angular/router';
+import { SendMessageInfo } from '../models/send-message-info.interface';
+import { DirectThreadComponent } from '../direct-thread/direct-thread.component';
 
 @Component({
   selector: 'app-thread',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DirectThreadComponent],
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss',
-  animations: [
-    trigger('slideFromRight', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(50%)' }),
-        animate(
-          '125ms ease-in-out',
-          style({ opacity: 1, transform: 'translateX(0)' })
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '125ms ease-in-out',
-          style({ opacity: 0, transform: 'translateX(50%)' })
-        ),
-      ]),
-    ]),
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0}),
-        animate(
-          '125ms ease-in-out',
-          style({ opacity: 1})
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '125ms ease-in-out',
-          style({ opacity: 0})
-        ),
-      ]),
-    ])
-  ],
 })
+
 export class ThreadComponent {
-
   @Output() closeThread = new EventEmitter<void>();
-  showTopicBubble: boolean = false;
-  showMessageBubble: boolean = false;
-  showUserBubble: boolean = false;
-  showMessagePopup: boolean = false;
-  showUserPopup: boolean = false;
 
-  constructor() {}
+  constructor(){}
 
-  toggleTopicBubble() {
-    this.showTopicBubble = !this.showTopicBubble;
-  }
-  toggleMessageBubble() {
-    this.showMessageBubble = !this.showMessageBubble;
-  }
-  toggleUserBubble(){
-    this.showUserBubble = !this.showUserBubble
-  }
-  toggleMessagePopup(){
-    this.showMessagePopup = !this.showMessagePopup
-  }
-  toggleUserPopup(){
-    this.showUserPopup = !this.showUserPopup
+  @Input() selectedUser: any;
+
+  onDirectThreadClosed() {
+    this.closeThread.emit(); 
   }
 
-  onClose() {
-    this.closeThread.emit();
-  }
 }

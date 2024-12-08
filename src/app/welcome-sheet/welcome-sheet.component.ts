@@ -23,7 +23,6 @@ export class WelcomeSheetComponent implements OnInit {
     this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestAccount = status;
-        console.log('guest log status:', status); 
       }
     );
   }
