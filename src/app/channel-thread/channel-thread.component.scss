@@ -208,6 +208,7 @@ header {
   &:hover {
     background-color: #eceefe;
   }
+  cursor: pointer;
 }
 
 .reaction-info {
@@ -245,8 +246,10 @@ header {
   border-bottom-right-radius: 30px;
   top: 2px;
   left: 272px;
+  text-align: center;
 }
 
 .emoji-from {
   font-size: 24px;
+  cursor: pointer;
 }
