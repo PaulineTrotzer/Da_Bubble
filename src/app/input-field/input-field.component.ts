@@ -97,6 +97,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       event.preventDefault();
       await this.processSendMessage();
     }
+
+
   }
   
   sendMessageClick(): void {
@@ -109,6 +111,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     this.processSendMessage();
+    
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -132,7 +135,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.senderStickerCount,
         this.recipientStickerCount
       );
-  
+
       messageData.selectedFiles = fileData;
   
       const messagesRef = collection(this.firestore, 'messages');
@@ -256,6 +259,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
      
     const channelMessagesRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages');
+
     const fileData  = await this.uploadFilesToFirebaseStorage();
     const messageData = {
       text: this.chatMessage,
