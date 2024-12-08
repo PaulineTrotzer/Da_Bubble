@@ -252,6 +252,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
+    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -326,14 +327,18 @@ export class DirectThreadComponent implements OnInit {
   }
 
   TwoReactionsTwoSameEmojis(recipientId: any, senderId: any): boolean {
-    if (
-      recipientId.counter > 0 &&
-      senderId.counter > 0
-    ) {
+    // Überprüfen, ob counter-Werte existieren und größer als 0 sind
+    if (recipientId?.counter > 0 && senderId?.counter > 0) {
       return true;
-    } else {
+    }
+  
+    // Falls einer oder beide counter-Werte 0 oder undefiniert sind
+    if (!recipientId?.counter || !senderId?.counter) {
       return false;
     }
+  
+    // Standard-Fallback, falls keine der Bedingungen erfüllt ist
+    return false;
   }
 
   getSenderReaction(reactions: any): any {
