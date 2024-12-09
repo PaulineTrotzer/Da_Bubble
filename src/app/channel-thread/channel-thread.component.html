@@ -41,19 +41,48 @@
       (mouseenter)="hoveredTopic = true"
       (mouseleave)="hoveredTopic = false"
     >
-    <div class="message-edit" *ngIf="showEditDialog">
-      <span>Nachricht bearbeiten</span>
-    </div>
+      <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
+        <form>
+          <textarea
+            cols="35"
+            rows="3"
+            name="message"
+            id="message"
+            [(ngModel)]="messageToEdit"
+          >
+          {{ topicMessage?.text! }} </textarea
+          >
+          <div class="button-row">
+            <button class="btn-secondary" (click)="cancelEdit()">
+              Abbrechen
+            </button>
+            <button
+              class="btn-primary"
+              (click)="saveEditedMessage(topicMessage?.id!)"
+            >
+              Speichern
+            </button>
+          </div>
+        </form>
+        <img [src]="topicMessage?.senderPicture" />
+      </div>
+      <div
+        (click)="toggleEditArea(topicMessage?.id!, topicMessage?.text!)"
+        class="message-edit-dialog"
+        *ngIf="showEditDialog === topicMessage?.id!"
+      >
+        <span>Nachricht bearbeiten</span>
+      </div>
       <div class="emoji-container" *ngIf="isPickerVisible === topicMessage?.id">
         <emoji-mart
-        [set]="'apple'"
-        [emojiSize]="32"
-        (emojiClick)="addEmoji($event, topicMessage?.id!)"
-      ></emoji-mart>
+          [set]="'apple'"
+          [emojiSize]="32"
+          (emojiClick)="addEmojiToMessage($event.emoji.native, topicMessage?.id!)"
+        ></emoji-mart>
       </div>
       <div
         class="reaction-bar"
-        *ngIf="hoveredTopic"
+        *ngIf="hoveredTopic && !showEditArea"
         [ngClass]="{
           'reaction-bar-current':
             topicMessage?.senderId === global.currentUserData.id,
@@ -61,15 +90,15 @@
             topicMessage?.senderId !== global.currentUserData.id
         }"
       >
-      <div class="used-emojis">
-        <span
-          *ngFor="let emoji of currentUserLastEmojis"
-          class="emoji"
-          (click)="addEmojiToMessage(emoji, topicMessage?.id!)"
-        >
-          {{ emoji }}
-        </span>
-      </div>
+        <div class="used-emojis">
+          <span
+            *ngFor="let emoji of currentUserLastEmojis"
+            class="emoji"
+            (click)="addEmojiToMessage(emoji, topicMessage?.id!)"
+          >
+            {{ emoji }}
+          </span>
+        </div>
         <div class="img-container" (click)="togglePicker(topicMessage?.id!)">
           <svg
             width="25"
@@ -151,22 +180,39 @@
           >
             {{ topicMessage?.text }}
           </p>
-          <div class="reaction-info" [ngClass]="{
-            'flex-end': topicMessage?.senderId === global.currentUserData.id
-          }">
-            <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === topicMessage?.id && hoveredEmoji">
+          <div
+            class="reaction-info"
+            [ngClass]="{
+              'flex-end': topicMessage?.senderId === global.currentUserData.id
+            }"
+          >
+            <div
+              class="reaction-from-container"
+              *ngIf="
+                hoveredReactionMessageId === topicMessage?.id && hoveredEmoji
+              "
+            >
               <span class="emoji-from"> {{ hoveredEmoji }} </span>
-              <p class="reaction-text">{{ getReactionText(topicMessage!, hoveredEmoji) }}</p>
+              <p class="reaction-text">
+                {{ getReactionText(topicMessage!, hoveredEmoji) }}
+              </p>
             </div>
-            <span 
-            *ngFor="let reaction of topicMessage?.reactions | keyvalue"
-            class="reaction"
-            (mouseenter)="onReactionHover(topicMessage!, reaction.key)"
-            (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
-            (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)"
-            > {{ reaction.key }} {{ reaction.value.length }}
+            <span
+              *ngFor="let reaction of topicMessage?.reactions | keyvalue"
+              class="reaction"
+              (mouseenter)="onReactionHover(topicMessage!, reaction.key)"
+              (mouseleave)="
+                hoveredReactionMessageId = null; hoveredEmoji = null
+              "
+              (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)"
+            >
+              {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div class="img-container" *ngIf="hasReactions(topicMessage?.reactions!)" (click)="togglePicker(topicMessage?.id!)">
+            <div
+              class="img-container"
+              *ngIf="hasReactions(topicMessage?.reactions!)"
+              (click)="togglePicker(topicMessage?.id!)"
+            >
               <svg
                 width="25"
                 height="24"
@@ -209,32 +255,63 @@
       (mouseleave)="hoveredMessageId = null"
       *ngFor="let message of messages"
     >
-    <div class="emoji-container" *ngIf="isPickerVisible === message.id">
-      <emoji-mart
-      [set]="'apple'"
-      [emojiSize]="32"
-      (emojiClick)="addEmoji($event, message.id)"
-    ></emoji-mart>
+    <div class="edit-message-container" *ngIf="showEditArea === message.id">
+      <form>
+        <textarea
+          cols="35"
+          rows="3"
+          name="message"
+          id="message"
+          [(ngModel)]="messageToEdit"
+        >
+        {{ message.text }} </textarea
+        >
+        <div class="button-row">
+          <button class="btn-secondary" (click)="cancelEdit()">
+            Abbrechen
+          </button>
+          <button
+            class="btn-primary"
+            (click)="saveEditedMessage(message.id)"
+          >
+            Speichern
+          </button>
+        </div>
+      </form>
+      <img [src]="message.senderPicture" />
     </div>
+    <div
+    (click)="toggleEditArea(message.id, message.text)"
+    class="message-edit-dialog"
+    *ngIf="showEditDialog === message.id"
+  >
+    <span>Nachricht bearbeiten</span>
+  </div>
+      <div class="emoji-container" *ngIf="isPickerVisible === message.id">
+        <emoji-mart
+          [set]="'apple'"
+          [emojiSize]="32"
+          (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"
+        ></emoji-mart>
+      </div>
       <div
         class="reaction-bar"
-        *ngIf="hoveredMessageId === message.id"
+        *ngIf="hoveredMessageId === message.id && !showEditArea"
         [ngClass]="{
           'reaction-bar-current':
             message.senderId === global.currentUserData.id,
-          'reaction-bar-user':
-          message.senderId !== global.currentUserData.id
+          'reaction-bar-user': message.senderId !== global.currentUserData.id
         }"
       >
-      <div class="used-emojis">
-        <span
-          *ngFor="let emoji of currentUserLastEmojis"
-          class="emoji"
-          (click)="addEmojiToMessage(emoji, message.id)"
-        >
-          {{ emoji }}
-        </span>
-      </div>
+        <div class="used-emojis">
+          <span
+            *ngFor="let emoji of currentUserLastEmojis"
+            class="emoji"
+            (click)="addEmojiToMessage(emoji, message.id)"
+          >
+            {{ emoji }}
+          </span>
+        </div>
         <div class="img-container" (click)="togglePicker(message.id)">
           <svg
             width="25"
@@ -264,6 +341,7 @@
           </svg>
         </div>
         <div
+          (click)="toggleEditDialog(message.id)"
           class="img-container"
           *ngIf="message.senderId === global.currentUserData.id"
         >
@@ -310,22 +388,37 @@
           >
             {{ message.text }}
           </div>
-          <div class="reaction-info" [ngClass]="{
-            'flex-end': message.senderId === global.currentUserData.id
-          }">
-          <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji">
-            <span class="emoji-from"> {{ hoveredEmoji }} </span>
-            <p class="reaction-text">{{ getReactionText(message, hoveredEmoji) }}</p>
-          </div>
-            <span 
-            *ngFor="let reaction of message.reactions | keyvalue"
-            class="reaction"
-            (mouseenter)="onReactionHover(message, reaction.key)"
-            (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
-            (click)="addEmojiToMessage(reaction.key, message.id!)"
-            > {{ reaction.key }} {{ reaction.value.length }}
+          <div
+            class="reaction-info"
+            [ngClass]="{
+              'flex-end': message.senderId === global.currentUserData.id
+            }"
+          >
+            <div
+              class="reaction-from-container"
+              *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji"
+            >
+              <span class="emoji-from"> {{ hoveredEmoji }} </span>
+              <p class="reaction-text">
+                {{ getReactionText(message, hoveredEmoji) }}
+              </p>
+            </div>
+            <span
+              *ngFor="let reaction of message.reactions | keyvalue"
+              class="reaction"
+              (mouseenter)="onReactionHover(message, reaction.key)"
+              (mouseleave)="
+                hoveredReactionMessageId = null; hoveredEmoji = null
+              "
+              (click)="addEmojiToMessage(reaction.key, message.id!)"
+            >
+              {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
+            <div
+              class="img-container"
+              *ngIf="hasReactions(message.reactions)"
+              (click)="togglePicker(message.id)"
+            >
               <svg
                 width="25"
                 height="24"

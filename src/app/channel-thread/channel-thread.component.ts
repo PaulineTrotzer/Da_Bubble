@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
+import { FormsModule } from '@angular/forms';
 
 interface Message {
   id: string;
@@ -30,7 +31,7 @@ interface Message {
 @Component({
   selector: 'app-channel-thread',
   standalone: true,
-  imports: [CommonModule, InputFieldComponent, PickerComponent],
+  imports: [CommonModule, InputFieldComponent, PickerComponent, FormsModule],
   templateUrl: './channel-thread.component.html',
   styleUrl: './channel-thread.component.scss',
 })
@@ -49,12 +50,14 @@ export class ChannelThreadComponent implements OnInit {
   isChannelThreadOpen: boolean = false;
   isPickerVisible: string | null = null;
   showEditDialog: string | null = null;
+  showEditArea: string | null = null;
   hoveredMessageId: string | null = null;
   hoveredTopic: boolean = false;
   currentUserLastEmojis: string [] = [];
   hoveredReactionMessageId: string | null = null;
   hoveredEmoji: string | null = null;
   reactionUserNames: { [userId: string]: string } = {};
+  messageToEdit: string = '';
 
   unsubscribe: (() => void) | undefined;
 
@@ -319,6 +322,7 @@ export class ChannelThreadComponent implements OnInit {
    
       updateDoc(messageDocRef, { reactions });
     });
+    this.isPickerVisible = null;
    }
    
    onReactionHover(message: Message, emoji: string) {
@@ -371,5 +375,51 @@ export class ChannelThreadComponent implements OnInit {
 
   toggleEditDialog(messageId: string) {
     this.showEditDialog = this.showEditDialog === messageId ? null : messageId
+  }
+
+  cancelEdit() {
+    this.showEditArea = null;
+    this.messageToEdit = '';
+  }
+
+  async saveEditedMessage(messageId: string) {
+    try {
+      const messageDocRef = messageId === this.topicMessage?.id ? doc(
+        this.db,
+        'channels',
+        this.selectedChannel.id,
+        'messages',
+        messageId
+      ) : doc(
+        this.db,
+        'channels',
+        this.selectedChannel.id,
+        'messages',
+        this.channelMessageId,
+        'thread',
+        messageId
+      )
+
+      await updateDoc(messageDocRef, { text: this.messageToEdit });
+
+      this.showEditArea = null;
+      this.messageToEdit = '';
+
+      console.log(`Message ${messageId} updated successfully.`);
+    } catch (error) {
+      console.error('Error saving edited message:', error);
+    }
+  }
+
+
+  toggleEditArea(messageId: string, messageText: string) {
+    if(this.showEditArea === messageId) {
+      this.showEditArea = null;
+      this.messageToEdit = '';
+    } else {
+      this.showEditArea = messageId;
+      this.messageToEdit = messageText;
+      this.toggleEditDialog(messageId);
+    }
   }
 }
