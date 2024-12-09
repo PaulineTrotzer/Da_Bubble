@@ -48,6 +48,7 @@ export class ChannelThreadComponent implements OnInit {
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
   isPickerVisible: string | null = null;
+  showEditDialog: string | null = null;
   hoveredMessageId: string | null = null;
   hoveredTopic: boolean = false;
   currentUserLastEmojis: string [] = [];
@@ -366,5 +367,9 @@ export class ChannelThreadComponent implements OnInit {
 
     const firstReactorName = this.reactionUserNames[reactors[0]] || 'Jemand';
     return `${firstReactorName} hat reagiert.`;
+  }
+
+  toggleEditDialog(messageId: string) {
+    this.showEditDialog = this.showEditDialog === messageId ? null : messageId
   }
 }

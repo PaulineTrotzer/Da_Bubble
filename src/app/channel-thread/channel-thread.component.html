@@ -41,6 +41,9 @@
       (mouseenter)="hoveredTopic = true"
       (mouseleave)="hoveredTopic = false"
     >
+    <div class="message-edit" *ngIf="showEditDialog">
+      <span>Nachricht bearbeiten</span>
+    </div>
       <div class="emoji-container" *ngIf="isPickerVisible === topicMessage?.id">
         <emoji-mart
         [set]="'apple'"
@@ -96,6 +99,7 @@
           </svg>
         </div>
         <div
+          (click)="toggleEditDialog(topicMessage?.id!)"
           class="img-container"
           *ngIf="topicMessage?.senderId === global.currentUserData.id"
         >
@@ -311,7 +315,7 @@
           }">
           <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji">
             <span class="emoji-from"> {{ hoveredEmoji }} </span>
-            <p class="reaction-text">{{ getReactionText(topicMessage!, hoveredEmoji) }}</p>
+            <p class="reaction-text">{{ getReactionText(message, hoveredEmoji) }}</p>
           </div>
             <span 
             *ngFor="let reaction of message.reactions | keyvalue"
