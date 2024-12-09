@@ -22,7 +22,6 @@ import {
   addDoc,
   orderBy,
   setDoc,
-  where,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -252,7 +251,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
-    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -326,18 +324,13 @@ export class DirectThreadComponent implements OnInit {
     });
   }
 
-  TwoReactionsTwoSameEmojis(recipientId: any, senderId: any): boolean {
-    // Überprüfen, ob counter-Werte existieren und größer als 0 sind
+  TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
       return true;
     }
-  
-    // Falls einer oder beide counter-Werte 0 oder undefiniert sind
     if (!recipientId?.counter || !senderId?.counter) {
       return false;
     }
-  
-    // Standard-Fallback, falls keine der Bedingungen erfüllt ist
     return false;
   }
 
