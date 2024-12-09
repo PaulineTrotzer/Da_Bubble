@@ -21,7 +21,12 @@ import {
   Firestore,
   addDoc,
   collection,
-  onSnapshot,doc,getDoc, updateDoc,setDoc, increment,
+  onSnapshot,
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+  increment,
 } from '@angular/fire/firestore';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
@@ -31,12 +36,10 @@ import { Subscription } from 'rxjs';
 import {
   Storage,
   ref,
-  uploadBytes,
   getDownloadURL,
   uploadString,
 } from '@angular/fire/storage';
 import { ActivatedRoute } from '@angular/router';
-
 
 @Component({
   selector: 'app-input-field',
@@ -68,37 +71,35 @@ export class InputFieldComponent implements OnInit, OnChanges {
   mentionUserName: any[] = [];
   threadControlService = inject(ThreadControlService);
   private subscription: Subscription = new Subscription();
-  storage=inject(Storage)
-  userId:any
+  storage = inject(Storage);
+  userId: any;
   route = inject(ActivatedRoute);
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser'] &&  this.selectedUser?.id ){
-
+    if (changes['selectedUser'] && this.selectedUser?.id) {
     }
   }
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
-    if(this.userId && this.selectedUser?.id){
-      console.log('user.id ist da ')
+    if (this.userId && this.selectedUser?.id) {
+      console.log('user.id ist da ');
     }
-    this.getByUserName();;;
+    this.getByUserName();
     this.subscription.add(
       this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
         this.currentThreadMessageId = messageId;
       })
     );
-  } 
+  }
 
-    
   async sendMessage(event: KeyboardEvent): Promise<void> {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       await this.processSendMessage();
     }
   }
-  
+
   sendMessageClick(): void {
     if (this.chatMessage.trim() === '' && this.selectFiles.length === 0) {
       console.warn('Keine Nachricht und keine Dateien zum Senden.');
@@ -125,33 +126,33 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   private async processSendMessage(): Promise<void> {
     try {
-      const fileData = await this.uploadFilesToFirebaseStorage();
-  
-      const messageData = this.messageData(
-        this.chatMessage,
-        this.senderStickerCount,
-        this.recipientStickerCount
-      );
-  
-      messageData.selectedFiles = fileData;
-  
-      const messagesRef = collection(this.firestore, 'messages');
-      const docRef = await addDoc(messagesRef, messageData);
-      const messageWithId = { ...messageData, id: docRef.id };
-      console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
-  
-      this.messagesData.push(messageWithId);
-      this.messageSent.emit();
-  
+      if (this.selectedChannel) {
+        await this.sendChannelMessage();
+      } else if (this.isDirectThreadOpen) {
+        await this.sendDirectThreadMessage();
+      } else {
+        const fileData = await this.uploadFilesToFirebaseStorage();
+        const messageData = this.messageData(this.chatMessage, 0, 0);
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+        const messageWithId = { ...messageData, id: docRef.id };
+
+        console.log('Message successfully sent with ID:', messageWithId);
+
+        this.messagesData.push(messageWithId);
+        await this.setMessageCount();
+        this.messageSent.emit();
+      }
       this.chatMessage = '';
       this.formattedChatMessage = '';
       this.selectFiles = [];
     } catch (error) {
-      console.error('Fehler beim Senden der Nachricht:', error);
+      console.error('Error while sending message:', error);
     }
-  }    
+  }
 
   async sendDirectThreadMessage() {
+    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
       console.warn('t is not open or msg is empty');
       return;
@@ -165,6 +166,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.firestore,
         `messages/${this.currentThreadMessageId}/threadMessages`
       );
+      console.log('Firestore-Pfad:', `messages/${this.currentThreadMessageId}/threadMessages`);
+
       const messageData = {
         text: this.chatMessage,
         senderId: this.global.currentUserData.id,
@@ -175,11 +178,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
         editedTextShow: false,
         recipientId: this.selectedUser.uid,
         recipientName: this.selectedUser.name,
-        reactions: ''
+        reactions: '',
       };
+      console.log('Versuche, die Nachricht zu senden...');
       const docRef = await addDoc(threadMessagesRef, messageData);
+      console.log('Nachricht erfolgreich gesendet:', docRef.id);
       const newThreadMessageId = docRef.id;
-      this.handleNewThreadMessage(newThreadMessageId);
+     // this.handleNewThreadMessage(newThreadMessageId);
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
@@ -192,23 +197,24 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.selectFiles = [];
   }
 
-
-   
-
   async setMessageCount() {
     try {
       if (!this.userId || !this.selectedUser?.id) {
         console.error('User ID or selected user ID is missing.');
         return;
-      }           
-        // if(this.global.checkCountStatus && this.userId && !this.selectedUser?.id ){
-        //   return
-        // } 
-      const messageCountDocRef = doc(this.firestore, 'messageCounts', this.selectedUser?.id);
+      }
+      // if(this.global.checkCountStatus && this.userId && !this.selectedUser?.id ){
+      //   return
+      // }
+      const messageCountDocRef = doc(
+        this.firestore,
+        'messageCounts',
+        this.selectedUser?.id
+      );
       const userUpdate: any = {};
       userUpdate[`messageCount.${this.userId}`] = increment(1);
       const docSnapshot = await getDoc(messageCountDocRef);
-      if (docSnapshot.exists() ) {
+      if (docSnapshot.exists()) {
         await updateDoc(messageCountDocRef, userUpdate);
       } else {
         await setDoc(messageCountDocRef, {
@@ -221,12 +227,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Error updating message count:', error);
     }
-
   }
-    
-  
-     
-
 
   async uploadFilesToFirebaseStorage(): Promise<
     { url: string; type: string }[]
@@ -237,26 +238,31 @@ export class InputFieldComponent implements OnInit, OnChanges {
         file.type.split('/')[1]
       }`;
       const fileRef = ref(storage, filePath);
-      await uploadString(fileRef, file.data, 'data_url'); 
-      const url = await getDownloadURL(fileRef); 
-      return { url, type: file.type, data:file.data }; 
+      await uploadString(fileRef, file.data, 'data_url');
+      const url = await getDownloadURL(fileRef);
+      return { url, type: file.type, data: file.data };
     });
     return await Promise.all(uploadPromises);
   }
-
 
   handleNewThreadMessage(threadMessageId: string) {
     this.currentThreadMessageId = threadMessageId;
     this.threadControlService.setCurrentThreadMessageId(threadMessageId);
   }
+
   async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
     }
-     
-    const channelMessagesRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages');
-    const fileData  = await this.uploadFilesToFirebaseStorage();
+
+    const channelMessagesRef = collection(
+      this.firestore,
+      'channels',
+      this.selectedChannel.id,
+      'messages'
+    );
+    const fileData = await this.uploadFilesToFirebaseStorage();
     const messageData = {
       text: this.chatMessage,
       senderId: this.global.currentUserData.id,
@@ -264,8 +270,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       senderPicture: this.global.currentUserData.picture || '',
       timestamp: new Date(),
       selectedFiles: this.selectFiles,
-      editedTextShow: false
-    }; 
+      editedTextShow: false,
+    };
     messageData.selectedFiles = fileData;
     const docRef = await addDoc(channelMessagesRef, messageData);
     this.chatMessage = '';
@@ -277,8 +283,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   messageData(
     chatMessage: string,
     senderStickerCount: number = 0,
-    recipientStickerCount: number = 0,
-    
+    recipientStickerCount: number = 0
   ): SendMessageInfo {
     const recipientId = this.selectedUser?.id;
     const recipientName = this.selectedUser?.name;
@@ -287,8 +292,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       senderId: this.global.currentUserData.id,
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
-      recipientId:recipientId,
-      recipientName:recipientName,
+      recipientId: recipientId,
+      recipientName: recipientName,
       timestamp: new Date(),
       senderSticker: '',
       senderStickerCount,
@@ -302,10 +307,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       editedTextShow: false,
     };
   }
- 
-
-
-
 
   handleMentionUser(mention: string) {
     const mentionTag = `@${mention}`;
@@ -329,7 +330,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.scrollTop = textarea.scrollHeight;
-    this.selectedUser?.id
+    this.selectedUser?.id;
   }
 
   getByUserName() {

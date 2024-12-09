@@ -26,7 +26,9 @@
 
       <div *ngFor="let message of messagesData" class="message-bubble">
 
-        <div class="color-separator" (mouseenter)="onMouseEnter(message)" (mouseleave)="onMouseLeave(message)">
+        <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
+          (mouseleave)="toggleOptionBar(message.id,false)" (mouseenter)="onMouseEnter(message)"
+          (mouseleave)="onMouseLeave(message)">
           <div *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name"
             class="chatpartner-message-container">
             <div class="partner-message-header">
@@ -40,7 +42,7 @@
               <p>{{ message.text }}</p>
             </div>
 
-            <div class="sticker-hover-ct">
+            <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set">
                 <div class="img-flex-bar-options">
                   <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
@@ -59,7 +61,8 @@
           </div>
         </div>
 
-        <div class="color-separator">
+        <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
+          (mouseleave)="toggleOptionBar(message.id,false)">
           <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
             class="cu-message-container">
             <div class="cu-message-header">
@@ -73,7 +76,7 @@
               <p class="cu-msg-text">{{ message.text }}</p>
             </div>
 
-            <div class="sticker-hover-ct">
+            <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set-reverse">
                 <div class="img-flex-bar-options">
                   <img class="icon-more" [src]="icons['iconMore']"
@@ -103,8 +106,8 @@
           <div class="render-reaction-ct-sender">
             <ng-container>
               <div *ngIf="getSenderReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)"
-                class="emoji-holder" (mouseenter)="toggleReactionInfo('sender')"
-                (mouseleave)="toggleReactionInfo('sender')">
+                class="emoji-holder" (mouseenter)="toggleReactionInfoSender(message.id, true)"
+                (mouseleave)="toggleReactionInfoSender(message.id, false)">
                 <span class="single-emoji">
                   {{ getSenderReaction(message.reactions)?.emoji }}
                 </span>
@@ -112,11 +115,11 @@
                   {{ getSenderReaction(message.reactions)?.counter }}
                 </span>
               </div>
-              <div *ngIf="showReactionPopUpSender" class="reaction-name-info-ct-sender"
-                [class.reaction-sender-selectedUser-left]="message.senderName === selectedUser.name"
-                [class.reaction-sender-currentUser-right]="message.senderName== currentUser.name">
+              <div *ngIf="showReactionPopUpSender[message.id]" class="reaction-name-info-ct-sender"
+                [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
+                [class.reaction-sender-currentUser-right]="message.senderId== currentUser.uid">
                 <span class="reaction-info-txt">
-                  <ng-container *ngIf="isCurrentUser(message.senderName); else senderText">
+                  <ng-container *ngIf="isCurrentUser(message.senderId); else senderText">
                     Du hast mit <span class="react-emoji-value">{{ getSenderReaction(message.reactions)?.emoji
                       }}</span> reagiert
                   </ng-container>
@@ -133,11 +136,11 @@
           <div class="render-reaction-ct-recipient">
             <ng-container>
               <div *ngIf="getRecipientReaction(message.reactions)?.counter > 0 && !areEmojisSame(message.reactions)"
-                class="emoji-holder" (mouseenter)="toggleReactionInfo('recipient')"
-                (mouseleave)="toggleReactionInfo('recipient')">
-                <div *ngIf="showReactionPopUpRecipient" class="reaction-name-info-ct-recipient">
+                class="emoji-holder" (mouseenter)="toggleReactionInfoRecipient(message.id, true)"
+                (mouseleave)="toggleReactionInfoRecipient(message.id, false)">
+                <div *ngIf="showReactionPopUpRecipient[message.id]" class="reaction-name-info-ct-recipient">
                   <span class="reaction-info-txt">
-                    <ng-container *ngIf="isCurrentUser(message.recipientName); else recipientText">
+                    <ng-container *ngIf="isCurrentUser(message.recipientId) else recipientText">
                       Du hast mit <span class="react-emoji-value">{{ getRecipientReaction(message.reactions)?.emoji
                         }}</span> reagiert
                     </ng-container>
