@@ -22,14 +22,13 @@ import {
   addDoc,
   orderBy,
   setDoc,
-  where,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { firstValueFrom, Subscription, first, BehaviorSubject } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
@@ -48,6 +47,7 @@ import { currentThreadMessage } from '../models/threadMessage.class';
   animations: [slideFromRight, fadeIn],
 })
 export class DirectThreadComponent implements OnInit {
+  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -59,7 +59,7 @@ export class DirectThreadComponent implements OnInit {
   userService = inject(UserService);
   userID: any | null = null;
   messagesData: any[] = [];
-  showOptionBar = false;
+  showOptionBar: { [key: string]: boolean } = {};
   isHovered = false;
   isEmojiPickerVisible = false;
   currentSrc?: string;
@@ -77,22 +77,74 @@ export class DirectThreadComponent implements OnInit {
   shouldScrollToBottom = false;
   firstInitialisedThreadMsg: string | null = null;
   currentThreadMessage!: currentThreadMessage;
-  showReactionPopUpSender = false;
-  showReactionPopUpRecipient = false;
+  showReactionPopUpSender: { [key: string]: boolean } = {};
+  showReactionPopUpRecipient: { [key: string]: boolean } = {};
   showReactionPopUpBoth = false;
   isMouseInside: any;
-
+  firstThreadValue: string | null = null;
+  currentUserId: string | null = null;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
-
   ngOnInit(): void {
     this.initializeUser();
     this.subscribeToThreadMessages();
     this.scrollToBottom();
+    this.initializeFirstThreadMsg();
+    this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
 
-  isCurrentUser(name: string): boolean {
-    return name === this.currentUser.name;
+  initializeFirstThreadMsg() {
+    this.threadControlService.firstThreadMessageId$
+      .pipe(first())
+      .subscribe((id) => {
+        this.firstThreadValue = id;
+      });
+  }
+
+  hasCurrentUserReacted(message: any): boolean {
+    if (this.currentUserId === null) {
+      return false; 
+    }
+    const currentUserReaction = message.reactions[this.currentUserId];
+    return currentUserReaction && currentUserReaction.counter > 0;
+  }
+  getCurrentUserReaction(message: any): any {
+    if (this.currentUserId !== null && message.reactions) {
+      console.log('Current User ID:', this.currentUserId); 
+      console.log('Available reaction keys:', Object.keys(message.reactions));
+      return message.reactions[this.currentUserId] ?? null;
+    }
+    return null;
+  }
+
+  getOtherPersonName(message: any): string {
+    debugger;
+    if (!this.hasCurrentUserReacted(message)) {
+      if (message.senderId !== this.currentUserId) {
+        return message.senderName;
+      }
+      if (message.recipientId !== this.currentUserId) {
+        return message.recipientName;
+      }
+    }
+    return '';
+  }
+  
+  
+
+  hasCurrentMessage(message: any) {
+    return message.senderId === this.currentUserId;
+  }
+
+  toggleOptionBar(messageId: string, status: boolean): void {
+    this.showOptionBar[messageId] = status;
+  }
+
+  toggleReactionInfoSender(messageId: string, status: boolean): void {
+    this.showReactionPopUpSender[messageId] = status;
+  }
+  toggleReactionInfoRecipient(messageId: string, status: boolean): void {
+    this.showReactionPopUpRecipient[messageId] = status;
   }
 
   private subscribeToThreadMessages() {
@@ -120,8 +172,7 @@ export class DirectThreadComponent implements OnInit {
   isLeftReactions(message: any): boolean {
     return message.senderId === this.selectedUser?.uid;
   }
-
-  initializeUser() {
+  async initializeUser() {
     this.route.paramMap.subscribe(async (paramMap) => {
       const userID = paramMap.get('id');
       if (userID) {
@@ -129,15 +180,6 @@ export class DirectThreadComponent implements OnInit {
       }
     });
   }
-
-  toggleReactionInfo(id: string) {
-    if (id === 'sender') {
-      this.showReactionPopUpSender = !this.showReactionPopUpSender;
-    } else if (id === 'recipient') {
-      this.showReactionPopUpRecipient = !this.showReactionPopUpRecipient;
-    }
-  }
-
   toggleBothReactionInfo(show: boolean): void {
     this.showReactionPopUpBoth = show;
   }
@@ -252,7 +294,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
-    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -292,25 +333,44 @@ export class DirectThreadComponent implements OnInit {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerVisible = false;
   }
-
-  async addEmoji(event: any, currentThreadMessageId: string, userId: string) {
+  async addEmoji(event: any, currentMessageId: string, userId: string) {
+    debugger;
     const emoji = event.emoji.native;
-    const firstInitialisedThreadMsg = await firstValueFrom(
-      this.threadControlService.firstThreadMessageId$
-    );
-    const threadMessageRef = doc(
+
+ 
+    let threadMessageRef = doc(
       this.firestore,
-      `messages/${firstInitialisedThreadMsg}/threadMessages/${currentThreadMessageId}`
+      `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
+
+    if (!this.firstThreadValue) {
+      const firstInitialisedThreadMsg = await firstValueFrom(
+        this.threadControlService.firstThreadMessageId$
+      );
+
+      threadMessageRef = doc(
+        this.firestore,
+        `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
+      );
+    }
+
+    if (this.firstThreadValue) {
+      threadMessageRef = doc(
+        this.firestore,
+        `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
+      );
+    }
     const threadMessageDoc = await getDoc(threadMessageRef);
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
       return;
     }
+
     const threadMessageData = threadMessageDoc.data();
     if (!threadMessageData['reactions']) {
       threadMessageData['reactions'] = {};
     }
+
     const userReaction = threadMessageData['reactions'][userId];
     if (userReaction && userReaction.emoji === emoji) {
       threadMessageData['reactions'][userId].counter =
@@ -321,23 +381,19 @@ export class DirectThreadComponent implements OnInit {
         counter: 1,
       };
     }
+
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
   }
 
-  TwoReactionsTwoSameEmojis(recipientId: any, senderId: any): boolean {
-    // Überprüfen, ob counter-Werte existieren und größer als 0 sind
+  TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
       return true;
     }
-  
-    // Falls einer oder beide counter-Werte 0 oder undefiniert sind
     if (!recipientId?.counter || !senderId?.counter) {
       return false;
     }
-  
-    // Standard-Fallback, falls keine der Bedingungen erfüllt ist
     return false;
   }
 
@@ -456,6 +512,4 @@ export class DirectThreadComponent implements OnInit {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
   }
-
-
 }

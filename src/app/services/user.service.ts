@@ -21,7 +21,7 @@ export class UserService {
   private selectedUserSubject = new BehaviorSubject<User | null>(null);
   selectedUser$ = this.selectedUserSubject.asObservable();
 
-  private profileSelectionSubject = new BehaviorSubject<string | null>(null); // Neue Variable
+  private profileSelectionSubject = new BehaviorSubject<string | null>(null); 
   profileSelection$ = this.profileSelectionSubject.asObservable();
 
   user: User = new User();

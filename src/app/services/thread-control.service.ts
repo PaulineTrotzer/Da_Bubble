@@ -35,8 +35,9 @@ export class ThreadControlService {
   setCurrentThreadMessageId(id: string) {
     if (id) {
       this.currentThreadMessageIdSubject.next(id);
+      console.log('currentThreadMessageId gesetzt auf:', id);
     } else {
-      console.error('errr thread-Nachricht-ID übergeben.');
+      console.error('Keine gültige Thread-Nachricht-ID übergeben.');
     }
   }
 
