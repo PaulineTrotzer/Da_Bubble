@@ -30,6 +30,7 @@ export class ThreadComponent {
   constructor(){}
 
   @Input() selectedUser: any;
+  
 
   onDirectThreadClosed() {
     this.closeThread.emit(); 

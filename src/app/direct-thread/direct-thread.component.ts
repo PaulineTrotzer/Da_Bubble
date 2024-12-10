@@ -28,7 +28,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { firstValueFrom, Subscription, first } from 'rxjs';
+import { firstValueFrom, Subscription, first, BehaviorSubject } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
@@ -47,6 +47,7 @@ import { currentThreadMessage } from '../models/threadMessage.class';
   animations: [slideFromRight, fadeIn],
 })
 export class DirectThreadComponent implements OnInit {
+  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -81,6 +82,7 @@ export class DirectThreadComponent implements OnInit {
   showReactionPopUpBoth = false;
   isMouseInside: any;
   firstThreadValue: string | null = null;
+  currentUserId: string | null = null;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   ngOnInit(): void {
@@ -88,6 +90,7 @@ export class DirectThreadComponent implements OnInit {
     this.subscribeToThreadMessages();
     this.scrollToBottom();
     this.initializeFirstThreadMsg();
+    this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
 
   initializeFirstThreadMsg() {
@@ -96,6 +99,41 @@ export class DirectThreadComponent implements OnInit {
       .subscribe((id) => {
         this.firstThreadValue = id;
       });
+  }
+
+  hasCurrentUserReacted(message: any): boolean {
+    if (this.currentUserId === null) {
+      return false; 
+    }
+    const currentUserReaction = message.reactions[this.currentUserId];
+    return currentUserReaction && currentUserReaction.counter > 0;
+  }
+  getCurrentUserReaction(message: any): any {
+    if (this.currentUserId !== null && message.reactions) {
+      console.log('Current User ID:', this.currentUserId); 
+      console.log('Available reaction keys:', Object.keys(message.reactions));
+      return message.reactions[this.currentUserId] ?? null;
+    }
+    return null;
+  }
+
+  getOtherPersonName(message: any): string {
+    debugger;
+    if (!this.hasCurrentUserReacted(message)) {
+      if (message.senderId !== this.currentUserId) {
+        return message.senderName;
+      }
+      if (message.recipientId !== this.currentUserId) {
+        return message.recipientName;
+      }
+    }
+    return '';
+  }
+  
+  
+
+  hasCurrentMessage(message: any) {
+    return message.senderId === this.currentUserId;
   }
 
   toggleOptionBar(messageId: string, status: boolean): void {
@@ -107,10 +145,6 @@ export class DirectThreadComponent implements OnInit {
   }
   toggleReactionInfoRecipient(messageId: string, status: boolean): void {
     this.showReactionPopUpRecipient[messageId] = status;
-  }
-
-  isCurrentUser(id: string): boolean {
-    return id === this.currentUser.uid;
   }
 
   private subscribeToThreadMessages() {
@@ -138,8 +172,7 @@ export class DirectThreadComponent implements OnInit {
   isLeftReactions(message: any): boolean {
     return message.senderId === this.selectedUser?.uid;
   }
-
-  initializeUser() {
+  async initializeUser() {
     this.route.paramMap.subscribe(async (paramMap) => {
       const userID = paramMap.get('id');
       if (userID) {
@@ -147,7 +180,6 @@ export class DirectThreadComponent implements OnInit {
       }
     });
   }
-
   toggleBothReactionInfo(show: boolean): void {
     this.showReactionPopUpBoth = show;
   }
@@ -305,19 +337,17 @@ export class DirectThreadComponent implements OnInit {
     debugger;
     const emoji = event.emoji.native;
 
-    // Standardmäßig die übergebene message.id verwenden
+ 
     let threadMessageRef = doc(
       this.firestore,
       `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
 
-    // Nur beim ersten Aufruf den ersten Thread initialisieren
     if (!this.firstThreadValue) {
       const firstInitialisedThreadMsg = await firstValueFrom(
         this.threadControlService.firstThreadMessageId$
       );
 
-      // Ersetzen der Standardreferenz mit der initialisierten ID
       threadMessageRef = doc(
         this.firestore,
         `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
