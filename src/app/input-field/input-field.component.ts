@@ -98,6 +98,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       event.preventDefault();
       await this.processSendMessage();
     }
+
+
   }
 
   sendMessageClick(): void {
@@ -110,6 +112,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     this.processSendMessage();
+    
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -133,24 +136,24 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
-
+    
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
-
+  
         messageData.selectedFiles = fileData;
-
+    
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
         console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
-
+    
         this.messagesData.push(messageWithId);
         await this.setMessageCount();
         this.messageSent.emit();
-
+    
         this.chatMessage = '';
         this.formattedChatMessage = '';
         this.selectFiles = [];
@@ -158,11 +161,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
-  }
-
+  }     
 
   async sendDirectThreadMessage() {
-
+    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
       console.warn('t is not open or msg is empty');
       return;
@@ -176,10 +178,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.firestore,
         `messages/${this.currentThreadMessageId}/threadMessages`
       );
-      console.log(
-        'Firestore-Pfad:',
-        `messages/${this.currentThreadMessageId}/threadMessages`
-      );
+      console.log('Firestore-Pfad:', `messages/${this.currentThreadMessageId}/threadMessages`);
 
       const messageData = {
         text: this.chatMessage,
@@ -197,7 +196,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       const docRef = await addDoc(threadMessagesRef, messageData);
       console.log('Nachricht erfolgreich gesendet:', docRef.id);
       const newThreadMessageId = docRef.id;
-      // this.handleNewThreadMessage(newThreadMessageId);
+     // this.handleNewThreadMessage(newThreadMessageId);
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
