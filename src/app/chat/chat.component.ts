@@ -109,6 +109,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getAllUsersname();
+
   }
 
   subscribeToThreadAnswers() {
@@ -201,11 +202,6 @@ export class ChatComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-       
-       
-     
-
-      console.log(this.selectedUser?.id)
       this.getMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
@@ -214,29 +210,28 @@ export class ChatComponent implements OnInit, OnChanges {
     } 
 
 
-    if (changes['selectedChannel'] && !changes['selectedChannel'].firstChange) {
+    if (changes['selectedChannel'] &&  this.selectedChannel) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
-      console.log('changing')
       this.clearInput();
     }   
     
 
-    // if (changes['onHeaderChannel'] && !changes['onHeaderChannel'].firstChange) {
-    //   this.showWelcomeChatText = false;
-    //   this.showTwoPersonConversationTxt = false;
-    //   console.log('changing on channel')
-    //   this.clearInput();
-    // }    
+    if (changes['onHeaderChannel'] &&  this.onHeaderChannel) {
+      this.showWelcomeChatText = false;
+      this.showTwoPersonConversationTxt = false;
+      this.clearInput();
+    }    
 
-    // if (changes['onHeaderUser'] && this.onHeaderUser) {
-    //   console.log('hallo on header User')
-    //   this.global.channelSelected = false;
-    //   this.chatMessage = '';
-    //   this.global.clearCurrentChannel();
-    // }
-  }
+    if (changes['onHeaderUser'] && this.onHeaderUser) {
+      this.global.clearCurrentChannel();
+      this.getMessages();
+      this.chatMessage = '';
+    } 
+        
+  }  
 
+  
   checkForSelfChat() {
     if (
       this.selectedUser?.id === this.global.currentUserData?.id &&
@@ -367,7 +362,7 @@ export class ChatComponent implements OnInit, OnChanges {
     return ids.join('_');
   }
 
-  async getMessages() {
+  async getMessages() { 
     const docRef = collection(this.firestore, 'messages');
     const q = query(
       docRef,

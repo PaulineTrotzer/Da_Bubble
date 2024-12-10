@@ -4,7 +4,7 @@
     </app-mention-message-box>
 
         
-    <div *ngIf="selectedUser || selectedChannel " class="main-current-messagebox" #scrollContainer>
+    <div *ngIf="selectedUser  ||global.channelSelected" class="main-current-messagebox" #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
             <div *ngIf="displayDayInfo(i)" class="new-day-info">
                 <div class="day-info">
@@ -389,9 +389,9 @@
                 </div>
             </div>
         </div>
-        <app-channel-chat *ngIf="selectedChannel" [selectedChannel]="selectedChannel"></app-channel-chat>
+        <app-channel-chat *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
-    <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText">
+    <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
         <div class="self-name-and-img">
             <img class="self-chat-img" src={{selectedUser?.picture}}>
             <p>{{selectedUser?.name }}</p>
@@ -402,7 +402,7 @@
             auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
             gerne Dinge mit dir selbst besprechen.
         </span>
-    </div>  
+    </div>   
     <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt">
         <div class="img-and-name">
             <img class="self-chat-img" src={{selectedUser?.picture}}>

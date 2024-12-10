@@ -42,7 +42,7 @@ export class GlobalVariableService {
     this.channelSelected = true;
     if (channel.name == 'Willkommen') {
       this.welcomeChannelSubject.next(true);
-      this.channelSelected = false;
+      this.channelSelected = true;
     } else {
       this.welcomeChannelSubject.next(false);
     }

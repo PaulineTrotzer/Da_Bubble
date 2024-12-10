@@ -126,32 +126,40 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
-  private async processSendMessage(): Promise<void> {
-    try {
-      const fileData = await this.uploadFilesToFirebaseStorage();
+  private async processSendMessage(): Promise<void> { 
+    if(this.selectedChannel){
+      await this.sendChannelMessage();
+    }else{ 
+      try {
+        const fileData = await this.uploadFilesToFirebaseStorage();
+    
+        const messageData = this.messageData(
+          this.chatMessage,
+          this.senderStickerCount,
+          this.recipientStickerCount
+        );
   
-      const messageData = this.messageData(
-        this.chatMessage,
-        this.senderStickerCount,
-        this.recipientStickerCount
-      );
+        messageData.selectedFiles = fileData;
+    
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+        const messageWithId = { ...messageData, id: docRef.id };
+        console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
+    
+        this.messagesData.push(messageWithId);
+        await this.setMessageCount();
+        this.messageSent.emit();
+    
+        this.chatMessage = '';
+        this.formattedChatMessage = '';
+        this.selectFiles = [];
+      } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error);
+      }
 
-      messageData.selectedFiles = fileData;
-  
-      const messagesRef = collection(this.firestore, 'messages');
-      const docRef = await addDoc(messagesRef, messageData);
-      const messageWithId = { ...messageData, id: docRef.id };
-      console.log('Nachricht erfolgreich gesendet mit ID:', messageWithId);
-  
-      this.messagesData.push(messageWithId);
-      this.messageSent.emit();
-  
-      this.chatMessage = '';
-      this.formattedChatMessage = '';
-      this.selectFiles = [];
-    } catch (error) {
-      console.error('Fehler beim Senden der Nachricht:', error);
     }
+
+    
   }    
 
   async sendDirectThreadMessage() {

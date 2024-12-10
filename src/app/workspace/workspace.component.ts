@@ -68,7 +68,6 @@ export class WorkspaceComponent implements OnInit {
     }
     this.subscribeToGuestLoginStatus();
     await this.getAllChannels(); 
-    console.log(this.messageCountsArr?.messageCount)
      
   }
 
@@ -144,7 +143,9 @@ selectUser(user: any) {
       (channel) => channel.name == 'Willkommen'
     );
     if (willkommenChannel) {
+      this.global.channelSelected=false;
       this.selectChannel(willkommenChannel);
+      console.log(this.global.channelSelected=false)
     }
   }
 
@@ -211,13 +212,17 @@ selectUser(user: any) {
     });
   }
 
-  selectChannel(channel: any) {
-    this.selectedChannel = channel;
-    this.channelSelected.emit(channel);
-    this.global.channelSelected = true;
-    this.global.setCurrentChannel(channel);
-  }
+  selectChannel(channel: any) {  
+      this.selectedChannel = channel;
+      this.global.channelSelected=true;
+      this.channelSelected.emit(channel);
+      console.log('es em Wilkommen@')
+  }  
 
+
+   
+    
+      
   toggleChannelDrawer() {
     this.channelDrawerOpen = !this.channelDrawerOpen;
   }

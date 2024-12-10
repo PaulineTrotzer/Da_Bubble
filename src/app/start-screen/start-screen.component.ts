@@ -107,6 +107,13 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   private guestLoginStatusSub: Subscription | undefined;
   loginAuthService = inject(LoginAuthService);
   enterChatByUser:any
+   
+ 
+
+
+  ngAfterViewChecked() {
+    this.cdr.detectChanges();
+  }
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -115,6 +122,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
+   
   } 
 
   
@@ -167,40 +175,53 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   @Input() onHeaderChannel:any
-
+ 
+  aaa:boolean=false
+   
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
+      this.global.channelSelected = false;
+      this.selectedChannel=null;
+      this.onHeaderChannel=null;
       this.checkProfileType();
       this.global.clearCurrentChannel();
-      this.global.channelSelected = false;
       this.afterLoginSheet = false; 
       }   
           
-    if (changes['selectedChannel'] && this.selectedChannel) {
+    if (changes['selectedChannel'] && this.selectedChannel) { 
+      this.selectedUser=null;
+      this.onHeaderUser=null;
       this.fetchChannelMembers();
+      this.global.channelSelected = true;
       this.global.setCurrentChannel(this.selectedChannel);
     } 
       
-    //  if(changes['onHeaderUser'] && this.onHeaderUser){       
-    //       this.selectedUser=this.onHeaderUser
-    //       this.checkProfileType();
-    //       this.global.clearCurrentChannel();
-    //       this.global.channelSelected = false;
-    //       this.afterLoginSheet=false;
-    //  } 
+     if(changes['onHeaderUser'] && this.onHeaderUser){ 
+          this.selectedChannel=null;
+          this.onHeaderChannel=null;   
+          this.global.channelSelected = false;   
+          this.selectedUser=this.onHeaderUser;
+          this.checkProfileType();
+          this.global.clearCurrentChannel();
+          this.afterLoginSheet=false; 
+     } 
 
-      // if(changes['onHeaderChannel'] && this.onHeaderChannel){
-      //   this.global.channelSelected=true
-      //   this.selectedChannel=this.onHeaderChannel;
-      //   this.fetchChannelMembers();
-      //   this.global.setCurrentChannel(this.selectedChannel);
-      //   // this.afterLoginSheet=false;
-      // } 
+      if(changes['onHeaderChannel'] && this.onHeaderChannel){
+        this.selectedUser=null;
+        this.onHeaderUser=null;
+        this.selectedChannel=this.onHeaderChannel;
+        this.fetchChannelMembers();
+        this.global.setCurrentChannel(this.onHeaderChannel);
+      } 
        
-      
+       
        
   }  
 
+   resetChannelMessages(){
+    console.log(this.onHeaderChannel.messages)
+    return this.onHeaderChannel.messages=[]
+   }
   
 
 
@@ -257,6 +278,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       );
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
+          console.log('aram')
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
           const membersPromises = userIds.map(async (userId: string) => {
