@@ -6,7 +6,7 @@
         <app-start-screen  [onHeaderChannel]="onHeaderChannel"  [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
-        <app-thread *ngIf="isThreadOpen" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"></app-thread>
+        <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId" [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"></app-thread>
     </div>
     <div *ngIf="successfullyLogged" class="overlay"></div>
 </div>

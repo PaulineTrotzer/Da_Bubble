@@ -408,6 +408,7 @@ export class ChatComponent implements OnInit, OnChanges {
   async openThread(messageId: any) {
     try {
         this.threadOpened.emit();  
+        this.global.setCurrentThreadMessage(messageId);
       this.chosenThreadMessage = messageId;
       this.threadControlService.setFirstThreadMessageId(messageId);
       const threadMessagesRef = collection(

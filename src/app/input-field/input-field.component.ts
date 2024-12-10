@@ -50,7 +50,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
-  @Input() isDirectThreadOpen: boolean | undefined;
+  currentChannelThreadId: string | null = null;
+  @Input() isDirectThreadOpen: boolean = false;
+  @Input() isChannelThreadOpen: boolean = false;
   @Output() messageSent = new EventEmitter<void>();
   @Input() mentionUser: string = '';
   @Input() selectedUser: any;
@@ -91,6 +93,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.currentThreadMessageId = messageId;
       })
     );
+    this.global.currentThreadMessage$.subscribe((messageId) => {
+      this.currentThreadMessageId = messageId;
+    });
+    this.global.channelThread$.subscribe((messageId) => {
+      this.currentChannelThreadId = messageId;
+    })
+    this.selectedChannel = this.global.currentChannel;
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -133,6 +142,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else if (this.isDirectThreadOpen) {
       await this.sendDirectThreadMessage();
       await this.setMessageCount();
+    } else if(this.isChannelThreadOpen) {
+      await this.sendChannelThreadMessage();
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
@@ -162,6 +173,28 @@ export class InputFieldComponent implements OnInit, OnChanges {
       }
     }
   }     
+
+  async sendChannelThreadMessage() {
+    if(!this.currentChannelThreadId || this.chatMessage.trim() === '') {
+      console.warn('Thread is not open or message is empty');
+      return;
+    }
+    try {
+      const threadRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages', this.currentChannelThreadId, 'thread');
+      const messageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles,
+      };
+      await addDoc(threadRef, messageData)
+    } catch (err) {
+      console.error(err);
+    }
+    
+  }
 
   async sendDirectThreadMessage() {
     debugger;

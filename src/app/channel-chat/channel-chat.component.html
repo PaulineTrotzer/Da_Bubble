@@ -75,7 +75,7 @@
           </g>
         </svg>
       </div>
-      <div class="img-container">
+      <div class="img-container" (click)="openThread(message.id)">
         <svg
           width="24"
           height="24"
@@ -128,7 +128,7 @@
         <div class="text-container">
           <div class="heading">
             <h3>{{ message.senderName }}</h3>
-            <span> {{ message.timestamp | date : "HH:MM" }} Uhr</span>
+            <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
           </div>
           <div class="text-content">
             <div class="text">

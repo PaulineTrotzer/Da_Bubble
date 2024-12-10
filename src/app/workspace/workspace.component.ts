@@ -79,14 +79,14 @@ export class WorkspaceComponent implements OnInit {
     );
   } 
 
-
-
  clickedUsers: string[] = []; // Array, um angeklickte Benutzer zu speichern
  id:any;
 
 selectUser(user: any) {
   this.userSelected.emit(user);
   this.id = user.id;
+  this.global.currentThreadMessageSubject.next('');
+  this.global.channelThreadSubject.next(null);
   const actuallyId = this.id; 
     if(this.userId && actuallyId && this.messageCountsArr?.messageCount && !this.messageCountsArr?.messageCount[actuallyId]){
       this.clickedUsers.push(actuallyId);
@@ -212,15 +212,17 @@ selectUser(user: any) {
     });
   }
 
+
   selectChannel(channel: any) {  
       this.selectedChannel = channel;
       this.global.channelSelected=true;
       this.channelSelected.emit(channel);
+      this.global.currentThreadMessageSubject.next('');
+      this.global.channelThreadSubject.next(null);
+      this.global.setCurrentChannel(channel);
       console.log('es em Wilkommen@')
   }  
 
-
-   
     
       
   toggleChannelDrawer() {

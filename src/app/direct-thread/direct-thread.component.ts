@@ -511,5 +511,6 @@ export class DirectThreadComponent implements OnInit {
   onClose() {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
+    this.global.currentThreadMessageSubject.next(null);
   }
 }
