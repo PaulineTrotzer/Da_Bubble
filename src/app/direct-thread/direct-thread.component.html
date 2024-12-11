@@ -103,7 +103,7 @@
           'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
           'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name
         }">
-          <div class="render-reaction-ct-sender">
+          <div class="render-reaction-ct-sender" *ngIf="!areEmojisSame(message.reactions)">
             <ng-container>
               <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
                 (mouseenter)="toggleReactionInfoSender(message.id, true)"
@@ -136,9 +136,9 @@
           </div>
 
 
-          <div class="render-reaction-ct-recipient">
+          <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)">
             <ng-container>
-              <div *ngIf="message.reactions[message.recipientId]?.counter > 0" class="emoji-holder"
+              <div *ngIf=" message.reactions[message.recipientId]?.counter> 0" class="emoji-holder"
                 (mouseenter)="toggleReactionInfoRecipient(message.id, true)"
                 (mouseleave)="toggleReactionInfoRecipient(message.id, false)">
                 <span class="single-emoji">
@@ -172,8 +172,8 @@
           'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name,
         }">
           <ng-container *ngIf="areEmojisSame(message.reactions)">
-            <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(true)"
-              (mouseout)="toggleBothReactionInfo(false)"
+            <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(message.id,true)"
+              (mouseout)="toggleBothReactionInfo(message.id,false)"
               [class.emojis-holder-both-two-single]="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]) && message.reactions.counter > 0"
               [class.both-reaction-right-emojis-holder]="message.senderName === currentUser.name">
               <span class="single-emoji">
@@ -187,7 +187,7 @@
                   'both-reaction-right': message.senderName === currentUser.name,
                   'both-reaction-left': message.recipientName === currentUser.name,
                   'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
-                }" [style.visibility]="showReactionPopUpBoth ? 'visible' : 'hidden'">
+                }" [style.visibility]="showReactionPopUpBoth[message.id] ? 'visible' : 'hidden'">
               <span class="reaction-info-txt-both"
                 *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
                 Du und {{

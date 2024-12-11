@@ -78,7 +78,7 @@ export class DirectThreadComponent implements OnInit {
   currentThreadMessage!: currentThreadMessage;
   showReactionPopUpSender: { [key: string]: boolean } = {};
   showReactionPopUpRecipient: { [key: string]: boolean } = {};
-  showReactionPopUpBoth = false;
+  showReactionPopUpBoth : { [key: string]: boolean } = {};
   isMouseInside: any;
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
@@ -119,36 +119,15 @@ export class DirectThreadComponent implements OnInit {
     this.showReactionPopUpRecipient[messageId] = status;
   }
 
+  toggleBothReactionInfo(messageId:string, show: boolean): void {
+    this.showReactionPopUpBoth[messageId] = show;
+  }
+
   private subscribeToThreadMessages() {
     this.threadControlService.firstThreadMessageId$.subscribe(
       async (firstInitialisedThreadMsg) => {
         if (firstInitialisedThreadMsg) {
           await this.processThreadMessages(firstInitialisedThreadMsg);
-  
-          // Für alle Nachrichten den Empfänger und den Sender abonnieren
-          this.messagesData.forEach((message) => {
-            // Empfänger abonnieren
-            this.threadControlService.getRecipient(message).subscribe({
-              next: (recipientId) => {
-                message.recipientId = recipientId; // Empfänger aktualisieren
-                this.cdr.detectChanges(); // Änderungen im Template triggern
-              },
-              error: (err) => {
-                console.error('Fehler beim Abrufen von recipientId:', err);
-              },
-            });
-  
-            // Sender abonnieren
-            this.threadControlService.getSender(message).subscribe({
-              next: (senderId) => {
-                message.senderId = senderId; // Sender aktualisieren
-                this.cdr.detectChanges(); // Änderungen im Template triggern
-              },
-              error: (err) => {
-                console.error('Fehler beim Abrufen von senderId:', err);
-              },
-            });
-          });
         }
       }
     );
@@ -177,9 +156,7 @@ export class DirectThreadComponent implements OnInit {
       }
     });
   }
-  toggleBothReactionInfo(show: boolean): void {
-    this.showReactionPopUpBoth = show;
-  }
+
 
   async loadCurrentUser(userID: string) {
     try {
