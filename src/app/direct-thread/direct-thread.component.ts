@@ -47,7 +47,6 @@ import { currentThreadMessage } from '../models/threadMessage.class';
   animations: [slideFromRight, fadeIn],
 })
 export class DirectThreadComponent implements OnInit {
-  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -91,6 +90,7 @@ export class DirectThreadComponent implements OnInit {
     this.scrollToBottom();
     this.initializeFirstThreadMsg();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
+    console.log('selectedUSr',this.selectedUser);
   }
 
   initializeFirstThreadMsg() {
@@ -101,36 +101,6 @@ export class DirectThreadComponent implements OnInit {
       });
   }
 
-  hasCurrentUserReacted(message: any): boolean {
-    if (this.currentUserId === null) {
-      return false; 
-    }
-    const currentUserReaction = message.reactions[this.currentUserId];
-    return currentUserReaction && currentUserReaction.counter > 0;
-  }
-  getCurrentUserReaction(message: any): any {
-    if (this.currentUserId !== null && message.reactions) {
-      console.log('Current User ID:', this.currentUserId); 
-      console.log('Available reaction keys:', Object.keys(message.reactions));
-      return message.reactions[this.currentUserId] ?? null;
-    }
-    return null;
-  }
-
-  getOtherPersonName(message: any): string {
-    debugger;
-    if (!this.hasCurrentUserReacted(message)) {
-      if (message.senderId !== this.currentUserId) {
-        return message.senderName;
-      }
-      if (message.recipientId !== this.currentUserId) {
-        return message.recipientName;
-      }
-    }
-    return '';
-  }
-  
-  
 
   hasCurrentMessage(message: any) {
     return message.senderId === this.currentUserId;
@@ -141,6 +111,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   toggleReactionInfoSender(messageId: string, status: boolean): void {
+    console.log('Toggle reaction info for sender', messageId, 'show:', status);
     this.showReactionPopUpSender[messageId] = status;
   }
   toggleReactionInfoRecipient(messageId: string, status: boolean): void {
@@ -334,58 +305,78 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
   async addEmoji(event: any, currentMessageId: string, userId: string) {
-    debugger;
     const emoji = event.emoji.native;
-
- 
+  
+    // Referenz zur Nachricht
     let threadMessageRef = doc(
       this.firestore,
       `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
-
+  
+    // Falls die erste Thread-Nachricht noch nicht gesetzt ist, hole sie von der entsprechenden Quelle
     if (!this.firstThreadValue) {
       const firstInitialisedThreadMsg = await firstValueFrom(
         this.threadControlService.firstThreadMessageId$
       );
-
       threadMessageRef = doc(
         this.firestore,
         `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
       );
     }
-
+  
     if (this.firstThreadValue) {
       threadMessageRef = doc(
         this.firestore,
         `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
       );
     }
+  
+    // Hole die Nachricht aus Firestore
     const threadMessageDoc = await getDoc(threadMessageRef);
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
       return;
     }
-
+  
     const threadMessageData = threadMessageDoc.data();
     if (!threadMessageData['reactions']) {
       threadMessageData['reactions'] = {};
     }
-
+  
+    // Überprüfen, ob der User schon auf die Nachricht reagiert hat
     const userReaction = threadMessageData['reactions'][userId];
     if (userReaction && userReaction.emoji === emoji) {
-      threadMessageData['reactions'][userId].counter =
-        userReaction.counter === 0 ? 1 : 0;
+      // Reaktion umkehren (wenn der gleiche Emoji erneut geklickt wird, zähle die Reaktion zurück)
+      threadMessageData['reactions'][userId].counter = userReaction.counter === 0 ? 1 : 0;
     } else {
+      // Reaktion neu setzen oder ersetzen
       threadMessageData['reactions'][userId] = {
         emoji: emoji,
         counter: 1,
       };
     }
-
+  
+    // Sicherstellen, dass für den Sender und Empfänger jeweils eine Reaktion existiert
+    const senderId = threadMessageData['senderId'];
+    const recipientId = threadMessageData['recipientId'];
+  
+    // Wenn der Sender keine Reaktion hat, lege eine leere Reaktion an
+    if (senderId && !threadMessageData['reactions'][senderId]) {
+      threadMessageData['reactions'][senderId] = { emoji: "", counter: 0 };
+    }
+  
+    // Wenn der Empfänger keine Reaktion hat, lege eine leere Reaktion an
+    if (recipientId && !threadMessageData['reactions'][recipientId]) {
+      threadMessageData['reactions'][recipientId] = { emoji: "", counter: 0 };
+    }
+  
+    // Reaktionen in Firestore aktualisieren
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
   }
+  
+
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -397,17 +388,18 @@ export class DirectThreadComponent implements OnInit {
     return false;
   }
 
-  getSenderReaction(reactions: any): any {
-    const senderId = this.currentThreadMessage?.senderId;
-    return senderId && reactions[senderId] ? reactions[senderId] : null;
-  }
+  
+  getSenderReaction(reactions: any): any | null {
+    const reactionsArray = Array.isArray(reactions) ? reactions : Object.values(reactions || {});
+    console.log('Sender reactions (as Array):', reactionsArray);
+    return reactionsArray.find(reaction => reaction.senderId === this.currentUser.uid) || null;
+}
 
-  getRecipientReaction(reactions: any): any {
-    const recipientId = this.currentThreadMessage?.recipientId;
-    return recipientId && reactions[recipientId]
-      ? reactions[recipientId]
-      : null;
-  }
+getRecipientReaction(reactions: any): any | null {
+    const reactionsArray = Array.isArray(reactions) ? reactions : Object.values(reactions || {});
+    console.log('Recipient reactions (as Array):', reactionsArray);
+    return reactionsArray.find(reaction => reaction.recipientId === this.currentUser.uid) || null;
+}
 
   areEmojisSame(reactions: any): boolean {
     const userIds = this.getUserIds(reactions);
