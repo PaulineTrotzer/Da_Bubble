@@ -120,7 +120,7 @@
               <div class="reaction-name-info-ct-sender" *ngIf="showReactionPopUpSender[message.id]"
                 [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
                 [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid">
-                <span  class="reaction-info-txt">
+                <span class="reaction-info-txt">
                   <ng-container *ngIf="message.senderId === currentUser.uid">
                     Du hast mit
                     <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
@@ -129,12 +129,6 @@
                   <ng-container *ngIf="message.senderId === selectedUser.uid">
                     {{ message.senderName }} hat mit
                     <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span> reagiert
-                  </ng-container>
-                  <ng-container *ngIf="message.senderId !== currentUser.uid && message.senderId !== selectedUser.uid">
-                    {{ message.senderName }} hat mit
-                    <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span> reagiert
-                    <span>{{ message.reactions[message.senderId]?.emoji ? 'Reaktion erkannt' : 'Keine Reaktion'
-                      }}</span>
                   </ng-container>
                 </span>
               </div>
@@ -162,15 +156,10 @@
                     Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji
                       }}</span> reagiert
                   </ng-container>
-                  <ng-template *ngIf="message.recipientId === selectedUser.uid">
+                  <ng-container *ngIf="message.recipientId === selectedUser.uid">
                     {{ message.recipientName }} hat mit <span class="react-emoji-value">{{
                       message.reactions[message.recipientId]?.emoji }}</span> reagiert
-                  </ng-template>
-                  <ng-template
-                    *ngIf="message.recipientId !== currentUser.uid && message.recipientId !== selectedUser.uid">
-                    {{ message.recipientName }} hat mit <span class="react-emoji-value">{{
-                      message.reactions[message.recipientId]?.emoji }}</span> reagiert
-                  </ng-template>
+                  </ng-container>
                 </span>
               </div>
             </ng-container>

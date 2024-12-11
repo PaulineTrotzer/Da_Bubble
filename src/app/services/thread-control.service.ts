@@ -21,8 +21,69 @@ export class ThreadControlService {
   );
   currentThreadMessageId$ = this.currentThreadMessageIdSubject.asObservable();
 
+  private recipientSubject = new BehaviorSubject<number>(0);
+  recipientId$ = this.recipientSubject.asObservable();
+
+  private senderSubject = new BehaviorSubject<number>(0);
+  senderId$ = this.senderSubject.asObservable();
 
   constructor() {}
+
+  getRecipient(message: any): Observable<number> {
+    return new Observable<number>((observer) => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, `messages/${message.id}/threadMessages`),
+        (snapshot) => {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data && data['recipientId']) {
+              console.log(
+                `Recipient ID for message ID ${message.id}:`,
+                data['recipientId']
+              );
+              observer.next(data['recipientId']);
+            }
+          });
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+
+      return () => {
+        unsubscribe();
+      };
+    });
+  }
+
+
+  getSender(message: any): Observable<number> {
+    return new Observable<number>((observer) => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, `messages/${message.id}/threadMessages`),
+        (snapshot) => {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data && data['senderId']) {
+              console.log(
+                `senderId ID for message ID ${message.id}:`,
+                data['sende']
+              );
+              observer.next(data['senderId']);
+            }
+          });
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+
+      return () => {
+        unsubscribe();
+      };
+    });
+  }
+
 
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);
@@ -45,14 +106,12 @@ export class ThreadControlService {
     return this.currentThreadMessageIdSubject.value;
   }
 
-
   getReplyCount(messageId: string): Observable<number> {
     return new Observable<number>((observer) => {
       const unsubscribe = onSnapshot(
         collection(this.firestore, `messages/${messageId}/threadMessages`),
         (snapshot) => {
           const replyCount = snapshot.size - 1;
-          console.log(`Reply count for message ID ${messageId}:`, replyCount);
           observer.next(replyCount);
         }
       );

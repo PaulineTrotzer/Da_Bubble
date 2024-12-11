@@ -91,6 +91,8 @@ export class DirectThreadComponent implements OnInit {
     this.initializeFirstThreadMsg();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
     console.log('selectedUSr',this.selectedUser);
+
+
   }
 
   initializeFirstThreadMsg() {
@@ -111,7 +113,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   toggleReactionInfoSender(messageId: string, status: boolean): void {
-    console.log('Toggle reaction info for sender', messageId, 'show:', status);
     this.showReactionPopUpSender[messageId] = status;
   }
   toggleReactionInfoRecipient(messageId: string, status: boolean): void {
@@ -123,6 +124,31 @@ export class DirectThreadComponent implements OnInit {
       async (firstInitialisedThreadMsg) => {
         if (firstInitialisedThreadMsg) {
           await this.processThreadMessages(firstInitialisedThreadMsg);
+  
+          // Für alle Nachrichten den Empfänger und den Sender abonnieren
+          this.messagesData.forEach((message) => {
+            // Empfänger abonnieren
+            this.threadControlService.getRecipient(message).subscribe({
+              next: (recipientId) => {
+                message.recipientId = recipientId; // Empfänger aktualisieren
+                this.cdr.detectChanges(); // Änderungen im Template triggern
+              },
+              error: (err) => {
+                console.error('Fehler beim Abrufen von recipientId:', err);
+              },
+            });
+  
+            // Sender abonnieren
+            this.threadControlService.getSender(message).subscribe({
+              next: (senderId) => {
+                message.senderId = senderId; // Sender aktualisieren
+                this.cdr.detectChanges(); // Änderungen im Template triggern
+              },
+              error: (err) => {
+                console.error('Fehler beim Abrufen von senderId:', err);
+              },
+            });
+          });
         }
       }
     );
@@ -369,7 +395,7 @@ export class DirectThreadComponent implements OnInit {
     if (recipientId && !threadMessageData['reactions'][recipientId]) {
       threadMessageData['reactions'][recipientId] = { emoji: "", counter: 0 };
     }
-  
+ 
     // Reaktionen in Firestore aktualisieren
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
