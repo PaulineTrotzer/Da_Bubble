@@ -301,7 +301,7 @@ export class DirectThreadComponent implements OnInit {
     };
     setTimeout(async () => {
       await addDoc(threadMessagesRef, messageData);
-    }, 120);
+    }, 150);
   }
 
   async getThreadMessages(messageId: any) {
