@@ -24,7 +24,7 @@
   <div class="overflow-container">
     <div #messageContainer class="all-thread-message-container">
 
-      <div *ngFor="let message of messagesData" class="message-bubble">
+      <div *ngFor="let message of messagesData" [id]="message.id" class="message-bubble">
 
         <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)" (mouseenter)="onMouseEnter(message)"
@@ -124,7 +124,7 @@
                   <ng-container *ngIf="message.senderId === currentUser.uid">
                     Du hast mit
                     <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
-                    </span>
+                    </span> reagiert
                   </ng-container>
                   <ng-container *ngIf="message.senderId === selectedUser.uid">
                     {{ message.senderName }} hat mit
@@ -149,8 +149,8 @@
                 </span>
               </div>
 
-              <!-- Recipient Reaction Pop-Up -->
-              <div *ngIf="showReactionPopUpRecipient[message.id]" class="reaction-name-info-ct-recipient">
+
+              <div  class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
                 <span class="reaction-info-txt">
                   <ng-container *ngIf="message.recipientId === currentUser.uid">
                     Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji

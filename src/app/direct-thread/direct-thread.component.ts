@@ -78,10 +78,10 @@ export class DirectThreadComponent implements OnInit {
   currentThreadMessage!: currentThreadMessage;
   showReactionPopUpSender: { [key: string]: boolean } = {};
   showReactionPopUpRecipient: { [key: string]: boolean } = {};
-  showReactionPopUpBoth : { [key: string]: boolean } = {};
-  isMouseInside: any;
+  showReactionPopUpBoth: { [key: string]: boolean } = {};
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
+  lastMessageId: string | null = null;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   ngOnInit(): void {
@@ -90,9 +90,31 @@ export class DirectThreadComponent implements OnInit {
     this.scrollToBottom();
     this.initializeFirstThreadMsg();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
-    console.log('selectedUSr',this.selectedUser);
+    /*     this.initializeLastmessage(); */
+  }
 
+  initializeLastmessage(): void {
+    // Initialisiere die lastMessageId, wenn der Thread geöffnet wird
+    const threadId = this.route.snapshot.paramMap.get('threadId'); // Hole die Thread-ID, wenn vorhanden
+    if (threadId) {
+      this.threadControlService.initializeLastMessageId(threadId);
+    }
 
+    // Abonniere den letzten Nachrichtenwert
+    this.threadControlService.getLastMessageId().subscribe((lastMessageId) => {
+      this.lastMessageId = lastMessageId;
+      console.log('After init', this.lastMessageId); // Überprüfe den Wert nach der Initialisierung
+      this.scrollToLastMessage(); // Scrollen, wenn lastMessageId gesetzt ist
+    });
+  }
+
+  scrollToLastMessage() {
+    if (this.lastMessageId) {
+      this.scrollToMessage(this.lastMessageId);
+    } else {
+      console.warn('Keine Nachrichten vorhanden, zum Ende scrollen.');
+      this.scrollToBottom();
+    }
   }
 
   initializeFirstThreadMsg() {
@@ -100,9 +122,15 @@ export class DirectThreadComponent implements OnInit {
       .pipe(first())
       .subscribe((id) => {
         this.firstThreadValue = id;
+        if (!this.lastMessageId) {
+          this.lastMessageId = this.firstThreadValue;
+          console.log(
+            'Setze lastMessageId auf firstThreadValue:',
+            this.lastMessageId
+          );
+        }
       });
   }
-
 
   hasCurrentMessage(message: any) {
     return message.senderId === this.currentUserId;
@@ -119,7 +147,7 @@ export class DirectThreadComponent implements OnInit {
     this.showReactionPopUpRecipient[messageId] = status;
   }
 
-  toggleBothReactionInfo(messageId:string, show: boolean): void {
+  toggleBothReactionInfo(messageId: string, show: boolean): void {
     this.showReactionPopUpBoth[messageId] = show;
   }
 
@@ -148,6 +176,7 @@ export class DirectThreadComponent implements OnInit {
   isLeftReactions(message: any): boolean {
     return message.senderId === this.selectedUser?.uid;
   }
+
   async initializeUser() {
     this.route.paramMap.subscribe(async (paramMap) => {
       const userID = paramMap.get('id');
@@ -156,7 +185,6 @@ export class DirectThreadComponent implements OnInit {
       }
     });
   }
-
 
   async loadCurrentUser(userID: string) {
     try {
@@ -183,6 +211,15 @@ export class DirectThreadComponent implements OnInit {
     if (this.shouldScrollToBottom) {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
+    }
+  }
+
+  scrollToMessage(messageId: string) {
+    const messageElement = document.getElementById(messageId);
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.error(`Nachricht mit ID ${messageId} nicht gefunden.`);
     }
   }
 
@@ -224,7 +261,6 @@ export class DirectThreadComponent implements OnInit {
       if (docSnapshot.exists()) {
         const docData = docSnapshot.data();
         if (docData?.['firstMessageCreated']) {
-          console.log('Die erste Nachricht wurde bereits erstellt.');
           this.currentThreadMessage = {
             id: docSnapshot.id,
             ...docSnapshot.data(),
@@ -260,11 +296,12 @@ export class DirectThreadComponent implements OnInit {
       recipientStickerCount: 0,
       recipientSticker: '',
       text: this.currentThreadMessage.text || '',
+      firstMessageCreated: true,
       reactions: '',
     };
     setTimeout(async () => {
       await addDoc(threadMessagesRef, messageData);
-    }, 100);
+    }, 120);
   }
 
   async getThreadMessages(messageId: any) {
@@ -307,15 +344,16 @@ export class DirectThreadComponent implements OnInit {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerVisible = false;
   }
+
   async addEmoji(event: any, currentMessageId: string, userId: string) {
     const emoji = event.emoji.native;
-  
+
     // Referenz zur Nachricht
     let threadMessageRef = doc(
       this.firestore,
       `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
-  
+
     // Falls die erste Thread-Nachricht noch nicht gesetzt ist, hole sie von der entsprechenden Quelle
     if (!this.firstThreadValue) {
       const firstInitialisedThreadMsg = await firstValueFrom(
@@ -326,31 +364,32 @@ export class DirectThreadComponent implements OnInit {
         `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
       );
     }
-  
+
     if (this.firstThreadValue) {
       threadMessageRef = doc(
         this.firestore,
         `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
       );
     }
-  
+
     // Hole die Nachricht aus Firestore
     const threadMessageDoc = await getDoc(threadMessageRef);
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
       return;
     }
-  
+
     const threadMessageData = threadMessageDoc.data();
     if (!threadMessageData['reactions']) {
       threadMessageData['reactions'] = {};
     }
-  
+
     // Überprüfen, ob der User schon auf die Nachricht reagiert hat
     const userReaction = threadMessageData['reactions'][userId];
     if (userReaction && userReaction.emoji === emoji) {
       // Reaktion umkehren (wenn der gleiche Emoji erneut geklickt wird, zähle die Reaktion zurück)
-      threadMessageData['reactions'][userId].counter = userReaction.counter === 0 ? 1 : 0;
+      threadMessageData['reactions'][userId].counter =
+        userReaction.counter === 0 ? 1 : 0;
     } else {
       // Reaktion neu setzen oder ersetzen
       threadMessageData['reactions'][userId] = {
@@ -358,28 +397,27 @@ export class DirectThreadComponent implements OnInit {
         counter: 1,
       };
     }
-  
+
     // Sicherstellen, dass für den Sender und Empfänger jeweils eine Reaktion existiert
     const senderId = threadMessageData['senderId'];
     const recipientId = threadMessageData['recipientId'];
-  
+
     // Wenn der Sender keine Reaktion hat, lege eine leere Reaktion an
     if (senderId && !threadMessageData['reactions'][senderId]) {
-      threadMessageData['reactions'][senderId] = { emoji: "", counter: 0 };
+      threadMessageData['reactions'][senderId] = { emoji: '', counter: 0 };
     }
-  
+
     // Wenn der Empfänger keine Reaktion hat, lege eine leere Reaktion an
     if (recipientId && !threadMessageData['reactions'][recipientId]) {
-      threadMessageData['reactions'][recipientId] = { emoji: "", counter: 0 };
+      threadMessageData['reactions'][recipientId] = { emoji: '', counter: 0 };
     }
- 
-    // Reaktionen in Firestore aktualisieren
+
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
-  }
-  
 
+    /*     this.scrollToMessage(currentMessageId); */
+  }
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -391,18 +429,29 @@ export class DirectThreadComponent implements OnInit {
     return false;
   }
 
-  
   getSenderReaction(reactions: any): any | null {
-    const reactionsArray = Array.isArray(reactions) ? reactions : Object.values(reactions || {});
+    const reactionsArray = Array.isArray(reactions)
+      ? reactions
+      : Object.values(reactions || {});
     console.log('Sender reactions (as Array):', reactionsArray);
-    return reactionsArray.find(reaction => reaction.senderId === this.currentUser.uid) || null;
-}
+    return (
+      reactionsArray.find(
+        (reaction) => reaction.senderId === this.currentUser.uid
+      ) || null
+    );
+  }
 
-getRecipientReaction(reactions: any): any | null {
-    const reactionsArray = Array.isArray(reactions) ? reactions : Object.values(reactions || {});
+  getRecipientReaction(reactions: any): any | null {
+    const reactionsArray = Array.isArray(reactions)
+      ? reactions
+      : Object.values(reactions || {});
     console.log('Recipient reactions (as Array):', reactionsArray);
-    return reactionsArray.find(reaction => reaction.recipientId === this.currentUser.uid) || null;
-}
+    return (
+      reactionsArray.find(
+        (reaction) => reaction.recipientId === this.currentUser.uid
+      ) || null
+    );
+  }
 
   areEmojisSame(reactions: any): boolean {
     const userIds = this.getUserIds(reactions);

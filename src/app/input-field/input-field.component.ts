@@ -197,7 +197,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
-    debugger;
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
       console.warn('t is not open or msg is empty');
       return;
@@ -211,8 +210,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.firestore,
         `messages/${this.currentThreadMessageId}/threadMessages`
       );
-      console.log('Firestore-Pfad:', `messages/${this.currentThreadMessageId}/threadMessages`);
-
       const messageData = {
         text: this.chatMessage,
         senderId: this.global.currentUserData.id,
@@ -225,11 +222,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
         recipientName: this.selectedUser.name,
         reactions: '',
       };
-      console.log('Versuche, die Nachricht zu senden...');
       const docRef = await addDoc(threadMessagesRef, messageData);
-      console.log('Nachricht erfolgreich gesendet:', docRef.id);
+      this.threadControlService.setLastMessageId(messageData);
       const newThreadMessageId = docRef.id;
-     // this.handleNewThreadMessage(newThreadMessageId);
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
