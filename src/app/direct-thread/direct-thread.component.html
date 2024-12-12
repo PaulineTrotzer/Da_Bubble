@@ -24,8 +24,14 @@
   <div class="overflow-container">
     <div #messageContainer class="all-thread-message-container">
 
-      <div *ngFor="let message of messagesData" [id]="message.id" class="message-bubble">
+      <div *ngFor="let message of messagesData; let i=index" [id]="message.id" class="message-bubble">
+        <div *ngIf="displayDayInfo(i)" class="new-day-info">
+          <div class="day-info">
+              <div class="line"></div>
+              <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+          </div>
 
+      </div>
         <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)" (mouseenter)="onMouseEnter(message)"
           (mouseleave)="onMouseLeave(message)">
