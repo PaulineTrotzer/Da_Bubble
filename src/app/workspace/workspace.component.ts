@@ -220,7 +220,6 @@ selectUser(user: any) {
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
       this.global.setCurrentChannel(channel);
-      console.log('es em Wilkommen@')
   }  
 
     

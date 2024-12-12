@@ -2,7 +2,7 @@ import { Component, Inject, inject, OnInit } from '@angular/core';
 import { Channel } from '../models/channel.class';
 import { Firestore } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
-import { collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { CommonModule } from '@angular/common';
 import {
   MAT_DIALOG_DATA,
@@ -34,6 +34,7 @@ export class DialogCreateChannelComponent implements OnInit {
   userData: any;
   selectedChannel: Channel = new Channel();
   global =inject(GlobalVariableService);
+  channelExists: boolean = false;
 
   onSubmit(form: any) {
     this.addChannel();
@@ -67,6 +68,15 @@ export class DialogCreateChannelComponent implements OnInit {
 
   async addChannel() {
     const channelsRef = collection(this.db, 'channels');
+  
+    const channelQuery = query(channelsRef, where('name', '==', this.channel.name));
+    const querySnapshot = await getDocs(channelQuery);
+  
+    if (!querySnapshot.empty) {
+      this.channelExists = true;
+      return;
+    }
+  
     const docRef = await addDoc(channelsRef, this.channel.toJSON());
     this.channel.id = docRef.id;
     await updateDoc(doc(channelsRef, docRef.id), {
