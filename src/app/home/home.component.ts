@@ -39,6 +39,8 @@ export class HomeComponent implements OnInit {
   onHeaderChannel:any
   directThreadId: string | null = null;
   channelThreadId: string | null = null;
+  isWorkspaceOpen: boolean = true;
+  isHovered: boolean = false;
 
   ngOnInit(): void {
     this.subscribeToLoginStatus();
@@ -103,6 +105,12 @@ export class HomeComponent implements OnInit {
     this.isThreadOpen = false;
   } 
 
-    
+  toggleWorkspace() {
+    this.isWorkspaceOpen = !this.isWorkspaceOpen
+  }
+
+  toggleHover() {
+    this.isHovered = !this.isHovered;
+  }
 
 }

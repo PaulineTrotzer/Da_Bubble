@@ -72,3 +72,43 @@ app-thread {
   box-shadow: 0px 2px 10px 0px #00000014;
   background-color: white;
 }
+
+.workspace-opener {
+  cursor: pointer;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: -122px;
+  z-index: 10;
+  top: 50%;
+  transform: rotate(-90deg);
+  width: 300px;
+  background-color: white;
+  padding: 12px;
+  gap: 10px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  box-shadow: 4px 4px 7px 0px #00000033;
+}
+
+.workspace-opener {
+  &:hover > p {
+    color: #444df2;
+  }
+}
+
+.workspace-closed {
+  width: 0;
+  overflow-x: hidden;
+  transition: all 175ms ease-in-out;
+}
+
+.workspace-open {
+  width: 366px;
+  transition: all 175ms ease-in-out;
+}
+
+.workspace-drawer {
+  transform: rotate(90deg);
+}
