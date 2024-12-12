@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { collection, getDocs, query, where } from '@firebase/firestore';
-import { Firestore, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, limit, onSnapshot, orderBy } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -18,35 +18,54 @@ export class ThreadControlService {
   currentThreadMessageIdSubject = new BehaviorSubject<string | null>(null);
   currentThreadMessageId$ = this.currentThreadMessageIdSubject.asObservable();
 
-  private lastMessageIdSubject = new BehaviorSubject<string | null>(null); // Anfangswert ist null
+  private lastMessageIdSubject = new BehaviorSubject<string | null>(null);
   lastMessageId$ = this.lastMessageIdSubject.asObservable();
 
   constructor() {}
 
-  async initializeLastMessageId(threadId: string): Promise<void> {
-    const threadMessagesRef = collection(this.firestore, `messages/${threadId}/threadMessages`);
+  async initializeLastMessageId(threadId: any): Promise<void> {
+    const threadMessagesRef = collection(
+      this.firestore,
+      `messages/${threadId}/threadMessages`
+    );
+    const querySnapshot = await getDocs(
+      query(threadMessagesRef, orderBy('timestamp', 'desc'), limit(1))
+    );
 
-    // Hole die Nachrichten und warte, bis die Promise aufgelöst ist
-    const querySnapshot = await getDocs(threadMessagesRef);
-
-    // Überprüfe, ob es Nachrichten gibt
     if (!querySnapshot.empty) {
-      const lastMessage = querySnapshot.docs[querySnapshot.size - 1]; // Nimm die letzte Nachricht
-      this.lastMessageIdSubject.next(lastMessage.id); // Setze die ID der letzten Nachricht
+      const lastMessage = querySnapshot.docs[0];
+      this.setLastMessageId(lastMessage.id);
     } else {
-      this.lastMessageIdSubject.next(null); // Setze null, wenn keine Nachrichten vorhanden sind
+      console.log(
+        'Kein letzter Nachrichteneintrag gefunden, Standardwert bleibt 0.'
+      );
     }
   }
 
+  setLastMessageId(id: string): void {
+    console.log('Setze lastMessageId:', id);
+    this.lastMessageIdSubject.next(id);
+  }
 
-  setLastMessageId(messageData: any): void {
-    this.lastMessageIdSubject.next(messageData.id);
+  async updateLastMessageId(threadId: string): Promise<void> {
+    const threadMessagesRef = collection(
+      this.firestore,
+      `messages/${threadId}/threadMessages`
+    );
+    const latestMessage = await getDocs(
+      query(threadMessagesRef, orderBy('timestamp', 'desc'), limit(1))
+    );
+    if (!latestMessage.empty) {
+      const messageId = latestMessage.docs[0].id;
+      this.setLastMessageId(messageId);
+    } else {
+      console.log('Kein letzter Nachrichteneintrag gefunden.');
+    }
   }
 
   getLastMessageId(): Observable<string | null> {
     return this.lastMessageId$;
   }
-
 
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);

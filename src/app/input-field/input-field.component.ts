@@ -85,7 +85,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId && this.selectedUser?.id) {
-      console.log('user.id ist da ');
     }
     this.getByUserName();
     this.subscription.add(
@@ -198,13 +197,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   async sendDirectThreadMessage() {
     if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
-      console.warn('t is not open or msg is empty');
+      console.warn('Thread is not open or message is empty');
       return;
     }
     if (!this.currentThreadMessageId) {
-      console.error(' keine aktuelle msg ausgewählt.');
+      console.error('No current message selected.');
       return;
     }
+  
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -223,14 +223,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
         reactions: '',
       };
       const docRef = await addDoc(threadMessagesRef, messageData);
-      this.threadControlService.setLastMessageId(messageData);
-      const newThreadMessageId = docRef.id;
+      this.threadControlService.setLastMessageId(docRef.id);
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
-      console.error('Fehler beim Senden der Nachricht:', error);
+      console.error('Error sending message:', error);
     }
   }
+  
 
   resetInputdata() {
     this.chatMessage = '';

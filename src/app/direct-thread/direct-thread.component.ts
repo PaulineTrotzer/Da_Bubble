@@ -81,56 +81,49 @@ export class DirectThreadComponent implements OnInit {
   showReactionPopUpBoth: { [key: string]: boolean } = {};
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
-  lastMessageId: string | null = null;
+  lastMessageId: string | null = '0';
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeUser();
     this.subscribeToThreadMessages();
-    this.scrollToBottom();
-    this.initializeFirstThreadMsg();
+    this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
-    /*     this.initializeLastmessage(); */
   }
 
-  initializeLastmessage(): void {
-    // Initialisiere die lastMessageId, wenn der Thread geöffnet wird
-    const threadId = this.route.snapshot.paramMap.get('threadId'); // Hole die Thread-ID, wenn vorhanden
-    if (threadId) {
-      this.threadControlService.initializeLastMessageId(threadId);
-    }
 
-    // Abonniere den letzten Nachrichtenwert
-    this.threadControlService.getLastMessageId().subscribe((lastMessageId) => {
-      this.lastMessageId = lastMessageId;
-      console.log('After init', this.lastMessageId); // Überprüfe den Wert nach der Initialisierung
-      this.scrollToLastMessage(); // Scrollen, wenn lastMessageId gesetzt ist
+  checkLastMessageForScroll(){
+    this.threadControlService.lastMessageId$.subscribe((id) => {
+      if (id && id !== '0') {
+        this.scrollToLastMessage(id);
+      } else {
+      }
     });
-  }
-
-  scrollToLastMessage() {
-    if (this.lastMessageId) {
-      this.scrollToMessage(this.lastMessageId);
-    } else {
-      console.warn('Keine Nachrichten vorhanden, zum Ende scrollen.');
-      this.scrollToBottom();
+    if (this.lastMessageId === '0') {
+      this.initializeLastMessageId();
     }
   }
 
-  initializeFirstThreadMsg() {
-    this.threadControlService.firstThreadMessageId$
-      .pipe(first())
-      .subscribe((id) => {
-        this.firstThreadValue = id;
-        if (!this.lastMessageId) {
-          this.lastMessageId = this.firstThreadValue;
-          console.log(
-            'Setze lastMessageId auf firstThreadValue:',
-            this.lastMessageId
-          );
-        }
-      });
+
+  async initializeLastMessageId(): Promise<void> {
+    try {
+      await this.threadControlService.initializeLastMessageId(this.global.currentThreadMessageSubject.value);
+    } catch (error) {
+      console.error('fehler beim Initialisieren der lastMessageId:', error);
+    }
   }
+
+  
+  scrollToLastMessage(messageId: string): void {
+    const interval = setInterval(() => {
+      const element = document.getElementById(messageId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        clearInterval(interval);
+      }
+    }, 100); 
+  }
+  
 
   hasCurrentMessage(message: any) {
     return message.senderId === this.currentUserId;
@@ -207,29 +200,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-  ngAfterViewChecked(): void {
-    if (this.shouldScrollToBottom) {
-      this.scrollToBottom();
-      this.shouldScrollToBottom = false;
-    }
-  }
-
-  scrollToMessage(messageId: string) {
-    const messageElement = document.getElementById(messageId);
-    if (messageElement) {
-      messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      console.error(`Nachricht mit ID ${messageId} nicht gefunden.`);
-    }
-  }
-
-  scrollToBottom() {
-    if (this.messageContainer) {
-      const element = this.messageContainer.nativeElement;
-      element.scrollTop = element.scrollHeight;
-    }
-  }
-
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
   }
@@ -283,25 +253,33 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-  settingDataforFireBase(threadMessagesRef: any) {
-    const messageData = {
-      senderId: this.global.currentUserData.id,
-      senderName: this.global.currentUserData.name,
-      senderPicture: this.global.currentUserData.picture || '',
-      timestamp: new Date(),
-      selectedFiles: this.selectFiles || [],
-      editedTextShow: false,
-      recipientId: this.selectedUser.uid,
-      recipientName: this.selectedUser.name,
-      recipientStickerCount: 0,
-      recipientSticker: '',
-      text: this.currentThreadMessage.text || '',
-      firstMessageCreated: true,
-      reactions: '',
-    };
-    setTimeout(async () => {
-      await addDoc(threadMessagesRef, messageData);
-    }, 150);
+  async settingDataforFireBase(threadMessagesRef: any) {
+    try {
+      const messageData = {
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        selectedFiles: this.selectFiles || [],
+        editedTextShow: false,
+        recipientId: this.selectedUser.uid,
+        recipientName: this.selectedUser.name,
+        recipientStickerCount: 0,
+        recipientSticker: '',
+        text: this.currentThreadMessage?.text || '',
+        firstMessageCreated: true,
+        reactions: '',
+      };
+  
+      // Nachricht zu Firestore hinzufügen
+      const docRef = await addDoc(threadMessagesRef, messageData);
+      console.log('Erstellte Nachricht-ID:', docRef.id);
+  
+      // ID als `lastMessageId` setzen
+      this.threadControlService.setLastMessageId(docRef.id);
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Nachricht:', error);
+    }
   }
 
   async getThreadMessages(messageId: any) {
