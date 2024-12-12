@@ -112,9 +112,9 @@
 }
 
 .both-reaction-right-emojis-holder {
-  position: absolute;
+/*   position: absolute;
   right: 98px;
-  margin-top: -40px;
+  margin-top: -40px; */
 }
 
 .emojis-holder-both-two-single {
@@ -221,6 +221,15 @@ h3 {
   padding: 16px;
 }
 
+.emoji-flex-right{
+  display: flex;
+  align-items: baseline;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  position: relative;
+  bottom: 45px;
+}
+
 .reaction-name-info-ct-sender {
   display: flex;
   position: absolute;
@@ -240,7 +249,7 @@ h3 {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 0px;
-  bottom: 77px;
+  bottom: 40px;
   right: -28px;
 }
 

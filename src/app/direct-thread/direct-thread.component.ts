@@ -123,7 +123,7 @@ export class DirectThreadComponent implements OnInit {
       }
     }, 100); 
   }
-  
+
 
   hasCurrentMessage(message: any) {
     return message.senderId === this.currentUserId;
@@ -204,25 +204,38 @@ export class DirectThreadComponent implements OnInit {
     this.isDirectThreadOpen = status;
   }
 
-  getFormattedTimestamp(): Date | null {
+  getFormattedTimestamp(): string | null {
     if (!this.currentThreadMessage?.timestamp) {
       return null;
     }
+  
     const timestamp = this.currentThreadMessage.timestamp;
+    let date: Date;
+  
+    // Überprüfe, ob der Timestamp ein Date-Objekt ist
     if (timestamp instanceof Date) {
-      return timestamp;
+      date = timestamp;
     }
-    if (
-      typeof timestamp === 'object' &&
-      'seconds' in timestamp &&
-      'nanoseconds' in timestamp
-    ) {
-      return new Date(
+    // Überprüfe, ob der Timestamp ein Firestore-Timestamp ist
+    else if (typeof timestamp === 'object' && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
+      date = new Date(
         timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000
       );
+    } else {
+      return null;
     }
-    return null;
+  
+    return this.formatTime(date);
   }
+  
+  private formatTime(date: Date): string {
+    // Extrahiere Stunden und Minuten
+    const hours = date.getHours().toString().padStart(2, '0'); // Zwei Ziffern für Stunden
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // Zwei Ziffern für Minuten
+    return `${hours}:${minutes}`;
+  }
+  
+
 
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
     try {
@@ -270,15 +283,11 @@ export class DirectThreadComponent implements OnInit {
         firstMessageCreated: true,
         reactions: '',
       };
-  
-      // Nachricht zu Firestore hinzufügen
       const docRef = await addDoc(threadMessagesRef, messageData);
-      console.log('Erstellte Nachricht-ID:', docRef.id);
-  
-      // ID als `lastMessageId` setzen
+      console.log('erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
     } catch (error) {
-      console.error('Fehler beim Hinzufügen der Nachricht:', error);
+      console.error('fehler beim hinzufügen der nachricht:', error);
     }
   }
 
@@ -325,14 +334,11 @@ export class DirectThreadComponent implements OnInit {
 
   async addEmoji(event: any, currentMessageId: string, userId: string) {
     const emoji = event.emoji.native;
-
-    // Referenz zur Nachricht
     let threadMessageRef = doc(
       this.firestore,
       `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
 
-    // Falls die erste Thread-Nachricht noch nicht gesetzt ist, hole sie von der entsprechenden Quelle
     if (!this.firstThreadValue) {
       const firstInitialisedThreadMsg = await firstValueFrom(
         this.threadControlService.firstThreadMessageId$
@@ -350,7 +356,6 @@ export class DirectThreadComponent implements OnInit {
       );
     }
 
-    // Hole die Nachricht aus Firestore
     const threadMessageDoc = await getDoc(threadMessageRef);
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
@@ -376,25 +381,9 @@ export class DirectThreadComponent implements OnInit {
       };
     }
 
-    // Sicherstellen, dass für den Sender und Empfänger jeweils eine Reaktion existiert
-    const senderId = threadMessageData['senderId'];
-    const recipientId = threadMessageData['recipientId'];
-
-    // Wenn der Sender keine Reaktion hat, lege eine leere Reaktion an
-    if (senderId && !threadMessageData['reactions'][senderId]) {
-      threadMessageData['reactions'][senderId] = { emoji: '', counter: 0 };
-    }
-
-    // Wenn der Empfänger keine Reaktion hat, lege eine leere Reaktion an
-    if (recipientId && !threadMessageData['reactions'][recipientId]) {
-      threadMessageData['reactions'][recipientId] = { emoji: '', counter: 0 };
-    }
-
     await updateDoc(threadMessageRef, {
       reactions: threadMessageData['reactions'],
     });
-
-    /*     this.scrollToMessage(currentMessageId); */
   }
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {

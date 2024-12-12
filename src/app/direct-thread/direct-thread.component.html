@@ -171,7 +171,9 @@
         <div [ngClass]="{
           'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name,
         }">
-          <ng-container *ngIf="areEmojisSame(message.reactions)">
+          <div [ngClass]="{
+            'emoji-flex-right':message.senderName === currentUser.name
+          }" *ngIf="areEmojisSame(message.reactions)">
             <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(message.id,true)"
               (mouseout)="toggleBothReactionInfo(message.id,false)"
               [class.emojis-holder-both-two-single]="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]) && message.reactions.counter > 0"
@@ -200,7 +202,7 @@
                 <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
                 reagiert</span>
             </div>
-          </ng-container>
+          </div>
 
         </div>
 
