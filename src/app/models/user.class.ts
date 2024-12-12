@@ -5,7 +5,7 @@ export class User {
     password: string;
     picture?: string;
     status: string;
-    lastEmojis: string[]; // Add lastEmojis property
+    lastEmojis: string[];
   
     constructor(obj?: any, uid?: string) {
       this.uid = uid || obj?.uid || '';

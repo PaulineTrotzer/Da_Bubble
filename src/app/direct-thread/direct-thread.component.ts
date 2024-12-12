@@ -91,8 +91,7 @@ export class DirectThreadComponent implements OnInit {
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
 
-
-  checkLastMessageForScroll(){
+  checkLastMessageForScroll() {
     this.threadControlService.lastMessageId$.subscribe((id) => {
       if (id && id !== '0') {
         this.scrollToLastMessage(id);
@@ -144,16 +143,16 @@ export class DirectThreadComponent implements OnInit {
     return `${day}.${month}.${year}`;
   }
 
-
   async initializeLastMessageId(): Promise<void> {
     try {
-      await this.threadControlService.initializeLastMessageId(this.global.currentThreadMessageSubject.value);
+      await this.threadControlService.initializeLastMessageId(
+        this.global.currentThreadMessageSubject.value
+      );
     } catch (error) {
       console.error('fehler beim Initialisieren der lastMessageId:', error);
     }
   }
 
-  
   scrollToLastMessage(messageId: string): void {
     const interval = setInterval(() => {
       const element = document.getElementById(messageId);
@@ -161,9 +160,8 @@ export class DirectThreadComponent implements OnInit {
         element.scrollIntoView({ behavior: 'smooth' });
         clearInterval(interval);
       }
-    }, 100); 
+    }, 100);
   }
-
 
   hasCurrentMessage(message: any) {
     return message.senderId === this.currentUserId;
@@ -244,38 +242,11 @@ export class DirectThreadComponent implements OnInit {
     this.isDirectThreadOpen = status;
   }
 
-  getFormattedTimestamp(): string | null {
-    if (!this.currentThreadMessage?.timestamp) {
-      return null;
-    }
-  
-    const timestamp = this.currentThreadMessage.timestamp;
-    let date: Date;
-  
-    // Überprüfe, ob der Timestamp ein Date-Objekt ist
-    if (timestamp instanceof Date) {
-      date = timestamp;
-    }
-    // Überprüfe, ob der Timestamp ein Firestore-Timestamp ist
-    else if (typeof timestamp === 'object' && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
-      date = new Date(
-        timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000
-      );
-    } else {
-      return null;
-    }
-  
-    return this.formatTime(date);
-  }
-  
-  private formatTime(date: Date): string {
-    // Extrahiere Stunden und Minuten
+  formatTime(date: Date): string {
     const hours = date.getHours().toString().padStart(2, '0'); // Zwei Ziffern für Stunden
     const minutes = date.getMinutes().toString().padStart(2, '0'); // Zwei Ziffern für Minuten
     return `${hours}:${minutes}`;
   }
-  
-
 
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
     try {

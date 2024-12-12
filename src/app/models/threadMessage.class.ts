@@ -5,7 +5,7 @@ export class currentThreadMessage {
   recipientName?: string;
   text?: string;
   senderPicture?: string;
-  timestamp?: Date | { seconds: number; nanoseconds: number };
+  timestamp?: Date;
   senderId?: string;
   isHovered?: boolean;
 }
