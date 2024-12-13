@@ -432,6 +432,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   addEmoji(event: any) {
     const emoji = event.emoji.native;
     this.chatMessage += emoji;
+    this.formattedMessage+=emoji
     this.isEmojiPickerVisible = false;
   }
 
