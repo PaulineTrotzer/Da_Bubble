@@ -98,6 +98,7 @@ export class DirectThreadComponent implements OnInit {
   scrollHeightInput: any;
   editWasClicked = false;
   showEditOption: { [messageId: string]: boolean } = {};
+  hoveredReactionIcon: boolean = false;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -411,6 +412,9 @@ export class DirectThreadComponent implements OnInit {
 
   onHover(iconKey: string, newSrc: string): void {
     this.icons[iconKey] = newSrc;
+    if (iconKey === 'iconAddReaction') {
+      this.hoveredReactionIcon = true;
+    }
   }
 
   openEmojiPicker() {
@@ -423,51 +427,61 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-  async addEmoji(event: any, currentMessageId: string, userId: string) {
-    const emoji = event.emoji.native;
-    let threadMessageRef = doc(
-      this.firestore,
-      `messages/${currentMessageId}/threadMessages/${currentMessageId}`
+async getThreadMessageRef(currentMessageId: string): Promise<any> {
+  let threadMessageRef = doc(
+    this.firestore,
+    `messages/${currentMessageId}/threadMessages/${currentMessageId}`
+  );
+  if (!this.firstThreadValue) {
+    const firstInitialisedThreadMsg = await firstValueFrom(
+      this.threadControlService.firstThreadMessageId$
     );
-    if (!this.firstThreadValue) {
-      const firstInitialisedThreadMsg = await firstValueFrom(
-        this.threadControlService.firstThreadMessageId$
-      );
-      threadMessageRef = doc(
-        this.firestore,
-        `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
-      );
-    }
-    if (this.firstThreadValue) {
-      threadMessageRef = doc(
-        this.firestore,
-        `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
-      );
-    }
-    const threadMessageDoc = await getDoc(threadMessageRef);
-    if (!threadMessageDoc.exists()) {
-      console.error('Thread message nicht gefunden.');
-      return;
-    }
-    const threadMessageData = threadMessageDoc.data();
-    if (!threadMessageData['reactions']) {
-      threadMessageData['reactions'] = {};
-    }
-    const userReaction = threadMessageData['reactions'][userId];
-    if (userReaction && userReaction.emoji === emoji) {
-      threadMessageData['reactions'][userId].counter =
-        userReaction.counter === 0 ? 1 : 0;
-    } else {
-      threadMessageData['reactions'][userId] = {
-        emoji: emoji,
-        counter: 1,
-      };
-    }
-
-    await updateDoc(threadMessageRef, {
-      reactions: threadMessageData['reactions'],
-    });
+    threadMessageRef = doc(
+      this.firestore,
+      `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
+    );
   }
+  if (this.firstThreadValue) {
+    threadMessageRef = doc(
+      this.firestore,
+      `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
+    );
+  }
+  return threadMessageRef;
+}
+
+async getThreadMessageDoc(threadMessageRef: any): Promise<any> {
+  const threadMessageDoc = await getDoc(threadMessageRef);
+  if (!threadMessageDoc.exists()) {
+    console.error('thread message nicht gefunden.');
+    return null;
+  }
+  return threadMessageDoc.data();
+}
+
+async addEmoji(event: any, currentMessageId: string, userId: string) {
+  const emoji = event.emoji.native;
+  const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+  const threadMessageData = await this.getThreadMessageDoc(threadMessageRef);
+  if (!threadMessageData) return;
+  if (!threadMessageData['reactions']) {
+    threadMessageData['reactions'] = {};
+  }
+  const userReaction = threadMessageData['reactions'][userId];
+  if (userReaction && userReaction.emoji === emoji) {
+    threadMessageData['reactions'][userId].counter =
+      userReaction.counter === 0 ? 1 : 0;
+  } else {
+    threadMessageData['reactions'][userId] = {
+      emoji: emoji,
+      counter: 1,
+    };
+  }
+  await updateDoc(threadMessageRef, {
+    reactions: threadMessageData['reactions'],
+  });
+}
+
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -483,7 +497,6 @@ export class DirectThreadComponent implements OnInit {
     const reactionsArray = Array.isArray(reactions)
       ? reactions
       : Object.values(reactions || {});
-    console.log('Sender reactions (as Array):', reactionsArray);
     return (
       reactionsArray.find(
         (reaction) => reaction.senderId === this.currentUser.uid
@@ -495,7 +508,6 @@ export class DirectThreadComponent implements OnInit {
     const reactionsArray = Array.isArray(reactions)
       ? reactions
       : Object.values(reactions || {});
-    console.log('Recipient reactions (as Array):', reactionsArray);
     return (
       reactionsArray.find(
         (reaction) => reaction.recipientId === this.currentUser.uid
@@ -586,7 +598,7 @@ export class DirectThreadComponent implements OnInit {
         });
       }
     } catch (error) {
-      console.error('Fehler beim Aktualisieren der Reaktionen:', error);
+      console.error('fehler beim Aktualisieren der Reaktionen:', error);
     }
   }
 
@@ -596,6 +608,17 @@ export class DirectThreadComponent implements OnInit {
 
   onMouseLeave(message: any) {
     message.isHovered = false;
+  }
+
+  onMouseIcon(iconKey: string, newSrc: string): void {
+    this.icons[iconKey] = newSrc;
+    if (iconKey === 'iconAddReaction') {
+      this.hoveredReactionIcon = true;
+    }
+  }
+
+  onLeaveIcon(){
+    this.hoveredReactionIcon = false;
   }
 
   onClose() {
