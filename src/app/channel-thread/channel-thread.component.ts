@@ -17,6 +17,7 @@ import { InputFieldComponent } from '../input-field/input-field.component';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { OverlayStatusService } from '../services/overlay-status.service';
 
 interface Message {
   id: string;
@@ -44,6 +45,7 @@ export class ChannelThreadComponent implements OnInit {
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
+  overlay = inject(OverlayStatusService)
 
   topicMessage: Message | null = null;
   messages: Message[] = [];
@@ -196,6 +198,11 @@ export class ChannelThreadComponent implements OnInit {
 
   togglePicker(messageId: string) {
     this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+    this.overlay.setOverlayStatus(true)
+  }
+
+  closePicker() {
+    this.overlay.setOverlayStatus(false)
   }
 
   async removeReaction(emoji: string, messageId: string) {
@@ -323,6 +330,7 @@ export class ChannelThreadComponent implements OnInit {
       updateDoc(messageDocRef, { reactions });
     });
     this.isPickerVisible = null;
+    this.closePicker();
    }
    
    onReactionHover(message: Message, emoji: string) {
