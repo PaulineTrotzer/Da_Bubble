@@ -84,6 +84,10 @@ form {
     justify-content: flex-end;
 }
 
+.warn-message {
+  color: red;
+}
+
 @media (min-width: 768px){
   .card {
     padding: 40px;

@@ -1,7 +1,10 @@
-<div [ngClass]="{'page-content-plus-header': successfullyLogged}">
+<div [ngClass]="{'page-content-plus-header': successfullyLogged}">  
     <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"  (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
     <div class="full-page-content">
-        <app-workspace (userSelected)="onUserSelected($event)"
+        <app-workspace [ngClass]="{
+            'workspace-open': isWorkspaceOpen,
+            'workspace-closed': !isWorkspaceOpen
+        }" (userSelected)="onUserSelected($event)"
             (channelSelected)="onChannelSelected($event)"></app-workspace>
         <app-start-screen  [onHeaderChannel]="onHeaderChannel"  [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
@@ -28,6 +31,14 @@
         </span>
     </mat-card-content>
 </mat-card>
+<div class="workspace-opener" (click)="toggleWorkspace()" (mouseenter)="toggleHover()" (mouseleave)="toggleHover()">
+    <p *ngIf="isWorkspaceOpen">Workspace-Menü schließen</p>
+    <img class="workspace-drawer" *ngIf="isWorkspaceOpen && !isHovered" src="../../assets/img/hide-workspace-black.png" alt="">
+    <img class="workspace-drawer" *ngIf="isWorkspaceOpen && isHovered" src="../../assets/img/hide-workspace-hover.png" alt="">
+    <p *ngIf="!isWorkspaceOpen">Workspace-Menü öffnen</p>
+    <img class="workspace-drawer" *ngIf="!isWorkspaceOpen && !isHovered" src="../../assets/img/show-workspace-black.png" alt="">
+    <img class="workspace-drawer" *ngIf="!isWorkspaceOpen && isHovered" src="../../assets/img/show-workspace-hover.png" alt="">
+</div>
 
 
 
