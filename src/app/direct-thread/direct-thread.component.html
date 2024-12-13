@@ -52,8 +52,9 @@
               <div class="show-set">
                 <div class="img-flex-bar-options">
                   <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
-                  (mouseenter)="onMouseIcon('iconAddReaction', 'assets/img/add_reaction.png')"
-                  (mouseleave)="onLeaveIcon()">
+                  (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
+                  (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default"
+                  (mouseenter)="toggleEditOption(message.id, false)">
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
                       <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
