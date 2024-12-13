@@ -106,6 +106,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       await this.processSendMessage();
+          this.formattedMessage='';
     }
 
 
@@ -120,6 +121,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
+    this.formattedMessage='';
     this.processSendMessage();
     
   }
@@ -240,6 +242,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   resetInputdata() {
     this.chatMessage = '';
     this.selectFiles = [];
+ 
   }
 
   async setMessageCount() {
@@ -352,31 +355,43 @@ export class InputFieldComponent implements OnInit, OnChanges {
       editedTextShow: false,
     };
   }
+   
+  formattedMessage:string='';
 
   handleMentionUser(mention: string) {
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
-      this.chatMessage += `${mentionTag} `;
-      // this.formatMentions();
+      this.chatMessage += `${mentionTag}  `;
+      this.updateFormattedMessage() 
     }
-  }
+  } 
+ 
 
-  formatMentions() {
-    //   const regex = /@\w+(?:\s\w+)?/g;
-    //   this.formattedChatMessage = this.chatMessage.replace(regex, (match) => {
-    //     const mentionName = match.substring(1).trim();
-    //     if (this.mentionUserName.some((name) => name.toLowerCase() === mentionName.toLowerCase())) {
-    //       return `<span class="mention">${match}</span>`;
-    //     }
-    //     return `<span class="normal-text">${match}</span>`;
-    //   });
+  updateFormattedMessage() {
+    const regex = /@\w+(?:\s\w+)?/g;
+    this.formattedMessage = this.chatMessage.replace(
+      regex,
+      (match) => `<span class="mention">${match}</span>`
+    );
   }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    textarea.scrollTop = textarea.scrollHeight;
-    this.selectedUser?.id;
+    textarea.style.height = 'auto'; 
+    textarea.style.height = `${textarea.scrollHeight}px`; 
+    const container = document.querySelector('.main-input-area') as HTMLElement;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    } 
+    const containerh = document.querySelector('.highlight') as HTMLElement;
+    if (containerh) {
+      containerh.scrollTop = containerh.scrollHeight;
+    }
+    this.updateFormattedMessage();
   }
+ 
+
+
 
   getByUserName() {
     const docRef = collection(this.firestore, 'users');

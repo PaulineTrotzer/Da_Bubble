@@ -11,12 +11,12 @@
         <img  [src]="chossePicture || user.picture || previewUrl">
     </div>
 
-     <div *ngIf="!guestAccount && !global.googleAccountLogIn" class="avatar-box">
+     <div *ngIf="!guestAccount " class="avatar-box">
     <div  *ngFor="let avatar of avatarBox">
       <img [src]="avatar"   (click)="selectAvatar(avatar)">   
     </div>        
     </div>
-    <div *ngIf="!guestAccount && !global.googleAccountLogIn"   class="added-avatar">
+    <div *ngIf="!guestAccount "   class="added-avatar">
         <div class="picture-info-text">oder Bild</div>
         <div>
             <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
@@ -40,15 +40,14 @@
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
 
-        <input *ngIf="!guestAccount && !global.googleAccountLogIn" class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
+        <input *ngIf="!guestAccount && !global.googleAccountLogIn " class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
 
-        <input *ngIf="guestAccount || global.googleAccountLogIn" class="user-mail-input" [value]="user.email" readonly />
-        <span *ngIf="guestAccount" class="error-msg">Kein Zugriff als Gast</span>
+        <input *ngIf="guestAccount || userData?.blockInputField===true" class="user-mail-input" [value]="user.email" readonly />
+        <span *ngIf="guestAccount || userData?.blockInputField===true " class="error-msg">Kein Zugriff als Gast</span>
     </div>
 
     <div class="button-flex">
         <button (click)="closeEditModus()" class="btn-secondary">Abbrechen</button>
         <button (click)="saveUser()" class="btn-primary">Speichern</button>
     </div>
-
 </div>

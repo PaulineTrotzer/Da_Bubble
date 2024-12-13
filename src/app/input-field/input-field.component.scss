@@ -7,26 +7,23 @@
 
 .chat-input {
   flex: 1;
-  border: 1px solid #adb0d9;
-  border-radius: 20px;
-  // height: 150px;
-  // padding: 20px 8px 8px 18px;
-
-  padding: 20px 20px 40px 18px;
-  position: relative;
-  resize: none;
-  font-size: 18px !important;
-  font-family: 'Nunito';
-  background: none;
-  color: black;
-  caret-color: black;
-  width: 100%;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  overflow: visible;
-  scrollbar-width: none;
-  max-height: 150px;
-  
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    padding: 20px 20px 40px 18px;
+    position: relative;
+    resize: none;
+    font-size: 18px !important;
+    font-family: "Nunito";
+    background: none;
+    color: transparent;
+    caret-color: black;
+    width: 100%;
+    white-space: pre-wrap;
+    overflow: visible;
+    scrollbar-width: none;
+    max-height: 250px;
+    word-wrap: break-word;
+ 
 
   &:focus {
     border-color: #444df2;
@@ -42,7 +39,7 @@
 }
  
 .chat-input::selection {
-  color: none;
+  color: #FFFFFF;
   background: #444df2; 
 }
 
@@ -137,25 +134,26 @@
 .main-input-area {
   position: relative;
   width: 100%;
+  display: flex;
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: #FFFFFF;
+  scrollbar-width: thin;
 }
-
-
-.formatted-preview {
+  
+.highlight{
   position: absolute;
   top: 0;
   left: 0;
-  font-size: 18px;
-  // padding: 20px 8px 8px 18px;
-  padding: 20px 20px 40px 18px;
-  color: black;
-  white-space: pre-wrap;
-  z-index: 1;
-  word-wrap: break-word;
-  pointer-events: none;
   width: 100%;
-  max-height: 150px;
-  overflow: auto;
-  scrollbar-width: none;
+  height: 100%;
+  pointer-events: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: black;
+  padding: 20px 20px 40px 18px;
+  font-size: 18px !important;
+  // overflow-y: auto;
 }
 
 
