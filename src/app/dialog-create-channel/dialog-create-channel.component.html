@@ -45,6 +45,7 @@
         name="channel-name"
         [(ngModel)]="channel.name"
         #channelName="ngModel"
+        (input)="channelExists = false"
         required
         placeholder="z.B. Kooperationsprojekte">
     </div>
@@ -71,5 +72,6 @@
         }"
         >Erstellen</button>
     </div>
+    <p class="warn-message" *ngIf="channelExists">Channel mit diesem Name existiert bereits!</p>
   </form>
 </div>
