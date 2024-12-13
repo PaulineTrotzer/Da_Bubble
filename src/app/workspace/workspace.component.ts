@@ -174,13 +174,15 @@ selectUser(user: any) {
 
   async getUserById(userId: string) {
     const userDocref = doc(this.firestore, 'users', userId);
-    const userDoc = await getDoc(userDocref);
-    if (userDoc.exists()) {
-      this.global.currentUserData = {
-        id: userDoc.id,
-        ...userDoc.data(),
-      };
-    }
+    onSnapshot(userDocref,(docSnapshot)=>{
+      if (docSnapshot.exists()) {
+        const data=docSnapshot.data();
+        const id = docSnapshot.id
+        this.global.currentUserData ={id:id,...data};
+      }else{
+        this.global.currentUserData={};
+      }
+    })
   }
     
     messageCountsArr:any={};
@@ -188,7 +190,7 @@ selectUser(user: any) {
    getUserMessageCount(userId:string){
     const userDocRef=doc(this.firestore,'messageCounts',userId)
      onSnapshot(userDocRef,(snapshot)=>{
-       if(snapshot.exists()  ){ 
+       if(snapshot.exists()){ 
           // const data=snapshot.data()
           this.messageCountsArr={...snapshot.data()}
           console.log(this.messageCountsArr)

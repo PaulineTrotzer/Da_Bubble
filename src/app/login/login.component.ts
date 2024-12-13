@@ -4,6 +4,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
+import { GoogleAuthProvider, signInWithPopup, } from 'firebase/auth';
 import {
   Firestore,
   getDocs,
@@ -11,6 +12,8 @@ import {
   query,
   where,
   doc,
+  setDoc,
+  getDoc
 } from '@angular/fire/firestore';
 import { signInWithEmailAndPassword } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
@@ -20,8 +23,8 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { GlobalService } from '../global.service';
-
+// import { GlobalService } from '../global.service';
+import { GlobalVariableService } from '../services/global-variable.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -52,11 +55,11 @@ export class LoginComponent implements OnInit {
   loginSuccessful = false;
   loginAuthService = inject(LoginAuthService);
   overlayStatusService = inject(OverlayStatusService);
-  global=inject(GlobalService);
+  global = inject(GlobalVariableService);
+  googleUserUid: any = ''
+  constructor() { }
 
-  constructor() {}
-
-  ngOnInit() {}
+  ngOnInit() { }
 
   async onSubmit(ngForm: NgForm) {
     if (ngForm.submitted && ngForm.form.valid) {
@@ -124,8 +127,81 @@ export class LoginComponent implements OnInit {
   guestLogin() {
     this.auth.SignGuestIn();
   }
-
+   
   async googleLogIn() {
     this.auth.googleLogIn();
   }
+    
+  // async googleLogIn() {
+  //   await this.googleAccountDaten();
+  //   this.router.navigate(['/welcome', this.googleUserUid]);
+  // }
+  
+
+  // async googleAccountDaten(): Promise<void> {
+  //   const provider = new GoogleAuthProvider();
+  //   const auth = getAuth();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     if (user) {
+  //       const userRef = doc(this.firestore, 'users', user.uid);
+  //       const userDoc = await getDoc(userRef);
+  //       if (userDoc.exists()) {
+  //         await this.checkExsistingGoogleData(user)
+  //       } else {
+  //         await this.checkSetNewGoogleAccount(user)
+  //       }
+  //       this.googleUserUid = user.uid;
+  //       // this.global.googleAccountLogIn=true;
+  //     }
+  //   } catch (error:any) { 
+  //     console.error('Fehler bei der Google-Anmeldung:', error);
+  //   }
+  // }
+
+
+
+
+  // async checkExsistingGoogleData(user: any) {
+  //   const userRef = doc(this.firestore, 'users', user.uid);
+  //   const userDoc = await getDoc(userRef);
+  //   const existingData: any = userDoc.data();
+  //   await setDoc(
+  //     userRef,
+  //     {
+  //       uid: user.uid,
+  //       name: existingData['name'] || user.displayName || 'Unbekannter Nutzer',
+  //       email: existingData['email'] || user.email,
+  //       picture: existingData['picture'] || user.photoURL || null,
+  //       blockInputField:existingData['blockInputField']
+  //     },
+  //     { merge: true }
+  //   );
+  // }
+
+  // async checkSetNewGoogleAccount(user: any) {
+  //   const userRef = doc(this.firestore, 'users', user.uid);
+  //   await setDoc(
+  //     userRef,
+  //     {
+  //       uid: user.uid,
+  //       name: user.displayName || 'Unbekannter Nutzer',
+  //       email: user.email,
+  //       picture: user.photoURL || null,
+  //       blockInputField:true  
+  //     },
+  //     { merge: true }
+  //   );
+  // }
+
+
+
+
 }
+
+
+
+
+
+

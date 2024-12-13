@@ -4,7 +4,7 @@ import { User } from '../models/user.class';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { Firestore } from '@angular/fire/firestore';
-import { updateDoc, doc } from '@angular/fire/firestore';
+import { updateDoc, doc,onSnapshot } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -13,6 +13,7 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
+ 
 } from '@angular/fire/storage';
 import { LoginAuthService } from '../services/login-auth.service';
 
@@ -58,13 +59,34 @@ export class DialogEditUserComponent implements OnInit {
       this.userID = paramMap.get('id');
       if (this.userID) {
         const userResult = await this.userservice.getUser(this.userID);
+        this.getUserById(this.userID)
         if (userResult) {
           this.user = userResult;
         }
       }
     }); 
   }
-  
+    
+  userData:any={}
+
+  async getUserById(userId: string) {
+    const userDocref = doc(this.firestore, 'users', userId);
+    onSnapshot(userDocref,(docSnapshot)=>{
+      if (docSnapshot.exists()) {
+        const data=docSnapshot.data();
+        const id = docSnapshot.id
+        if (data['blockInputField'] === true) {
+          this.global.googleAccountLogIn=true;
+          this.userData={id:id,...data} 
+        }
+      }else{
+        this.userData={};
+        this.global.googleAccountLogIn=false;
+      }
+    })
+  }
+
+
 
   closeEditModus(){
     this.editCardOpen = false;
@@ -95,12 +117,10 @@ export class DialogEditUserComponent implements OnInit {
     }
   }
 
-
   async saveUser() {
     const edititingAvatar=await this.editAvatar()
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
-
       await updateDoc(userRef, {
         name: this.user.name,
         email: this.user.email,

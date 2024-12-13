@@ -1,29 +1,19 @@
 <div class="msg-input-ct">
     
- 
-    
-
-    <!-- <div class="main-input-area"> -->
-        <label for="msg-input"></label>
-
-        <!-- <div   class="formatted-preview" 
-        [innerHTML]="formattedChatMessage"></div> -->
-   
+    <div class="main-input-area">
+    <label for="msg-input"></label>
+    <div class="highlight" [innerHTML]="formattedMessage"></div>
    <textarea  
     id="msg-input" 
     placeholder="Schreib etwas..." 
     class="chat-input" 
-   
     type="text" 
     [(ngModel)]="chatMessage"
     (input)=" onInput($event)" 
-     rows="3" 
-     (keydown)="sendMessage($event)"
+    (keydown)="sendMessage($event)"
       >
   </textarea>
-
-<!-- </div> -->
-<!-- contenteditable="true" -->
+</div>
 
 
    <div class="show-selected-files" > 
