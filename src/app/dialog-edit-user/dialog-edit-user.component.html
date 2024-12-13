@@ -40,7 +40,7 @@
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
 
-        <input *ngIf="!guestAccount && !global.googleAccountLogIn " class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
+        <input *ngIf="!guestAccount && !global.googleAccountLogIn" class="user-mail-input" [(ngModel)]="user.email" placeholder="{{user.email}}" />
 
         <input *ngIf="guestAccount || userData?.blockInputField===true" class="user-mail-input" [value]="user.email" readonly />
         <span *ngIf="guestAccount || userData?.blockInputField===true " class="error-msg">Kein Zugriff als Gast</span>
