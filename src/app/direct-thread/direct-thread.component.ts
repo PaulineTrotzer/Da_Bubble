@@ -22,6 +22,7 @@ import {
   addDoc,
   orderBy,
   setDoc,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -37,11 +38,19 @@ import {
   fadeIn,
 } from './../../assets/direct-thread.animations';
 import { currentThreadMessage } from '../models/threadMessage.class';
+import { MatCardModule } from '@angular/material/card';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-direct-thread',
   standalone: true,
-  imports: [CommonModule, PickerComponent, InputFieldComponent],
+  imports: [
+    CommonModule,
+    PickerComponent,
+    InputFieldComponent,
+    FormsModule,
+    MatCardModule,
+  ],
   templateUrl: './direct-thread.component.html',
   styleUrl: './direct-thread.component.scss',
   animations: [slideFromRight, fadeIn],
@@ -82,6 +91,13 @@ export class DirectThreadComponent implements OnInit {
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
   lastMessageId: string | null = '0';
+  editMessageId: string | null = null;
+  editableTextarea!: ElementRef<HTMLTextAreaElement>;
+  isFirstClick: boolean = true;
+  editableMessageText: string = '';
+  scrollHeightInput: any;
+  editWasClicked = false;
+  showEditOption: { [messageId: string]: boolean } = {};
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -89,6 +105,10 @@ export class DirectThreadComponent implements OnInit {
     this.subscribeToThreadMessages();
     this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
+  }
+
+  toggleEditOption(messageId: string, show: boolean) {
+    this.showEditOption[messageId] = show;
   }
 
   checkLastMessageForScroll() {
@@ -111,6 +131,69 @@ export class DirectThreadComponent implements OnInit {
       new Date(currentMessage.timestamp),
       new Date(previousMessage.timestamp)
     );
+  }
+
+  editMessages(message: any) {
+    this.editWasClicked = true;
+    this.editMessageId = message.id;
+    this.editableMessageText = message.text;
+    if (this.isFirstClick) {
+      setTimeout(() => {
+        if (this.editableTextarea) {
+          const textarea = this.editableTextarea.nativeElement;
+          textarea.scrollTop = textarea.scrollHeight;
+          textarea.focus();
+        }
+      }, 20);
+      this.isFirstClick = false;
+    }
+  }
+
+  cancelEdit() {
+    this.editMessageId = null;
+    this.editableMessageText = '';
+    this.editWasClicked = false;
+    this.isFirstClick = true;
+  }
+
+  async saveOrDeleteMessage(message: any) {
+    try {
+      if (!message || !message.id) {
+        console.error('Invalid message object passed to saveOrDeleteMessage');
+        return;
+      }
+      const messageRef = doc(
+        this.firestore,
+        `messages/${this.firstInitialisedThreadMsg}/threadMessages/${message.id}`
+      );
+      if (!this.editableMessageText || this.editableMessageText.trim() === '') {
+        await deleteDoc(messageRef);
+      } else {
+        const editMessage = {
+          text: this.editableMessageText,
+          editedTextShow: true,
+        };
+        await updateDoc(messageRef, editMessage);
+      }
+      this.resetEditMode();
+    } catch (error) {
+      console.error('Error in saveOrDeleteMessage:', error);
+    }
+  }
+
+
+    resetEditMode() {
+      this.editMessageId = null;
+      this.editableMessageText = '';
+      this.isFirstClick = true;
+      this.editWasClicked = false;
+      this.showOptionBar = {}; 
+    }
+
+  onInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const height = (textarea.scrollTop = textarea.scrollHeight);
+    this.scrollHeightInput = height;
   }
 
   getDayInfoForMessage(index: number): string {
@@ -167,8 +250,11 @@ export class DirectThreadComponent implements OnInit {
     return message.senderId === this.currentUserId;
   }
 
-  toggleOptionBar(messageId: string, status: boolean): void {
-    this.showOptionBar[messageId] = status;
+  toggleOptionBar(messageId: string, show: boolean): void {
+    if (this.editWasClicked && this.editMessageId !== messageId) {
+      return;  
+    }
+    this.showOptionBar[messageId] = show;
   }
 
   toggleReactionInfoSender(messageId: string, status: boolean): void {
@@ -240,12 +326,6 @@ export class DirectThreadComponent implements OnInit {
 
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
-  }
-
-  formatTime(date: Date): string {
-    const hours = date.getHours().toString().padStart(2, '0'); // Zwei Ziffern für Stunden
-    const minutes = date.getMinutes().toString().padStart(2, '0'); // Zwei Ziffern für Minuten
-    return `${hours}:${minutes}`;
   }
 
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
@@ -349,7 +429,6 @@ export class DirectThreadComponent implements OnInit {
       this.firestore,
       `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
-
     if (!this.firstThreadValue) {
       const firstInitialisedThreadMsg = await firstValueFrom(
         this.threadControlService.firstThreadMessageId$
@@ -359,33 +438,26 @@ export class DirectThreadComponent implements OnInit {
         `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
       );
     }
-
     if (this.firstThreadValue) {
       threadMessageRef = doc(
         this.firestore,
         `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
       );
     }
-
     const threadMessageDoc = await getDoc(threadMessageRef);
     if (!threadMessageDoc.exists()) {
       console.error('Thread message nicht gefunden.');
       return;
     }
-
     const threadMessageData = threadMessageDoc.data();
     if (!threadMessageData['reactions']) {
       threadMessageData['reactions'] = {};
     }
-
-    // Überprüfen, ob der User schon auf die Nachricht reagiert hat
     const userReaction = threadMessageData['reactions'][userId];
     if (userReaction && userReaction.emoji === emoji) {
-      // Reaktion umkehren (wenn der gleiche Emoji erneut geklickt wird, zähle die Reaktion zurück)
       threadMessageData['reactions'][userId].counter =
         userReaction.counter === 0 ? 1 : 0;
     } else {
-      // Reaktion neu setzen oder ersetzen
       threadMessageData['reactions'][userId] = {
         emoji: emoji,
         counter: 1,
@@ -439,10 +511,6 @@ export class DirectThreadComponent implements OnInit {
     return firstEmoji === secondEmoji;
   }
 
-  getCounterFromFirstUser(reactions: any): number | null {
-    const userIds = this.getUserIds(reactions);
-    return userIds.length > 0 ? reactions[userIds[0]]?.counter : null;
-  }
 
   getEmojiFromFirstUser(reactions: any): string | null {
     const userIds = this.getUserIds(reactions);

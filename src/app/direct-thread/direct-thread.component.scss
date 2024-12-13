@@ -7,6 +7,48 @@
   width: 510px;
 }
 
+.mat-mdc-card {
+  border-style: none;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  position: absolute;
+  left: 58px;
+  top: 17px;
+  width: fit-content;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.edit-message-content {
+  color: #000000;
+  width: 100%;
+  max-height: 105px;
+  max-width: 770px;
+  overflow-wrap: break-word;
+  max-height: max-content;
+  span {
+    padding: 7px;
+  }
+  &:hover {
+    span {
+      color: #444df2;
+      background-color: #eceefe;
+      border: 0 solid;
+      border-radius: 30px;
+    }
+  }
+}
+
+.edit-message {
+  &:hover {
+    .edit-messages-card {
+      opacity: 1;
+    }
+  }
+}
+
 .separated-both-currentUser-reaction-right {
   display: flex;
   gap: 8px;
@@ -49,7 +91,7 @@
     }
   }
   span {
-    font-family: Nunito;
+    font-family: 'Nunito';
     font-size: 14px;
     font-weight: 400;
     line-height: 19.1px;
@@ -82,8 +124,36 @@
 
 .img-flex-bar-options {
   display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
   padding: 3px 12px;
   gap: 3px;
+  img {
+    object-fit: contain;
+  }
+}
+
+.edit-icon-holder {
+  position: relative;
+}
+
+.edit-input {
+  width: 88%;
+  height: 148px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  resize: none;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+  font-family: Nunito, "Helvetica Neue";
+  font-size: 18px;
+  overflow-y: auto;
+  &:focus {
+    border-color: #444df2;
+    outline: none;
+  }
 }
 
 .render-reaction-ct-recipient {
@@ -111,12 +181,6 @@
   }
 }
 
-.both-reaction-right-emojis-holder {
-/*   position: absolute;
-  right: 98px;
-  margin-top: -40px; */
-}
-
 .emojis-holder-both-two-single {
   bottom: 4px;
 }
@@ -142,7 +206,6 @@
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 0;
   top: 0;
-/*   transition: right 0.3s ease, opacity 0.3s ease; */
   color: white;
 }
 
@@ -221,7 +284,12 @@ h3 {
   padding: 16px;
 }
 
-.emoji-flex-right{
+.reaction-icon-container-editMode{
+  position: absolute;
+  bottom: 15px;
+}
+
+.emoji-flex-right {
   display: flex;
   align-items: baseline;
   flex-direction: row-reverse;
@@ -286,8 +354,8 @@ h3 {
   padding: 5px 15px;
   background-color: #ffffff;
   position: absolute;
-  right: 50%; 
-  top: 50%; 
+  right: 50%;
+  top: 50%;
   transform: translate(50%, -50%);
   font-size: 18px;
   font-weight: 400;
@@ -336,7 +404,7 @@ h3 {
   display: flex;
   position: absolute;
   bottom: 44px;
-  background-color:#444df2;
+  background-color: #444df2;
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 0;
@@ -365,7 +433,24 @@ h3 {
   }
 }
 
-.message-holder{
+.option-flex{
+  display: flex;
+  position: absolute;
+  right: 46px;
+  bottom: 25px;
+  gap: 10px;
+  img{
+    object-fit: contain;
+    width: 24px;
+    &:hover{
+      background-color: #eceefe;
+      border-radius: 50px;
+    }
+  }
+}
+
+.message-holder {
+  position: relative;
   padding: 15px 0 10px 0;
 }
 

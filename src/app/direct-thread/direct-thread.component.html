@@ -27,11 +27,11 @@
       <div *ngFor="let message of messagesData; let i=index" [id]="message.id" class="message-bubble">
         <div *ngIf="displayDayInfo(i)" class="new-day-info">
           <div class="day-info">
-              <div class="line"></div>
-              <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+            <div class="line"></div>
+            <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
           </div>
 
-      </div>
+        </div>
         <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)" (mouseenter)="onMouseEnter(message)"
           (mouseleave)="onMouseLeave(message)">
@@ -42,7 +42,7 @@
                 <img [src]="selectedUser.picture" alt="{{ selectedUser.name }}" />
               </div>
               <h4>{{ selectedUser.name }}</h4>
-              <span class="message-time">{{ message.timestamp |  date : "HH:mm" }}</span>
+              <span class="message-time">{{ message.timestamp | date : "HH:mm" }}</span>
             </div>
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
               <p>{{ message.text }}</p>
@@ -79,29 +79,56 @@
               <span class="message-time">{{ message.timestamp | date : "HH:mm" }}</span>
             </div>
             <div class="message-holder" [class.hovered]="message.isHovered">
-              <p class="cu-msg-text">{{ message.text }}</p>
+
+              <ng-container *ngIf="!(editWasClicked && editMessageId === message.id); else editMode">
+                <p class="cu-msg-text">{{ message.text }}</p>
+              </ng-container>
+
+              <ng-template #editMode>
+                <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
+                  [(ngModel)]="editableMessageText"></textarea>
+                <div class="reaction-icon-container-editMode">
+                  <img (click)="openEmojiPicker()" class="icon-add-reaction-editMode" [src]="icons['iconAddReaction']"
+                    (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
+                    (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="Add Reaction">
+                </div>
+                <div class="option-flex">
+                  <img (click)="saveOrDeleteMessage(message)" src="assets/img/check-mark.png">
+                  <img (click)="cancelEdit()" src="assets/img/cross.png">
+                </div>
+              </ng-template>
             </div>
 
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set-reverse">
-                <div class="img-flex-bar-options">
-                  <img class="icon-more" [src]="icons['iconMore']"
-                    (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
-                    (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default">
-
+                <div class="img-flex-bar-options" *ngIf="!editWasClicked">
+                  <div class="edit-icon-holder">
+                    <img class="icon-more" [src]="icons['iconMore']"
+                      (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
+                      (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default"
+                      (mouseenter)="toggleEditOption(message.id, true)">
+                  </div>
                   <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
                     (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
                     (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default">
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
                       <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
-                        size="18"></emoji-mart>
+                        size="18">
+                      </emoji-mart>
                     </div>
                   </div>
-                  <img>
                 </div>
               </div>
             </div>
+
+            <mat-card *ngIf="showEditOption[message.id]" class="edit-messages-card" appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
+              <mat-card-content class="edit-message-content">
+                <span (click)="editMessages(message)">Nachricht bearbeiten</span>
+              </mat-card-content>
+            </mat-card>
+
+
           </div>
         </div>
 
@@ -156,7 +183,7 @@
               </div>
 
 
-              <div  class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
+              <div class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
                 <span class="reaction-info-txt">
                   <ng-container *ngIf="message.recipientId === currentUser.uid">
                     Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji
