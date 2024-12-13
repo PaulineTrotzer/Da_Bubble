@@ -109,8 +109,10 @@ export class HomeComponent implements OnInit {
     this.isWorkspaceOpen = !this.isWorkspaceOpen
   }
 
-  toggleHover() {
-    this.isHovered = !this.isHovered;
+  getImageSource(): string {
+    const state = this.isWorkspaceOpen ? 'hide' : 'show';
+    const variant = this.isHovered ? 'hover' : 'black';
+    return `../../assets/img/${state}-workspace-${variant}.png`;
   }
 
 }

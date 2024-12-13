@@ -31,14 +31,19 @@
         </span>
     </mat-card-content>
 </mat-card>
-<div class="workspace-opener" (click)="toggleWorkspace()" (mouseenter)="toggleHover()" (mouseleave)="toggleHover()">
-    <p *ngIf="isWorkspaceOpen">Workspace-Menü schließen</p>
-    <img class="workspace-drawer" *ngIf="isWorkspaceOpen && !isHovered" src="../../assets/img/hide-workspace-black.png" alt="">
-    <img class="workspace-drawer" *ngIf="isWorkspaceOpen && isHovered" src="../../assets/img/hide-workspace-hover.png" alt="">
-    <p *ngIf="!isWorkspaceOpen">Workspace-Menü öffnen</p>
-    <img class="workspace-drawer" *ngIf="!isWorkspaceOpen && !isHovered" src="../../assets/img/show-workspace-black.png" alt="">
-    <img class="workspace-drawer" *ngIf="!isWorkspaceOpen && isHovered" src="../../assets/img/show-workspace-hover.png" alt="">
-</div>
+<div 
+      class="workspace-opener"
+      [class.hovered]="isHovered"
+      (click)="toggleWorkspace()"
+      (mouseenter)="isHovered = true"
+      (mouseleave)="isHovered = false">
+      <p>{{ isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen' }}</p>
+      <img 
+        class="workspace-drawer"
+        [src]="getImageSource()"
+        [alt]="isWorkspaceOpen ? 'Hide workspace' : 'Show workspace'"
+      >
+    </div>
 
 
 
