@@ -243,20 +243,20 @@ export class InputFieldComponent implements OnInit, OnChanges {
         console.error('User ID or selected user ID is missing.');
         return;
       }
-      const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
-      const clickedUserDocRef = doc(this.firestore, 'roomStatus', this.selectedUser.id);
-      const [currentUserStatus, clickedUserStatus] = await Promise.all([
-        getDoc(currentUserDocRef),
-        getDoc(clickedUserDocRef),
-      ]);
-      if (currentUserStatus.exists() && clickedUserStatus.exists()) {
-        const currentUserInRoom = currentUserStatus.data()['isInRoom'];
-        const clickedUserInRoom = clickedUserStatus.data()['isInRoom'];
-        if (currentUserInRoom && clickedUserInRoom) {
-          console.log('Beide Benutzer sind im selben Raum. Nachrichtenzähler wird nicht erhöht.');
-          return;
-        }
-      }
+      // const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
+      // const clickedUserDocRef = doc(this.firestore, 'roomStatus', this.selectedUser.id);
+      // const [currentUserStatus, clickedUserStatus] = await Promise.all([
+      //   getDoc(currentUserDocRef),
+      //   getDoc(clickedUserDocRef),
+      // ]);
+      // if (currentUserStatus.exists() && clickedUserStatus.exists()) {
+      //   const currentUserInRoom = currentUserStatus.data()['isInRoom'];
+      //   const clickedUserInRoom = clickedUserStatus.data()['isInRoom'];
+      //   if (currentUserInRoom && clickedUserInRoom) {
+      //     console.log('Beide Benutzer sind im selben Raum. Nachrichtenzähler wird nicht erhöht.');
+      //     return;
+      //   }
+      // }
       const messageCountDocRef = doc(
         this.firestore,
         'messageCounts',

@@ -288,6 +288,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
        this.hoverResultChannelId=channel.id 
     } 
 
+    
     leaveCheckChannelResultId(){
       this.hoverResultChannelId=''
     }
@@ -301,7 +302,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
      }
 
 
-
+    
 
 
 
