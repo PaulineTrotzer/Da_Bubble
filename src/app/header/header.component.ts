@@ -45,6 +45,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private overlayStatusSub!: Subscription;
   searcheNameOrChannel:string='';
   global=inject(GlobalVariableService)
+  overlay = inject(OverlayStatusService)
   @Output() headerUserSelected = new EventEmitter<any>();
   
 
@@ -83,6 +84,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.overlayOpen = status;
       }
     );
+  }
+
+  closePicker() {
+    this.overlay.setOverlayStatus(false)
   }
 
   ngOnDestroy(): void {
