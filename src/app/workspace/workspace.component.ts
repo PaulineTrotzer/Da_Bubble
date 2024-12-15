@@ -98,7 +98,8 @@ selectUser(user: any) {
     const resetMessageCount: any = {};
     resetMessageCount[`messageCount.${actuallyId}`] = 0;
     updateDoc(docRef, resetMessageCount);
-  }     
+  } 
+   this.global.statusCheck =false;
 }   
 
  

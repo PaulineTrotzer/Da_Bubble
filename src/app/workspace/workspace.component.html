@@ -189,7 +189,6 @@
                   <span [ngClass]="{'online': user.status === 'online', 'offline': user.status === 'offline'}"></span>
                 </div>
                 <h4>{{user.name}}</h4> 
-
                 <div class="messages-counts" *ngIf="messageCountsArr?.messageCount  && messageCountsArr.messageCount[user.id] > 0 && id !== user.id">
                  <span> {{ messageCountsArr?.messageCount[user.id] }}</span>  
                 </div>   
