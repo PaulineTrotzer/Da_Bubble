@@ -5,7 +5,8 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  updateDoc
+  updateDoc,
+  setDoc
 } from '@angular/fire/firestore';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
@@ -50,6 +51,10 @@ export class WorkspaceComponent implements OnInit {
   logInAuth=inject(LoginAuthService);
   isGuestLogin = false;
   private guestLoginStatusSub: Subscription | undefined;
+  clickedUsers: string[] = []; 
+  id:any;
+  selectedUsers: any[] = []; 
+  messageCountsArr:any={};
 
   constructor(public global: GlobalVariableService) {}
 
@@ -79,46 +84,37 @@ export class WorkspaceComponent implements OnInit {
     );
   } 
 
- clickedUsers: string[] = []; // Array, um angeklickte Benutzer zu speichern
- id:any;
+ 
+
 
 selectUser(user: any) {
   this.userSelected.emit(user);
   this.id = user.id;
   this.global.currentThreadMessageSubject.next('');
   this.global.channelThreadSubject.next(null);
-  const actuallyId = this.id; 
-    if(this.userId && actuallyId && this.messageCountsArr?.messageCount && !this.messageCountsArr?.messageCount[actuallyId]){
-      this.clickedUsers.push(actuallyId);
-    }
-    else if (this.userId && actuallyId && this.messageCountsArr?.messageCount && this.messageCountsArr.messageCount[actuallyId] > 0) {
-        this.clickedUsers.push(actuallyId);
-        this.global.checkCountStatus = true;
-      if (this.global.checkCountStatus) {
-        const docRef = doc(this.firestore, 'messageCounts', this.userId);
-        const resetMessageCount: any = {};
-        resetMessageCount[`messageCount.${actuallyId}`] = 0;
-        updateDoc(docRef, resetMessageCount);
-        console.log('arrays qaqs')
-      }
-      }
-  else { 
-      this.global.checkCountStatus = false;
-      this.global.statusCheck = false;
-      const arrFirstId=this.clickedUsers[0];
-       console.log(arrFirstId)
-      if(arrFirstId && arrFirstId!==actuallyId) {
-      const docRef = doc(this.firestore, 'messageCounts', this.userId);
-      const resetMessageCount: any = {};
-      resetMessageCount[`messageCount.${actuallyId}`] = 0;
-      updateDoc(docRef, resetMessageCount);
-      console.log('arrays qaqs')
-      console.log(actuallyId)  
-    }
-  }
-  this.global.statusCheck = false;
-} 
-      
+  const actuallyId = this.id;
+  if (this.userId && this.messageCountsArr?.messageCount && this.messageCountsArr.messageCount[actuallyId] > 0) {
+    const docRef = doc(this.firestore, 'messageCounts', this.userId);
+    const resetMessageCount: any = {};
+    resetMessageCount[`messageCount.${actuallyId}`] = 0;
+    updateDoc(docRef, resetMessageCount);
+  }     
+}   
+
+ 
+
+
+
+
+// async updateRoomStatus(userId: string, status: boolean) {
+//   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
+//   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
+//   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
+//   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
+// }
+  
+
+
            
   selectCurrentUser() {
     this.userSelected.emit(this.global.currentUserData);
@@ -185,15 +181,13 @@ selectUser(user: any) {
     })
   }
     
-    messageCountsArr:any={};
+    
 
    getUserMessageCount(userId:string){
     const userDocRef=doc(this.firestore,'messageCounts',userId)
      onSnapshot(userDocRef,(snapshot)=>{
        if(snapshot.exists()){ 
-          // const data=snapshot.data()
           this.messageCountsArr={...snapshot.data()}
-          console.log(this.messageCountsArr)
        }else{
         this.messageCountsArr={};
        }
@@ -208,7 +202,7 @@ selectUser(user: any) {
       snapshot.forEach((doc) => {
         this.checkUsersExsists = true;
         if (doc.id !== this.userId) {
-          this.allUsers.push({ id: doc.id, ...doc.data() });
+          this.allUsers.push({ id: doc.id, ...doc.data()});
         }
       });
     });
