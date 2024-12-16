@@ -3,7 +3,6 @@ mat-card {
   border-style: none;
 }
 
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -86,6 +85,9 @@ mat-card {
   display: flex;
   align-items: center;
   gap: 16px;
+  position: absolute;
+  top: 50px;
+  right: 25px;
 }
 
 .member-avatars {
@@ -145,7 +147,7 @@ mat-card {
   margin: 0;
 }
 
-.welcome-sheet{
+.welcome-sheet {
   position: absolute;
   top: 0;
   left: 0;
@@ -154,5 +156,3 @@ mat-card {
   padding: 0;
   z-index: 2;
 }
-
-

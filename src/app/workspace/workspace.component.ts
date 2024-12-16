@@ -219,7 +219,6 @@ selectUser(user: any) {
       this.global.setCurrentChannel(channel);
   }  
 
-    
       
   toggleChannelDrawer() {
     this.channelDrawerOpen = !this.channelDrawerOpen;
