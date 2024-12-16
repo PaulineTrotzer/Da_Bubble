@@ -182,14 +182,13 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-
-    resetEditMode() {
-      this.editMessageId = null;
-      this.editableMessageText = '';
-      this.isFirstClick = true;
-      this.editWasClicked = false;
-      this.showOptionBar = {}; 
-    }
+  resetEditMode() {
+    this.editMessageId = null;
+    this.editableMessageText = '';
+    this.isFirstClick = true;
+    this.editWasClicked = false;
+    this.showOptionBar = {};
+  }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
@@ -253,7 +252,7 @@ export class DirectThreadComponent implements OnInit {
 
   toggleOptionBar(messageId: string, show: boolean): void {
     if (this.editWasClicked && this.editMessageId !== messageId) {
-      return;  
+      return;
     }
     this.showOptionBar[messageId] = show;
   }
@@ -427,61 +426,74 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-async getThreadMessageRef(currentMessageId: string): Promise<any> {
-  let threadMessageRef = doc(
-    this.firestore,
-    `messages/${currentMessageId}/threadMessages/${currentMessageId}`
-  );
-  if (!this.firstThreadValue) {
-    const firstInitialisedThreadMsg = await firstValueFrom(
-      this.threadControlService.firstThreadMessageId$
-    );
-    threadMessageRef = doc(
+  openEmojiPickerEditMode() {
+    this.isEmojiPickerVisible = true;
+    this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  addEmojiToEdit(event: any) {
+    if (event && event.emoji && event.emoji.native) {
+      const emoji = event.emoji.native;
+      this.editableMessageText = (this.editableMessageText || '') + emoji;
+    } else {
+      console.error('kein Emoji ausgewählt');
+    }
+  }
+
+  async getThreadMessageRef(currentMessageId: string): Promise<any> {
+    let threadMessageRef = doc(
       this.firestore,
-      `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
+      `messages/${currentMessageId}/threadMessages/${currentMessageId}`
     );
+    if (!this.firstThreadValue) {
+      const firstInitialisedThreadMsg = await firstValueFrom(
+        this.threadControlService.firstThreadMessageId$
+      );
+      threadMessageRef = doc(
+        this.firestore,
+        `messages/${firstInitialisedThreadMsg}/threadMessages/${currentMessageId}`
+      );
+    }
+    if (this.firstThreadValue) {
+      threadMessageRef = doc(
+        this.firestore,
+        `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
+      );
+    }
+    return threadMessageRef;
   }
-  if (this.firstThreadValue) {
-    threadMessageRef = doc(
-      this.firestore,
-      `messages/${this.firstThreadValue}/threadMessages/${currentMessageId}`
-    );
-  }
-  return threadMessageRef;
-}
 
-async getThreadMessageDoc(threadMessageRef: any): Promise<any> {
-  const threadMessageDoc = await getDoc(threadMessageRef);
-  if (!threadMessageDoc.exists()) {
-    console.error('thread message nicht gefunden.');
-    return null;
+  async getThreadMessageDoc(threadMessageRef: any): Promise<any> {
+    const threadMessageDoc = await getDoc(threadMessageRef);
+    if (!threadMessageDoc.exists()) {
+      console.error('thread message nicht gefunden.');
+      return null;
+    }
+    return threadMessageDoc.data();
   }
-  return threadMessageDoc.data();
-}
 
-async addEmoji(event: any, currentMessageId: string, userId: string) {
-  const emoji = event.emoji.native;
-  const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
-  const threadMessageData = await this.getThreadMessageDoc(threadMessageRef);
-  if (!threadMessageData) return;
-  if (!threadMessageData['reactions']) {
-    threadMessageData['reactions'] = {};
+  async addEmoji(event: any, currentMessageId: string, userId: string) {
+    const emoji = event.emoji.native;
+    const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+    const threadMessageData = await this.getThreadMessageDoc(threadMessageRef);
+    if (!threadMessageData) return;
+    if (!threadMessageData['reactions']) {
+      threadMessageData['reactions'] = {};
+    }
+    const userReaction = threadMessageData['reactions'][userId];
+    if (userReaction && userReaction.emoji === emoji) {
+      threadMessageData['reactions'][userId].counter =
+        userReaction.counter === 0 ? 1 : 0;
+    } else {
+      threadMessageData['reactions'][userId] = {
+        emoji: emoji,
+        counter: 1,
+      };
+    }
+    await updateDoc(threadMessageRef, {
+      reactions: threadMessageData['reactions'],
+    });
   }
-  const userReaction = threadMessageData['reactions'][userId];
-  if (userReaction && userReaction.emoji === emoji) {
-    threadMessageData['reactions'][userId].counter =
-      userReaction.counter === 0 ? 1 : 0;
-  } else {
-    threadMessageData['reactions'][userId] = {
-      emoji: emoji,
-      counter: 1,
-    };
-  }
-  await updateDoc(threadMessageRef, {
-    reactions: threadMessageData['reactions'],
-  });
-}
-
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -522,7 +534,6 @@ async addEmoji(event: any, currentMessageId: string, userId: string) {
     const secondEmoji = reactions[userIds[1]]?.emoji;
     return firstEmoji === secondEmoji;
   }
-
 
   getEmojiFromFirstUser(reactions: any): string | null {
     const userIds = this.getUserIds(reactions);
@@ -617,7 +628,7 @@ async addEmoji(event: any, currentMessageId: string, userId: string) {
     }
   }
 
-  onLeaveIcon(){
+  onLeaveIcon() {
     this.hoveredReactionIcon = false;
   }
 
