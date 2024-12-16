@@ -109,22 +109,18 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   enterChatByUser: any;
 
   ngAfterViewChecked() {
-    this.updateChannelSelection(this.global.channelSelected);
+    this.cdr.detectChanges();
   }
-
-  updateChannelSelection(value: boolean) {
-    this.global.channelSelected = value;
-    this.cdr.detectChanges(); // Manuelle Aktualisierung der UI
-  }
+  
 
   ngOnInit(): void {
     this.global.channelSelected = false;
     this.userId = this.route.snapshot.paramMap.get('id');
+    this.user = this.userId;
     this.getcurrentUserById(this.userId);
     this.subscribeToProfileSelection();
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
-    this.subscribeToGuestLoginStatus();
   }
 
   ngOnDestroy(): void {

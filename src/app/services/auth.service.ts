@@ -92,27 +92,36 @@ export class AuthService {
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
+    provider.addScope('email'); 
     try {
       const result = await signInWithPopup(auth, provider);
       const currentUser = auth.currentUser;
+  
       if (currentUser) {
-        this.globalVariable.googleAccountLogIn = true;
+        const googleProviderData = result.user.providerData.find(
+          (data) => data.providerId === 'google.com'
+        );
+        const email = googleProviderData?.email;
         this.user = new User({
           picture: result.user.photoURL,
           uid: result.user.uid,
           name: result.user.displayName,
-          email: result.user.email,
+          email: email,
         });
+        this.addGoogleUserToFirestore(this.user);
+        this.globalVariable.googleAccountLogIn = true;
         this.LogInAuth.setLoginSuccessful(true);
         this.router.navigate(['/welcome', this.user.uid]);
+  
         setTimeout(() => {
           this.LogInAuth.setLoginSuccessful(false);
         }, 1500);
       }
     } catch (error) {
-      console.error('fehler Login:', error);
+      console.error('Fehler beim Login:', error);
     }
   }
+  
 
   async addGoogleUserToFirestore(user: User) {
     const userRef = doc(this.firestore, 'users', user.uid);
@@ -137,6 +146,7 @@ export class AuthService {
         }
         await signOut(auth);
       }
+      this.globalVariable.googleAccountLogIn = false;
       this.overlayStatusService.setOverlayStatus(false);
       this.router.navigate(['/']);
     } catch (error) {
