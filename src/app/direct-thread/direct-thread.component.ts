@@ -70,6 +70,7 @@ export class DirectThreadComponent implements OnInit {
   showOptionBar: { [key: string]: boolean } = {};
   isHovered = false;
   isEmojiPickerVisible = false;
+  isEmojiPickerEditVisible = false;
   currentSrc?: string;
   icons: { [key: string]: string } = {
     iconMore: 'assets/img/more_vertical.svg',
@@ -426,8 +427,13 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
+  closePickerEdit(){
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isEmojiPickerEditVisible = false;
+  }
+
   openEmojiPickerEditMode() {
-    this.isEmojiPickerVisible = true;
+    this.isEmojiPickerEditVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
 
