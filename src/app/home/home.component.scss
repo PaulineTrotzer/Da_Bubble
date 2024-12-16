@@ -92,9 +92,11 @@ app-thread {
   box-shadow: 4px 4px 7px 0px #00000033;
 }
 
-.workspace-opener:hover p {
+.workspace-opener {
+  &:hover  p {
     color: #444df2;
   }
+}
 
 .workspace-closed {
   width: 0;

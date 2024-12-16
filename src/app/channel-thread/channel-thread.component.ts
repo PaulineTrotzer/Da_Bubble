@@ -17,6 +17,8 @@ import { InputFieldComponent } from '../input-field/input-field.component';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
+import { OverlayStatusService } from '../services/overlay-status.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 interface Message {
   id: string;
@@ -34,6 +36,12 @@ interface Message {
   imports: [CommonModule, InputFieldComponent, PickerComponent, FormsModule],
   templateUrl: './channel-thread.component.html',
   styleUrl: './channel-thread.component.scss',
+  animations: [
+      trigger('slideIn', [
+        transition(':enter', [style({opacity: 0, transform: 'translateX(-50%)'}), animate('150ms ease-in-out', style({opacity: 100, transform: 'translateX(0)'}))]),
+        transition(':enter', [style({opacity: 100, transform: 'translateX(0)'}), animate('150ms ease-in-out', style({opacity: 0, transform: 'translateX(-50%)'}))])
+      ])
+    ]
 })
 export class ChannelThreadComponent implements OnInit {
   constructor() {}
@@ -44,6 +52,7 @@ export class ChannelThreadComponent implements OnInit {
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
+  overlay = inject(OverlayStatusService)
 
   topicMessage: Message | null = null;
   messages: Message[] = [];
@@ -56,6 +65,7 @@ export class ChannelThreadComponent implements OnInit {
   currentUserLastEmojis: string [] = [];
   hoveredReactionMessageId: string | null = null;
   hoveredEmoji: string | null = null;
+  editingMessageId: string | null = null;
   reactionUserNames: { [userId: string]: string } = {};
   messageToEdit: string = '';
 
@@ -196,6 +206,12 @@ export class ChannelThreadComponent implements OnInit {
 
   togglePicker(messageId: string) {
     this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+    this.editingMessageId = this.isPickerVisible ? messageId : null;
+    this.overlay.setOverlayStatus(true);
+  }
+
+  closePicker() {
+    this.overlay.setOverlayStatus(false)
   }
 
   async removeReaction(emoji: string, messageId: string) {
@@ -267,63 +283,66 @@ export class ChannelThreadComponent implements OnInit {
   addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-   
-    if (!currentUserId) return;
-   
-    const messageDocRef = messageId === this.topicMessage?.id 
-      ? doc(
-          this.db,
-          'channels',
-          this.selectedChannel.id,
-          'messages',
-          messageId
-        )
-      : doc(
-          this.db,
-          'channels',
-          this.selectedChannel.id,
-          'messages',
-          this.channelMessageId,
-          'thread',
-          messageId
-        );
-   
-    getDoc(messageDocRef).then((messageSnapshot) => {
-      const messageData = messageSnapshot.data();
-      const reactions = messageData?.['reactions'] || {};
-   
-      let oldReaction: string | null = null;
-      for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
-        if ((userIds as string[]).includes(currentUserId)) {
-          oldReaction = reactionEmoji;
-          break;
-        }
-      }
-   
-      if (oldReaction === emoji) {
-        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
-        if (reactions[emoji].length === 0) {
-          delete reactions[emoji];
-          this.hoveredReactionMessageId = null;
-        }
-      } else {
-        if (oldReaction) {
-          reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
-          if (reactions[oldReaction].length === 0) {
-            delete reactions[oldReaction];
+  
+    if (this.editingMessageId === messageId) {
+      this.messageToEdit += emoji;
+    } else if (currentUserId) {
+      const messageDocRef = messageId === this.topicMessage?.id
+        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
+        : doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            this.channelMessageId,
+            'thread',
+            messageId
+          );
+  
+      getDoc(messageDocRef).then((messageSnapshot) => {
+        const messageData = messageSnapshot.data();
+        const reactions = messageData?.['reactions'] || {};
+  
+        let oldReaction: string | null = null;
+        for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
+          if ((userIds as string[]).includes(currentUserId)) {
+            oldReaction = reactionEmoji;
+            break;
           }
         }
-   
-        if (!reactions[emoji]) {
-          reactions[emoji] = [];
+  
+        if (oldReaction === emoji) {
+          reactions[emoji] = reactions[emoji].filter(
+            (userId: string) => userId !== currentUserId
+          );
+          if (reactions[emoji].length === 0) {
+            delete reactions[emoji];
+            this.hoveredReactionMessageId = null;
+          }
+        } else {
+          if (oldReaction) {
+            reactions[oldReaction] = reactions[oldReaction].filter(
+              (userId: string) => userId !== currentUserId
+            );
+            if (reactions[oldReaction].length === 0) {
+              delete reactions[oldReaction];
+            }
+          }
+  
+          if (!reactions[emoji]) {
+            reactions[emoji] = [];
+          }
+          reactions[emoji].push(currentUserId);
         }
-        reactions[emoji].push(currentUserId);
-      }
-   
-      updateDoc(messageDocRef, { reactions });
-    });
+  
+        updateDoc(messageDocRef, { reactions });
+      });
+    }
+  
     this.isPickerVisible = null;
-   }
+    this.closePicker();
+  }
+  
    
    onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
@@ -381,6 +400,7 @@ export class ChannelThreadComponent implements OnInit {
     this.showEditArea = null;
     this.messageToEdit = '';
   }
+
 
   async saveEditedMessage(messageId: string) {
     try {

@@ -17,6 +17,8 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { Overlay } from '@angular/cdk/overlay';
+import { OverlayStatusService } from '../services/overlay-status.service';
 
 interface Message {
   id: string;
@@ -49,6 +51,7 @@ export class ChannelChatComponent implements OnInit {
 
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
+  overlay = inject(OverlayStatusService)
 
   messagesData: Message[] = [];
   showThreadInfo: boolean = false;
@@ -59,6 +62,7 @@ export class ChannelChatComponent implements OnInit {
   reactionUserNames: { [userId: string]: string } = {};
   hoveredEmoji: string | null = null;
   isPickerVisible: string | null = null;
+  editingMessageId: string | null = null;
   currentUserLastEmojis: string [] = [];
   
   messageToEdit: string = '';
@@ -133,15 +137,10 @@ export class ChannelChatComponent implements OnInit {
     }
   }
 
-  addEmoji(event: any, messageId: string) {
-    const emoji = event.emoji;
-    this.isPickerVisible = null;
-    this.addLastUsedEmoji(emoji);
-    this.addToReactionInfo(emoji, messageId);
-  }
-
-  togglePicker(messageId: string) {
+  togglePicker(messageId: string, isEditing: boolean = false) {
     this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+    this.editingMessageId = isEditing ? messageId : null; // Track editing mode
+    this.overlay.setOverlayStatus(true);
   }
 
   async addLastUsedEmoji(emoji: any) {
@@ -178,53 +177,7 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No current user logged in');
     }
   }
-
-  async addToReactionInfo(emoji: any, messageId: string) {
-    const auth = getAuth();
-    const currentUserId = auth.currentUser?.uid;
-  
-    if (!currentUserId) {
-      console.warn('No current user logged in');
-      return;
-    }
-  
-    const messageDocRef = doc(
-      this.firestore,
-      'channels',
-      this.selectedChannel.id,
-      'messages',
-      messageId
-    );
-  
-    try {
-      const messageSnapshot = await getDoc(messageDocRef);
-      const messageData = messageSnapshot.data();
-      const reactions = messageData?.['reactions'] || {};
-  
-      const hasReacted = Object.values(reactions).some((userIds) =>
-        (userIds as string[]).includes(currentUserId)
-      );
-  
-      if (hasReacted) {
-        console.warn('User has already reacted to this message');
-        return;
-      }
-  
-      if (!reactions[emoji.native]) {
-        reactions[emoji.native] = [];
-      }
-      reactions[emoji.native].push(currentUserId);
-  
-      await updateDoc(messageDocRef, { reactions });
-  
-      console.log(`Updated reactions for message ${messageId}:`, reactions);
-    } catch (error) {
-      console.error('Error updating reactions:', error);
-    }
-  }
-  
-  
-  
+ 
 
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
@@ -259,58 +212,73 @@ export class ChannelChatComponent implements OnInit {
   }
   
   addEmojiToMessage(emoji: string, messageId: string) {
-    const auth = getAuth();
-    const currentUserId = auth.currentUser?.uid;
+    if (this.editingMessageId === messageId) {
+      // Append emoji to the message being edited
+      this.messageToEdit += emoji;
+    } else {
+      // Existing reaction logic
+      const auth = getAuth();
+      const currentUserId = auth.currentUser?.uid;
   
-    if (!currentUserId) {
-      console.warn('No current user logged in');
-      return;
-    }
-  
-    const messageDocRef = doc(this.firestore, 'channels', this.selectedChannel.id, 'messages', messageId);
-  
-    getDoc(messageDocRef).then((messageSnapshot) => {
-      const messageData = messageSnapshot.data();
-      const reactions = messageData?.['reactions'] || {};
-  
-      let oldReaction: string | null = null;
-      for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
-        if ((userIds as string[]).includes(currentUserId)) {
-          oldReaction = reactionEmoji;
-          break;
-        }
+      if (!currentUserId) {
+        console.warn('No current user logged in');
+        return;
       }
   
-      if (oldReaction === emoji) {
-        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
-        if (reactions[emoji].length === 0) {
-          delete reactions[emoji];
-          this.hoveredReactionMessageId = null;
-        }
-        console.log(`Removed reaction "${emoji}" by user ${currentUserId}`);
-      } else {
-        if (oldReaction) {
-          reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
-          if (reactions[oldReaction].length === 0) {
-            delete reactions[oldReaction];
+      const messageDocRef = doc(
+        this.firestore,
+        'channels',
+        this.selectedChannel.id,
+        'messages',
+        messageId
+      );
+  
+      getDoc(messageDocRef).then((messageSnapshot) => {
+        const messageData = messageSnapshot.data();
+        const reactions = messageData?.['reactions'] || {};
+  
+        let oldReaction: string | null = null;
+        for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
+          if ((userIds as string[]).includes(currentUserId)) {
+            oldReaction = reactionEmoji;
+            break;
           }
-          console.log(`Replaced reaction "${oldReaction}" with "${emoji}" by user ${currentUserId}`);
         }
   
-        if (!reactions[emoji]) {
-          reactions[emoji] = [];
-        }
-        reactions[emoji].push(currentUserId);
-      }
+        if (oldReaction === emoji) {
+          reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
+          if (reactions[emoji].length === 0) {
+            delete reactions[emoji];
+          }
+        } else {
+          if (oldReaction) {
+            reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
+            if (reactions[oldReaction].length === 0) {
+              delete reactions[oldReaction];
+            }
+          }
   
-      updateDoc(messageDocRef, { reactions })
-        .then(() => {
-          console.log(`Updated reactions for message ${messageId}:`, reactions);
-        })
-        .catch((error) => {
+          if (!reactions[emoji]) {
+            reactions[emoji] = [];
+          }
+          reactions[emoji].push(currentUserId);
+        }
+  
+        updateDoc(messageDocRef, { reactions }).catch((error) => {
           console.error('Error updating reactions:', error);
         });
-    });
+      });
+    }
+  
+    this.isPickerVisible = null;
+    this.overlay.setOverlayStatus(false);
+  }
+  
+
+  closePicker() {
+    this.isPickerVisible = null;
+    this.editingMessageId = null;
+    this.overlay.setOverlayStatus(false);
   }
   
 

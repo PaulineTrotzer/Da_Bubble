@@ -138,7 +138,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   private async processSendMessage(): Promise<void> {
-    if (this.selectedChannel) {
+    if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
       await this.sendDirectThreadMessage();

@@ -9,6 +9,10 @@
 .img-container {
   padding: 4px;
   border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
   &:hover {
     background-color: #eceefe;
   }
@@ -184,17 +188,27 @@
 }
 
 .emoji-container-user {
-  position: absolute;
-  right: 136px;
-  top: -11px;
-  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
 }
 
 .emoji-container-current {
-  position: absolute;
-  z-index: 10;
-  left: 180px;
-  top: -11px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
 }
 
 .used-emojis {
@@ -241,9 +255,16 @@
   max-width: 269px;
   text-align: center;
   width: 100%;
-  left: 248px;
-  bottom: 70px;
   z-index: 5;
+  left: 200px;
+  top: 32px;
+}
+
+.textarea {
+  position: absolute;
+  bottom: 4px;
+  left: 54px;
+  background-color: white;
 }
 
 .message-container {
@@ -289,6 +310,12 @@ textarea {
   text-decoration-skip-ink: none;
   width: 100%;
   height: 100%;
+  overflow: auto;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  background-color: transparent;
 }
 
 form {
