@@ -1,19 +1,21 @@
-import { Component, inject, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { DialogHeaderProfilCardComponent } from '../dialog-header-profil-card/dialog-header-profil-card.component';
 import { doc, Firestore, updateDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { OverlayStatusService } from '../services/overlay-status.service';
-
+import { GlobalVariableService } from '../services/global-variable.service';
 
 @Component({
   selector: 'app-dialog-header-dropdown',
   standalone: true,
-  imports: [
-    CommonModule,
-    DialogHeaderProfilCardComponent,
-  ],
+  imports: [CommonModule, DialogHeaderProfilCardComponent],
   templateUrl: './dialog-header-dropdown.component.html',
   styleUrl: './dialog-header-dropdown.component.scss',
 })
@@ -24,8 +26,8 @@ export class DialogHeaderDropdownComponent implements OnInit, OnDestroy {
   wasClicked = false;
   showDropDownOptions = true;
   userId: any;
-  overlayStatusService = inject(OverlayStatusService); 
-
+  overlayStatusService = inject(OverlayStatusService);
+  global =inject(GlobalVariableService);
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -43,16 +45,17 @@ export class DialogHeaderDropdownComponent implements OnInit, OnDestroy {
 
   logOut() {
     this.authService.logOut();
+    this.global.isGuest = false;
+    this.global.googleAccountLogIn = false;
     this.updateStatus(this.userId);
   }
   handleClickOutside = (event: MouseEvent) => {
     const dropdown = document.querySelector('.dialog-ct');
     if (dropdown && !dropdown.contains(event.target as Node)) {
-      this.showDropDownOptions = false; 
+      this.showDropDownOptions = false;
       this.overlayStatusService.setOverlayStatus(false);
     }
   };
-
 
   async updateStatus(userId: string) {
     const docRef = doc(this.firestore, 'users', userId);

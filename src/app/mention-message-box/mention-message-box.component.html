@@ -42,7 +42,7 @@
           <span class="user-email">{{global.getUserByName?.email}}</span>   
       </div>
           
-          <div class="btn-div">
+          <div class="btn-div" *ngIf="!global.isGuest">
             <button (click)="enterChat(global.getUserByName)" class="btn-primary">
               <img src="./assets/img/direct-msg.svg" >
                Nachricht

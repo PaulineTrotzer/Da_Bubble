@@ -22,6 +22,7 @@ export class GlobalVariableService {
   checkCountStatus:any
   checkCountStatusUser:any
   currentRoom:any
+  isGuest : boolean = false;
 
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
