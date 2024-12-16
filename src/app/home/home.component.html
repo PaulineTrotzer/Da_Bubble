@@ -11,8 +11,9 @@
         </app-start-screen>
         <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId" [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"></app-thread>
     </div>
-    <div *ngIf="successfullyLogged" class="overlay"></div>
 </div>
+
+<div *ngIf="successfullyLogged" class="overlay"></div>
 <mat-card *ngIf="successfullyLogged" appearance="outlined" class="login-sended-info"
     [ngClass]="{'visible': successfullyLogged, 'hidden': !successfullyLogged}">
     <mat-card-content class="success-login-content">
