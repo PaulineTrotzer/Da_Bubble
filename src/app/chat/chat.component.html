@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <div class="button-box">
-                        <div>
+                        <div class="edit-button">
                         <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
                         <button class="btn-primary"
                             (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
@@ -152,10 +152,10 @@
             }">
                         <span class="message-time">{{
                             message.timestamp | date : "HH:mm"
-                            }}</span>
+                            }} Uhr</span>
                         <span class="sender-name">{{ message.senderName }}</span>
                     </div>
-                    <div class="message-area">
+                    <div *ngIf="message.text.trim()!==''" class="message-area">
                         <mat-card [ngClass]="{
                             'message-card-current':
                               message.senderId === global.currentUserData.id,

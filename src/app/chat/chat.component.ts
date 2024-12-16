@@ -426,7 +426,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   splitMessage(text: string) {
-    const regex = /(@[\w]+(?:\s[\w]+)?)/g;
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
     return text.split(regex);
   }
 
@@ -479,10 +479,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.scrollHeightInput=height;
     console.log(this.scrollHeightInput)
   }  
-
-
-
-
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -784,7 +780,6 @@ export class ChatComponent implements OnInit, OnChanges {
          } 
        }
 
-
       chatByUserName:any
       @Output() enterChatUser=new EventEmitter<any>()
 
@@ -793,7 +788,6 @@ export class ChatComponent implements OnInit, OnChanges {
         this.enterChatUser.emit(this.chatByUserName)
         
        }
-
     } 
 
 

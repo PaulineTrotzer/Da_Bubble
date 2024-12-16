@@ -356,7 +356,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
       selectedFiles: this.selectFiles,
       editedTextShow: false,
     };
+  } 
+
+  getByUserName() {
+    const docRef = collection(this.firestore, 'users');
+    onSnapshot(docRef, (querySnapshot) => {
+      this.mentionUserName = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const userName = data['name'];
+        this.mentionUserName.push(userName);
+      });
+    });
   }
+
+
    
   formattedMessage:string='';
 
@@ -364,17 +378,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
       this.chatMessage += `${mentionTag}  `;
-      this.updateFormattedMessage() 
+      this.updateFormattedMessage(); 
     }
   } 
- 
+
+  // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
-    const regex = /@\w+(?:\s\w+)?/g;
-    this.formattedMessage = this.chatMessage.replace(
-      regex,
-      (match) => `<span class="mention">${match}</span>`
-    );
+  const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
+    this.formattedMessage = this.chatMessage.replace(regex, (match) => {
+      const mentionName = match.substring(1);
+      if (this.mentionUserName.some((some)=>some===mentionName)) {
+        return `<span class="mention">${match}</span>`; 
+      } else {
+        return match; 
+      }
+    });
   }
 
   onInput(event: Event): void {
@@ -395,17 +414,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
 
 
-  getByUserName() {
-    const docRef = collection(this.firestore, 'users');
-    onSnapshot(docRef, (querySnapshot) => {
-      this.mentionUserName = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const userName = data['name'];
-        this.mentionUserName.push(userName);
-      });
-    });
-  }
+
 
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
