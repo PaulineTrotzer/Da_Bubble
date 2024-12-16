@@ -135,6 +135,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
 
   openEmojiPicker() {
+    debugger;
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
