@@ -10,11 +10,8 @@ import {
   ViewChild,
   Output,
   EventEmitter,
-  HostListener
-  
-  
+  HostListener,
 } from '@angular/core';
-import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
 import {
@@ -37,11 +34,11 @@ import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { Subscription } from 'rxjs';
-import { ThreadComponent } from '../thread/thread.component';
 import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { OverlayStatusService } from '../services/overlay-status.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -53,7 +50,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
     InputFieldComponent,
     ChannelChatComponent,
     MentionMessageBoxComponent,
-    PickerComponent
+    PickerComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -68,8 +65,8 @@ export class ChatComponent implements OnInit, OnChanges {
   selectFiles: any[] = [];
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
-  @Input() onHeaderUser:any
-  @Input ()  onHeaderChannel:any
+  @Input() onHeaderUser: any;
+  @Input() onHeaderChannel: any;
   messagesData: any[] = [];
   elementRef = inject(ElementRef);
   firestore = inject(Firestore);
@@ -90,9 +87,10 @@ export class ChatComponent implements OnInit, OnChanges {
   @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
   @Output() threadOpened = new EventEmitter<void>();
   chosenThreadMessage: any;
-  currentThreadMessageId: string | null = null;  
-  checkEditbox:boolean=false
-  @ViewChild('editableTextarea') editableTextarea!: ElementRef<HTMLTextAreaElement>;
+  currentThreadMessageId: string | null = null;
+  checkEditbox: boolean = false;
+  @ViewChild('editableTextarea')
+  editableTextarea!: ElementRef<HTMLTextAreaElement>;
   commentStricker: string[] = [
     '../../assets/img/comment/face.png',
     '../../assets/img/comment/rocket.png',
@@ -104,13 +102,20 @@ export class ChatComponent implements OnInit, OnChanges {
   isFirstClick: boolean = true;
   replyCounts: Map<string, number> = new Map();
   replyCountValue: number = 0;
+  checkEmojiId: any;
+  isEmojiPickerVisible: boolean = false;
+  isEmojiPickerVisibleEdit: boolean = false;
+  @Output() userMention = new EventEmitter<any>();
+  getAllUsersName: any[] = [];
+  overlayStatusService =inject(OverlayStatusService);
+  overlayOpen = false;
 
   constructor() {}
 
   ngOnInit(): void {
     this.getAllUsersname();
-
   }
+
 
   subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
@@ -121,6 +126,18 @@ export class ChatComponent implements OnInit, OnChanges {
         }
       });
     });
+  }
+
+  closePicker() {
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isEmojiPickerVisible = false;
+  }
+
+
+  openEmojiPicker() {
+    debugger;
+    this.isEmojiPickerVisible = true;
+    this.overlayStatusService.setOverlayStatus(true);
   }
 
   getReplyCountValue(messageId: string): number {
@@ -147,10 +164,10 @@ export class ChatComponent implements OnInit, OnChanges {
         if (this.editableTextarea) {
           const textarea = this.editableTextarea.nativeElement;
           textarea.scrollTop = textarea.scrollHeight;
-          textarea.focus(); 
+          textarea.focus();
         }
-      },20);
-      this.isFirstClick = false; 
+      }, 20);
+      this.isFirstClick = false;
     }
   }
 
@@ -167,9 +184,9 @@ export class ChatComponent implements OnInit, OnChanges {
   cancelEdit() {
     this.editMessageId = null;
     this.editableMessageText = '';
-    this.checkEditbox=false;
-    this.isFirstClick=true;
-    console.log(this.isFirstClick)
+    this.checkEditbox = false;
+    this.isFirstClick = true;
+    console.log(this.isFirstClick);
   }
 
   resetIcon(message: any) {
@@ -207,31 +224,24 @@ export class ChatComponent implements OnInit, OnChanges {
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
       this.getMessages().then(() => this.checkForSelfChat());
-    } 
-
-
-    if (changes['selectedChannel'] &&  this.selectedChannel) {
+    }
+    if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
       this.clearInput();
-    }   
-    
-
-    if (changes['onHeaderChannel'] &&  this.onHeaderChannel) {
+    }
+    if (changes['onHeaderChannel'] && this.onHeaderChannel) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
       this.clearInput();
-    }    
-
+    }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
       this.getMessages();
       this.chatMessage = '';
-    } 
-        
-  }  
+    }
+  }
 
-  
   checkForSelfChat() {
     if (
       this.selectedUser?.id === this.global.currentUserData?.id &&
@@ -270,8 +280,8 @@ export class ChatComponent implements OnInit, OnChanges {
       deleteDoc(messageRef).then(() => {
         this.editMessageId = null;
       });
-      this.isFirstClick=true;
-      this.checkEditbox=false
+      this.isFirstClick = true;
+      this.checkEditbox = false;
     } else {
       const editMessage = {
         text: this.editableMessageText,
@@ -279,9 +289,9 @@ export class ChatComponent implements OnInit, OnChanges {
       };
       updateDoc(messageRef, editMessage).then(() => {
         this.editMessageId = null;
-      }); 
-      this.checkEditbox=false;
-      this.isFirstClick=true;
+      });
+      this.checkEditbox = false;
+      this.isFirstClick = true;
     }
   }
 
@@ -308,9 +318,9 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   scrollToBottom(): void {
-    if(this.scrollContainer){
-    this.scrollContainer.nativeElement.scrollTop =
-      this.scrollContainer.nativeElement.scrollHeight;
+    if (this.scrollContainer) {
+      this.scrollContainer.nativeElement.scrollTop =
+        this.scrollContainer.nativeElement.scrollHeight;
     }
   }
 
@@ -354,15 +364,13 @@ export class ChatComponent implements OnInit, OnChanges {
     };
   }
 
-  
-
   getConversationId(): string {
     const ids = [this.global.currentUserData?.id, this.selectedUser?.id];
     ids.sort();
     return ids.join('_');
   }
 
-  async getMessages() { 
+  async getMessages() {
     const docRef = collection(this.firestore, 'messages');
     const q = query(
       docRef,
@@ -375,7 +383,6 @@ export class ChatComponent implements OnInit, OnChanges {
         this.global.currentUserData?.id,
       ])
     );
-
     onSnapshot(q, (querySnapshot) => {
       this.messagesData = [];
       querySnapshot.forEach((doc) => {
@@ -401,14 +408,13 @@ export class ChatComponent implements OnInit, OnChanges {
       if (this.shouldScroll) {
         this.scrollAutoDown();
       }
-    }); 
-    
+    });
   }
 
   async openThread(messageId: any) {
     try {
-        this.threadOpened.emit();  
-        this.global.setCurrentThreadMessage(messageId);
+      this.threadOpened.emit();
+      this.global.setCurrentThreadMessage(messageId);
       this.chosenThreadMessage = messageId;
       this.threadControlService.setFirstThreadMessageId(messageId);
       const threadMessagesRef = collection(
@@ -438,8 +444,6 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
-  @Output() userMention = new EventEmitter<any>();
-
   handleMentionClick(mention: string) {
     this.global.openMentionMessageBox = false;
     const cleanName = mention.substring(1);
@@ -457,8 +461,6 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  getAllUsersName: any[] = [];
-
   getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
@@ -471,14 +473,14 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  scrollHeightInput:any
- 
+  scrollHeightInput: any;
+
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    const height=textarea.scrollTop = textarea.scrollHeight;
-    this.scrollHeightInput=height;
-    console.log(this.scrollHeightInput)
-  }  
+    const height = (textarea.scrollTop = textarea.scrollHeight);
+    this.scrollHeightInput = height;
+    console.log(this.scrollHeightInput);
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -489,22 +491,18 @@ export class ChatComponent implements OnInit, OnChanges {
     const emojiPicker = targetElement.querySelector(
       '.emoji-picker-container .emoji-picker'
     );
-
     const isEmojiButtonClicked =
       emojiButton && emojiButton.contains(event.target);
     const isPickerClicked = emojiPicker && emojiPicker.contains(event.target);
-
     if (!isEmojiButtonClicked && !isPickerClicked) {
       this.isEmojiPickerVisible = false;
-    } 
+    }
   }
 
 
-
   async addEmoji(event: any, message: any) {
-    const emoji = event.emoji.native; 
+    const emoji = event.emoji.native;
     this.shouldScroll = false;
-    
     if (this.global.currentUserData?.id === message.senderId) {
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
@@ -518,7 +516,8 @@ export class ChatComponent implements OnInit, OnChanges {
         message.senderStickerCount = 1;
       }
       if (message.recipientSticker === emoji) {
-        message.recipientStickerCount =   (message.recipientStickerCount || 1) + 1
+        message.recipientStickerCount =
+          (message.recipientStickerCount || 1) + 1;
         message.senderSticker = '';
         if (message.recipientStickerCount === 2) {
           message.senderSticker = message.recipientSticker;
@@ -533,10 +532,9 @@ export class ChatComponent implements OnInit, OnChanges {
 
       if (message.senderSticker === message.recipientSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
-      } 
+      }
       this.isEmojiPickerVisible = false;
-      this.messageIdHovered=null;
-      
+      this.messageIdHovered = null;
     } else if (this.global.currentUserData?.id !== message.senderId) {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
@@ -563,14 +561,12 @@ export class ChatComponent implements OnInit, OnChanges {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
       this.isEmojiPickerVisible = false;
-      this.messageIdHovered=null;
+      this.messageIdHovered = null;
     }
-
     const messageData = this.messageData(
       message.senderStickerCount,
       message.recipientStickerCount
     );
-
     const strickerRef = doc(this.firestore, 'messages', message.id);
     const stikerObj = {
       senderSticker: message.senderSticker,
@@ -579,7 +575,7 @@ export class ChatComponent implements OnInit, OnChanges {
       recipientStickerCount: message.recipientStickerCount,
       senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
       recipientChoosedStickerBackColor:
-      message.recipientChoosedStickerBackColor,
+        message.recipientChoosedStickerBackColor,
       stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
       stickerBoxOpacity: message.stickerBoxOpacity,
     };
@@ -589,10 +585,8 @@ export class ChatComponent implements OnInit, OnChanges {
     await updateDoc(strickerRef, stikerObj);
   }
 
-    
-
-  toggleEmojiPicker(message:any) {
-    this.checkEmojiId=message.id
+  toggleEmojiPicker(message: any) {
+    this.checkEmojiId = message.id;
     this.isEmojiPickerVisible = !this.isEmojiPickerVisible;
     if (this.isEmojiPickerVisible) {
       setTimeout(() => {
@@ -601,184 +595,229 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  checkEmojiId:any
-  isEmojiPickerVisible: boolean = false;
-  
-
-  removeSenderSticker(message:any){
-    const docRef=doc(this.firestore,'messages',message.id);
-    if (this.global.currentUserData?.id === message.senderId) {  
-    if(message.senderSticker && message.senderStickerCount===1 ){
-      this.messageIdHovered=null;
-       updateDoc(docRef,{senderSticker:'',senderStickerCount:null}) 
-    }else if(message.senderSticker && message.senderStickerCount===2 && message.recipientStickerCount===1 && message.recipientSticker){
-        updateDoc(docRef,{senderSticker:'', senderStickerCount:null,recipientStickerCount:1})
-    } 
-    else if(message.senderSticker && message.senderStickerCount===2 && message.recipientStickerCount===2 && message.recipientSticker){
-            updateDoc(docRef,{
-              senderSticker:'',
-              senderStickerCount:null,
-              recipientStickerCount:1
-            })
-    } else if(message.senderSticker && message.senderStickerCount===1 && message.recipientSticker && message.recipientStickerCount===1 && message.senderSticker!==message.recipientSticker){
-        updateDoc(docRef,{
-          senderSticker:'',
-          senderStickerCount:null,
-          recipientStickerCount:1
-        })
-    } 
-//     else if(message.senderStickerCount===2 && message.senderSticker && message.recipientSticker && message.recipientStickerCount===null){
-//       updateDoc(docRef,{
-//         senderSticker:'',
-//         recipientStickerCount:1,
-//         senderStickerCount:1,
-//       })
-// }   
-
-  } else if(this.global.currentUserData?.id !== message.senderId) {
-      if(message.recipientSticker && message.recipientStickerCount===2 && message.senderStickerCount===2 && message.senderSticker){
-        updateDoc(docRef,{
-          recipientSticker:'',
-          senderStickerCount:1,
-          recipientStickerCount:null
-          
-         })
-      } else if(message.senderStickerCount===2 && message.senderSticker && message.recipientSticker && message.recipientStickerCount===1){
-            updateDoc(docRef,{
-              recipientSticker:'',
-              recipientCount:null,
-              senderStickerCount:1,
-            })
+  removeSenderSticker(message: any) {
+    const docRef = doc(this.firestore, 'messages', message.id);
+    if (this.global.currentUserData?.id === message.senderId) {
+      if (message.senderSticker && message.senderStickerCount === 1) {
+        this.messageIdHovered = null;
+        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
+      } else if (
+        message.senderSticker &&
+        message.senderStickerCount === 2 &&
+        message.recipientStickerCount === 1 &&
+        message.recipientSticker
+      ) {
+        updateDoc(docRef, {
+          senderSticker: '',
+          senderStickerCount: null,
+          recipientStickerCount: 1,
+        });
+      } else if (
+        message.senderSticker &&
+        message.senderStickerCount === 2 &&
+        message.recipientStickerCount === 2 &&
+        message.recipientSticker
+      ) {
+        updateDoc(docRef, {
+          senderSticker: '',
+          senderStickerCount: null,
+          recipientStickerCount: 1,
+        });
+      } else if (
+        message.senderSticker &&
+        message.senderStickerCount === 1 &&
+        message.recipientSticker &&
+        message.recipientStickerCount === 1 &&
+        message.senderSticker !== message.recipientSticker
+      ) {
+        updateDoc(docRef, {
+          senderSticker: '',
+          senderStickerCount: null,
+          recipientStickerCount: 1,
+        });
       }
-  else if(message.senderStickerCount===2 && message.senderSticker && message.recipientSticker && message.recipientStickerCount===null){
-        updateDoc(docRef,{
-          recipientSticker:'',
-          recipientCount:null,
-          senderStickerCount:1,
-        })
-  }  
+      //     else if(message.senderStickerCount===2 && message.senderSticker && message.recipientSticker && message.recipientStickerCount===null){
+      //       updateDoc(docRef,{
+      //         senderSticker:'',
+      //         recipientStickerCount:1,
+      //         senderStickerCount:1,
+      //       })
+      // }
+    } else if (this.global.currentUserData?.id !== message.senderId) {
+      if (
+        message.recipientSticker &&
+        message.recipientStickerCount === 2 &&
+        message.senderStickerCount === 2 &&
+        message.senderSticker
+      ) {
+        updateDoc(docRef, {
+          recipientSticker: '',
+          senderStickerCount: 1,
+          recipientStickerCount: null,
+        });
+      } else if (
+        message.senderStickerCount === 2 &&
+        message.senderSticker &&
+        message.recipientSticker &&
+        message.recipientStickerCount === 1
+      ) {
+        updateDoc(docRef, {
+          recipientSticker: '',
+          recipientCount: null,
+          senderStickerCount: 1,
+        });
+      } else if (
+        message.senderStickerCount === 2 &&
+        message.senderSticker &&
+        message.recipientSticker &&
+        message.recipientStickerCount === null
+      ) {
+        updateDoc(docRef, {
+          recipientSticker: '',
+          recipientCount: null,
+          senderStickerCount: 1,
+        });
+      }
+    }
   }
+
+  removeRecipientSticker(message: any) {
+    const docRef = doc(this.firestore, 'messages', message.id);
+    if (this.global.currentUserData?.id !== message.senderId) {
+      this.hoveredName = null;
+      this.messageIdHovered = null;
+      if (message.recipientSticker && message.recipientStickerCount === 1) {
+        updateDoc(docRef, {
+          recipientSticker: '',
+          recipientStickerCount: null,
+        });
+      }
+    }
   }
 
-  removeRecipientSticker(message:any){
-    const docRef=doc(this.firestore,'messages',message.id);
-    if(this.global.currentUserData?.id !== message.senderId){
-      this.hoveredName=null
-      this.messageIdHovered=null;
-       if(message.recipientSticker && message.recipientStickerCount===1){
-        updateDoc(docRef,{recipientSticker:'',recipientStickerCount:null})
-       }
-       }
-    } 
-     
-    
-    emojiSender(message:any) {
-      const docRef=doc(this.firestore,'messages',message.id)
-       if(this.global.currentUserData?.id === message.senderId){
-        const docRef=doc(this.firestore,'messages',message.id);
-        if(message.senderSticker && message.senderStickerCount===1){
-          this.messageIdHovered=null;
-           updateDoc(docRef,{senderSticker:'',senderStickerCount:null}) 
-        }else if(message.senderStickerCount===2 && message.senderSticker){
-          updateDoc(docRef,{senderSticker:'',senderStickerCount:null}) 
-        }else if(message.senderStickerCount===2 && message.senderSticker===message.recipientSticker){
-          updateDoc(docRef,{senderStickerCount:1,recipientSticker:''})
-       }  
-       } else if(this.global.currentUserData?.id !== message.senderId){ 
-            console.log('emoj')
-               const docRef=doc(this.firestore,'messages',message.id);
-             if(message.senderSticker){
-              const senderemoji=message.senderSticker;
-              console.log('nuynna')
-              updateDoc(docRef,{recipientSticker:senderemoji,senderStickerCount:2})
-               if(message.senderStickerCount===2 && message.recipientSticker){
-                updateDoc(docRef,{recipientSticker:'',senderStickerCount:1})
-               }
-             }
-             } 
-             message.stickerBoxCurrentStyle = true;
-
-             updateDoc(docRef,{
-              senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-              stickerBoxOpacity: message.stickerBoxOpacity,
-              stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-              recipientChoosedStickerBackColor:
-      message.recipientChoosedStickerBackColor,
-            }) 
-       }
-         
-  
-       emojirecipient(message:any){
-        const docRef=doc(this.firestore,'messages',message.id)
-        if(this.global.currentUserData?.id === message.senderId){
-          console.log('emoj') 
-          if(message.recipientSticker && message.senderSticker && message.senderSticker!==message.recipientSticker){
-            const senderemoji=message.recipientSticker;
-            if(message.recipientSticker){
-               updateDoc(docRef,{senderSticker:senderemoji,recipientStickerCount:2 ,senderStickerCount:2})
-            }
-          } 
-           if(message.senderSticker==='' && message.senderStickerCount===null){
-             if(message.recipientSticker){
-              const senderemoji=message.recipientSticker;
-              console.log('hi World')
-              updateDoc(docRef,{senderSticker:senderemoji,senderStickerCount:2})
-             } 
-            }
-           }else if(this.global.currentUserData?.id !== message.senderId){
-            if(message.senderStickerCount===2 ){
-              updateDoc(docRef,{senderStickerCount:1,recipientSticker:''})
-           } else if(message.recipientSticker && message.recipientStickerCount===1){
-             updateDoc(docRef,{recipientSticker:'',recipientStickerCount:null})
-           }
-           }
-           message.stickerBoxCurrentStyle = true;
-            updateDoc(docRef,{
-              senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-              stickerBoxOpacity: message.stickerBoxOpacity,
-              stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-              recipientChoosedStickerBackColor:
-      message.recipientChoosedStickerBackColor,
-            })
-       } 
-
-
-       editMessageAdd(event: any){
-         const emoji = event.emoji.native; 
-         this.editableMessageText+=emoji
-         this. isEmojiPickerVisibleEdit=false;
-       }
-       
-       isEmojiPickerVisibleEdit:boolean=false
-
-       toggleEmojiEditPicker(){
-        this.isEmojiPickerVisibleEdit = !this.isEmojiPickerVisibleEdit;
-        if (this.isEmojiPickerVisible) {
-          setTimeout(() => {
-            this.isEmojiPickerVisibleEdit = true;
-          }, 0);
+  emojiSender(message: any) {
+    const docRef = doc(this.firestore, 'messages', message.id);
+    if (this.global.currentUserData?.id === message.senderId) {
+      const docRef = doc(this.firestore, 'messages', message.id);
+      if (message.senderSticker && message.senderStickerCount === 1) {
+        this.messageIdHovered = null;
+        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
+      } else if (message.senderStickerCount === 2 && message.senderSticker) {
+        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
+      } else if (
+        message.senderStickerCount === 2 &&
+        message.senderSticker === message.recipientSticker
+      ) {
+        updateDoc(docRef, { senderStickerCount: 1, recipientSticker: '' });
+      }
+    } else if (this.global.currentUserData?.id !== message.senderId) {
+      console.log('emoj');
+      const docRef = doc(this.firestore, 'messages', message.id);
+      if (message.senderSticker) {
+        const senderemoji = message.senderSticker;
+        console.log('nuynna');
+        updateDoc(docRef, {
+          recipientSticker: senderemoji,
+          senderStickerCount: 2,
+        });
+        if (message.senderStickerCount === 2 && message.recipientSticker) {
+          updateDoc(docRef, { recipientSticker: '', senderStickerCount: 1 });
         }
-       }
-        
+      }
+    }
+    message.stickerBoxCurrentStyle = true;
+    updateDoc(docRef, {
+      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
+      stickerBoxOpacity: message.stickerBoxOpacity,
+      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
+      recipientChoosedStickerBackColor:
+        message.recipientChoosedStickerBackColor,
+    });
+  }
 
-       @HostListener('document:click', ['$event'])
-       onEMojiEditClick(event: MouseEvent) {
-         const targetElement = this.elementRef.nativeElement;
-         const emojiButton = targetElement.querySelector(
-           '.edit-emoji-main div'
-         );
-         const emojiPicker = targetElement.querySelector(
-           '.edit-emoji-main .emoji-picker-edit'
-         );
-     
-         const isEmojiButtonClicked =
-           emojiButton && emojiButton.contains(event.target);
-         const isPickerClicked = emojiPicker && emojiPicker.contains(event.target);
-     
-         if (!isEmojiButtonClicked && !isPickerClicked) {
-           this.isEmojiPickerVisibleEdit = false;
-         } 
-       }
+  emojirecipient(message: any) {
+    const docRef = doc(this.firestore, 'messages', message.id);
+    if (this.global.currentUserData?.id === message.senderId) {
+      console.log('emoj');
+      if (
+        message.recipientSticker &&
+        message.senderSticker &&
+        message.senderSticker !== message.recipientSticker
+      ) {
+        const senderemoji = message.recipientSticker;
+        if (message.recipientSticker) {
+          updateDoc(docRef, {
+            senderSticker: senderemoji,
+            recipientStickerCount: 2,
+            senderStickerCount: 2,
+          });
+        }
+      }
+      if (message.senderSticker === '' && message.senderStickerCount === null) {
+        if (message.recipientSticker) {
+          const senderemoji = message.recipientSticker;
+          console.log('hi World');
+          updateDoc(docRef, {
+            senderSticker: senderemoji,
+            senderStickerCount: 2,
+          });
+        }
+      }
+    } else if (this.global.currentUserData?.id !== message.senderId) {
+      if (message.senderStickerCount === 2) {
+        updateDoc(docRef, { senderStickerCount: 1, recipientSticker: '' });
+      } else if (
+        message.recipientSticker &&
+        message.recipientStickerCount === 1
+      ) {
+        updateDoc(docRef, {
+          recipientSticker: '',
+          recipientStickerCount: null,
+        });
+      }
+    }
+    message.stickerBoxCurrentStyle = true;
+    updateDoc(docRef, {
+      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
+      stickerBoxOpacity: message.stickerBoxOpacity,
+      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
+      recipientChoosedStickerBackColor:
+        message.recipientChoosedStickerBackColor,
+    });
+  }
+
+  editMessageAdd(event: any) {
+    const emoji = event.emoji.native;
+    this.editableMessageText += emoji;
+    this.isEmojiPickerVisibleEdit = false;
+  }
+
+  toggleEmojiEditPicker() {
+    this.isEmojiPickerVisibleEdit = !this.isEmojiPickerVisibleEdit;
+    if (this.isEmojiPickerVisible) {
+      setTimeout(() => {
+        this.isEmojiPickerVisibleEdit = true;
+      }, 0);
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onEMojiEditClick(event: MouseEvent) {
+    const targetElement = this.elementRef.nativeElement;
+    const emojiButton = targetElement.querySelector('.edit-emoji-main div');
+    const emojiPicker = targetElement.querySelector(
+      '.edit-emoji-main .emoji-picker-edit'
+    );
+
+    const isEmojiButtonClicked =
+      emojiButton && emojiButton.contains(event.target);
+    const isPickerClicked = emojiPicker && emojiPicker.contains(event.target);
+
+    if (!isEmojiButtonClicked && !isPickerClicked) {
+      this.isEmojiPickerVisibleEdit = false;
+    }
+  }
+
 
       chatByUserName:any
       @Output() enterChatUser=new EventEmitter<any>()
@@ -788,10 +827,9 @@ export class ChatComponent implements OnInit, OnChanges {
         this.enterChatUser.emit(this.chatByUserName)
         
        }
+
     } 
 
-
-   
   
 
 

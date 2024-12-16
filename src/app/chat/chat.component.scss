@@ -136,7 +136,7 @@ app-input-field {
   position: absolute;
   top: 140px;
   width: 100%;
-  max-height: 632px;
+  max-height: 482px;
   overflow-y: auto;
   margin-top: -28px;
 }
@@ -575,7 +575,6 @@ app-input-field {
 .edit-message-content {
   color: #000000;
   width: 100%;
-
   span {
     padding: 7px;
   }
@@ -777,10 +776,6 @@ app-mention-message-box {
   right: 33%;
 }
 
-// .show-selected-files{
-
-
-// }
 
 .show-selected-files{
   width: 100%;
@@ -816,7 +811,6 @@ app-mention-message-box {
       height: 38px;
     }
   }
-
   img {
     &:hover {
       scale: 1.1;
@@ -825,12 +819,24 @@ app-mention-message-box {
   }
 }
 
+.emoji-picker-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
 .emoji-picker {
-   position: absolute;
-    z-index: 500;
-    left: 38px;
-    top: 13px;
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .emoji-picker-user{

@@ -71,10 +71,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   route = inject(ActivatedRoute);
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
-  
+
   @Input() mentionUser: string = '';
-  @Input() onHeaderUser:any
-  
+  @Input() onHeaderUser: any;
+
   channelMembers: any[] = [];
   messagesData: any = [];
   commentImages: string[] = [
@@ -106,32 +106,29 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   private loginStatusSub: Subscription | undefined;
   private guestLoginStatusSub: Subscription | undefined;
   loginAuthService = inject(LoginAuthService);
-  enterChatByUser:any
-   
- 
-
+  enterChatByUser: any;
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
+  
 
   ngOnInit(): void {
+    this.global.channelSelected = false;
     this.userId = this.route.snapshot.paramMap.get('id');
+    this.user = this.userId;
     this.getcurrentUserById(this.userId);
     this.subscribeToProfileSelection();
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
-    this.subscribeToGuestLoginStatus();
-   
-  } 
+  }
 
-  
   ngOnDestroy(): void {
     if (this.loginStatusSub) {
-      this.loginStatusSub.unsubscribe(); 
+      this.loginStatusSub.unsubscribe();
     }
     if (this.guestLoginStatusSub) {
-      this.guestLoginStatusSub.unsubscribe(); 
+      this.guestLoginStatusSub.unsubscribe();
     }
     if (this.welcomeChannelSubscription) {
       this.welcomeChannelSubscription.unsubscribe();
@@ -173,57 +170,52 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       }
     );
   }
-  
-  @Input() onHeaderChannel:any
- 
-  aaa:boolean=false
-   
+
+  @Input() onHeaderChannel: any;
+
+  aaa: boolean = false;
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
       this.global.channelSelected = false;
-      this.selectedChannel=null;
-      this.onHeaderChannel=null;
+      this.selectedChannel = null;
+      this.onHeaderChannel = null;
       this.checkProfileType();
       this.global.clearCurrentChannel();
-      this.afterLoginSheet = false; 
-      }   
-          
-    if (changes['selectedChannel'] && this.selectedChannel) { 
-      this.selectedUser=null;
-      this.onHeaderUser=null;
+      this.afterLoginSheet = false;
+    }
+
+    if (changes['selectedChannel'] && this.selectedChannel) {
+      this.selectedUser = null;
+      this.onHeaderUser = null;
       this.fetchChannelMembers();
       this.global.channelSelected = true;
       this.global.setCurrentChannel(this.selectedChannel);
-    } 
-      
-     if(changes['onHeaderUser'] && this.onHeaderUser){ 
-          this.selectedChannel=null;
-          this.onHeaderChannel=null;   
-          this.global.channelSelected = false;   
-          this.selectedUser=this.onHeaderUser;
-          this.checkProfileType();
-          this.global.clearCurrentChannel();
-          this.afterLoginSheet=false; 
-     } 
+    }
 
-      if(changes['onHeaderChannel'] && this.onHeaderChannel){
-        this.selectedUser=null;
-        this.onHeaderUser=null;
-        this.selectedChannel=this.onHeaderChannel;
-        this.fetchChannelMembers();
-        this.global.setCurrentChannel(this.onHeaderChannel);
-      } 
-       
-       
-       
-  }  
+    if (changes['onHeaderUser'] && this.onHeaderUser) {
+      this.selectedChannel = null;
+      this.onHeaderChannel = null;
+      this.global.channelSelected = false;
+      this.selectedUser = this.onHeaderUser;
+      this.checkProfileType();
+      this.global.clearCurrentChannel();
+      this.afterLoginSheet = false;
+    }
 
-   resetChannelMessages(){
-    console.log(this.onHeaderChannel.messages)
-    return this.onHeaderChannel.messages=[]
-   }
-  
+    if (changes['onHeaderChannel'] && this.onHeaderChannel) {
+      this.selectedUser = null;
+      this.onHeaderUser = null;
+      this.selectedChannel = this.onHeaderChannel;
+      this.fetchChannelMembers();
+      this.global.setCurrentChannel(this.onHeaderChannel);
+    }
+  }
 
+  resetChannelMessages() {
+    console.log(this.onHeaderChannel.messages);
+    return (this.onHeaderChannel.messages = []);
+  }
 
   onMessageForwarded(data: any) {
     this.messagesData.push(data);
@@ -265,7 +257,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async fetchChannelMembers() {
-    if (!this.selectedChannel?.id ) {
+    if (!this.selectedChannel?.id) {
       this.channelMembers = [];
       return;
     }
@@ -278,7 +270,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       );
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
-          console.log('aram')
+          console.log('aram');
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
           const membersPromises = userIds.map(async (userId: string) => {
@@ -341,8 +333,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.contactWasSelected = true;
     }
-  } 
-
+  }
 
   closeMyUserProfile() {
     this.openMyProfile = false;
@@ -352,14 +343,12 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   onThreadOpened() {
     this.threadOpened.emit();
   }
-   
-  enterByUsername(user:any){
-    this.enterChatByUser=user;
-    this.selectedUser=this.enterChatByUser;
-    this.global.openMentionMessageBox=false;
+
+  enterByUsername(user: any) {
+    this.enterChatByUser = user;
+    this.selectedUser = this.enterChatByUser;
+    this.global.openMentionMessageBox = false;
     this.checkProfileType();
     this.global.clearCurrentChannel();
-   } 
-   
-
+  }
 }

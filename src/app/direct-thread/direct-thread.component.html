@@ -89,7 +89,7 @@
                 <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
                   [(ngModel)]="editableMessageText"></textarea>
                 <div class="reaction-icon-container-editMode">
-                  <img (click)="openEmojiPicker()" class="icon-add-reaction-editMode" [src]="icons['iconAddReaction']"
+                  <img (click)="openEmojiPickerEditMode()" class="icon-add-reaction-editMode" [src]="icons['iconAddReaction']"
                   (mouseenter)="onMouseIcon('iconAddReaction', 'assets/img/add_reaction.png')"
                     (mouseleave)="onLeaveIcon()">
                 </div>
@@ -98,12 +98,20 @@
                   <img (click)="cancelEdit()" src="assets/img/cross.png">
                 </div>
               </ng-template>
+
+              <div (click)="closePickerEdit()" *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container">
+                <div class="emoji-picker">
+                  <emoji-mart (emojiClick)="addEmojiToEdit($event)" class="emoji-picker"
+                    size="18">
+                  </emoji-mart>
+                </div>
+              </div>
             </div>
 
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set-reverse">
-                <div class="img-flex-bar-options" *ngIf="!editWasClicked">
-                  <div class="edit-icon-holder">
+                <div class="img-flex-bar-options" >
+                  <div class="edit-icon-holder" *ngIf="!editWasClicked">
                     <img class="icon-more" [src]="icons['iconMore']"
                       (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
                       (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default"

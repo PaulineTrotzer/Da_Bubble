@@ -1,18 +1,22 @@
-<div [ngClass]="{'page-content-plus-header': successfullyLogged}">  
-    <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"  (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
+<div [ngClass]="{'page-content-plus-header': successfullyLogged}">
+    <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"
+        (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
     <div class="full-page-content">
         <app-workspace [ngClass]="{
             'workspace-open': isWorkspaceOpen,
             'workspace-closed': !isWorkspaceOpen
-        }" (userSelected)="onUserSelected($event)"
-            (channelSelected)="onChannelSelected($event)"></app-workspace>
-        <app-start-screen  [onHeaderChannel]="onHeaderChannel"  [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
+        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
+        <app-start-screen [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
+            [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
-        <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId" [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"></app-thread>
+        <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
+            [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
+            [selectedChannel]="selectedChannel"></app-thread>
     </div>
-    <div *ngIf="successfullyLogged" class="overlay"></div>
 </div>
+
+<div *ngIf="successfullyLogged" class="overlay"></div>
 <mat-card *ngIf="successfullyLogged" appearance="outlined" class="login-sended-info"
     [ngClass]="{'visible': successfullyLogged, 'hidden': !successfullyLogged}">
     <mat-card-content class="success-login-content">
@@ -23,10 +27,11 @@
                     isGuestLogin
                     ? 'Gast'
                     : global.googleAccountLogIn
-                    ? (global.currentUserData.email || 'Google Nutzer')
+                    ? 'Google Nutzer'
                     : global.currentUserData.email
                     }}
                 </b>
+
             </span>
         </span>
     </mat-card-content>

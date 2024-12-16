@@ -1,4 +1,4 @@
-<div *ngIf="profileCardopen" class="profile-card-ct">
+<div *ngIf="profileCardopen && user.email" class="profile-card-ct">
     <div class="name-escape-flex">
         <span>Profil</span>
         <div>
@@ -6,7 +6,7 @@
         </div>
     </div>
     <div class="img-frame">
-        <img src={{user.picture}}>
+        <img [src]="user.picture">
     </div>
     <div class="name-edit-flex">
         <div class="edit-option-title">
@@ -14,7 +14,8 @@
         </div>
         <div class="name-status-flex">
             <h2>{{user.name}}</h2>
-            <div *ngIf="isCurrentUser" class="online-status-div"> <img src="./assets/img/green-dot.svg">
+            <div *ngIf="isCurrentUser" class="online-status-div">
+                <img src="./assets/img/green-dot.svg">
                 <p>Active</p>
             </div>
         </div>
@@ -28,5 +29,6 @@
 </div>
 
 <div *ngIf="openEdit">
-    <app-dialog-edit-user [guestAccount]="guestAccount" (closeEditDialog)="closeProfileCard()"></app-dialog-edit-user>
-  </div>
+    <app-dialog-edit-user [currentUser]="user" [guestAccount]="guestAccount"
+        (closeEditDialog)="closeProfileCard()"></app-dialog-edit-user>
+</div>
