@@ -81,9 +81,9 @@
                             </svg>
                         </div>
 
-                        <div (click)="closePicker()"  *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                        <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                             <div class="emoji-picker">
-                                <emoji-mart (emojiClick)="addEmoji($event,message); closePicker()"
+                                <emoji-mart class="emoji-picker" (emojiClick)="addEmoji($event,message); closePicker()"
                                     size="18"></emoji-mart>
                             </div>
                         </div>
