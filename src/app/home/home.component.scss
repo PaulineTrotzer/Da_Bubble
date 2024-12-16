@@ -9,7 +9,7 @@
   justify-content: center;
   max-width: 2000px;
   gap: 32px;
-  width: 100%;
+  width: 98%;
 }
 
 .overlay {
@@ -111,4 +111,8 @@ app-thread {
 
 .workspace-drawer {
   transform: rotate(90deg);
+}
+
+app-start-screen{
+  width: 98%;
 }
