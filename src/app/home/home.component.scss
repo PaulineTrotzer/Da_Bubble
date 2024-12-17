@@ -11,7 +11,7 @@ z-index: 110;
 .full-page-content {
   height: 100vh;
   display: flex;
-  justify-content: center;
+  // justify-content: center;
   max-width: 2000px;
   gap: 32px;
   width: 98%;
@@ -126,8 +126,40 @@ app-thread {
 
 .workspace-drawer {
   transform: rotate(90deg);
-}
+} 
+
+// .workspaceClose{
+//   // opacity: 0;
+//   overflow-x: hidden;
+//   transition: all 175ms ease-in-out;
+//   width: 0;
+// }  
+
+// .workspaceOpen{
+//   opacity: 1;
+//   transition: all 175ms ease-in-out;
+// }
+
+
+
+
 
 app-start-screen{
   width: 98%;
+} 
+
+
+
+@media(max-width:720px){
+  app-start-screen{
+    display: none;
+  } 
+
+  // .workspace-open {
+  //   width: 100%;
+  //   transition: all 175ms ease-in-out;
+  // } 
+
+  
+
 }

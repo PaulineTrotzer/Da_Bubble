@@ -263,7 +263,14 @@
 
   span{
     color: #ffffff;
-    
   }
 
 }
+
+
+  @media(max-width:720px){
+    .card{
+      max-width: unset;
+    } 
+  }
+

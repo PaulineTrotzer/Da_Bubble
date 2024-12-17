@@ -4,7 +4,7 @@
     <div class="full-page-content">
         <app-workspace [ngClass]="{
             'workspace-open': isWorkspaceOpen,
-            'workspace-closed': !isWorkspaceOpen
+            'workspace-closed': (!isWorkspaceOpen || global.openChannelorUserBox),
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
         <app-start-screen [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
             [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"

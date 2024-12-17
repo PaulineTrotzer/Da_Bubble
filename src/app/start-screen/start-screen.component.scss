@@ -155,3 +155,11 @@ mat-card {
   padding: 0;
   z-index: 2;
 }
+
+
+@media(max-width:1349px){
+  .big-chat-card{
+    min-width: unset;
+  }
+
+}

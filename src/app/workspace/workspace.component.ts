@@ -100,10 +100,18 @@ selectUser(user: any) {
     updateDoc(docRef, resetMessageCount);
   } 
    this.global.statusCheck =false;
+   if (window.innerWidth <= 720) {
+    this.global.openChannelorUserBox = true;
+    console.log(this.global.openChannelorUserBox )
+  } else {
+    this.global.openChannelorUserBox = false;
+    console.log(this.global.openChannelorUserBox)
+  }
+  
 }   
 
  
-
+ 
 
 
 
