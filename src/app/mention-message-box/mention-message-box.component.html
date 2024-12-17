@@ -43,11 +43,11 @@
         <span class="user-email">{{global.getUserByName?.email}}</span>
       </div>
 
-      <div class="btn-div" *ngIf="!global.isGuest">
-        <button (click)="global.getUserByName ? enterChat(global.getUserByName) : cancelCard()" class="btn-primary">
-          Enter Chat
+      <div class="btn-div">
+        <button (click)="enterChat(global.getUserByName)" class="btn-primary">
+          <img src="./assets/img/direct-msg.svg">
+          Nachricht
         </button>
-
       </div>
 
     </mat-card-content>
