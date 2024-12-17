@@ -41,6 +41,11 @@
     padding: 7px;
   }
   &:hover {
+    background-color: white;
+    border-top-right-radius: 30px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
     span {
       color: #444df2;
       background-color: #eceefe;
@@ -129,6 +134,7 @@
   border-bottom-right-radius: 0;
   top: -22px;
   color: white;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .img-flex-bar-options {
@@ -231,6 +237,7 @@
   border-bottom-right-radius: 0;
   top: 0;
   color: white;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 header {
@@ -589,6 +596,8 @@ h3 {
   font-weight: 400;
   line-height: 19.1px;
   color: #686868;
+  position: relative;
+  left: 8px;
 }
 
 .partner-message-header {
