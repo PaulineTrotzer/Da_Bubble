@@ -10,9 +10,6 @@
   overflow: auto;
 }
 
-
-
-
 .channel-name {
   font-family: "Nunito";
   color: #797ef3;
@@ -81,10 +78,14 @@ header {
   }
 }
 
-.avatar-container img {
-  height: 70px;
-  width: 70px;
-  border-radius: 100%;
+.avatar-container {
+  display: flex;
+  align-self: center;
+  img {
+    height: 70px;
+    width: 70px;
+    border-radius: 100%;
+  }
 }
 
 .reverse {
@@ -154,6 +155,8 @@ header {
 }
 
 .from-current {
+  display: flex;
+  align-self: self-end;
   background-color: #797ef3;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -289,10 +292,17 @@ header {
   border-bottom-right-radius: 30px;
   border-bottom-left-radius: 30px;
   padding: 10px 20px;
-  left: 187px;
+  left: 105px;
+  top: 10px;
+  span {
+    padding: 7px;
+  }
   cursor: pointer;
   &:hover span {
-    color: #535af1;
+    color: #444df2;
+    background-color: #eceefe;
+    border: 0 solid;
+    border-radius: 30px;
   }
 }
 
@@ -330,14 +340,14 @@ header {
       border-radius: 50px;
     }
   }
-  .cancel-icon{
+  .cancel-icon {
     object-fit: contain;
     width: 22px;
     padding: 3px;
     &:hover {
       background-color: #eceefe;
       border-radius: 50px;
-    } 
+    }
   }
 }
 
@@ -356,6 +366,10 @@ textarea {
   text-decoration-skip-ink: none;
   width: 100%;
   height: 100%;
+  font-size: 16px;
+  &:focus{
+    font-size: 16px;
+  }
 }
 
 .textarea {
