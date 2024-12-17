@@ -40,6 +40,7 @@ import {
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-direct-thread',
@@ -51,9 +52,26 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     MatCardModule,
   ],
-  templateUrl: './direct-thread.component.html',
-  styleUrl: './direct-thread.component.scss',
-  animations: [slideFromRight, fadeIn],
+ templateUrl: './direct-thread.component.html',
+  styleUrls: ['./direct-thread.component.scss'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in-out', style({ opacity: 1 }))
+      ])
+    ]),
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-50%)' }),
+        animate('150ms ease-in-out', style({ opacity: 1, transform: 'translateX(0)' }))
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateX(0)' }),
+        animate('150ms ease-in-out', style({ opacity: 0, transform: 'translateX(-50%)' }))
+      ])
+    ])
+  ]
 })
 export class DirectThreadComponent implements OnInit {
   @Output() closeDirectThread = new EventEmitter<void>();
@@ -183,8 +201,6 @@ export class DirectThreadComponent implements OnInit {
       console.error('Error in saveOrDeleteMessage:', error);
     }
   }
-  
-  
 
   resetEditMode() {
     this.editMessageId = null;
@@ -250,9 +266,6 @@ export class DirectThreadComponent implements OnInit {
     }, 100);
   }
 
-  hasCurrentMessage(message: any) {
-    return message.senderId === this.currentUserId;
-  }
 
   toggleOptionBar(messageId: string, show: boolean): void {
     if (this.editWasClicked && this.editMessageId !== messageId) {
@@ -292,10 +305,6 @@ export class DirectThreadComponent implements OnInit {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-  }
-
-  isLeftReactions(message: any): boolean {
-    return message.senderId === this.selectedUser?.uid;
   }
 
   async initializeUser() {
@@ -413,12 +422,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-  onHover(iconKey: string, newSrc: string): void {
-    this.icons[iconKey] = newSrc;
-    if (iconKey === 'iconAddReaction') {
-      this.hoveredReactionIcon = true;
-    }
-  }
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
@@ -628,17 +631,6 @@ export class DirectThreadComponent implements OnInit {
 
   onMouseLeave(message: any) {
     message.isHovered = false;
-  }
-
-  onMouseIcon(iconKey: string, newSrc: string): void {
-    this.icons[iconKey] = newSrc;
-    if (iconKey === 'iconAddReaction') {
-      this.hoveredReactionIcon = true;
-    }
-  }
-
-  onLeaveIcon() {
-    this.hoveredReactionIcon = false;
   }
 
   onClose() {

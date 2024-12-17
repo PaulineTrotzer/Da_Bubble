@@ -310,7 +310,7 @@ h3 {
 
 .reaction-icon-container-editMode {
   position: absolute;
-  bottom: 19px;
+  bottom: 45px;
   left: 5px;
   svg {
     display: block;
@@ -496,16 +496,28 @@ h3 {
   display: flex;
   position: absolute;
   right: 46px;
-  bottom: 25px;
+  bottom: 49px;
   gap: 10px;
-  img {
-    object-fit: contain;
-    width: 24px;
-    &:hover {
-      background-color: #eceefe;
-      border-radius: 50px;
-    }
+}
+
+.save-icon {
+  object-fit: contain;
+  width: 24px;
+  padding: 2px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
   }
+}
+
+.cancel-icon{
+  object-fit: contain;
+  width: 22px;
+  padding: 3px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
+  } 
 }
 
 .message-holder {
