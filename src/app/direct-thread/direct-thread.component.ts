@@ -174,6 +174,7 @@ export class DirectThreadComponent implements OnInit {
         const editMessage = {
           text: this.editableMessageText,
           editedTextShow: true,
+          editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, editMessage);
       }
@@ -182,6 +183,8 @@ export class DirectThreadComponent implements OnInit {
       console.error('Error in saveOrDeleteMessage:', error);
     }
   }
+  
+  
 
   resetEditMode() {
     this.editMessageId = null;

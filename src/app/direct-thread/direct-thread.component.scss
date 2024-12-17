@@ -7,6 +7,14 @@
   width: 510px;
 }
 
+.text-info-edit {
+  position: relative;
+  font-size: 12px;
+  margin-top: 9px;
+  font-family: "Nunito";
+  text-align: center;
+}
+
 .mat-mdc-card {
   border-style: none;
   border-top-right-radius: 30px;
@@ -14,11 +22,12 @@
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
   position: absolute;
-  left: 58px;
-  top: 17px;
+  left: 100px;
+  top: 34px;
   width: fit-content;
   white-space: nowrap;
   font-size: 14px;
+  transition: opacity 0.3s ease;
 }
 
 .edit-message-content {
@@ -91,7 +100,7 @@
     }
   }
   span {
-    font-family: 'Nunito';
+    font-family: "Nunito";
     font-size: 14px;
     font-weight: 400;
     line-height: 19.1px;
@@ -198,7 +207,7 @@
 
 .show-set-reverse {
   position: absolute;
-  left: -8px;
+  left: 25px;
   border: 1px solid #adb0d9;
   background-color: white;
   border-top-right-radius: 30px;
@@ -263,7 +272,7 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 10px;
+  padding: 16px 0;
   margin: 16px 0;
   max-height: 100%;
   overflow-y: auto;
@@ -284,7 +293,7 @@ h3 {
   padding: 16px;
 }
 
-.reaction-icon-container-editMode{
+.reaction-icon-container-editMode {
   position: absolute;
   bottom: 15px;
 }
@@ -433,16 +442,16 @@ h3 {
   }
 }
 
-.option-flex{
+.option-flex {
   display: flex;
   position: absolute;
   right: 46px;
   bottom: 25px;
   gap: 10px;
-  img{
+  img {
     object-fit: contain;
     width: 24px;
-    &:hover{
+    &:hover {
       background-color: #eceefe;
       border-radius: 50px;
     }
@@ -452,6 +461,7 @@ h3 {
 .message-holder {
   position: relative;
   padding: 15px 0 10px 0;
+  right: 31px;
 }
 
 .message-content-bubble {
@@ -480,6 +490,8 @@ h3 {
   align-items: center;
   gap: 16px;
   flex-direction: row-reverse;
+  position: relative;
+  right: 35px;
   h4 {
     font-family: Nunito;
     font-size: 18px;
@@ -497,8 +509,8 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 10px 30px 42px 30px;
-  margin: 16px 52px 0 0;
+  padding: 10px 0;
+  margin: 16px 0;
 }
 
 .message-text {

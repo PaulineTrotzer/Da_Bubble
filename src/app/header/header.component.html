@@ -1,108 +1,135 @@
-<div class="main-header" >
-    <div class="header-content " >
+<div class="main-header">
+    <div class="header-content ">
         <img src="../../assets/img/bubble.png" alt="">
 
-        <div 
-        class="search-container"
-      >
-        <input  
-        [ngClass]="{'radius':(showUserList||showChannelList || (getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult ))}"
-          [(ngModel)]="searcheNameOrChannel"
-          type="text"
-          placeholder="Suche... gib @ für alle User und # für alle Channel ein"
-          (focus)="handleFocus()"
-          (blur)="handleFocus()"
-          (input)="checkInputValue()"
-        /> 
+        <div class="search-container">
+            <input
+                [ngClass]="{'radius':(showUserList||showChannelList || (getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult ))}"
+                [(ngModel)]="searcheNameOrChannel" type="text"
+                placeholder="Suche... gib @ für alle User und # für alle Channel ein" (focus)="handleFocus()"
+                (blur)="handleFocus()" (input)="checkInputValue()" />
 
-                   <mat-card *ngIf="showUserList || showChannelList || (getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult )"  class="mainSearch-box">
-                        <mat-card-content>
-                           <div *ngIf="showUserList"  class="main-user">   
-                                <div class="user-list"> 
-                                <div *ngFor="let user of filteredUsers">
-                                     <div class="user-info-list" (mouseenter)="checkUserId(user)" (mouseleave)="leaveUserId()" (click)="enterChatUser(user)">
-                                         <div class="user-image-box">
-                                         <img [src]="user.picture" >
+            <mat-card
+                *ngIf="showUserList || showChannelList || (getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult )"
+                class="mainSearch-box">
+                <mat-card-content>
+                    <div *ngIf="showUserList" class="main-user">
+                        <div class="user-list">
+                            <div *ngFor="let user of filteredUsers">
+                                <div class="user-info-list" (mouseenter)="checkUserId(user)"
+                                    (mouseleave)="leaveUserId()" (click)="enterChatUser(user)">
+                                    <div class="user-image-box">
+                                        <img [src]="user.picture">
                                         <div class="status-position">
-                                          <span [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span> 
-                                        </div>    
+                                            <span
+                                                [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span>
                                         </div>
-                                          <div class="user-name"> {{'@'+user.name}}</div>
-                                          <div *ngIf="userIdHover===user.id" class="enter-chat-text">Chat beitreten</div>
-                                     </div>   
-                               </div>
-                            </div>        
-                               <div class="noUser-info" *ngIf="noUserFounded">Keine User gefunden</div>
-                            </div>    
-                              
-                            <div  *ngIf="showChannelList" class="main-channel">
-                                <div class="channel-list">
-                                   <div *ngFor="let channel of filterChannel">
-                                         <div class="channel-info-list" (mouseenter)="checkChannelId(channel)" (mouseleave)="leaveChannelId()" (click)="enterChannel(channel)">
-                                             <div class="channel-name">{{'#'+channel.name}}</div>  
-                                              <div *ngIf="channelIdHover===channel.id" class="enter-channel-text">Channel beitreten </div>
-                                         </div>
-                                   </div> 
-                                </div>
-                                    <div class="noChannel-info" *ngIf="noChannelFounded">Keine Channel gefunden</div>
-                            </div>
-
-                               <div class="main-result-box" *ngIf="getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult">
-                                <h3>Aktuelle Suchanfragen</h3>
-                                    <div>
-                                       <div *ngFor="let searchResult of getSeperateUser.searchHeaderResult">
-                                        <div>
-                                            <div class="main-result-user"  *ngIf="searchResult.status" >
-                                                <div class="user-info-list" (mouseenter)="checkuserResultId(searchResult)" (mouseleave)="leaveCheckuserResultId()" (click)="enterChatUser(searchResult)">
-                                                <div class="user-image-box">
-                                                    <img [src]="searchResult.picture" >
-                                                   <div class="status-position">
-                                                     <span [ngClass]="{'online':searchResult.status==='online','offline':searchResult.status==='offline'}"></span> 
-                                                   </div>    
-                                                   </div>
-                                                   <div class="user-name"> {{'@'+searchResult.name}}</div>
-                                                   <div *ngIf="hoverResultnameId===searchResult.id" class="enter-chat-text">Chat beitreten</div>
-                                                
-                                                </div>
-                                                <div  *ngIf="hoverResultnameId !== searchResult.id"  class="svg-box" (click)="deleteUser(searchResult)"> 
-                                                    <svg width="20px" height="20px" viewBox="0 0 1024 1024" fill="#000000" class="icon"  version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M32 241.6c-11.2 0-20-8.8-20-20s8.8-20 20-20l940 1.6c11.2 0 20 8.8 20 20s-8.8 20-20 20L32 241.6zM186.4 282.4c0-11.2 8.8-20 20-20s20 8.8 20 20v688.8l585.6-6.4V289.6c0-11.2 8.8-20 20-20s20 8.8 20 20v716.8l-666.4 7.2V282.4z" fill="" /><path d="M682.4 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM367.2 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM524.8 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM655.2 213.6v-48.8c0-17.6-14.4-32-32-32H418.4c-18.4 0-32 14.4-32 32.8V208h-40v-42.4c0-40 32.8-72.8 72.8-72.8H624c40 0 72.8 32.8 72.8 72.8v48.8h-41.6z" fill="" /></svg>
-                                                </div>
-                                                
-                                           </div> 
-
-                                         <div  *ngIf="!searchResult.status" class="main-result-channel">
-                                        <div class="channel-info-list"   (mouseenter)="checkChannelResultId(searchResult)" (mouseleave)="leaveCheckChannelResultId()" (click)="enterChannel(searchResult)">
-                                            <div class="channel-name">{{'#'+searchResult.name}}</div> 
-                                            <div *ngIf="hoverResultChannelId===searchResult.id" class="enter-channel-text">Channel beitreten </div>
-                                        </div> 
-                                        <div *ngIf="hoverResultChannelId!==searchResult.id"   class="svg-box" (click)="deleteUser(searchResult)"> 
-                                            <svg width="20px" height="20px" viewBox="0 0 1024 1024" fill="#000000" class="icon"  version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M32 241.6c-11.2 0-20-8.8-20-20s8.8-20 20-20l940 1.6c11.2 0 20 8.8 20 20s-8.8 20-20 20L32 241.6zM186.4 282.4c0-11.2 8.8-20 20-20s20 8.8 20 20v688.8l585.6-6.4V289.6c0-11.2 8.8-20 20-20s20 8.8 20 20v716.8l-666.4 7.2V282.4z" fill="" /><path d="M682.4 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM367.2 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM524.8 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM655.2 213.6v-48.8c0-17.6-14.4-32-32-32H418.4c-18.4 0-32 14.4-32 32.8V208h-40v-42.4c0-40 32.8-72.8 72.8-72.8H624c40 0 72.8 32.8 72.8 72.8v48.8h-41.6z" fill="" /></svg>
-                                        </div>
-
-                                        </div>
-                               </div>
-                                       </div> 
                                     </div>
-                               </div>
-                            
+                                    <div class="user-name"> {{'@'+user.name}}</div>
+                                    <div *ngIf="userIdHover===user.id" class="enter-chat-text">Chat beitreten</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="noUser-info" *ngIf="noUserFounded">Keine User gefunden</div>
+                    </div>
 
-                         </mat-card-content>  
-                 </mat-card> 
-      </div>
-        
+                    <div *ngIf="showChannelList" class="main-channel">
+                        <div class="channel-list">
+                            <div *ngFor="let channel of filterChannel">
+                                <div class="channel-info-list" (mouseenter)="checkChannelId(channel)"
+                                    (mouseleave)="leaveChannelId()" (click)="enterChannel(channel)">
+                                    <div class="channel-name">{{'#'+channel.name}}</div>
+                                    <div *ngIf="channelIdHover===channel.id" class="enter-channel-text">Channel
+                                        beitreten </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="noChannel-info" *ngIf="noChannelFounded">Keine Channel gefunden</div>
+                    </div>
+
+                    <div class="main-result-box"
+                        *ngIf="getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult">
+                        <h3>Aktuelle Suchanfragen</h3>
+                        <div>
+                            <div *ngFor="let searchResult of getSeperateUser.searchHeaderResult">
+                                <div>
+                                    <div class="main-result-user" *ngIf="searchResult.status">
+                                        <div class="user-info-list" (mouseenter)="checkuserResultId(searchResult)"
+                                            (mouseleave)="leaveCheckuserResultId()"
+                                            (click)="enterChatUser(searchResult)">
+                                            <div class="user-image-box">
+                                                <img [src]="searchResult.picture">
+                                                <div class="status-position">
+                                                    <span
+                                                        [ngClass]="{'online':searchResult.status==='online','offline':searchResult.status==='offline'}"></span>
+                                                </div>
+                                            </div>
+                                            <div class="user-name"> {{'@'+searchResult.name}}</div>
+                                            <div *ngIf="hoverResultnameId===searchResult.id" class="enter-chat-text">
+                                                Chat beitreten</div>
+
+                                        </div>
+                                        <div *ngIf="hoverResultnameId !== searchResult.id" class="svg-box"
+                                            (click)="deleteUser(searchResult)">
+                                            <svg width="20px" height="20px" viewBox="0 0 1024 1024" fill="#000000"
+                                                class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M32 241.6c-11.2 0-20-8.8-20-20s8.8-20 20-20l940 1.6c11.2 0 20 8.8 20 20s-8.8 20-20 20L32 241.6zM186.4 282.4c0-11.2 8.8-20 20-20s20 8.8 20 20v688.8l585.6-6.4V289.6c0-11.2 8.8-20 20-20s20 8.8 20 20v716.8l-666.4 7.2V282.4z"
+                                                    fill="" />
+                                                <path
+                                                    d="M682.4 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM367.2 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM524.8 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM655.2 213.6v-48.8c0-17.6-14.4-32-32-32H418.4c-18.4 0-32 14.4-32 32.8V208h-40v-42.4c0-40 32.8-72.8 72.8-72.8H624c40 0 72.8 32.8 72.8 72.8v48.8h-41.6z"
+                                                    fill="" />
+                                            </svg>
+                                        </div>
+
+                                    </div>
+
+                                    <div *ngIf="!searchResult.status" class="main-result-channel">
+                                        <div class="channel-info-list" (mouseenter)="checkChannelResultId(searchResult)"
+                                            (mouseleave)="leaveCheckChannelResultId()"
+                                            (click)="enterChannel(searchResult)">
+                                            <div class="channel-name">{{'#'+searchResult.name}}</div>
+                                            <div *ngIf="hoverResultChannelId===searchResult.id"
+                                                class="enter-channel-text">Channel beitreten </div>
+                                        </div>
+                                        <div *ngIf="hoverResultChannelId!==searchResult.id" class="svg-box"
+                                            (click)="deleteUser(searchResult)">
+                                            <svg width="20px" height="20px" viewBox="0 0 1024 1024" fill="#000000"
+                                                class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M32 241.6c-11.2 0-20-8.8-20-20s8.8-20 20-20l940 1.6c11.2 0 20 8.8 20 20s-8.8 20-20 20L32 241.6zM186.4 282.4c0-11.2 8.8-20 20-20s20 8.8 20 20v688.8l585.6-6.4V289.6c0-11.2 8.8-20 20-20s20 8.8 20 20v716.8l-666.4 7.2V282.4z"
+                                                    fill="" />
+                                                <path
+                                                    d="M682.4 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM367.2 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM524.8 867.2c-11.2 0-20-8.8-20-20V372c0-11.2 8.8-20 20-20s20 8.8 20 20v475.2c0.8 11.2-8.8 20-20 20zM655.2 213.6v-48.8c0-17.6-14.4-32-32-32H418.4c-18.4 0-32 14.4-32 32.8V208h-40v-42.4c0-40 32.8-72.8 72.8-72.8H624c40 0 72.8 32.8 72.8 72.8v48.8h-41.6z"
+                                                    fill="" />
+                                            </svg>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </mat-card-content>
+            </mat-card>
+        </div>
+
 
         <div class="user-info">
             <h2>{{user.name}}</h2>
             <img class="user-img" src={{user.picture}}>
             <button class="arrow-down-btn" (click)="toggleDropDown()">
-                <svg class="svg-down" width="15" height="10" viewBox="0 0 15 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="svg-down" width="15" height="10" viewBox="0 0 15 10" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M7.45324 9.125C7.2449 9.125 7.04157 9.08333 6.84324 9C6.64574 8.91667 6.46365 8.79167 6.29699 8.625L0.484489 2.8125C0.171989 2.5 0.0207386 2.10917 0.0307386 1.64C0.0415719 1.17167 0.203239 0.78125 0.515739 0.46875C0.828239 0.15625 1.21907 0 1.68824 0C2.15657 0 2.54699 0.15625 2.85949 0.46875L7.45324 5.09375L12.0782 0.46875C12.3907 0.15625 12.7812 0 13.2495 0C13.7187 0 14.1095 0.15625 14.422 0.46875C14.7345 0.78125 14.8907 1.17167 14.8907 1.64C14.8907 2.10917 14.7345 2.5 14.422 2.8125L8.60949 8.625C8.44282 8.79167 8.26074 8.91667 8.06324 9C7.8649 9.08333 7.66157 9.125 7.45324 9.125Z"
                         fill="#444DF2" />
                 </svg>
             </button>
             <div *ngIf="clicked">
-                <app-dialog-header-dropdown ></app-dialog-header-dropdown>
+                <app-dialog-header-dropdown></app-dialog-header-dropdown>
             </div>
         </div>
     </div>
