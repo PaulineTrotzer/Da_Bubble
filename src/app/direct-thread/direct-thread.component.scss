@@ -295,8 +295,26 @@ h3 {
 
 .reaction-icon-container-editMode {
   position: absolute;
-  bottom: 15px;
+  bottom: 19px;
+  left: 5px;
+  svg {
+    display: block; /* Entfernt zusätzlichen Inline-Space */
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe; 
+      cursor: pointer;
+
+      path {
+        fill: #444df2; 
+      }
+    }
+  }
 }
+
 
 .emoji-flex-right {
   display: flex;
