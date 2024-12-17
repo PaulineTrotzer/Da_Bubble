@@ -42,7 +42,7 @@
                 <img [src]="selectedUser.picture" alt="{{ selectedUser.name }}" />
               </div>
               <h4>{{ selectedUser.name }}</h4>
-              <span class="message-time">{{ message.timestamp | date : "HH:mm" }}</span>
+              <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
               <p>{{ message.text }}</p>
@@ -110,7 +110,7 @@
                 <img [src]="currentUser.picture" alt="{{ currentUser.name }}" />
               </div>
               <h4>{{ currentUser.name }}</h4>
-              <span class="message-time">{{ message.timestamp | date : "HH:mm" }}</span>
+              <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
             <div class="message-holder" [class.hovered]="message.isHovered">
 

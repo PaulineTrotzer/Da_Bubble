@@ -60,7 +60,6 @@ input.radius {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
   position: relative;
   &:hover {
     svg {
@@ -75,6 +74,7 @@ input.radius {
     line-height: 43.65px;
     color: #000000;
     white-space: nowrap;
+    margin-right: 8px;
   }
   .user-img {
     width: 70px;
@@ -174,7 +174,6 @@ input.radius {
   &:hover {
     background-color: #eceefe;
     border-radius: 40px;
-
     .user-name {
       color: #444df2;
     }
