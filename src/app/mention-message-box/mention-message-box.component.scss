@@ -113,7 +113,6 @@
         width: 30px;
         filter: brightness(0) saturate(100%);  
      } 
-       
   }
 
   .user-email {
@@ -131,4 +130,8 @@
         display: flex;
         align-items: center;
     }
+ }
+
+ .icon{
+  margin-right: 8px;
  }

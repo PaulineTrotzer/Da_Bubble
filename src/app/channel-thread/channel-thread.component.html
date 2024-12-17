@@ -3,7 +3,7 @@
     <header>
       <div class="left">
         <h2>Thread</h2>
-        <p># {{ selectedChannel?.name }}</p>
+        <p class="channel-name"># {{ selectedChannel?.name }}</p>
       </div>
       <div class="right">
         <div class="img-container" (click)="closeThread()">
@@ -40,12 +40,15 @@
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
           {{ topicMessage?.text! }} </textarea>
           <div class="button-row edit-message-button-row">
-            <button class="btn-secondary edit-button" (click)="cancelEdit()">
+            <!--             <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
-            </button>
-            <button class="btn-primary edit-button" (click)="saveEditedMessage(topicMessage?.id!)">
+            </button> -->
+            <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
+            <img class="save-icon" (click)="saveEditedMessage(topicMessage?.id!)" src="assets/img/check-mark.svg"
+              alt="Speichern">
+            <!--             <button class="btn-primary edit-button" (click)="saveEditedMessage(topicMessage?.id!)">
               Speichern
-            </button>
+            </button> -->
           </div>
         </form>
         <img [src]="topicMessage?.senderPicture" />
@@ -135,7 +138,7 @@
               " (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)">
               {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div class="img-container" *ngIf="hasReactions(topicMessage?.reactions!)"
+            <!--             <div class="img-container" *ngIf="hasReactions(topicMessage?.reactions!)"
               (click)="togglePicker(topicMessage?.id!)">
               <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                 class="icon">
@@ -149,7 +152,7 @@
                     fill="black" />
                 </g>
               </svg>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -179,12 +182,15 @@
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
         {{ message.text }} </textarea>
           <div class="button-row edit-message-button-row">
-            <button class="btn-secondary edit-button" (click)="cancelEdit()">
+    <!--         <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
             </button>
             <button class="btn-primary edit-button" (click)="saveEditedMessage(message.id)">
               Speichern
-            </button>
+            </button> -->
+            <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
+            <img class="save-icon" (click)="saveEditedMessage(topicMessage?.id!)" src="assets/img/check-mark.svg"
+              alt="Speichern">
           </div>
         </form>
         <img [src]="message.senderPicture" />
@@ -265,7 +271,7 @@
               " (click)="addEmojiToMessage(reaction.key, message.id!)">
               {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
+            <!--             <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
               <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                 class="icon">
                 <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
@@ -278,7 +284,7 @@
                     fill="black" />
                 </g>
               </svg>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

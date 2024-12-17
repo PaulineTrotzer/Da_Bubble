@@ -269,6 +269,7 @@ app-input-field {
   max-width: 770px;
   overflow-wrap: break-word;
   max-height: max-content;
+  width: fit-content;
 }
 
 .message-card-user {
@@ -279,6 +280,7 @@ app-input-field {
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
   max-width: 770px;
+  width: fit-content;
   overflow-wrap: break-word;
   max-height: max-content;
 
@@ -539,7 +541,6 @@ app-input-field {
   width: 40px;
   height: 40px;
   position: relative;
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;

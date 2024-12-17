@@ -29,14 +29,10 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { firstValueFrom, Subscription, } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import {
-  slideFromRight,
-  fadeIn,
-} from './../../assets/direct-thread.animations';
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
@@ -52,26 +48,32 @@ import { animate, style, transition, trigger } from '@angular/animations';
     FormsModule,
     MatCardModule,
   ],
- templateUrl: './direct-thread.component.html',
+  templateUrl: './direct-thread.component.html',
   styleUrls: ['./direct-thread.component.scss'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('300ms ease-in-out', style({ opacity: 1 }))
-      ])
+        animate('300ms ease-in-out', style({ opacity: 1 })),
+      ]),
     ]),
     trigger('slideIn', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateX(-50%)' }),
-        animate('150ms ease-in-out', style({ opacity: 1, transform: 'translateX(0)' }))
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 1, transform: 'translateX(0)' })
+        ),
       ]),
       transition(':leave', [
         style({ opacity: 1, transform: 'translateX(0)' }),
-        animate('150ms ease-in-out', style({ opacity: 0, transform: 'translateX(-50%)' }))
-      ])
-    ])
-  ]
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 0, transform: 'translateX(-50%)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class DirectThreadComponent implements OnInit {
   @Output() closeDirectThread = new EventEmitter<void>();
@@ -121,8 +123,8 @@ export class DirectThreadComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
-    this.initializeUser();
-    this.subscribeToThreadMessages();
+    await this.initializeUser();
+    await this.subscribeToThreadMessages();
     this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
@@ -266,7 +268,6 @@ export class DirectThreadComponent implements OnInit {
     }, 100);
   }
 
-
   toggleOptionBar(messageId: string, show: boolean): void {
     if (this.editWasClicked && this.editMessageId !== messageId) {
       return;
@@ -285,7 +286,7 @@ export class DirectThreadComponent implements OnInit {
     this.showReactionPopUpBoth[messageId] = show;
   }
 
-  private subscribeToThreadMessages() {
+  async subscribeToThreadMessages() {
     this.threadControlService.firstThreadMessageId$.subscribe(
       async (firstInitialisedThreadMsg) => {
         if (firstInitialisedThreadMsg) {
@@ -422,7 +423,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
@@ -433,7 +433,7 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-  closePickerEdit(){
+  closePickerEdit() {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerEditVisible = false;
   }
@@ -565,7 +565,7 @@ export class DirectThreadComponent implements OnInit {
     }, 0);
   }
 
-  handlingExistingUserReaction(
+  async handlingExistingUserReaction(
     threadMessageId: string,
     userId: string,
     emoji: Emoji

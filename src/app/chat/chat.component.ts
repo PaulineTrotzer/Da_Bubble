@@ -107,15 +107,14 @@ export class ChatComponent implements OnInit, OnChanges {
   isEmojiPickerVisibleEdit: boolean = false;
   @Output() userMention = new EventEmitter<any>();
   getAllUsersName: any[] = [];
-  overlayStatusService =inject(OverlayStatusService);
+  overlayStatusService = inject(OverlayStatusService);
   overlayOpen = false;
 
   constructor() {}
 
-  ngOnInit(): void {
-    this.getAllUsersname();
+  async ngOnInit(): Promise<void> {
+    await this.getAllUsersname();
   }
-
 
   subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
@@ -132,7 +131,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerVisible = false;
   }
-
 
   openEmojiPicker() {
     debugger;
@@ -217,13 +215,13 @@ export class ChatComponent implements OnInit, OnChanges {
     return `${day}.${month}.${year}`;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-      this.getMessages();
+      await this.getMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      this.getMessages().then(() => this.checkForSelfChat());
+      await this.getMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
@@ -237,7 +235,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
-      this.getMessages();
+      await this.getMessages();
       this.chatMessage = '';
     }
   }
@@ -444,7 +442,7 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
-  handleMentionClick(mention: string) {
+  async handleMentionClick(mention: string) {
     this.global.openMentionMessageBox = false;
     const cleanName = mention.substring(1);
     const userRef = collection(this.firestore, 'users');
@@ -461,7 +459,7 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  getAllUsersname() {
+  async getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
       this.getAllUsersName = [];
@@ -498,7 +496,6 @@ export class ChatComponent implements OnInit, OnChanges {
       this.isEmojiPickerVisible = false;
     }
   }
-
 
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
@@ -818,33 +815,11 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
+  chatByUserName: any;
+  @Output() enterChatUser = new EventEmitter<any>();
 
-      chatByUserName:any
-      @Output() enterChatUser=new EventEmitter<any>()
-
-       enterChatByUserName(user:any){
-        this.chatByUserName=user
-        this.enterChatUser.emit(this.chatByUserName)
-        
-       }
-
-    } 
-
-  
-
-
-  
-
- 
-      
-    
-
-
-    
-  
-
-
-
-
-
-
+  enterChatByUserName(user: any) {
+    this.chatByUserName = user;
+    this.enterChatUser.emit(this.chatByUserName);
+  }
+}

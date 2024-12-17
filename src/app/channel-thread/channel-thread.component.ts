@@ -44,16 +44,12 @@ interface Message {
     ]
 })
 export class ChannelThreadComponent implements OnInit {
-  constructor() {}
-
   channelMessageId: any;
   @Input() selectedChannel: any;
-
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
   overlay = inject(OverlayStatusService)
-
   topicMessage: Message | null = null;
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
@@ -68,17 +64,18 @@ export class ChannelThreadComponent implements OnInit {
   editingMessageId: string | null = null;
   reactionUserNames: { [userId: string]: string } = {};
   messageToEdit: string = '';
-
   unsubscribe: (() => void) | undefined;
 
-  ngOnInit(): void {
+  constructor() {}
+
+  async ngOnInit(): Promise<void> {
     this.global.channelThread$.subscribe(async (threadId) => {
       if (threadId) {
         this.channelMessageId = threadId;
         await this.getTopic();
-        this.loadThreadMessages();
+        await this.loadThreadMessages();
         this.toggleChannelThread(true);
-        this.loadCurrentUserEmojis();
+        await this.loadCurrentUserEmojis();
       }
     });
   }
@@ -95,8 +92,7 @@ export class ChannelThreadComponent implements OnInit {
         this.selectedChannel.id,
         'messages', 
         this.channelMessageId
-      );
-      
+      ); 
       onSnapshot(docRef, (doc) => {
         const data = doc.data();
         if (data) {
@@ -115,11 +111,9 @@ export class ChannelThreadComponent implements OnInit {
       console.log('No message selected!');
       return;
     }
-
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-
     const messagesRef = collection(
       this.db,
       'channels',
@@ -145,11 +139,11 @@ export class ChannelThreadComponent implements OnInit {
     this.global.channelThreadSubject.next(null);
   }
 
-  addEmoji(event: any, messageId: string) {
+  async addEmoji(event: any, messageId: string) {
     const emoji = event.emoji;
     this.isPickerVisible = null;
-    this.addLastUsedEmoji(emoji);
-    this.addToReactionInfo(emoji, messageId);
+    await this.addLastUsedEmoji(emoji);
+    await this.addToReactionInfo(emoji, messageId);
   }
 
   async addLastUsedEmoji(emoji: any) {
@@ -262,7 +256,7 @@ export class ChannelThreadComponent implements OnInit {
     return reactions && Object.keys(reactions).length > 0;
   }
 
-  loadCurrentUserEmojis() {
+  async loadCurrentUserEmojis() {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
   
@@ -280,7 +274,7 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
 
-  addEmojiToMessage(emoji: string, messageId: string) {
+  async addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
   
