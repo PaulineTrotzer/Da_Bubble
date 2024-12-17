@@ -29,7 +29,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { firstValueFrom, Subscription, first, BehaviorSubject } from 'rxjs';
+import { firstValueFrom, Subscription, } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
@@ -355,7 +355,7 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${firstInitialisedThreadMsg}/threadMessages`
       );
-      this.settingDataforFireBase(threadMessagesRef);
+      await this.settingDataforFireBase(threadMessagesRef);
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }

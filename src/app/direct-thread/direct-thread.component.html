@@ -51,10 +51,20 @@
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set">
                 <div class="img-flex-bar-options">
-                  <img (click)="openEmojiPicker()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
-                  (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
-                  (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default"
-                  (mouseenter)="toggleEditOption(message.id, false)">
+                  <div class="add-reaction" (click)="openEmojiPicker()">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
+                        width="24" height="24">
+                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                      </mask>
+                      <g mask="url(#mask0_489_4318)">
+                        <path
+                          d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                          fill="black" />
+                      </g>
+                    </svg>
+                  </div>
+
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
                       <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
@@ -68,40 +78,61 @@
           </div>
         </div>
 
+        <!-- CURRENT USER I FOLLOWING-->
+
         <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)">
 
-            <div class="sticker-hover-ct" >
-              <div class="show-set-reverse">
-                <div class="img-flex-bar-options" >
-                  <div class="edit-icon-holder" *ngIf="!editWasClicked">
-                    <img class="icon-more" [src]="icons['iconMore']"
-                      (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
-                      (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default"
-                      (mouseenter)="toggleEditOption(message.id, true)">
-                  </div>
-                  <img (click)="openEmojiPickerEditMode()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
-                    (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
-                    (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default"
-                    (mouseenter)="toggleEditOption(message.id, false)">
-                  <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-                    <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmojiToEdit($event)" class="emoji-picker"
-                        size="18">
-                      </emoji-mart>
-                    </div>
+          <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
+            <div class="show-set-reverse">
+              <div class="img-flex-bar-options">
+                <div class="edit-icon-holder" (mouseenter)="toggleEditOption(message.id, true)" *ngIf="!editWasClicked">
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                      y="8" width="24" height="24">
+                      <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                  </mask>
+                  <g mask="url(#mask0_1817_16003)">
+                      <path
+                          d="M20 28C19.45 28 18.9792 27.8042 18.5875 27.4125C18.1958 27.0208 18 26.55 18 26C18 25.45 18.1958 24.9792 18.5875 24.5875C18.9792 24.1958 19.45 24 20 24C20.55 24 21.0208 24.1958 21.4125 24.5875C21.8042 24.9792 22 25.45 22 26C22 26.55 21.8042 27.0208 21.4125 27.4125C21.0208 27.8042 20.55 28 20 28ZM20 22C19.45 22 18.9792 21.8042 18.5875 21.4125C18.1958 21.0208 18 20.55 18 20C18 19.45 18.1958 18.9792 18.5875 18.5875C18.9792 18.1958 19.45 18 20 18C20.55 18 21.0208 18.1958 21.4125 18.5875C21.8042 18.9792 22 19.45 22 20C22 20.55 21.8042 21.0208 21.4125 21.4125C21.0208 21.8042 20.55 22 20 22ZM20 16C19.45 16 18.9792 15.8042 18.5875 15.4125C18.1958 15.0208 18 14.55 18 14C18 13.45 18.1958 12.9792 18.5875 12.5875C18.9792 12.1958 19.45 12 20 12C20.55 12 21.0208 12.1958 21.4125 12.5875C21.8042 12.9792 22 13.45 22 14C22 14.55 21.8042 15.0208 21.4125 15.4125C21.0208 15.8042 20.55 16 20 16Z"
+                          fill="#1C1B1F" />
+                  </g>
+              </svg>
+                </div>
+
+                <div class="add-reaction-cu-ct" (mouseenter)="toggleEditOption(message.id, false)"
+                  (click)="openEmojiPicker()">
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8" width="24"
+                      height="24">
+                      <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                    </mask>
+                    <g mask="url(#mask0_489_4318)">
+                      <path
+                        d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                        fill="black" />
+                    </g>
+                  </svg>
+                </div>
+
+
+                <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                  <div class="emoji-picker">
+                    <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
+                      size="18">
+                    </emoji-mart>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <mat-card class="edit-messages-card" appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
-              <mat-card-content class="edit-message-content">
-                <span (click)="editMessages(message)">Nachricht bearbeiten</span>
-              </mat-card-content>
-            </mat-card>
-
-
+          <mat-card class="edit-messages-card" appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
+            <mat-card-content class="edit-message-content">
+              <span (click)="editMessages(message)">Nachricht bearbeiten</span>
+            </mat-card-content>
+          </mat-card>
 
           <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
             class="cu-message-container">
@@ -121,22 +152,26 @@
               <ng-template #editMode>
                 <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
                   [(ngModel)]="editableMessageText"></textarea>
-                <div (click)="openEmojiPicker()" class="reaction-icon-container-editMode">
-<!--                   <img class="icon-add-reaction-editMode" [src]="icons['iconAddReaction']"
-                    (mouseenter)="onMouseIcon('iconAddReaction', 'assets/img/add_reaction.png')"
-                    (mouseleave)="onLeaveIcon()"> -->
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
-                        width="24" height="24">
-                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8" width="24"
+                      height="24">
+                      <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
                     </mask>
                     <g mask="url(#mask0_489_4318)">
-                        <path
-                            d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
-                            fill="black" />
+                      <path
+                        d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                        fill="black" />
                     </g>
-                </svg>
+                  </svg>
+                </div>
+
+                <div (click)="closePickerEdit()" *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container">
+                  <div class="emoji-picker">
+                    <emoji-mart (emojiClick)="addEmojiToEdit($event)" class="emoji-picker"
+                      size="18">
+                    </emoji-mart>
+                  </div>
                 </div>
 
                 <div class="option-flex">
@@ -147,169 +182,145 @@
               <div *ngIf="message.editedTextShow" class="text-info-edit">
                 (Bearbeitet)
               </div>
-<!-- 
-            <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
-              <div class="show-set-reverse">
-                <div class="img-flex-bar-options" >
-                  <div class="edit-icon-holder" *ngIf="!editWasClicked">
-                    <img class="icon-more" [src]="icons['iconMore']"
-                      (mouseenter)="onHover('iconMore', 'assets/img/dots.png')"
-                      (mouseleave)="onHover('iconMore', 'assets/img/more_vertical.svg')" alt="default"
-                      (mouseenter)="toggleEditOption(message.id, true)">
-                  </div>
-                  <img (click)="openEmojiPickerEditMode()" class="icon-add-reaction" [src]="icons['iconAddReaction']"
-                    (mouseenter)="onHover('iconAddReaction', 'assets/img/add_reaction.png')"
-                    (mouseleave)="onHover('iconAddReaction', 'assets/img/comment/add_reaction.svg')" alt="default"
-                    (mouseenter)="toggleEditOption(message.id, false)">
-                  <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-                    <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmojiToEdit($event)" class="emoji-picker"
-                        size="18">
-                      </emoji-mart>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
-
+            </div>
           </div>
-        </div>
 
-        <div [ngClass]="{
+
+
+          <div [ngClass]="{
           'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
           'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name
         }">
-          <div class="render-reaction-ct-sender" *ngIf="!areEmojisSame(message.reactions)">
-            <ng-container>
-              <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoSender(message.id, true)"
-                (mouseleave)="toggleReactionInfoSender(message.id, false)">
-                <span class="single-emoji">
-                  {{ message.reactions[message.senderId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
-                  {{ message.reactions[message.senderId]?.counter }}
-                </span>
-              </div>
+            <div class="render-reaction-ct-sender" *ngIf="!areEmojisSame(message.reactions)">
+              <ng-container>
+                <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
+                  (mouseenter)="toggleReactionInfoSender(message.id, true)"
+                  (mouseleave)="toggleReactionInfoSender(message.id, false)">
+                  <span class="single-emoji">
+                    {{ message.reactions[message.senderId]?.emoji }}
+                  </span>
+                  <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                    {{ message.reactions[message.senderId]?.counter }}
+                  </span>
+                </div>
 
 
-              <div class="reaction-name-info-ct-sender" *ngIf="showReactionPopUpSender[message.id]"
-                [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
-                [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid">
-                <span class="reaction-info-txt">
-                  <ng-container *ngIf="message.senderId === currentUser.uid">
-                    Du hast mit
-                    <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
-                    </span> reagiert
-                  </ng-container>
-                  <ng-container *ngIf="message.senderId === selectedUser.uid">
-                    {{ message.senderName }} hat mit
-                    <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span> reagiert
-                  </ng-container>
-                </span>
-              </div>
-            </ng-container>
+                <div class="reaction-name-info-ct-sender" *ngIf="showReactionPopUpSender[message.id]"
+                  [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
+                  [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid">
+                  <span class="reaction-info-txt">
+                    <ng-container *ngIf="message.senderId === currentUser.uid">
+                      Du hast mit
+                      <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
+                      </span> reagiert
+                    </ng-container>
+                    <ng-container *ngIf="message.senderId === selectedUser.uid">
+                      {{ message.senderName }} hat mit
+                      <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span> reagiert
+                    </ng-container>
+                  </span>
+                </div>
+              </ng-container>
+            </div>
+
+
+            <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)">
+              <ng-container>
+                <div *ngIf=" message.reactions[message.recipientId]?.counter> 0" class="emoji-holder"
+                  (mouseenter)="toggleReactionInfoRecipient(message.id, true)"
+                  (mouseleave)="toggleReactionInfoRecipient(message.id, false)">
+                  <span class="single-emoji">
+                    {{ message.reactions[message.recipientId]?.emoji }}
+                  </span>
+                  <span *ngIf="message.reactions[message.recipientId]?.counter > 0" class="reaction-counter">
+                    {{ message.reactions[message.recipientId]?.counter }}
+                  </span>
+                </div>
+
+
+                <div class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
+                  <span class="reaction-info-txt">
+                    <ng-container *ngIf="message.recipientId === currentUser.uid">
+                      Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji
+                        }}</span> reagiert
+                    </ng-container>
+                    <ng-container *ngIf="message.recipientId === selectedUser.uid">
+                      {{ message.recipientName }} hat mit <span class="react-emoji-value">{{
+                        message.reactions[message.recipientId]?.emoji }}</span> reagiert
+                    </ng-container>
+                  </span>
+                </div>
+              </ng-container>
+            </div>
           </div>
 
 
-          <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)">
-            <ng-container>
-              <div *ngIf=" message.reactions[message.recipientId]?.counter> 0" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoRecipient(message.id, true)"
-                (mouseleave)="toggleReactionInfoRecipient(message.id, false)">
-                <span class="single-emoji">
-                  {{ message.reactions[message.recipientId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.recipientId]?.counter > 0" class="reaction-counter">
-                  {{ message.reactions[message.recipientId]?.counter }}
-                </span>
-              </div>
 
-
-              <div class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
-                <span class="reaction-info-txt">
-                  <ng-container *ngIf="message.recipientId === currentUser.uid">
-                    Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji
-                      }}</span> reagiert
-                  </ng-container>
-                  <ng-container *ngIf="message.recipientId === selectedUser.uid">
-                    {{ message.recipientName }} hat mit <span class="react-emoji-value">{{
-                      message.reactions[message.recipientId]?.emoji }}</span> reagiert
-                  </ng-container>
-                </span>
-              </div>
-            </ng-container>
-          </div>
-        </div>
-
-
-
-        <div [ngClass]="{
+          <div [ngClass]="{
           'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name,
         }">
-          <div [ngClass]="{
+            <div [ngClass]="{
             'emoji-flex-right':message.senderName === currentUser.name
           }" *ngIf="areEmojisSame(message.reactions)">
-            <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(message.id,true)"
-              (mouseout)="toggleBothReactionInfo(message.id,false)"
-              [class.emojis-holder-both-two-single]="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]) && message.reactions.counter > 0"
-              [class.both-reaction-right-emojis-holder]="message.senderName === currentUser.name">
-              <span class="single-emoji">
-                {{ getEmojiFromFirstUser(message.reactions) }}
-              </span>
-              <span class="reaction-counter">
-                {{ getTotalCounterForSameEmoji(message.reactions) }}
-              </span>
-            </div>
-            <div class="both-reaction-info-ct" [ngClass]="{
+              <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(message.id,true)"
+                (mouseout)="toggleBothReactionInfo(message.id,false)"
+                [class.emojis-holder-both-two-single]="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]) && message.reactions.counter > 0"
+                [class.both-reaction-right-emojis-holder]="message.senderName === currentUser.name">
+                <span class="single-emoji">
+                  {{ getEmojiFromFirstUser(message.reactions) }}
+                </span>
+                <span class="reaction-counter">
+                  {{ getTotalCounterForSameEmoji(message.reactions) }}
+                </span>
+              </div>
+              <div class="both-reaction-info-ct" [ngClass]="{
                   'both-reaction-right': message.senderName === currentUser.name,
                   'both-reaction-left': message.recipientName === currentUser.name,
                   'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
                 }" [style.visibility]="showReactionPopUpBoth[message.id] ? 'visible' : 'hidden'">
-              <span class="reaction-info-txt-both"
-                *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
-                Du und {{
-                selectedUser.name }} haben mit
-                <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
-                reagiert</span>
-              <span class="reaction-info-txt-both two-single"
-                *ngIf="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
-                {{selectedUser.name}} hat mit
-                <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
-                reagiert</span>
+                <span class="reaction-info-txt-both"
+                  *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
+                  Du und {{
+                  selectedUser.name }} haben mit
+                  <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
+                  reagiert</span>
+                <span class="reaction-info-txt-both two-single"
+                  *ngIf="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
+                  {{selectedUser.name}} hat mit
+                  <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
+                  reagiert</span>
+              </div>
             </div>
+
           </div>
 
         </div>
 
-      </div>
-
-      <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
-        <div class="img-container">
-          <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
-            <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
-              height="24">
-              <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
-            </mask>
-            <g mask="url(#mask0_86084_18390)">
+        <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
+          <div class="img-container">
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+              <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+                height="24">
+                <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
+              </mask>
+              <g mask="url(#mask0_86084_18390)">
+                <path
+                  d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
+                  fill="black" />
+              </g>
+            </svg>
+          </div>
+          <div class="img-container">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
+              class="icon">
               <path
-                d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                fill="black" />
-            </g>
-          </svg>
+                d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+            </svg>
+          </div>
         </div>
-        <div class="img-container">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
-            class="icon">
-            <path
-              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-          </svg>
-        </div>
-      </div>
 
+      </div>
+      <div class="input-holder">
+        <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+      </div>
     </div>
-    <div class="input-holder">
-      <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
-    </div>
-  </div>

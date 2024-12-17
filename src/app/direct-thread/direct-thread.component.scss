@@ -62,8 +62,8 @@
   display: flex;
   gap: 8px;
   position: relative;
-  right: 83px;
-  bottom: 40px;
+  right: 18px;
+  bottom: 30px;
   justify-content: end;
   align-items: center;
 }
@@ -144,6 +144,21 @@
 
 .edit-icon-holder {
   position: relative;
+  svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      border-radius: 100%;
+      path {
+        fill: #444df2;
+      }
+    }
+  }
 }
 
 .edit-input {
@@ -298,23 +313,40 @@ h3 {
   bottom: 19px;
   left: 5px;
   svg {
-    display: block; /* Entfernt zusätzlichen Inline-Space */
+    display: block;
     width: 36px;
     height: 36px;
     object-fit: contain;
     background-color: transparent;
     border-radius: 50%;
     &:hover {
-      background-color: #eceefe; 
+      background-color: #eceefe;
       cursor: pointer;
 
       path {
-        fill: #444df2; 
+        fill: #444df2;
       }
     }
   }
 }
 
+.add-reaction-cu-ct {
+  svg {
+    width: 36px;
+    height: 36px;
+    display: block;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      cursor: pointer;
+
+      path {
+        fill: #444df2;
+      }
+    }
+  }
+}
 
 .emoji-flex-right {
   display: flex;
