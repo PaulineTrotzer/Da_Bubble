@@ -6,7 +6,7 @@
         <h2>Devspace</h2>
       </div>
       <div class="logo-container">
-<!--         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+        <!--         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
           <mask id="mask0_84021_6642" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
             height="24">
             <rect width="24" height="24" fill="#D9D9D9" />
@@ -168,33 +168,38 @@
           }">
           <div class="contacts">
             <div class="contact" (click)="selectCurrentUser()">
-              <img [src]="global.currentUserData.picture" class="avatar" />
-              <div class="status-border">
-                <span
-                  [ngClass]="{'online': global.currentUserData.status === 'online', 'offline': global.currentUserData.status === 'offline'}"></span>
+              <div class="active-user-div" [class.active]="selectedUser === global.currentUserData">
+                <img [src]="global.currentUserData.picture" class="avatar" />
+                <div class="status-border">
+                  <span
+                    [ngClass]="{'online': global.currentUserData.status === 'online', 'offline': global.currentUserData.status === 'offline'}"></span>
+                </div>
+                <h4>{{global.currentUserData.name}} (Du)</h4>
               </div>
-              <h4>{{global.currentUserData.name}} (Du)</h4>
-              
-             
+
             </div>
 
-                <!-- <div class="message-notification" *ngIf="user.id && user.messageCount  && user.messageCount[userId] > 0">
+            <!-- <div class="message-notification" *ngIf="user.id && user.messageCount  && user.messageCount[userId] > 0">
                   <span>{{user.messageCount[userId]}}</span>
                 </div> -->
 
-            <div *ngIf="checkUsersExsists && !isGuestLogin " class="all-user-contacts">
+            <div *ngIf="checkUsersExsists && !isGuestLogin" class="all-user-contacts">
               <div class="all-user" *ngFor="let user of allUsers" (click)="selectUser(user)">
-                <img [src]="user.picture">
-                <div class="status-border">
-                  <span [ngClass]="{'online': user.status === 'online', 'offline': user.status === 'offline'}"></span>
+                <div class="active-user-div" [class.active]="selectedUser === user">
+                  <img [src]="user.picture">
+                  <div class="status-border">
+                    <span [ngClass]="{'online': user.status === 'online', 'offline': user.status === 'offline'}"></span>
+                  </div>
+                  <h4>{{user.name}}</h4>
+                  <div class="messages-counts"
+                    *ngIf="messageCountsArr?.messageCount && messageCountsArr.messageCount[user.id] > 0 && id !== user.id">
+                    <span>{{ messageCountsArr?.messageCount[user.id] }}</span>
+                  </div>
                 </div>
-                <h4>{{user.name}}</h4> 
-                <div class="messages-counts" *ngIf="messageCountsArr?.messageCount  && messageCountsArr.messageCount[user.id] > 0 && id !== user.id">
-                 <span> {{ messageCountsArr?.messageCount[user.id] }}</span>  
-                </div>   
               </div>
             </div>
-           
+
+
           </div>
         </div>
       </div>

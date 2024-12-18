@@ -42,7 +42,6 @@
       <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
         [onHeaderChannel]="onHeaderChannel" [selectedChannel]="selectedChannel" [onHeaderUser]="onHeaderUser"
         (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
-        
         <div class="members-container" *ngIf="global.channelSelected">
           <div class="member-avatars" (click)="openMemberDialog()">
             <div class="avatar-container">

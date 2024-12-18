@@ -6,7 +6,7 @@
             'workspace-open': isWorkspaceOpen,
             'workspace-closed': !isWorkspaceOpen
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
-        <app-start-screen [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
+        <app-start-screen (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
             [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>

@@ -6,7 +6,7 @@ import {
   getDoc,
   onSnapshot,
   updateDoc,
-  setDoc
+  setDoc,
 } from '@angular/fire/firestore';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
@@ -23,10 +23,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [
-    CommonModule, 
-    MatDialogModule, 
-    DialogCreateChannelComponent],
+  imports: [CommonModule, MatDialogModule, DialogCreateChannelComponent],
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
@@ -48,13 +45,14 @@ export class WorkspaceComponent implements OnInit {
   @Output() channelSelected = new EventEmitter<Channel>();
   readonly dialog = inject(MatDialog);
   private channelsUnsubscribe: Unsubscribe | undefined;
-  logInAuth=inject(LoginAuthService);
+  logInAuth = inject(LoginAuthService);
   isGuestLogin = false;
   private guestLoginStatusSub: Subscription | undefined;
-  clickedUsers: string[] = []; 
-  id:any;
-  selectedUsers: any[] = []; 
-  messageCountsArr:any={};
+  clickedUsers: string[] = [];
+  id: any;
+  selectedUsers: any[] = [];
+  messageCountsArr: any = {};
+  selectedUser: any;
 
   constructor(public global: GlobalVariableService) {}
 
@@ -72,8 +70,7 @@ export class WorkspaceComponent implements OnInit {
       );
     }
     this.subscribeToGuestLoginStatus();
-    await this.getAllChannels(); 
-     
+    await this.getAllChannels();
   }
 
   subscribeToGuestLoginStatus(): void {
@@ -82,46 +79,42 @@ export class WorkspaceComponent implements OnInit {
         this.isGuestLogin = status;
       }
     );
-  } 
+  }
 
- 
+  selectUser(user: any) {
+    this.selectedChannel = null;
+    this.selectedUser = user;
+    this.userSelected.emit(user);
+    this.id = user.id;
+    this.global.currentThreadMessageSubject.next('');
+    this.global.channelThreadSubject.next(null);
+    const actuallyId = this.id;
+    if (
+      this.userId &&
+      this.messageCountsArr?.messageCount &&
+      this.messageCountsArr.messageCount[actuallyId] > 0
+    ) {
+      const docRef = doc(this.firestore, 'messageCounts', this.userId);
+      const resetMessageCount: any = {};
+      resetMessageCount[`messageCount.${actuallyId}`] = 0;
+      updateDoc(docRef, resetMessageCount);
+    }
+    this.global.statusCheck = false;
+  }
 
+  // async updateRoomStatus(userId: string, status: boolean) {
+  //   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
+  //   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
+  //   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
+  //   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
+  // }
 
-selectUser(user: any) {
-  this.userSelected.emit(user);
-  this.id = user.id;
-  this.global.currentThreadMessageSubject.next('');
-  this.global.channelThreadSubject.next(null);
-  const actuallyId = this.id;
-  if (this.userId && this.messageCountsArr?.messageCount && this.messageCountsArr.messageCount[actuallyId] > 0) {
-    const docRef = doc(this.firestore, 'messageCounts', this.userId);
-    const resetMessageCount: any = {};
-    resetMessageCount[`messageCount.${actuallyId}`] = 0;
-    updateDoc(docRef, resetMessageCount);
-  } 
-   this.global.statusCheck =false;
-}   
-
- 
-
-
-
-
-// async updateRoomStatus(userId: string, status: boolean) {
-//   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
-//   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
-//   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
-//   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
-// }
-  
-
-
-           
   selectCurrentUser() {
+    this.selectedChannel = null; 
+    this.selectedUser = this.global.currentUserData; 
     this.userSelected.emit(this.global.currentUserData);
     this.global.statusCheck = true;
   }
-
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
       data: {
@@ -140,9 +133,9 @@ selectUser(user: any) {
       (channel) => channel.name == 'Willkommen'
     );
     if (willkommenChannel) {
-      this.global.channelSelected=false;
+      this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
-      console.log(this.global.channelSelected=false)
+      console.log((this.global.channelSelected = false));
     }
   }
 
@@ -165,36 +158,33 @@ selectUser(user: any) {
     this.allChannels.sort((a, b) => {
       if (a.name === 'Willkommen') return -1;
       if (b.name === 'Willkommen') return 1;
-      return 0; 
+      return 0;
     });
   }
 
   async getUserById(userId: string) {
     const userDocref = doc(this.firestore, 'users', userId);
-    onSnapshot(userDocref,(docSnapshot)=>{
+    onSnapshot(userDocref, (docSnapshot) => {
       if (docSnapshot.exists()) {
-        const data=docSnapshot.data();
-        const id = docSnapshot.id
-        this.global.currentUserData ={id:id,...data};
-      }else{
-        this.global.currentUserData={};
+        const data = docSnapshot.data();
+        const id = docSnapshot.id;
+        this.global.currentUserData = { id: id, ...data };
+      } else {
+        this.global.currentUserData = {};
       }
-    })
+    });
   }
-    
-    
 
-   getUserMessageCount(userId:string){
-    const userDocRef=doc(this.firestore,'messageCounts',userId)
-     onSnapshot(userDocRef,(snapshot)=>{
-       if(snapshot.exists()){ 
-          this.messageCountsArr={...snapshot.data()}
-       }else{
-        this.messageCountsArr={};
-       }
-     })
-   }  
-   
+  getUserMessageCount(userId: string) {
+    const userDocRef = doc(this.firestore, 'messageCounts', userId);
+    onSnapshot(userDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        this.messageCountsArr = { ...snapshot.data() };
+      } else {
+        this.messageCountsArr = {};
+      }
+    });
+  }
 
   async getAllUsers() {
     const usersCollection = collection(this.firestore, 'users');
@@ -203,23 +193,22 @@ selectUser(user: any) {
       snapshot.forEach((doc) => {
         this.checkUsersExsists = true;
         if (doc.id !== this.userId) {
-          this.allUsers.push({ id: doc.id, ...doc.data()});
+          this.allUsers.push({ id: doc.id, ...doc.data() });
         }
       });
     });
   }
 
+  selectChannel(channel: any) {
+    this.selectedUser = null;
+    this.selectedChannel = channel;
+    this.global.channelSelected = true;
+    this.channelSelected.emit(channel);
+    this.global.currentThreadMessageSubject.next('');
+    this.global.channelThreadSubject.next(null);
+    this.global.setCurrentChannel(channel);
+  }
 
-  selectChannel(channel: any) {  
-      this.selectedChannel = channel;
-      this.global.channelSelected=true;
-      this.channelSelected.emit(channel);
-      this.global.currentThreadMessageSubject.next('');
-      this.global.channelThreadSubject.next(null);
-      this.global.setCurrentChannel(channel);
-  }  
-
-      
   toggleChannelDrawer() {
     this.channelDrawerOpen = !this.channelDrawerOpen;
   }

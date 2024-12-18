@@ -113,8 +113,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
   
-  
-
   ngOnInit(): void {
     this.global.channelSelected = false;
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -149,7 +147,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  private subscribeToWelcomeChannel(): void {
+   subscribeToWelcomeChannel(): void {
     this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe(
       (welcomeChannelStatus) => {
         this.afterLoginSheet = welcomeChannelStatus;
@@ -174,8 +172,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   @Input() onHeaderChannel: any;
-
-  aaa: boolean = false;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
@@ -347,6 +343,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   enterByUsername(user: any) {
+    debugger;
     this.enterChatByUser = user;
     this.selectedUser = this.enterChatByUser;
     this.checkProfileType();
