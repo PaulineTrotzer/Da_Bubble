@@ -76,6 +76,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
   storage = inject(Storage);
   userId: any;
   route = inject(ActivatedRoute);
+  @Output() mentionCardOpened = new EventEmitter<boolean>();
+  isMentionPeopleCardVisible: boolean = false;
+  isMentionCardOpen: boolean = true;
+  @Output() mentionUserOut = new EventEmitter<string>(); 
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -97,7 +101,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     });
     this.global.channelThread$.subscribe((messageId) => {
       this.currentChannelThreadId = messageId;
-    })
+    });
     this.selectedChannel = this.global.currentChannel;
   }
 
@@ -105,10 +109,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       await this.processSendMessage();
-          this.formattedMessage='';
+      this.formattedMessage = '';
     }
-
-
   }
 
   sendMessageClick(): void {
@@ -120,9 +122,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
-    this.formattedMessage='';
+    this.formattedMessage = '';
     this.processSendMessage();
-    
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -143,20 +144,20 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else if (this.isDirectThreadOpen) {
       await this.sendDirectThreadMessage();
       await this.setMessageCount();
-    } else if(this.isChannelThreadOpen) {
+    } else if (this.isChannelThreadOpen) {
       await this.sendChannelThreadMessage();
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
-    
+
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
-  
+
         messageData.selectedFiles = fileData;
-    
+
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
@@ -170,15 +171,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
-  }     
+  }
 
   async sendChannelThreadMessage() {
-    if(!this.currentChannelThreadId || this.chatMessage.trim() === '') {
+    if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {
       console.warn('Thread is not open or message is empty');
       return;
     }
     try {
-      const threadRef = collection(this.firestore, 'channels', this.selectedChannel.id, 'messages', this.currentChannelThreadId, 'thread');
+      const threadRef = collection(
+        this.firestore,
+        'channels',
+        this.selectedChannel.id,
+        'messages',
+        this.currentChannelThreadId,
+        'thread'
+      );
       const messageData = {
         text: this.chatMessage,
         senderId: this.global.currentUserData.id,
@@ -187,11 +195,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
         timestamp: new Date(),
         selectedFiles: this.selectFiles,
       };
-      await addDoc(threadRef, messageData)
+      await addDoc(threadRef, messageData);
     } catch (err) {
       console.error(err);
     }
-    
   }
 
   async sendDirectThreadMessage() {
@@ -203,7 +210,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('No current message selected.');
       return;
     }
-  
+
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -229,12 +236,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Error sending message:', error);
     }
   }
-  
 
   resetInputdata() {
     this.chatMessage = '';
     this.selectFiles = [];
- 
   }
 
   async setMessageCount() {
@@ -356,7 +361,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       selectedFiles: this.selectFiles,
       editedTextShow: false,
     };
-  } 
+  }
 
   getByUserName() {
     const docRef = collection(this.firestore, 'users');
@@ -370,51 +375,54 @@ export class InputFieldComponent implements OnInit, OnChanges {
     });
   }
 
-
-   
-  formattedMessage:string='';
+  formattedMessage: string = '';
 
   handleMentionUser(mention: string) {
+    this.isMentionPeopleCardVisible = false;
+    this.mentionCardOpened.emit(false);
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
       this.chatMessage += `${mentionTag}  `;
-      this.updateFormattedMessage(); 
+      this.updateFormattedMessage();
     }
-  } 
+    
+    // Sende das Ereignis mit dem Mention-Wert an das Parent
+    this.mentionUserOut.emit(mention);
+  }
+
+  handleCardClosed() {
+    this.isMentionPeopleCardVisible = false; // Schließt die Karte
+  }
+
 
   // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
-  const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
+    const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
       const mentionName = match.substring(1);
-      if (this.mentionUserName.some((some)=>some===mentionName)) {
-        return `<span class="mention">${match}</span>`; 
+      if (this.mentionUserName.some((some) => some === mentionName)) {
+        return `<span class="mention">${match}</span>`;
       } else {
-        return match; 
+        return match;
       }
     });
   }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto'; 
-    textarea.style.height = `${textarea.scrollHeight}px`; 
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
     const container = document.querySelector('.main-input-area') as HTMLElement;
     if (container) {
       container.scrollTop = container.scrollHeight;
-    } 
+    }
     const containerh = document.querySelector('.highlight') as HTMLElement;
     if (containerh) {
       containerh.scrollTop = containerh.scrollHeight;
     }
     this.updateFormattedMessage();
   }
- 
-
-
-
-
 
   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
@@ -422,7 +430,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   openMentionPeople() {
-    this.global.openMentionPeopleCard = !this.global.openMentionPeopleCard;
+    this.isMentionPeopleCardVisible = !this.isMentionPeopleCardVisible;
   }
 
   toggleEmojiPicker() {
@@ -448,7 +456,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   addEmoji(event: any) {
     const emoji = event.emoji.native;
     this.chatMessage += emoji;
-    this.formattedMessage+=emoji
+    this.formattedMessage += emoji;
     this.isEmojiPickerVisible = false;
   }
 

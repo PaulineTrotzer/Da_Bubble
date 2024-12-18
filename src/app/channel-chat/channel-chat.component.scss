@@ -6,6 +6,15 @@
   position: relative;
 }
 
+.mention-message {
+  color: blue !important;
+  cursor: pointer;
+}
+
+.mention-message:hover {
+  color: red !important;
+}
+
 .img-container {
   padding: 4px;
   border-radius: 100%;
@@ -138,6 +147,8 @@
       }
     }
     .text {
+      display: flex;
+      align-self: end;
       width: fit-content;
       padding: 15px;
       border-top-left-radius: 30px;

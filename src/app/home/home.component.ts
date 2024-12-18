@@ -82,6 +82,7 @@ export class HomeComponent implements OnInit {
     this.globalService.clearCurrentChannel();
 }
 
+
   onHeaderchannelSelected(channel:any){
     this.onHeaderChannel=channel;
     this.globalService.setCurrentChannel(channel);

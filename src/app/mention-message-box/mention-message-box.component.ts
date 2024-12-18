@@ -4,6 +4,7 @@ import {
   OnInit,
   Output,
   inject,
+  Input,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -18,14 +19,13 @@ import { CommonModule } from '@angular/common';
 export class MentionMessageBoxComponent implements OnInit {
   global = inject(GlobalVariableService);
   @Output() enterChatUser = new EventEmitter<any>();
+  @Input() mention: string = '';
+  @Output() cancelMessageBoxCard = new EventEmitter<any>();
 
-  ngOnInit(): void {
-    if (this.global.getUserByName) {
-    }
-  }
+  ngOnInit(): void {}
 
   cancelCard() {
-    this.global.openMentionMessageBox = false;
+    this.cancelMessageBoxCard.emit();
   }
 
   onOutsideClick(event: MouseEvent): void {

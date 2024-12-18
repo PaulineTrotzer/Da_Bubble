@@ -109,6 +109,9 @@ export class ChatComponent implements OnInit, OnChanges {
   getAllUsersName: any[] = [];
   overlayStatusService = inject(OverlayStatusService);
   overlayOpen = false;
+  isMentionCardOpenInChat: boolean = false;
+  isMentionCardOpen: boolean = false; 
+  wasClickedinInput = false;
 
   constructor() {}
 
@@ -133,13 +136,19 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   openEmojiPicker() {
-    debugger;
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
 
   getReplyCountValue(messageId: string): number {
-    return this.replyCounts.get(messageId) ?? 0;
+    return this.
+    
+    replyCounts.get(messageId) ?? 0;
+  }
+
+
+  handleMentionCardOpened(isOpen: boolean) {
+    this.isMentionCardOpenInChat = isOpen;
   }
 
   onUserNameClick() {
@@ -184,7 +193,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.editableMessageText = '';
     this.checkEditbox = false;
     this.isFirstClick = true;
-    console.log(this.isFirstClick);
   }
 
   resetIcon(message: any) {
@@ -442,8 +450,13 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
+  onCancelMessageBox() {
+    this.wasClickedinInput = false; 
+  }
+
+
   async handleMentionClick(mention: string) {
-    this.global.openMentionMessageBox = false;
+    this.wasClickedinInput = true; 
     const cleanName = mention.substring(1);
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {

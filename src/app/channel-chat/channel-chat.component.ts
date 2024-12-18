@@ -1,7 +1,14 @@
-import { CommonModule, formatCurrency } from '@angular/common';
-import { Component, inject, Input, OnInit, SimpleChanges } from '@angular/core';
+import { CommonModule} from '@angular/common';
 import {
-  addDoc,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {
   collection,
   doc,
   DocumentReference,
@@ -17,8 +24,9 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Overlay } from '@angular/cdk/overlay';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
+import { GlobalService } from '../global.service';
 
 interface Message {
   id: string;
@@ -34,7 +42,12 @@ interface Message {
 @Component({
   selector: 'app-channel-chat',
   standalone: true,
-  imports: [CommonModule, PickerComponent, FormsModule],
+  imports: [
+    CommonModule,
+    PickerComponent,
+    FormsModule,
+    MentionMessageBoxComponent,
+  ],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
   animations: [
@@ -73,14 +86,77 @@ export class ChannelChatComponent implements OnInit {
   editingMessageId: string | null = null;
   currentUserLastEmojis: string[] = [];
   messageToEdit: string = '';
+  getAllUsersName: any[] = [];
   unsubscribe: (() => void) | undefined;
+  wasClickedinInput: boolean = false;
+  @Output() enterChatFromChannel = new EventEmitter<any>();
+  globalService=inject(GlobalVariableService);
+  @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
+
+  chatByUserName: any;
 
   constructor() {}
 
   async ngOnInit(): Promise<void> {
     await this.loadChannelMessages();
     await this.loadCurrentUserEmojis();
+    await this.getAllUsersname();
     await this.loadUserNames();
+  }
+
+  onCancelMessageBox() {
+    this.wasClickedinInput = false;
+  }
+
+  updateHeader(channel: any) {
+    this.headerUpdate.emit(channel); // Channel wird an die ChatComponent gesendet
+  }
+
+
+  enterChatByUserName(user: any) {
+    this.enterChatFromChannel.emit(user);
+  }
+
+  async getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedinInput = true;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
+  }
+
+  splitMessage(text: string) {
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
+    return text.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
   async loadUserNames() {

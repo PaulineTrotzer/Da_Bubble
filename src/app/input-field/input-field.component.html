@@ -1,93 +1,85 @@
 <div class="msg-input-ct">
-    
-    <div class="main-input-area">
+
+  <div class="main-input-area">
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
-   <textarea  
-    id="msg-input" 
-    placeholder="Schreib etwas..." 
-    class="chat-input" 
-    type="text" 
-    [(ngModel)]="chatMessage"
-    (input)=" onInput($event)" 
-    (keydown)="sendMessage($event)"
-      >
+    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" type="text" [(ngModel)]="chatMessage"
+      (input)=" onInput($event)" (keydown)="sendMessage($event)">
   </textarea>
-</div>
+  </div>
 
 
-   <div class="show-selected-files" > 
-      <div *ngFor="let file of selectFiles; let i=index">
+  <div class="show-selected-files">
+    <div *ngFor="let file of selectFiles; let i=index">
 
-        <div class="file-info" *ngIf="file.type.startsWith('image/')" >
-           <div class="file-box">
-           <img [src]="file.data">
-           <div class="delet-box"  (click)="deleteFile(i)">
-           <span class="delete-span">x</span>   
-        </div>    
-        </div>
-        </div>
-          <div class="file-info" *ngIf="file.type==='application/pdf' "> 
-            <div class="file-box">
-            <img src="../../assets/img/pdf.png"> 
-            <div class="delet-box"  (click)="deleteFile(i)">
-                <span class="delete-span">x</span>   
-             </div>   
-        </div>
+      <div class="file-info" *ngIf="file.type.startsWith('image/')">
+        <div class="file-box">
+          <img [src]="file.data">
+          <div class="delet-box" (click)="deleteFile(i)">
+            <span class="delete-span">x</span>
           </div>
-          <div class="file-info" *ngIf="file.type==='text/plain'">
-            <div class="file-box">
-                <img src="../../assets/img/textfile.png"  > 
-                <div  class="delet-box"  (click)="deleteFile(i)" >
-                    <span class="delete-span">x</span>   
-                 </div>   
-            </div>
+        </div>
+      </div>
+      <div class="file-info" *ngIf="file.type==='application/pdf' ">
+        <div class="file-box">
+          <img src="../../assets/img/pdf.png">
+          <div class="delet-box" (click)="deleteFile(i)">
+            <span class="delete-span">x</span>
           </div>
+        </div>
+      </div>
+      <div class="file-info" *ngIf="file.type==='text/plain'">
+        <div class="file-box">
+          <img src="../../assets/img/textfile.png">
+          <div class="delet-box" (click)="deleteFile(i)">
+            <span class="delete-span">x</span>
+          </div>
+        </div>
+      </div>
 
-          <div class="file-info-mix" 
-          *ngIf="!file.type.startsWith('image/')
+      <div class="file-info-mix" *ngIf="!file.type.startsWith('image/')
            &&  file.type !== 'application/pdf' && file.type!=='text/plain'">
-             <div class="file-box">
-                <img src="../../assets/img/alldatei.png"> 
-                <div   class="mix-file" >
-                    <span class="delete-span"  (click)="deleteFile(i)">x</span>  
-                    <span >{{file.type}}</span>
-                 </div>   
-            </div>
+        <div class="file-box">
+          <img src="../../assets/img/alldatei.png">
+          <div class="mix-file">
+            <span class="delete-span" (click)="deleteFile(i)">x</span>
+            <span>{{file.type}}</span>
           </div>
-      </div>  
-   </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="interactions-send-msg-ct">
     <div class="only-interactions-bottom-ct">
-        <div class="plus-separator-flex">
-            <div>
-                <div>
-                    <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
-                    <label for="upload"> <img class="plus" src="./assets/img/add.svg"></label>
-                </div>
-            </div>
-
+      <div class="plus-separator-flex">
+        <div>
+          <div>
+            <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
+            <label for="upload"> <img class="plus" src="./assets/img/add.svg"></label>
+          </div>
         </div>
-        <img src="./assets/img/vector_4.svg">
 
-        <div class="emoji-at-ct">
-            <div class="emoji-picker-container">
-                <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
-                    size="18"></emoji-mart>
-                <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
-            </div>
-            <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
+      </div>
+      <img src="./assets/img/vector_4.svg">
+
+      <div class="emoji-at-ct">
+        <div class="emoji-picker-container">
+          <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
+            size="18"></emoji-mart>
+          <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
         </div>
-        <app-people-mention class="people-mention-card" *ngIf="global.openMentionPeopleCard"
-            (mentionUser)="handleMentionUser($event)"></app-people-mention>
+        <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
+      </div>
+      <app-people-mention (cardClosed)="handleCardClosed()"class="people-mention-card" *ngIf="isMentionPeopleCardVisible"
+        (mentionUser)="handleMentionUser($event)"></app-people-mention>
     </div>
 
     <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
 
-</div>
+  </div>
 
 
-    
+
 
 </div>

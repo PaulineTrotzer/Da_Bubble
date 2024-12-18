@@ -108,9 +108,11 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   loginAuthService = inject(LoginAuthService);
   enterChatByUser: any;
 
+
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
+  
   
 
   ngOnInit(): void {
@@ -347,7 +349,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   enterByUsername(user: any) {
     this.enterChatByUser = user;
     this.selectedUser = this.enterChatByUser;
-    this.global.openMentionMessageBox = false;
     this.checkProfileType();
     this.global.clearCurrentChannel();
   }

@@ -1,4 +1,9 @@
 <div class="chat-box">
+
+  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedinInput"
+    (enterChatUser)="enterChatByUserName($event)">
+  </app-mention-message-box>
+
   <div class="message-container" [ngClass]="{
       'message-from-user': message.senderId !== global.currentUserData.id,
       'message-from-current': message.senderId === global.currentUserData.id
@@ -71,28 +76,41 @@
             <h3>{{ message.senderName }}</h3>
             <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
           </div>
+
+
+
           <div class="text-content">
             <div class="text">
-              <p>{{ message.text }}</p>
+              <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                  (click)="handleMentionClick(mentionName)">
+                  {{ mentionName }}
+                </span>
+                <span *ngIf="!isMention(mentionName)">
+                  {{ mentionName }}
+                </span>
+              </ng-container>
             </div>
-            <div class="reaction-info">
-              <div *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji" class="reaction-from-container"
-                [ngClass]="{
+          </div>
+
+          <div class="reaction-info">
+            <div *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji" class="reaction-from-container"
+              [ngClass]="{
                   'reaction-on-user':
                     message.senderId !== global.currentUserData.id,
                   'reaction-on-current':
                     message.senderId === global.currentUserData.id
                 }">
-                <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message,
-                  hoveredEmoji) }}</span>
-              </div>
-              <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
-                (mouseenter)="onReactionHover(message, reaction.key)"
-                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
-                (click)="addEmojiToMessage(reaction.key, message.id)">
-                {{ reaction.key }} {{ reaction.value.length }}
-              </span>
-<!--               <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
+              <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message,
+                hoveredEmoji) }}</span>
+            </div>
+            <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
+              (mouseenter)="onReactionHover(message, reaction.key)"
+              (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
+              (click)="addEmojiToMessage(reaction.key, message.id)">
+              {{ reaction.key }} {{ reaction.value.length }}
+            </span>
+            <!--               <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">
                   <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0"
@@ -106,8 +124,8 @@
                   </g>
                 </svg>
               </div> -->
-            </div>
           </div>
+
           <div class="thread-info-box" *ngIf="showThreadInfo">
             answers lastanswer
           </div>
