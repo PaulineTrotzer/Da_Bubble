@@ -108,10 +108,6 @@ export class ChannelChatComponent implements OnInit {
     this.wasClickedinInput = false;
   }
 
-  updateHeader(channel: any) {
-    this.headerUpdate.emit(channel); // Channel wird an die ChatComponent gesendet
-  }
-
 
   enterChatByUserName(user: any) {
     this.enterChatFromChannel.emit(user);

@@ -11,7 +11,7 @@ import {
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
@@ -43,6 +43,9 @@ export class WorkspaceComponent implements OnInit {
   userService = inject(UserService);
   @Output() userSelected = new EventEmitter<any>();
   @Output() channelSelected = new EventEmitter<Channel>();
+
+  @Input() selectedUserHome: any;
+  @Input() selectedChannelHome: any;
   readonly dialog = inject(MatDialog);
   private channelsUnsubscribe: Unsubscribe | undefined;
   logInAuth = inject(LoginAuthService);
@@ -81,7 +84,23 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedUserHome'] && !changes['selectedUserHome'].firstChange) {
+      this.selectedUser = this.selectedUserHome;  // Update selectedUser mit dem neuen Wert
+      this.userSelected.emit(this.selectedUser);  // Benachrichtige die übergeordnete Komponente
+      console.log('User has been updated:', this.selectedUser);
+    }
+    
+    if (changes['selectedChannelHome'] && !changes['selectedChannelHome'].firstChange) {
+      this.selectedChannel = this.selectedChannelHome;  
+      this.channelSelected.emit(this.selectedChannel);  
+      console.log('Channel has been updated:', this.selectedChannel);
+    }
+  }
+
   selectUser(user: any) {
+    debugger;
     this.selectedChannel = null;
     this.selectedUser = user;
     this.userSelected.emit(user);
@@ -115,6 +134,8 @@ export class WorkspaceComponent implements OnInit {
     this.userSelected.emit(this.global.currentUserData);
     this.global.statusCheck = true;
   }
+
+
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
       data: {

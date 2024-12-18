@@ -5,8 +5,12 @@
         <app-workspace [ngClass]="{
             'workspace-open': isWorkspaceOpen,
             'workspace-closed': !isWorkspaceOpen
-        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
-        <app-start-screen (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
+        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"
+            [selectedUserHome]="selectedUser" [selectedChannelHome]="selectedChannel"></app-workspace>
+
+        <app-start-screen (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
+            (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
+            (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
             [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
@@ -36,19 +40,12 @@
         </span>
     </mat-card-content>
 </mat-card>
-<div 
-      class="workspace-opener"
-      [class.hovered]="isHovered"
-      (click)="toggleWorkspace()"
-      (mouseenter)="isHovered = true"
-      (mouseleave)="isHovered = false">
-      <p>{{ isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen' }}</p>
-      <img 
-        class="workspace-drawer"
-        [src]="getImageSource()"
-        [alt]="isWorkspaceOpen ? 'Hide workspace' : 'Show workspace'"
-      >
-    </div>
+<div class="workspace-opener" [class.hovered]="isHovered" (click)="toggleWorkspace()" (mouseenter)="isHovered = true"
+    (mouseleave)="isHovered = false">
+    <p>{{ isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen' }}</p>
+    <img class="workspace-drawer" [src]="getImageSource()"
+        [alt]="isWorkspaceOpen ? 'Hide workspace' : 'Show workspace'">
+</div>
 
 
 

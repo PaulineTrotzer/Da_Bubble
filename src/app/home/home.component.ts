@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 import { WorkspaceComponent } from '../workspace/workspace.component';
 import { StartScreenComponent } from '../start-screen/start-screen.component';
@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit {
   channelThreadId: string | null = null;
   isWorkspaceOpen: boolean = true;
   isHovered: boolean = false;
+  @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
 
   ngOnInit(): void {
     this.subscribeToLoginStatus();
@@ -48,6 +49,12 @@ export class HomeComponent implements OnInit {
     this.setDirectThread();
     this.setChannelThread();
   }
+/* 
+  handleUserSelectionFromStartscreen(user: any) {
+    if (this.workspaceComponent) {
+      this.workspaceComponent.selectUser(user); // Aufrufen der selectUser-Methode in Workspace
+    }
+  } */
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -96,6 +103,20 @@ export class HomeComponent implements OnInit {
   onChannelSelected(channel: any) {
     this.selectedChannel = channel;
     this.globalService.setCurrentChannel(channel);
+  }
+
+  handleUserSelectionFromStartscreen(user: any) {
+    this.selectedUser = user;
+    this.onHeaderUser = user;
+    this.selectedChannel = null; // Channel zurücksetzen
+    this.onHeaderChannel = null;
+  }
+  
+  handleChannelSelectionFromStartscreen(channel: any) {
+    this.selectedChannel = channel;
+    this.onHeaderChannel = channel;
+    this.selectedUser = null; // User zurücksetzen
+    this.onHeaderUser = null;
   }
 
   onThreadOpened() {

@@ -71,7 +71,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   route = inject(ActivatedRoute);
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
-
   @Input() mentionUser: string = '';
   @Input() onHeaderUser: any;
 
@@ -341,12 +340,21 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   onThreadOpened() {
     this.threadOpened.emit();
   }
+  @Output() userSelectedFromStartscreen = new EventEmitter<any>();
+  @Output() channelSelectedFromStartscreen = new EventEmitter<any>();
 
-  enterByUsername(user: any) {
+  enterByUsername(user: any, isChannel: boolean = false) {
     debugger;
     this.enterChatByUser = user;
     this.selectedUser = this.enterChatByUser;
+    if (isChannel) {
+      this.channelSelectedFromStartscreen.emit(user); 
+      this.global.setCurrentChannel(user); 
+    } else {
+      this.userSelectedFromStartscreen.emit(user);
+      this.global.clearCurrentChannel(); 
+    }
+
     this.checkProfileType();
-    this.global.clearCurrentChannel();
   }
 }

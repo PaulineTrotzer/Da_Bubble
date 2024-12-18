@@ -832,7 +832,14 @@ export class ChatComponent implements OnInit, OnChanges {
   @Output() enterChatUser = new EventEmitter<any>();
 
   enterChatByUserName(user: any) {
+    debugger;
     this.chatByUserName = user;
     this.enterChatUser.emit(this.chatByUserName);
+    this.selectUser(user); 
+  }
+
+  selectUser(user: any) {
+    this.selectedUser = user; // Setzt den User als aktiv in der Chat-Komponente
+    // Optional: Weitere Logik, um den Chat direkt zu öffnen
   }
 }
