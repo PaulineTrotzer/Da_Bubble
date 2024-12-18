@@ -143,7 +143,14 @@ export class ChannelThreadComponent implements OnInit {
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
+    this.checkResponsiveWidtSize();
   }
+
+  checkResponsiveWidtSize(){
+    if(window.innerWidth<=720 && this.global.openChannelOrUserThread)
+      this.global.openChannelOrUserThread=false
+      this.global.openChannelorUserBox=true
+  } 
 
   addEmoji(event: any, messageId: string) {
     const emoji = event.emoji;
@@ -340,8 +347,13 @@ export class ChannelThreadComponent implements OnInit {
     }
   
     this.isPickerVisible = null;
-    this.closePicker();
-  }
+    this.closePicker(); 
+  } 
+ 
+
+
+ 
+
   
    
    onReactionHover(message: Message, emoji: string) {
@@ -442,4 +454,9 @@ export class ChannelThreadComponent implements OnInit {
       this.toggleEditDialog(messageId);
     }
   }
+
+
+  
+
+
 }

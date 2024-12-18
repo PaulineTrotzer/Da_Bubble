@@ -120,3 +120,24 @@
   display: flex;
   gap: 8px;
 }
+
+@media(max-width:750px){
+  .profile-card-ct{
+    width: unset;
+    height: unset;
+    padding-bottom: 26px;
+  }
+
+  .img-frame{
+      img{
+        width: 150px;
+        height: 150px;    
+      }
+  }
+
+  .edit-option-title{
+    height: unset; 
+    display: flex;
+    align-items: center;
+} 
+}

@@ -642,5 +642,14 @@ export class DirectThreadComponent implements OnInit {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
     this.global.currentThreadMessageSubject.next(null);
-  }
+    this.checkResponsiveWidtSize();
+  } 
+
+  checkResponsiveWidtSize(){
+    if(window.innerWidth<=720 && this.global.openChannelOrUserThread)
+      this.global.openChannelOrUserThread=false
+      this.global.openChannelorUserBox=true
+  } 
+
+  
 }

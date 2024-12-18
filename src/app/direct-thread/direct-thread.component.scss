@@ -613,3 +613,11 @@ h3 {
 svg {
   cursor: pointer;
 }
+
+
+@media (max-width:720px){
+  .full-page-content.reset-width{
+    width: unset;
+  }
+
+}

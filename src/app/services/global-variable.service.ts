@@ -24,7 +24,7 @@ export class GlobalVariableService {
   currentRoom:any
 
   openChannelorUserBox:boolean=false;
-
+  openChannelOrUserThread:boolean=false;
 
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();

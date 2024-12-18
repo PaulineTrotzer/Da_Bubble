@@ -4,15 +4,23 @@
     <div class="full-page-content">
         <app-workspace [ngClass]="{
             'workspace-open': isWorkspaceOpen,
-            'workspace-closed': (!isWorkspaceOpen || global.openChannelorUserBox),
+            'workspace-closed':!isWorkspaceOpen,
+            'close-box':global.openChannelorUserBox || global.openChannelOrUserThread ,
+            'open-box':!global.openChannelorUserBox && !global.openChannelOrUserThread,
+
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
-        <app-start-screen [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
+        <app-start-screen
+          [ngClass]="{'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen ,'hidden':global.openChannelOrUserThread}" 
+        [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
             [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
-        <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
+        <app-thread    *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
+            [ngClass]="{'openThread':global.openChannelOrUserThread}"
             [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
-            [selectedChannel]="selectedChannel"></app-thread>
+            [selectedChannel]="selectedChannel"> 
+            
+        </app-thread>
     </div>
 </div>
 
@@ -42,11 +50,12 @@
       (click)="toggleWorkspace()"
       (mouseenter)="isHovered = true"
       (mouseleave)="isHovered = false">
-      <p>{{ isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen' }}</p>
+     <p>{{!global.openChannelorUserBox && isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p> 
+
       <img 
         class="workspace-drawer"
         [src]="getImageSource()"
-        [alt]="isWorkspaceOpen ? 'Hide workspace' : 'Show workspace'"
+        [alt]="!global.openChannelorUserBox && isWorkspaceOpen  ? 'Hide workspace' : 'Show workspace'"
       >
     </div>
 

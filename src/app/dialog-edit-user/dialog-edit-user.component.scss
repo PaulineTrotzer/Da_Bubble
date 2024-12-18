@@ -221,3 +221,65 @@ h3 {
     cursor: pointer;
   }
 }
+
+ @media (max-width:750px){
+  .profile-card-ct{
+    width: 350px;
+    padding: 15px 15px;
+    gap: 12px;
+  } 
+  
+  .img-frame{
+    img{
+      width: 150px;
+      height: 150px;    
+    }
+}
+
+.avatar-box{
+  gap: 4px;
+  padding: 10px 0 0 0px;
+  img{
+    width: 50px;
+    height: 50px;
+  }
+} 
+
+.name-escape-flex{
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
+      margin-top: 0;
+}
+
+.added-avatar{
+    gap: 24px;
+    padding: 19px 0px;
+} 
+
+.name-edit-flex{
+  padding: 0;
+  
+  input{
+    width:98%;
+  } 
+}
+
+ .mail-flex-column{
+  padding: 0;
+  input{
+    width: 98%;
+  }
+}
+
+// .user-mail-input{
+//   width: 98px;
+// }
+ 
+.button-flex{
+  width: unset;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+}

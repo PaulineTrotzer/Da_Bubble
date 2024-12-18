@@ -106,13 +106,21 @@ export class HomeComponent implements OnInit {
   } 
 
   toggleWorkspace() {
-    this.isWorkspaceOpen = !this.isWorkspaceOpen
+    if(window.innerWidth<=720 && this.global.openChannelorUserBox ){
+      this.global.openChannelorUserBox=false;
+    }else if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
+      this.global.openChannelOrUserThread=false;
+    }
+    else {
+      this.isWorkspaceOpen = !this.isWorkspaceOpen;
+    }
   }
 
   getImageSource(): string {
-    const state = this.isWorkspaceOpen ? 'hide' : 'show';
-    const variant = this.isHovered ? 'hover' : 'black';
+    const state = this.isWorkspaceOpen && !this.global.openChannelorUserBox ? 'hide' : 'show';
+    const variant = this.isHovered  ? 'hover' : 'black';
     return `../../assets/img/${state}-workspace-${variant}.png`;
   }
+
 
 }

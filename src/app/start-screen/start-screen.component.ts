@@ -270,7 +270,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       );
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
-          console.log('aram');
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
           const membersPromises = userIds.map(async (userId: string) => {

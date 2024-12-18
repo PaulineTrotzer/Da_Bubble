@@ -429,7 +429,25 @@ export class ChatComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
+      this.checkWidthSize();
+      this.checkThreadOpen();
+  } 
+
+    checkThreadOpen(){
+      if(window.innerWidth<=750 && this.global.openChannelorUserBox ){
+        this.global.openChannelorUserBox=false
+      }
+    }
+
+
+  checkWidthSize(){
+    if(window.innerWidth<=750){
+       return this.global.openChannelOrUserThread=true 
+    }else{
+      return this.global.openChannelOrUserThread=false;    
+    }
   }
+   
 
   splitMessage(text: string) {
     const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;

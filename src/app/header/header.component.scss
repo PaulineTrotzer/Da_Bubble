@@ -4,11 +4,13 @@
   align-items: flex-start;
   display: flex;
   position: relative;
-  img {
-    width: 245px;
-    height: 70px;
-    object-fit: contain;
-  }
+ 
+} 
+
+.bubble-img {
+  width: 245px;
+  height: 70px;
+  object-fit: contain;
 }
 
 ::-webkit-scrollbar {
@@ -348,10 +350,8 @@ input{
       height: 50px;
     } 
    } 
-   .header-content{
-    img{
-      width: 200px;
-    }
+   .bubble-img{
+    width:200px;
    }
 }
 
@@ -365,5 +365,21 @@ input{
     input{
       font-size: 12px;
     }   
+  } 
+
+@media(max-width:400px){
+  .mainSearch-box{
+    padding-left: 0;
+  }
+  .search-result-content{
+    margin: 0 auto;
+  }
+}
+
+  @media(max-width:370px){
+    input{
+    background-position: calc(102% - 17px) center;
+    background-size: 20px 20px;
+    }
   }
 }

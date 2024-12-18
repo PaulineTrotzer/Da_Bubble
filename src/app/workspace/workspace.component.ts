@@ -84,9 +84,6 @@ export class WorkspaceComponent implements OnInit {
     );
   } 
 
- 
-
-
 selectUser(user: any) {
   this.userSelected.emit(user);
   this.id = user.id;
@@ -100,20 +97,25 @@ selectUser(user: any) {
     updateDoc(docRef, resetMessageCount);
   } 
    this.global.statusCheck =false;
-   if (window.innerWidth <= 720) {
-    this.global.openChannelorUserBox = true;
-    console.log(this.global.openChannelorUserBox )
-  } else {
-    this.global.openChannelorUserBox = false;
-    console.log(this.global.openChannelorUserBox)
-  }
-  
+    this.checkWidtSize();
+    this.cheackChatOpen();
 }   
 
- 
- 
+    
 
+  cheackChatOpen(){
+    if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
+      this.global.openChannelOrUserThread=false;
+    }
+  }    
 
+ checkWidtSize(){
+  if(window.innerWidth<=720){
+    return  this.global.openChannelorUserBox = true;
+  }else{
+    return  this.global.openChannelorUserBox = false;
+  }
+ }
 
 // async updateRoomStatus(userId: string, status: boolean) {
 //   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
@@ -121,13 +123,11 @@ selectUser(user: any) {
 //   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
 //   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
 // }
-  
 
-
-           
   selectCurrentUser() {
     this.userSelected.emit(this.global.currentUserData);
     this.global.statusCheck = true;
+    this.checkWidtSize();
   }
 
   openDialog() {
@@ -225,6 +225,8 @@ selectUser(user: any) {
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
       this.global.setCurrentChannel(channel);
+      this.checkWidtSize();
+      this.cheackChatOpen();
   }  
 
       

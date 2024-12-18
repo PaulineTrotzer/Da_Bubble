@@ -128,38 +128,61 @@ app-thread {
   transform: rotate(90deg);
 } 
 
-// .workspaceClose{
-//   // opacity: 0;
-//   overflow-x: hidden;
-//   transition: all 175ms ease-in-out;
-//   width: 0;
-// }  
-
-// .workspaceOpen{
-//   opacity: 1;
-//   transition: all 175ms ease-in-out;
-// }
-
-
-
+ .startScreen-open{
+  display: unset;
+  width: 100%;
+ } 
 
 
 app-start-screen{
   width: 98%;
 } 
 
-
-
 @media(max-width:720px){
   app-start-screen{
     display: none;
   } 
-
-  // .workspace-open {
-  //   width: 100%;
-  //   transition: all 175ms ease-in-out;
-  // } 
-
   
+  .full-page-content{
+    gap:17px;
+  }
+
+  .workspace-open {
+    width: 100%;
+    transition: all 175ms ease-in-out;
+  } 
+
+  .workspace-open.close-box{
+    width: 0;
+    transition: all 175ms ease-in-out;
+    overflow-x: hidden;
+    margin-left:0;
+   }
+   
+   .workspace-open.open-box{
+     width: 100%;
+     transition: all 175ms ease-in-out;
+     margin-left: 17px;
+   }  
+
+   app-thread {
+    display: none;
+   }
+
+   .openThread{
+    display: unset;
+    max-width: unset;
+   } 
+
+   .startScreen-open.hidden{
+     display: none;
+   } 
+
+   .thread-hidden{
+    display: none;
+   }
+    
+
+
 
 }

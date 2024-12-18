@@ -1,6 +1,6 @@
 <div class="main-header" >
     <div class="header-content " >
-        <img src="../../assets/img/bubble.png" alt="">
+        <img class="bubble-img" src="../../assets/img/bubble.png">
 
         <div 
         class="search-container"
@@ -18,7 +18,7 @@
         /> 
  
                    <mat-card *ngIf="showUserList || showChannelList || (getSeperateUser.searchHeaderResult?.length>0 && listlastResultResult )"  class="mainSearch-box">
-                        <mat-card-content>
+                        <mat-card-content class="search-result-content">
                            <div *ngIf="showUserList"  class="main-user">   
                                 <div class="user-list"> 
                                 <div *ngFor="let user of filteredUsers">

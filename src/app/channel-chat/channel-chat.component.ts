@@ -289,7 +289,26 @@ export class ChannelChatComponent implements OnInit {
   openThread(messageId: string){
     this.global.setChannelThread(messageId)
     console.log(messageId)
+     this.checkWidthSize();
+     this.checkThreadOpen();
+  } 
+ 
+
+  checkThreadOpen(){
+    if(window.innerWidth<=750 && this.global.openChannelorUserBox ){
+      this.global.openChannelorUserBox=false
+    }
   }
+
+checkWidthSize(){
+  if(window.innerWidth<=750){
+     return this.global.openChannelOrUserThread=true 
+  }else{
+    return this.global.openChannelOrUserThread=false;    
+  }
+}
+
+
   
   displayDayInfo(index: number): boolean {
     if (index === 0) return true;
