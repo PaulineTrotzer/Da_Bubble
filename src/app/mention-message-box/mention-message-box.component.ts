@@ -19,6 +19,8 @@ import { CommonModule } from '@angular/common';
 export class MentionMessageBoxComponent implements OnInit {
   global = inject(GlobalVariableService);
   @Output() enterChatUser = new EventEmitter<any>();
+
+  @Output() closeMentionBox = new EventEmitter<void>();
   @Input() mention: string = '';
   @Output() cancelMessageBoxCard = new EventEmitter<any>();
 
@@ -37,5 +39,6 @@ export class MentionMessageBoxComponent implements OnInit {
   }
   enterChat(user: any) {
     this.enterChatUser.emit(user);
+    this.closeMentionBox.emit(); 
   }
 }

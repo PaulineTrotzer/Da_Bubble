@@ -111,7 +111,7 @@ export class ChatComponent implements OnInit, OnChanges {
   overlayOpen = false;
   isMentionCardOpenInChat: boolean = false;
   isMentionCardOpen: boolean = false; 
-  wasClickedinInput = false;
+  wasClickedChatInput = false;
 
   constructor() {}
 
@@ -162,6 +162,8 @@ export class ChatComponent implements OnInit, OnChanges {
   onMessageSent(): void {
     this.scrollAutoDown();
   }
+
+  
 
   editMessages(message: any) {
     this.editMessageId = message.id;
@@ -450,13 +452,17 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
-  onCancelMessageBox() {
-    this.wasClickedinInput = false; 
+  closeMentionBoxHandler() {
+    this.wasClickedChatInput = false;
+  }
+
+  onInputClick() {
+    this.wasClickedChatInput = true;
   }
 
 
   async handleMentionClick(mention: string) {
-    this.wasClickedinInput = true; 
+    this.wasClickedChatInput = true; 
     const cleanName = mention.substring(1);
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
@@ -832,14 +838,13 @@ export class ChatComponent implements OnInit, OnChanges {
   @Output() enterChatUser = new EventEmitter<any>();
 
   enterChatByUserName(user: any) {
-    debugger;
     this.chatByUserName = user;
     this.enterChatUser.emit(this.chatByUserName);
     this.selectUser(user); 
   }
 
   selectUser(user: any) {
-    this.selectedUser = user; // Setzt den User als aktiv in der Chat-Komponente
-    // Optional: Weitere Logik, um den Chat direkt zu öffnen
+    this.selectedUser = user;
+
   }
 }

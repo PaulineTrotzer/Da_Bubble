@@ -88,7 +88,7 @@ export class ChannelChatComponent implements OnInit {
   messageToEdit: string = '';
   getAllUsersName: any[] = [];
   unsubscribe: (() => void) | undefined;
-  wasClickedinInput: boolean = false;
+  wasClickedInChannelInput: boolean = false;
   @Output() enterChatFromChannel = new EventEmitter<any>();
   globalService=inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
@@ -104,10 +104,9 @@ export class ChannelChatComponent implements OnInit {
     await this.loadUserNames();
   }
 
-  onCancelMessageBox() {
-    this.wasClickedinInput = false;
+  onCancelMessageBox(): void {
+    this.wasClickedInChannelInput = false; 
   }
-
 
   enterChatByUserName(user: any) {
     this.enterChatFromChannel.emit(user);
@@ -126,7 +125,7 @@ export class ChannelChatComponent implements OnInit {
   }
 
   async handleMentionClick(mention: string) {
-    this.wasClickedinInput = true;
+    this.wasClickedInChannelInput = true;
     const cleanName = mention.substring(1);
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
@@ -140,6 +139,11 @@ export class ChannelChatComponent implements OnInit {
         this.global.openMentionMessageBox = true;
       });
     });
+  }
+
+  closeMentionBoxHandler() {
+
+    this.wasClickedInChannelInput = false;
   }
 
   splitMessage(text: string) {

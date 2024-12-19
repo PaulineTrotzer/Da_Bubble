@@ -1,7 +1,7 @@
 <div class="chat-box">
 
-  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedinInput"
-    (enterChatUser)="enterChatByUserName($event)">
+  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()"  *ngIf="wasClickedInChannelInput"
+    (enterChatUser)="enterChatByUserName($event)"   (closeMentionBox)="closeMentionBoxHandler()" >
   </app-mention-message-box>
 
   <div class="message-container" [ngClass]="{

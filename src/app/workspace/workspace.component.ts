@@ -87,8 +87,8 @@ export class WorkspaceComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedUserHome'] && !changes['selectedUserHome'].firstChange) {
-      this.selectedUser = this.selectedUserHome;  // Update selectedUser mit dem neuen Wert
-      this.userSelected.emit(this.selectedUser);  // Benachrichtige die übergeordnete Komponente
+      this.selectedUser = this.selectedUserHome;  
+      this.userSelected.emit(this.selectedUser);  
       console.log('User has been updated:', this.selectedUser);
     }
     
