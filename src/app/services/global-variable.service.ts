@@ -18,11 +18,11 @@ export class GlobalVariableService {
   googleAccountLogIn: boolean = false;
   createNewPassword: boolean = false;
   verifyEmail: boolean = true;
-  checkoben:boolean=false
-  checkCountStatus:any
-  checkCountStatusUser:any
-  currentRoom:any
-  isGuest : boolean = false;
+  checkoben: boolean = false;
+  checkCountStatus: any;
+  checkCountStatusUser: any;
+  currentRoom: any;
+  isGuest: boolean = false;
 
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
@@ -31,10 +31,9 @@ export class GlobalVariableService {
   currentThreadMessage$ = this.currentThreadMessageSubject.asObservable();
 
   public channelThreadSubject = new BehaviorSubject<string | null>(null);
-  channelThread$ = this.channelThreadSubject.asObservable()
+  channelThread$ = this.channelThreadSubject.asObservable();
 
   constructor() {}
-
 
   async setCurrentUserData(userData: any) {
     this.currentUserData = userData;
@@ -42,11 +41,13 @@ export class GlobalVariableService {
   }
 
   setCurrentChannel(channel: any) {
+    if (!channel) {
+      return;
+    }
     this.currentChannel = channel;
     this.channelSelected = true;
-    if (channel.name == 'Willkommen') {
+    if (channel.name === 'Willkommen') {
       this.welcomeChannelSubject.next(true);
-      this.channelSelected = true;
     } else {
       this.welcomeChannelSubject.next(false);
     }
@@ -74,5 +75,4 @@ export class GlobalVariableService {
       setTimeout(() => this.channelThreadSubject.next(messageId), 0);
     }
   }
-
 }

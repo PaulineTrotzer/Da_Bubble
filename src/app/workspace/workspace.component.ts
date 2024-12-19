@@ -11,7 +11,17 @@ import {
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  Output,
+  EventEmitter,
+  Input,
+  SimpleChanges,
+  ChangeDetectorRef,
+  NgZone,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
@@ -57,10 +67,15 @@ export class WorkspaceComponent implements OnInit {
   messageCountsArr: any = {};
   selectedUser: any;
 
-  constructor(public global: GlobalVariableService) {}
+  constructor(
+    public global: GlobalVariableService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {}
 
   async ngOnInit(): Promise<void> {
-    this.getAllUsers();
+    await this.getAllChannels();
+    await this.getAllUsers();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.getUserById(this.userId);
@@ -72,11 +87,10 @@ export class WorkspaceComponent implements OnInit {
         }
       );
     }
-    this.subscribeToGuestLoginStatus();
-    await this.getAllChannels();
+    await this.subscribeToGuestLoginStatus();
   }
 
-  subscribeToGuestLoginStatus(): void {
+  async subscribeToGuestLoginStatus(): Promise<void> {
     this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
@@ -84,25 +98,30 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedUserHome'] && !changes['selectedUserHome'].firstChange) {
-      this.selectedUser = this.selectedUserHome;  
-      this.userSelected.emit(this.selectedUser);  
+    if (
+      changes['selectedUserHome'] &&
+      !changes['selectedUserHome'].firstChange
+    ) {
+      this.selectedUser = this.selectedUserHome;
+      this.userSelected.emit(this.selectedUser);
       console.log('User has been updated:', this.selectedUser);
     }
-    
-    if (changes['selectedChannelHome'] && !changes['selectedChannelHome'].firstChange) {
-      this.selectedChannel = this.selectedChannelHome;  
-      this.channelSelected.emit(this.selectedChannel);  
+
+    if (
+      changes['selectedChannelHome'] &&
+      !changes['selectedChannelHome'].firstChange
+    ) {
+      this.selectedChannel = this.selectedChannelHome;
+      this.channelSelected.emit(this.selectedChannel);
       console.log('Channel has been updated:', this.selectedChannel);
     }
   }
 
   selectUser(user: any) {
-    debugger;
     this.selectedChannel = null;
     this.selectedUser = user;
+    this.cdr.detectChanges();
     this.userSelected.emit(user);
     this.id = user.id;
     this.global.currentThreadMessageSubject.next('');
@@ -129,12 +148,11 @@ export class WorkspaceComponent implements OnInit {
   // }
 
   selectCurrentUser() {
-    this.selectedChannel = null; 
-    this.selectedUser = this.global.currentUserData; 
+    this.selectedChannel = null;
+    this.selectedUser = this.global.currentUserData;
     this.userSelected.emit(this.global.currentUserData);
     this.global.statusCheck = true;
   }
-
 
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
@@ -236,4 +254,41 @@ export class WorkspaceComponent implements OnInit {
   toggleMessageDrawer() {
     this.messageDrawerOpen = !this.messageDrawerOpen;
   }
+
+
+   isUserChanged(userOrChannel: any, isChannel: boolean): boolean {
+    if (isChannel) {
+      return false; 
+    }
+    return userOrChannel.id !== this.selectedUser?.id;
+  }
+  
+   setUser(userOrChannel: any): void {
+    this.selectedUser = userOrChannel;
+    this.selectUser(this.selectedUser);
+    const foundUser = this.allUsers.find((user: { id: any }) => user.id === this.selectedUser.id);
+    if (foundUser) {
+      this.selectedUser = foundUser;
+    }
+  }
+  
+   setChannel(userOrChannel: any): void {
+    this.selectedChannel = userOrChannel;
+    this.selectChannel(this.selectedChannel);
+  }
+  
+  enterByUsername(userOrChannel: any, isChannel: boolean = false) {
+    if (isChannel && (!userOrChannel || !userOrChannel.name)) {
+      console.warn('Invalid channel passed to enterByUsername. Aborting.');
+      return;
+    }
+    this.selectedChannel = isChannel ? userOrChannel : null;
+    if (this.isUserChanged(userOrChannel, isChannel)) {
+      this.setUser(userOrChannel);
+    }
+    if (isChannel) {
+      this.setChannel(userOrChannel);
+    }
+  }
+  
 }

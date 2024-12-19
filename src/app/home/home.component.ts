@@ -108,16 +108,22 @@ export class HomeComponent implements OnInit {
   handleUserSelectionFromStartscreen(user: any) {
     this.selectedUser = user;
     this.onHeaderUser = user;
-    this.selectedChannel = null; // Channel zurücksetzen
+    this.selectedChannel = null; 
     this.onHeaderChannel = null;
+
+    this.workspaceComponent.enterByUsername(user, false); 
   }
   
   handleChannelSelectionFromStartscreen(channel: any) {
     this.selectedChannel = channel;
     this.onHeaderChannel = channel;
-    this.selectedUser = null; // User zurücksetzen
+    this.selectedUser = null;
     this.onHeaderUser = null;
+
+    this.workspaceComponent.enterByUsername(channel, true); 
   }
+
+
 
   onThreadOpened() {
     this.isThreadOpen = true;
