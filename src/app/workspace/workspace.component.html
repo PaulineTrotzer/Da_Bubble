@@ -89,7 +89,7 @@
           }">
           <div class="channels">
             <div class="channel-row" *ngFor="let channel of allChannels" (click)="selectChannel(channel)">
-              <span [class.active]="selectedChannel === channel">
+              <span [ngClass]="{'active': global.currentChannel?.id === channel.id}">
                 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">
                   <mask id="mask0_239_1574" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"

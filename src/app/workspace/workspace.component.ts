@@ -120,6 +120,7 @@ export class WorkspaceComponent implements OnInit {
 
 
 selectUser(user: any) {
+  this.selectedChannel = null;
   this.userSelected.emit(user);
   this.id = user.id;
   this.global.currentThreadMessageSubject.next('');
@@ -207,7 +208,6 @@ return  this.global.openChannelorUserBox = false;
     if (willkommenChannel) {
       this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
-      console.log((this.global.channelSelected = false));
     }
   }
 
@@ -222,7 +222,10 @@ return  this.global.openChannelorUserBox = false;
     this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
       this.allChannels = snapshot.docs.map((doc) => new Channel(doc.data()));
       this.sortChannels();
-      this.findWelcomeChannel();
+  
+      if (!this.selectedChannel && !this.global.channelSelected) {
+        this.findWelcomeChannel();
+      }
     });
   }
 
