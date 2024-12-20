@@ -22,9 +22,11 @@ export class GlobalVariableService {
   checkCountStatus:any
   checkCountStatusUser:any
   currentRoom:any
-
   openChannelorUserBox:boolean=false;
   openChannelOrUserThread:boolean=false;
+ 
+  checkWideChannelorUserBox:boolean=false;
+  checkWideChannelOrUserThreadBox:boolean=false;
 
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();

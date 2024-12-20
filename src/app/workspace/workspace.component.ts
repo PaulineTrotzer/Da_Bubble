@@ -97,11 +97,26 @@ selectUser(user: any) {
     updateDoc(docRef, resetMessageCount);
   } 
    this.global.statusCheck =false;
+    this.openvollWidtChannelOrUserBox();
+    this.hiddenVoolThreadBox();
     this.checkWidtSize();
     this.cheackChatOpen();
 }   
-
-    
+ 
+   
+    openvollWidtChannelOrUserBox() {
+      if(window.innerWidth<=1349 && window.innerWidth > 720){
+        return this.global.checkWideChannelorUserBox=true;
+      }else{
+        return this.global.checkWideChannelorUserBox=false;
+      }
+    } 
+      
+    hiddenVoolThreadBox(){
+      if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelOrUserThreadBox){
+        this.global.checkWideChannelOrUserThreadBox=false;
+      }
+    }
 
   cheackChatOpen(){
     if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
@@ -225,6 +240,8 @@ selectUser(user: any) {
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
       this.global.setCurrentChannel(channel);
+      this.openvollWidtChannelOrUserBox();
+      this.hiddenVoolThreadBox();
       this.checkWidtSize();
       this.cheackChatOpen();
   }  

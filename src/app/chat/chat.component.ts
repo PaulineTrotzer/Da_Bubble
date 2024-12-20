@@ -428,7 +428,10 @@ export class ChatComponent implements OnInit, OnChanges {
       }
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
-    }
+    }  
+      
+      this.openvollThreadBox();
+      this.hiddenFullChannelOrUserThreadBox();
       this.checkWidthSize();
       this.checkThreadOpen();
   } 
@@ -445,6 +448,20 @@ export class ChatComponent implements OnInit, OnChanges {
        return this.global.openChannelOrUserThread=true 
     }else{
       return this.global.openChannelOrUserThread=false;    
+    }
+  }  
+
+  openvollThreadBox() {
+    if(window.innerWidth<=1349 && window.innerWidth > 720){
+      return this.global.checkWideChannelOrUserThreadBox=true;
+    }else{
+      return this.global.checkWideChannelOrUserThreadBox=false;
+    }
+  } 
+    
+  hiddenFullChannelOrUserThreadBox(){
+    if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelorUserBox){
+      this.global.checkWideChannelorUserBox=false;
     }
   }
    

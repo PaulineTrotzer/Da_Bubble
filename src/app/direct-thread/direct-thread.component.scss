@@ -615,6 +615,12 @@ svg {
 }
 
 
+@media(max-width:1349px){
+  .full-page-content.hidden-width{
+    width: unset;
+  }
+}
+
 @media (max-width:720px){
   .full-page-content.reset-width{
     width: unset;

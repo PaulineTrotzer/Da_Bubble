@@ -110,6 +110,7 @@ export class HomeComponent implements OnInit {
       this.global.openChannelorUserBox=false;
     }else if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
       this.global.openChannelOrUserThread=false;
+      this.isWorkspaceOpen=true;
     }
     else {
       this.isWorkspaceOpen = !this.isWorkspaceOpen;

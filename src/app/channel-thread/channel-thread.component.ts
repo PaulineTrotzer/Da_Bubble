@@ -143,9 +143,16 @@ export class ChannelThreadComponent implements OnInit {
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
+    this.hiddenThreadFullBox();
     this.checkResponsiveWidtSize();
-  }
+  } 
 
+  hiddenThreadFullBox(){
+    if(window.innerWidth<=1349 && window.innerWidth > 720 &&  this.global.checkWideChannelOrUserThreadBox){
+      this.global.checkWideChannelOrUserThreadBox=false;
+      this.global.checkWideChannelorUserBox=true;
+    }
+  }
   checkResponsiveWidtSize(){
     if(window.innerWidth<=720 && this.global.openChannelOrUserThread)
       this.global.openChannelOrUserThread=false

@@ -20,11 +20,12 @@
 
 
 .header-content {
-  display: flex;
-  width: 2000px;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px 50px;
+      display: flex;
+      max-width: 2000px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 50px;
+      width: 100%;
 }
 
 input {
@@ -314,7 +315,7 @@ position: relative;
   .search-container{
     position: absolute;
     max-width: 989px;
-    width: 96%;
+    width: 98%;
     margin: 0 auto;
     top: 98px;
     right: 0;

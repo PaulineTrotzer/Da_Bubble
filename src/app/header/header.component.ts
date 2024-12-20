@@ -191,7 +191,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }else{
       return  this.global.openChannelorUserBox = false;
      }
+   } 
+
+   checkThredBox() {
+    if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
+      this.global.openChannelOrUserThread=false;
+      this.global.openChannelorUserBox=true;
+    }
    }
+
+   hiddenThreadFullBox(){
+    if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelOrUserThreadBox){
+      this.global.checkWideChannelorUserBox=true;
+      this.global.checkWideChannelOrUserThreadBox=false;
+    }
+  }
+
 
   async enterChatUser(user: any) {  
      const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
@@ -201,8 +216,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.searcheNameOrChannel = '';
         this.listlastResultResult = false;
         this.hoverResultnameId = '';
+        this.hiddenThreadFullBox();
+        this.checkThredBox();
         this.checkWidtSize();
-}
+} 
   
 
   async getAllChannels () {
@@ -243,31 +260,29 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } 
   
   async  enterChannel(channel:any){
-    console.log(channel.messages)
       const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
       await setDoc(channelRef, {searchHeaderResult: arrayUnion(channel)}, { merge: true });
       this.headerChannelSelcted.emit(channel);
       this.showChannelList=false;
       this.searcheNameOrChannel='';
       this.listlastResultResult=false;
+      this.hiddenThreadFullBox();
+      this.checkThredBox();
       this.checkWidtSize();
     }
     
     getUser(currentId:any){
       const docRef=doc(this.firestore,'searchHeaderResult',currentId);
       if (!this.userID) {
-        console.error("UserID is undefined");
         return;
     } 
-
       onSnapshot(docRef,(docSnapshot)=>{
          if(docSnapshot.exists()){
             const data=docSnapshot.data();
-            const id = docSnapshot.id
+            const id = docSnapshot.id;
             this.getSeperateUser={id:id,...data};
          }else{
-          this.getSeperateUser={}
-          console.log(this.getSeperateUser)
+          this.getSeperateUser={};
          }
       })
     }

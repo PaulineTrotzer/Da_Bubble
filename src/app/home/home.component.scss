@@ -1,6 +1,11 @@
 mat-card{
 position: absolute;
 z-index: 110;
+} 
+
+.main-content{
+  display: flex;
+  justify-content: center;
 }
 
 .page-content-plus-header {
@@ -136,15 +141,44 @@ app-thread {
 
 app-start-screen{
   width: 98%;
-} 
+}  
+ 
+@media(max-width:1349px){ 
+  .full-page-content.reset-gap{
+  gap: 16px;
+  } 
+
+   
+
+  app-start-screen.hiddenFullWidth{
+    width: 0;
+    overflow-x: hidden;
+    transition: all 175ms ease-in-out;
+     gap: unset;
+  } 
+  
+  app-start-screen.display-show{
+    display: unset;
+    width: 100%;
+    transition: all 175ms ease-in-out;
+  }
+
+  app-thread.hiddenMax-Width{
+    max-width: unset;
+  }
+  app-thread.display-hidden{
+    display: none;
+  }
+}
+  
 
 @media(max-width:720px){
   app-start-screen{
     display: none;
   } 
-  
+
   .full-page-content{
-    gap:17px;
+    gap:0;
   }
 
   .workspace-open {
@@ -162,7 +196,7 @@ app-start-screen{
    .workspace-open.open-box{
      width: 100%;
      transition: all 175ms ease-in-out;
-     margin-left: 17px;
+    //  margin-left: 17px;
    }  
 
    app-thread {
@@ -181,8 +215,5 @@ app-start-screen{
    .thread-hidden{
     display: none;
    }
-    
-
-
-
+ 
 }
