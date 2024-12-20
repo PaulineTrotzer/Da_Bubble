@@ -197,6 +197,10 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isFirstClick = true;
   }
 
+  onCancelMessageBox(): void {
+    this.wasClickedChatInput = false;
+  }
+
   resetIcon(message: any) {
     this.isiconShow = null;
     const strickerRef = doc(this.firestore, 'messages', message.id);
