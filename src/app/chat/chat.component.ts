@@ -113,10 +113,16 @@ export class ChatComponent implements OnInit, OnChanges {
   isMentionCardOpen: boolean = false;
   wasClickedChatInput = false;
 
+
   constructor() {}
 
   async ngOnInit(): Promise<void> {
     await this.getAllUsersname();
+  }
+
+    onCancelMentionBox() {
+    this.wasClickedChatInput = false; 
+    console.log('Mention Message Box wurde geschlossen.');
   }
 
   async subscribeToThreadAnswers() {

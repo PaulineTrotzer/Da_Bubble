@@ -1,6 +1,7 @@
 <div class="full-app-content">
 
-    <app-mention-message-box    (closeMentionBox)="onCancelMessageBox()" *ngIf="wasClickedChatInput" (enterChatUser)="enterChatByUserName($event)">
+    <app-mention-message-box (cancelMessageBoxCard)="onCancelMentionBox()" *ngIf="wasClickedChatInput"
+        (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
 
@@ -392,7 +393,8 @@
                 </div>
             </div>
         </div>
-        <app-channel-chat (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
+        <app-channel-chat (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
+            [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
         <div class="self-name-and-img">
