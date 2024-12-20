@@ -38,11 +38,11 @@ import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import {
   animate,
-  AnimationPlayer,
   style,
   transition,
   trigger,
 } from '@angular/animations';
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 
 @Component({
   selector: 'app-direct-thread',
@@ -53,6 +53,7 @@ import {
     InputFieldComponent,
     FormsModule,
     MatCardModule,
+    MentionMessageBoxComponent
   ],
   templateUrl: './direct-thread.component.html',
   styleUrls: ['./direct-thread.component.scss'],
@@ -128,7 +129,7 @@ export class DirectThreadComponent implements OnInit {
   hoveredReactionIcon: boolean = false;
   wasClickedInDirectThread = false;
   getAllUsersName: any[] = [];
-  @Output() enterChatFromDirectThread = new EventEmitter<any>();
+  @Output() userSelectedFromDirectThread = new EventEmitter<any>();
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -181,9 +182,10 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-  enterChatByUserName(user: any) {
-    this.enterChatFromDirectThread.emit(user);
+  selectUserForChat(user: any) {
+    this.userSelectedFromDirectThread.emit(user);
   }
+
 
   async handleMentionClick(mention: string) {
     this.wasClickedInDirectThread = true;
@@ -236,6 +238,11 @@ export class DirectThreadComponent implements OnInit {
     this.editableMessageText = '';
     this.editWasClicked = false;
     this.isFirstClick = true;
+  }
+
+
+  onCancelMessageBox(): void {
+    this.wasClickedInDirectThread = false;
   }
 
   async saveOrDeleteMessage(message: any) {
@@ -403,7 +410,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
-    debugger;
     try {
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
       const docSnapshot = await getDoc(docRef);

@@ -21,6 +21,10 @@
   </header>
   <div class="header-seperator"></div>
 
+  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInDirectThread"
+  (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
+  </app-mention-message-box>
+
   <div class="overflow-container">
     <div #messageContainer class="all-thread-message-container">
 
@@ -152,6 +156,7 @@
               <h4>{{ currentUser.name }}</h4>
               <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
+
             <div class="message-holder" [class.hovered]="message.isHovered">
               <ng-container *ngIf="!(editWasClicked && editMessageId === message.id); else editMode">
                 <div class="cu-msg-text">
@@ -166,7 +171,7 @@
                   </ng-container>
                 </div>
               </ng-container>
-              
+
 
 
 

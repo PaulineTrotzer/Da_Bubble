@@ -35,8 +35,8 @@ export class HomeComponent implements OnInit {
   global = inject(GlobalVariableService);
   isGuestLogin = false;
   private guestLoginStatusSub: Subscription | undefined;
-  onHeaderUser:any
-  onHeaderChannel:any
+  onHeaderUser: any;
+  onHeaderChannel: any;
   directThreadId: string | null = null;
   channelThreadId: string | null = null;
   isWorkspaceOpen: boolean = true;
@@ -49,23 +49,17 @@ export class HomeComponent implements OnInit {
     this.setDirectThread();
     this.setChannelThread();
   }
-/* 
-  handleUserSelectionFromStartscreen(user: any) {
-    if (this.workspaceComponent) {
-      this.workspaceComponent.selectUser(user); // Aufrufen der selectUser-Methode in Workspace
-    }
-  } */
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
       this.directThreadId = messageId;
-    })
+    });
   }
 
   setChannelThread() {
     this.global.channelThread$.subscribe((messageId) => {
       this.channelThreadId = messageId;
-    })
+    });
   }
 
   subscribeToLoginStatus(): void {
@@ -82,16 +76,15 @@ export class HomeComponent implements OnInit {
         this.isGuestLogin = status;
       }
     );
-  } 
+  }
 
   onHeaderUserSelected(user: any) {
     this.onHeaderUser = user;
     this.globalService.clearCurrentChannel();
-}
+  }
 
-
-  onHeaderchannelSelected(channel:any){
-    this.onHeaderChannel=channel;
+  onHeaderchannelSelected(channel: any) {
+    this.onHeaderChannel = channel;
     this.globalService.setCurrentChannel(channel);
   }
 
@@ -108,22 +101,37 @@ export class HomeComponent implements OnInit {
   handleUserSelectionFromStartscreen(user: any) {
     this.selectedUser = user;
     this.onHeaderUser = user;
-    this.selectedChannel = null; 
+    this.selectedChannel = null;
     this.onHeaderChannel = null;
 
-    this.workspaceComponent.enterByUsername(user, false); 
+    this.workspaceComponent.enterByUsername(user, false);
   }
-  
+
   handleChannelSelectionFromStartscreen(channel: any) {
     this.selectedChannel = channel;
     this.onHeaderChannel = channel;
     this.selectedUser = null;
     this.onHeaderUser = null;
 
-    this.workspaceComponent.enterByUsername(channel, true); 
+    this.workspaceComponent.enterByUsername(channel, true);
   }
+  
+  handleUserSelectionFromThread(user: any) {
+    this.selectedUser = user;
+    this.onHeaderUser = user;
+    this.selectedChannel = null;
+    this.onHeaderChannel = null;
+
+    if (this.workspaceComponent) {
+      this.workspaceComponent.enterByUsername(user, false);
+    }
+  }
+  
 
 
+ /*  handleUserSelectionFromDirectThread(){
+
+  } */
 
   onThreadOpened() {
     this.isThreadOpen = true;
@@ -131,10 +139,10 @@ export class HomeComponent implements OnInit {
 
   onThreadClosed() {
     this.isThreadOpen = false;
-  } 
+  }
 
   toggleWorkspace() {
-    this.isWorkspaceOpen = !this.isWorkspaceOpen
+    this.isWorkspaceOpen = !this.isWorkspaceOpen;
   }
 
   getImageSource(): string {
@@ -142,5 +150,4 @@ export class HomeComponent implements OnInit {
     const variant = this.isHovered ? 'hover' : 'black';
     return `../../assets/img/${state}-workspace-${variant}.png`;
   }
-
 }
