@@ -119,7 +119,7 @@ export class ChatComponent implements OnInit, OnChanges {
     await this.getAllUsersname();
   }
 
-  subscribeToThreadAnswers() {
+  async subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
       this.threadControlService.getReplyCount(message.id).subscribe((count) => {
         this.replyCounts.set(message.id, count);
@@ -377,47 +377,67 @@ export class ChatComponent implements OnInit, OnChanges {
     ids.sort();
     return ids.join('_');
   }
-
   async getMessages() {
-    const docRef = collection(this.firestore, 'messages');
-    const q = query(
-      docRef,
-      where('recipientId', 'in', [
-        this.selectedUser?.id,
-        this.global.currentUserData?.id,
-      ]),
-      where('senderId', 'in', [
-        this.selectedUser?.id,
-        this.global.currentUserData?.id,
-      ])
-    );
-    onSnapshot(q, (querySnapshot) => {
-      this.messagesData = [];
-      querySnapshot.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
-        }
-        if (
-          (messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.selectedUser.id) ||
-          (messageData['senderId'] === this.selectedUser.id &&
-            messageData['recipientId'] === this.global.currentUserData.id) ||
-          (this.global.statusCheck &&
-            messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.global.currentUserData.id)
-        ) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
-      });
-      this.subscribeToThreadAnswers();
-      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-      this.checkForSelfChat();
-      if (this.shouldScroll) {
-        this.scrollAutoDown();
+    try {
+      if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
+        throw new Error(
+          `Invalid data: selectedUser.id = ${this.selectedUser?.id}, currentUser.id = ${this.global.currentUserData?.id}`
+        );
       }
-    });
+      const docRef = collection(this.firestore, 'messages');
+      const q = query(
+        docRef,
+        where('recipientId', 'in', [
+          this.selectedUser.id,
+          this.global.currentUserData.id,
+        ]),
+        where('senderId', 'in', [
+          this.selectedUser.id,
+          this.global.currentUserData.id,
+        ])
+      );
+      onSnapshot(
+        q,
+        async (querySnapshot) => {
+          try {
+            this.messagesData = [];
+            querySnapshot.forEach((doc) => {
+              const messageData = doc.data();
+              if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+                messageData['timestamp'] = messageData['timestamp'].toDate();
+              }
+              if (
+                (messageData['senderId'] === this.global.currentUserData.id &&
+                  messageData['recipientId'] === this.selectedUser.id) ||
+                (messageData['senderId'] === this.selectedUser.id &&
+                  messageData['recipientId'] === this.global.currentUserData.id) ||
+                (this.global.statusCheck &&
+                  messageData['senderId'] === this.global.currentUserData.id &&
+                  messageData['recipientId'] === this.global.currentUserData.id)
+              ) {
+                this.messagesData.push({ id: doc.id, ...messageData });
+              }
+            });
+            await this.subscribeToThreadAnswers();
+            this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
+            this.checkForSelfChat();
+            if (this.shouldScroll) {
+              this.scrollAutoDown();
+            }
+          } catch (innerError) {
+            console.error('rrror while  querySnapshot:', innerError);
+          }
+        },
+        (error) => {
+          console.error('rrror in onSnapshot:', error);
+        }
+      );
+    } catch (error) {
+      console.error('error initialie messages query:', error);
+    }
   }
+  
+  
 
   async openThread(messageId: any) {
     try {

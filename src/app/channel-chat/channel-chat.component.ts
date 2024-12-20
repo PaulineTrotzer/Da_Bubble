@@ -1,4 +1,4 @@
-import { CommonModule} from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -90,10 +90,10 @@ export class ChannelChatComponent implements OnInit {
   unsubscribe: (() => void) | undefined;
   wasClickedInChannelInput: boolean = false;
   @Output() enterChatFromChannel = new EventEmitter<any>();
-  globalService=inject(GlobalVariableService);
+  globalService = inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-  chatByUserName: any;
+/*   chatByUserName: any; */
 
   constructor() {}
 
@@ -105,7 +105,7 @@ export class ChannelChatComponent implements OnInit {
   }
 
   onCancelMessageBox(): void {
-    this.wasClickedInChannelInput = false; 
+    this.wasClickedInChannelInput = false;
   }
 
   enterChatByUserName(user: any) {
@@ -142,7 +142,6 @@ export class ChannelChatComponent implements OnInit {
   }
 
   closeMentionBoxHandler() {
-
     this.wasClickedInChannelInput = false;
   }
 

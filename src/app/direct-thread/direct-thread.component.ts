@@ -36,7 +36,13 @@ import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
-import { animate, style, transition, trigger } from '@angular/animations';
+import {
+  animate,
+  AnimationPlayer,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 
 @Component({
   selector: 'app-direct-thread',
@@ -120,11 +126,15 @@ export class DirectThreadComponent implements OnInit {
   editWasClicked = false;
   showEditOption: { [messageId: string]: boolean } = {};
   hoveredReactionIcon: boolean = false;
+  wasClickedInDirectThread = false;
+  getAllUsersName: any[] = [];
+  @Output() enterChatFromDirectThread = new EventEmitter<any>();
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     await this.initializeUser();
     await this.subscribeToThreadMessages();
+    await this.getAllUsersname();
     this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
@@ -169,6 +179,56 @@ export class DirectThreadComponent implements OnInit {
       }, 20);
       this.isFirstClick = false;
     }
+  }
+
+  enterChatByUserName(user: any) {
+    this.enterChatFromDirectThread.emit(user);
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedInDirectThread = true;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
+  }
+
+  closeMentionBoxHandler() {
+    this.wasClickedInDirectThread = false;
+  }
+
+  splitMessage(text: string) {
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
+    return text.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  }
+
+  async getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
   }
 
   cancelEdit() {
@@ -343,6 +403,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
+    debugger;
     try {
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
       const docSnapshot = await getDoc(docRef);
@@ -351,7 +412,7 @@ export class DirectThreadComponent implements OnInit {
         if (docData?.['firstMessageCreated']) {
           this.currentThreadMessage = {
             id: docSnapshot.id,
-            ...docSnapshot.data(),
+            ...docData, 
           };
           return;
         }
@@ -365,36 +426,57 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${firstInitialisedThreadMsg}/threadMessages`
       );
-      await this.settingDataforFireBase(threadMessagesRef);
+      await this.settingDataforFireBase(
+        threadMessagesRef,
+        this.currentThreadMessage 
+      );
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }
   }
+  
 
-  async settingDataforFireBase(threadMessagesRef: any) {
+  async settingDataforFireBase(
+    threadMessagesRef: any,
+    threadMessageData: any 
+  ) {
     try {
+/*       if (
+        !this.selectedUser ||
+        !this.selectedUser.uid ||
+        !this.global.currentUserData
+      ) {
+        throw new Error(
+          `Ungültige Daten: selectedUser = ${JSON.stringify(
+            this.selectedUser
+          )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
+        );
+      } */
+      debugger;
       const messageData = {
-        senderId: this.global.currentUserData.id,
-        senderName: this.global.currentUserData.name,
-        senderPicture: this.global.currentUserData.picture || '',
+        senderId: threadMessageData.senderId,
+        senderName: threadMessageData.senderName,
+        senderPicture: threadMessageData.senderPicture || '',
         timestamp: new Date(),
         selectedFiles: this.selectFiles || [],
         editedTextShow: false,
-        recipientId: this.selectedUser.uid,
-        recipientName: this.selectedUser.name,
+        recipientId: threadMessageData.recipientId,
+        recipientName: threadMessageData.recipientName,
         recipientStickerCount: 0,
         recipientSticker: '',
         text: this.currentThreadMessage?.text || '',
         firstMessageCreated: true,
         reactions: '',
       };
+  
       const docRef = await addDoc(threadMessagesRef, messageData);
-      console.log('erstellte Nachricht-ID:', docRef.id);
+      console.log('Erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
     } catch (error) {
-      console.error('fehler beim hinzufügen der nachricht:', error);
+      console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
   }
+  
 
   async getThreadMessages(messageId: any) {
     try {

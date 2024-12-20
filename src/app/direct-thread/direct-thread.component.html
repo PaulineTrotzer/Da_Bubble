@@ -45,8 +45,16 @@
               <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
-              <p>{{ message.text }}</p>
+              <!--               <p>{{ message.text }}</p> -->
+              <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                <span *ngIf="isMention(mentionName)" class="mention-message" (click)="handleMentionClick(mentionName)">
+                  {{ mentionName }}
+                </span>
+                <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+              </ng-container>
             </div>
+
+
 
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set" @slideIn>
@@ -145,10 +153,23 @@
               <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
             <div class="message-holder" [class.hovered]="message.isHovered">
-
               <ng-container *ngIf="!(editWasClicked && editMessageId === message.id); else editMode">
-                <p class="cu-msg-text">{{ message.text }}</p>
+                <div class="cu-msg-text">
+                  <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                    <span *ngIf="isMention(mentionName)" class="mention-message"
+                      (click)="handleMentionClick(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                    <span *ngIf="!isMention(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                  </ng-container>
+                </div>
               </ng-container>
+              
+
+
+
 
               <ng-template #editMode>
                 <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
