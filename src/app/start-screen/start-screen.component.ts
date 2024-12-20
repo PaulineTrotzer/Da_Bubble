@@ -71,7 +71,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   route = inject(ActivatedRoute);
   @Input() selectedUser: any;
   @Input() selectedChannel: any;
-
   @Input() mentionUser: string = '';
   @Input() onHeaderUser: any;
 
@@ -108,11 +107,11 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   loginAuthService = inject(LoginAuthService);
   enterChatByUser: any;
 
+
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
   
-
   ngOnInit(): void {
     this.global.channelSelected = false;
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -147,7 +146,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  private subscribeToWelcomeChannel(): void {
+   subscribeToWelcomeChannel(): void {
     this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe(
       (welcomeChannelStatus) => {
         this.afterLoginSheet = welcomeChannelStatus;
@@ -172,8 +171,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   @Input() onHeaderChannel: any;
-
-  aaa: boolean = false;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
@@ -270,6 +267,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       );
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
+          console.log('aram');
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
           const membersPromises = userIds.map(async (userId: string) => {
@@ -342,12 +340,21 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   onThreadOpened() {
     this.threadOpened.emit();
   }
+  @Output() userSelectedFromStartscreen = new EventEmitter<any>();
+  @Output() channelSelectedFromStartscreen = new EventEmitter<any>();
 
-  enterByUsername(user: any) {
+  
+  enterByUsername(user: any, isChannel: boolean = false) {
     this.enterChatByUser = user;
     this.selectedUser = this.enterChatByUser;
-    this.global.openMentionMessageBox = false;
+    if (isChannel) {
+      this.channelSelectedFromStartscreen.emit(user); 
+      this.global.setCurrentChannel(user); 
+    } else {
+      this.userSelectedFromStartscreen.emit(user);
+      this.global.clearCurrentChannel(); 
+    }
+
     this.checkProfileType();
-    this.global.clearCurrentChannel();
   }
 }

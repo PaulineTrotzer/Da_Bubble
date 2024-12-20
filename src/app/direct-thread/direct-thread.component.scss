@@ -7,6 +7,14 @@
   width: 510px;
 }
 
+.text-info-edit {
+  position: relative;
+  font-size: 12px;
+  margin-top: 9px;
+  font-family: "Nunito";
+  text-align: center;
+}
+
 .mat-mdc-card {
   border-style: none;
   border-top-right-radius: 30px;
@@ -14,14 +22,16 @@
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
   position: absolute;
-  left: 58px;
-  top: 17px;
+  left: 100px;
+  top: 34px;
   width: fit-content;
   white-space: nowrap;
   font-size: 14px;
+  transition: opacity 0.3s ease;
 }
 
 .edit-message-content {
+  box-shadow: 0px 6px 14px 0px #00000033;
   color: #000000;
   width: 100%;
   max-height: 105px;
@@ -32,6 +42,11 @@
     padding: 7px;
   }
   &:hover {
+    background-color: white;
+    border-top-right-radius: 30px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
     span {
       color: #444df2;
       background-color: #eceefe;
@@ -53,8 +68,8 @@
   display: flex;
   gap: 8px;
   position: relative;
-  right: 83px;
-  bottom: 40px;
+  right: 18px;
+  bottom: 30px;
   justify-content: end;
   align-items: center;
 }
@@ -91,7 +106,7 @@
     }
   }
   span {
-    font-family: 'Nunito';
+    font-family: "Nunito";
     font-size: 14px;
     font-weight: 400;
     line-height: 19.1px;
@@ -120,6 +135,7 @@
   border-bottom-right-radius: 0;
   top: -22px;
   color: white;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .img-flex-bar-options {
@@ -135,6 +151,21 @@
 
 .edit-icon-holder {
   position: relative;
+  svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      border-radius: 100%;
+      path {
+        fill: #444df2;
+      }
+    }
+  }
 }
 
 .edit-input {
@@ -198,7 +229,7 @@
 
 .show-set-reverse {
   position: absolute;
-  left: -8px;
+  left: 25px;
   border: 1px solid #adb0d9;
   background-color: white;
   border-top-right-radius: 30px;
@@ -207,6 +238,7 @@
   border-bottom-right-radius: 0;
   top: 0;
   color: white;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 header {
@@ -237,7 +269,7 @@ h3 {
 .header-seperator {
   width: 100%;
   height: 4px;
-  box-shadow: 0 4px 3px 0px rgba(0, 0, 0, 0.258);
+  box-shadow: 0 4px 3px 0px rgba(0, 0, 0, 0.25);
   margin-bottom: 8px;
 }
 
@@ -263,7 +295,7 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 10px;
+  padding: 16px 0;
   margin: 16px 0;
   max-height: 100%;
   overflow-y: auto;
@@ -284,9 +316,44 @@ h3 {
   padding: 16px;
 }
 
-.reaction-icon-container-editMode{
+.reaction-icon-container-editMode {
   position: absolute;
-  bottom: 15px;
+  bottom: 21px;
+  left: 5px;
+  svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      cursor: pointer;
+
+      path {
+        fill: #444df2;
+      }
+    }
+  }
+}
+
+.add-reaction-cu-ct {
+  svg {
+    width: 36px;
+    height: 36px;
+    display: block;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      cursor: pointer;
+
+      path {
+        fill: #444df2;
+      }
+    }
+  }
 }
 
 .emoji-flex-right {
@@ -433,25 +500,38 @@ h3 {
   }
 }
 
-.option-flex{
+.option-flex {
   display: flex;
   position: absolute;
   right: 46px;
   bottom: 25px;
   gap: 10px;
-  img{
-    object-fit: contain;
-    width: 24px;
-    &:hover{
-      background-color: #eceefe;
-      border-radius: 50px;
-    }
+}
+
+.save-icon {
+  object-fit: contain;
+  width: 24px;
+  padding: 2px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
   }
+}
+
+.cancel-icon{
+  object-fit: contain;
+  width: 22px;
+  padding: 3px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
+  } 
 }
 
 .message-holder {
   position: relative;
   padding: 15px 0 10px 0;
+  right: 31px;
 }
 
 .message-content-bubble {
@@ -480,6 +560,8 @@ h3 {
   align-items: center;
   gap: 16px;
   flex-direction: row-reverse;
+  position: relative;
+  right: 35px;
   h4 {
     font-family: Nunito;
     font-size: 18px;
@@ -497,8 +579,8 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 10px 30px 42px 30px;
-  margin: 16px 52px 0 0;
+  padding: 10px 0;
+  margin: 16px 0;
 }
 
 .message-text {
@@ -515,6 +597,8 @@ h3 {
   font-weight: 400;
   line-height: 19.1px;
   color: #686868;
+  position: relative;
+  left: 8px;
 }
 
 .partner-message-header {

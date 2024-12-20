@@ -8,12 +8,22 @@
   margin: 0;
 }
 
+
 html,
 body {
   height: 100%;
   overflow-x: hidden;
   background-color: #eceefe;
 }
+
+.mention-message {
+  color: blue;
+  cursor: pointer;
+  &:hover {
+    color: red;
+  }
+}
+
 
 body {
   margin: 0;

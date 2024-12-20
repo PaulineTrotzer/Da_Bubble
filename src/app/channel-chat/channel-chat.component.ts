@@ -1,7 +1,14 @@
-import { CommonModule, formatCurrency } from '@angular/common';
-import { Component, inject, Input, OnInit, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
-  addDoc,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {
   collection,
   doc,
   DocumentReference,
@@ -17,8 +24,9 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Overlay } from '@angular/cdk/overlay';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
+import { GlobalService } from '../global.service';
 
 interface Message {
   id: string;
@@ -28,31 +36,44 @@ interface Message {
   senderName: string;
   senderPicture: string;
   reactions: { [emoji: string]: string[] };
-  selectedFiles?:any[]
+  selectedFiles?: any[];
 }
 
 @Component({
   selector: 'app-channel-chat',
   standalone: true,
-  imports: [CommonModule, PickerComponent, FormsModule],
+  imports: [
+    CommonModule,
+    PickerComponent,
+    FormsModule,
+    MentionMessageBoxComponent,
+  ],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
   animations: [
     trigger('slideIn', [
-      transition(':enter', [style({opacity: 0, transform: 'translateX(-50%)'}), animate('150ms ease-in-out', style({opacity: 100, transform: 'translateX(0)'}))]),
-      transition(':enter', [style({opacity: 100, transform: 'translateX(0)'}), animate('150ms ease-in-out', style({opacity: 0, transform: 'translateX(-50%)'}))])
-    ])
-  ]
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-50%)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 100, transform: 'translateX(0)' })
+        ),
+      ]),
+      transition(':enter', [
+        style({ opacity: 100, transform: 'translateX(0)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 0, transform: 'translateX(-50%)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class ChannelChatComponent implements OnInit {
-  constructor() {}
-
   @Input() selectedChannel: any;
-
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
-  overlay = inject(OverlayStatusService)
-
+  overlay = inject(OverlayStatusService);
   messagesData: Message[] = [];
   showThreadInfo: boolean = false;
   showEditDialog: string | null = null;
@@ -63,32 +84,92 @@ export class ChannelChatComponent implements OnInit {
   hoveredEmoji: string | null = null;
   isPickerVisible: string | null = null;
   editingMessageId: string | null = null;
-  currentUserLastEmojis: string [] = [];
-  
+  currentUserLastEmojis: string[] = [];
   messageToEdit: string = '';
-
+  getAllUsersName: any[] = [];
   unsubscribe: (() => void) | undefined;
+  wasClickedInChannelInput: boolean = false;
+  @Output() enterChatFromChannel = new EventEmitter<any>();
+  globalService = inject(GlobalVariableService);
+  @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-  ngOnInit(): void {
-    this.loadChannelMessages();
-    this.loadCurrentUserEmojis();
-    this.loadUserNames(); 
+  constructor() {}
+
+  async ngOnInit(): Promise<void> {
+    await this.loadChannelMessages();
+    await this.loadCurrentUserEmojis();
+    await this.getAllUsersname();
+    await this.loadUserNames();
+  }
+
+  onCancelMessageBox(): void {
+    this.wasClickedInChannelInput = false;
+  }
+
+  enterChatByUserName(user: any) {
+    this.enterChatFromChannel.emit(user);
+  }
+
+  async getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedInChannelInput = true;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
+  }
+
+  closeMentionBoxHandler() {
+    this.wasClickedInChannelInput = false;
+  }
+
+  splitMessage(text: string) {
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
+    return text.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
   async loadUserNames() {
     const auth = getAuth();
     const userDocs = await Promise.all(
       this.messagesData
-        .flatMap(message => 
+        .flatMap((message) =>
           Object.values(message.reactions || {})
             .flat()
-            .filter(userId => userId !== auth.currentUser?.uid)
+            .filter((userId) => userId !== auth.currentUser?.uid)
         )
         .filter((userId, index, self) => self.indexOf(userId) === index)
-        .map(userId => getDoc(doc(this.firestore, 'users', userId)))
+        .map((userId) => getDoc(doc(this.firestore, 'users', userId)))
     );
 
-    userDocs.forEach(doc => {
+    userDocs.forEach((doc) => {
       const userData = doc.data();
       if (userData?.['name']) {
         this.reactionUserNames[doc.id] = userData['name'];
@@ -96,13 +177,13 @@ export class ChannelChatComponent implements OnInit {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
     if (changes['selectedChannel'] && this.selectedChannel) {
-      this.loadChannelMessages();
+      await this.loadChannelMessages();
     }
   }
 
-  loadChannelMessages() {
+  async loadChannelMessages() {
     if (!this.selectedChannel) {
       console.warn('No channel selected');
       return;
@@ -138,19 +219,23 @@ export class ChannelChatComponent implements OnInit {
   }
 
   togglePicker(messageId: string, isEditing: boolean = false) {
-    this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+    this.isPickerVisible =
+      this.isPickerVisible === messageId ? null : messageId;
     this.editingMessageId = isEditing ? messageId : null; // Track editing mode
     this.overlay.setOverlayStatus(true);
   }
 
   async addLastUsedEmoji(emoji: any) {
-    const auth = getAuth()
-    const currentUserId = auth.currentUser?.uid
-    if(currentUserId) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+    if (currentUserId) {
       const docRef = doc(this.firestore, 'users', currentUserId);
       await updateDoc(docRef, {
-        lastEmojis: [emoji.native, ...(await this.getExistingEmojis(docRef))].slice(0, 2),
-      })
+        lastEmojis: [
+          emoji.native,
+          ...(await this.getExistingEmojis(docRef)),
+        ].slice(0, 2),
+      });
     }
   }
 
@@ -160,13 +245,13 @@ export class ChannelChatComponent implements OnInit {
     return userData?.['lastEmojis'] || [];
   }
 
-  loadCurrentUserEmojis() {
+  async loadCurrentUserEmojis() {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
+
     if (currentUserId) {
       const userDocRef = doc(this.firestore, 'users', currentUserId);
-  
+
       onSnapshot(userDocRef, (docSnapshot) => {
         const userData = docSnapshot.data();
         if (userData?.['lastEmojis']) {
@@ -177,40 +262,47 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No current user logged in');
     }
   }
- 
 
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
+
     if (!currentUserId) {
       console.warn('No current user logged in');
       return;
     }
-  
-    const messageDocRef = doc(this.firestore, 'channels', this.selectedChannel.id, 'messages', messageId);
-  
+
+    const messageDocRef = doc(
+      this.firestore,
+      'channels',
+      this.selectedChannel.id,
+      'messages',
+      messageId
+    );
+
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
-  
+
       if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
-        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
-  
+        reactions[emoji] = reactions[emoji].filter(
+          (userId: string) => userId !== currentUserId
+        );
+
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
         }
-  
+
         await updateDoc(messageDocRef, { reactions });
-  
+
         console.log(`Updated reactions for message ${messageId}:`, reactions);
       }
     } catch (error) {
       console.error('Error removing reaction:', error);
     }
   }
-  
+
   addEmojiToMessage(emoji: string, messageId: string) {
     if (this.editingMessageId === messageId) {
       // Append emoji to the message being edited
@@ -219,12 +311,12 @@ export class ChannelChatComponent implements OnInit {
       // Existing reaction logic
       const auth = getAuth();
       const currentUserId = auth.currentUser?.uid;
-  
+
       if (!currentUserId) {
         console.warn('No current user logged in');
         return;
       }
-  
+
       const messageDocRef = doc(
         this.firestore,
         'channels',
@@ -232,11 +324,11 @@ export class ChannelChatComponent implements OnInit {
         'messages',
         messageId
       );
-  
+
       getDoc(messageDocRef).then((messageSnapshot) => {
         const messageData = messageSnapshot.data();
         const reactions = messageData?.['reactions'] || {};
-  
+
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
           if ((userIds as string[]).includes(currentUserId)) {
@@ -244,43 +336,45 @@ export class ChannelChatComponent implements OnInit {
             break;
           }
         }
-  
+
         if (oldReaction === emoji) {
-          reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
+          reactions[emoji] = reactions[emoji].filter(
+            (userId: string) => userId !== currentUserId
+          );
           if (reactions[emoji].length === 0) {
             delete reactions[emoji];
           }
         } else {
           if (oldReaction) {
-            reactions[oldReaction] = reactions[oldReaction].filter((userId: string) => userId !== currentUserId);
+            reactions[oldReaction] = reactions[oldReaction].filter(
+              (userId: string) => userId !== currentUserId
+            );
             if (reactions[oldReaction].length === 0) {
               delete reactions[oldReaction];
             }
           }
-  
+
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
-  
+
         updateDoc(messageDocRef, { reactions }).catch((error) => {
           console.error('Error updating reactions:', error);
         });
       });
     }
-  
+
     this.isPickerVisible = null;
     this.overlay.setOverlayStatus(false);
   }
-  
 
   closePicker() {
     this.isPickerVisible = null;
     this.editingMessageId = null;
     this.overlay.setOverlayStatus(false);
   }
-  
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {
     return reactions && Object.keys(reactions).length > 0;
@@ -371,7 +465,7 @@ hiddenFullChannelOrUserThreadBox(){
   }
 
   toggleEditArea(messageId: string, messageText: string) {
-    if(this.showEditArea === messageId) {
+    if (this.showEditArea === messageId) {
       this.showEditArea = null;
       this.messageToEdit = '';
     } else {
@@ -417,14 +511,15 @@ hiddenFullChannelOrUserThreadBox(){
     if (reactors.length === 0) return '';
 
     const currentUserReacted = reactors.includes(currentUserId);
-    const otherReactors = reactors.filter(userId => userId !== currentUserId);
+    const otherReactors = reactors.filter((userId) => userId !== currentUserId);
 
     if (currentUserReacted && reactors.length === 1) {
       return 'Du hast reagiert.';
     }
 
     if (currentUserReacted && otherReactors.length > 0) {
-      const otherUserName = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+      const otherUserName =
+        this.reactionUserNames[otherReactors[0]] || 'Jemand';
       return `${otherUserName} und Du haben reagiert.`;
     }
 
@@ -435,16 +530,16 @@ hiddenFullChannelOrUserThreadBox(){
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
-    
+
     const auth = getAuth();
     const reactors = message.reactions[emoji] || [];
     const unknownUsers = reactors
-      .filter(userId => userId !== auth.currentUser?.uid)
-      .filter(userId => !this.reactionUserNames[userId]);
-    
+      .filter((userId) => userId !== auth.currentUser?.uid)
+      .filter((userId) => !this.reactionUserNames[userId]);
+
     if (unknownUsers.length > 0) {
       Promise.all(
-        unknownUsers.map(async userId => {
+        unknownUsers.map(async (userId) => {
           const userDoc = await getDoc(doc(this.firestore, 'users', userId));
           const userData = userDoc.data();
           if (userData?.['name']) {
@@ -454,5 +549,4 @@ hiddenFullChannelOrUserThreadBox(){
       );
     }
   }
-  
 }

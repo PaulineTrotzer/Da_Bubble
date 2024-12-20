@@ -1,7 +1,27 @@
-import { Component, OnDestroy, OnInit, inject,Output,EventEmitter,ElementRef,HostListener  } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  Output,
+  EventEmitter,
+  ElementRef,
+  HostListener,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { collection, Firestore, onSnapshot,getDocs, updateDoc,doc,arrayRemove,arrayUnion, deleteDoc, setDoc} from '@angular/fire/firestore';
+import {
+  collection,
+  Firestore,
+  onSnapshot,
+  getDocs,
+  updateDoc,
+  doc,
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  setDoc,
+} from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
@@ -13,7 +33,7 @@ import { switchMap } from 'rxjs';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { GlobalVariableService } from '../services/global-variable.service';
 
 @Component({
@@ -26,7 +46,7 @@ import { GlobalVariableService } from '../services/global-variable.service';
     MatButtonModule,
     CommonModule,
     FormsModule,
-    MatCardModule
+    MatCardModule,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -68,8 +88,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.subscribe(async (paramMap) => {
       this.userID = paramMap.get('id');
-      if (this.userID) { 
-        this.getUser(this.userID) 
+      if (this.userID) {
+        this.getUser(this.userID);
         const userResult = await this.userservice.getUser(this.userID);
         if (userResult) {
           this.user = userResult;
@@ -85,14 +105,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscribeOverlayService();
     this.getAllUsers();
     this.getAllChannels();
-   
-     if(this.getSeperateUser){
-      console.log(this.getSeperateUser['searchHeaderResult'])
-     }
-  
+
+    if (this.getSeperateUser) {
+      console.log(this.getSeperateUser['searchHeaderResult']);
+    }
   }
 
-  subscribeOverlayService(){
+  subscribeOverlayService() {
     this.overlayStatusSub = this.overlayStatusService.overlayStatus$.subscribe(
       (status) => {
         this.overlayOpen = status;
@@ -101,7 +120,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   closePicker() {
-    this.overlay.setOverlayStatus(false)
+    this.overlay.setOverlayStatus(false);
   }
 
   ngOnDestroy(): void {
@@ -120,16 +139,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   closeDropDown() {
     this.overlayStatusService.setOverlayStatus(false);
-  } 
+  }
 
   @HostListener('document:click', ['$event'])
   closeDropdowns(event: Event): void {
     const clickedElement = event.target as HTMLElement;
-    if (!clickedElement.closest('.mainSearch-box') && !clickedElement.closest('input')) {
+    if (
+      !clickedElement.closest('.mainSearch-box') &&
+      !clickedElement.closest('input')
+    ) {
       this.showUserList = false;
       this.showChannelList = false;
       this.listlastResultResult = false;
-      this.searcheNameOrChannel=''
+      this.searcheNameOrChannel = '';
     }
   }
   
@@ -141,24 +163,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if(this.searcheNameOrChannel.startsWith('@') && this.searcheNameOrChannel.trim() !== ''){
       this.showUserList=true;
       this.filterUsers();
-    } else if(this.searcheNameOrChannel.startsWith('#')&& this.searcheNameOrChannel.trim()!=='' ){
-      this.showChannelList=true;
+    } else if (
+      this.searcheNameOrChannel.startsWith('#') &&
+      this.searcheNameOrChannel.trim() !== ''
+    ) {
+      this.showChannelList = true;
       this.filterChannels();
-    } 
-    else{
-      this.showUserList=false
-      this.showChannelList=false
-   }
+    } else {
+      this.showUserList = false;
+      this.showChannelList = false;
+    }
   }
 
 
-   checkUserId(user:any){
-    this.userIdHover=user.id
-   }
-   
-   leaveUserId(){
-    this.userIdHover=''
-   }
+  checkUserId(user: any) {
+    this.userIdHover = user.id;
+  }
+
+  leaveUserId() {
+    this.userIdHover = '';
+  }
 
   getAllUsers(){
     const userRef=collection(this.firestore,'users')
@@ -175,13 +199,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   } 
 
   filterUsers() {
-    const searchValue = this.searcheNameOrChannel.toLowerCase().replace('@', '').trim();
-    this.filteredUsers = this.getAllUsersCollection.filter((user) =>
-      user.name.toLowerCase().includes(searchValue),
-      this.noUserFounded=false
+    const searchValue = this.searcheNameOrChannel
+      .toLowerCase()
+      .replace('@', '')
+      .trim();
+    this.filteredUsers = this.getAllUsersCollection.filter(
+      (user) => user.name.toLowerCase().includes(searchValue),
+      (this.noUserFounded = false)
     );
     if (this.filteredUsers.length === 0) {
-         this.noUserFounded=true
+      this.noUserFounded = true;
     }
   }
      
@@ -251,9 +278,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
     }
 
-    checkChannelId(channel:any){
-      this.channelIdHover=channel.id;
-    } 
+  checkChannelId(channel: any) {
+    this.channelIdHover = channel.id;
+  }
 
     leaveChannelId(){
       this.channelIdHover='';

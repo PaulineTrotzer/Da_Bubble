@@ -3,271 +3,174 @@
     <header>
       <div class="left">
         <h2>Thread</h2>
-        <p># {{ selectedChannel?.name }}</p>
+        <p class="channel-name"># {{ selectedChannel?.name }}</p>
       </div>
       <div class="right">
         <div class="img-container" (click)="closeThread()">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            class="icon"
-          >
-            <mask
-              id="mask0_85344_17707"
-              style="mask-type: alpha"
-              maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="24"
-              height="24"
-            >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+            <mask id="mask0_85344_17707" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
+              height="24">
               <rect width="24" height="24" fill="#D9D9D9" />
             </mask>
             <g mask="url(#mask0_85344_17707)">
               <path
                 d="M12 13.4L7.10005 18.3C6.91672 18.4834 6.68338 18.575 6.40005 18.575C6.11672 18.575 5.88338 18.4834 5.70005 18.3C5.51672 18.1167 5.42505 17.8834 5.42505 17.6C5.42505 17.3167 5.51672 17.0834 5.70005 16.9L10.6 12L5.70005 7.10005C5.51672 6.91672 5.42505 6.68338 5.42505 6.40005C5.42505 6.11672 5.51672 5.88338 5.70005 5.70005C5.88338 5.51672 6.11672 5.42505 6.40005 5.42505C6.68338 5.42505 6.91672 5.51672 7.10005 5.70005L12 10.6L16.9 5.70005C17.0834 5.51672 17.3167 5.42505 17.6 5.42505C17.8834 5.42505 18.1167 5.51672 18.3 5.70005C18.4834 5.88338 18.575 6.11672 18.575 6.40005C18.575 6.68338 18.4834 6.91672 18.3 7.10005L13.4 12L18.3 16.9C18.4834 17.0834 18.575 17.3167 18.575 17.6C18.575 17.8834 18.4834 18.1167 18.3 18.3C18.1167 18.4834 17.8834 18.575 17.6 18.575C17.3167 18.575 17.0834 18.4834 16.9 18.3L12 13.4Z"
-                fill="black"
-              />
+                fill="black" />
             </g>
           </svg>
         </div>
       </div>
     </header>
-    <div
-      class="topic-container"
-      (mouseenter)="hoveredTopic = true"
-      (mouseleave)="hoveredTopic = false"
-    >
-      <div
-        class="edit-message-container"
-        *ngIf="showEditArea === topicMessage?.id!"
-      >
+
+    <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInChannelThread"
+      (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
+    </app-mention-message-box>
+
+
+    <div class="topic-container" (mouseenter)="hoveredTopic = true" (mouseleave)="hoveredTopic = false">
+      <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
         <form>
           <div class="img-container textarea" (click)="togglePicker(topicMessage?.id!)">
-            <svg
-              width="25"
-              height="24"
-              viewBox="0 0 25 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="icon"
-            >
-              <mask
-                id="mask0_86084_18390"
-                style="mask-type: alpha"
-                maskUnits="userSpaceOnUse"
-                x="0"
-                y="0"
-                width="25"
-                height="24"
-              >
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+              <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+                height="24">
                 <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
               </mask>
               <g mask="url(#mask0_86084_18390)">
                 <path
                   d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                  fill="black"
-                />
+                  fill="black" />
               </g>
             </svg>
           </div>
+
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
-          {{ topicMessage?.text! }} </textarea
-          >
+          {{ topicMessage?.text! }} </textarea>
+
           <div class="button-row edit-message-button-row">
-            <button class="btn-secondary edit-button" (click)="cancelEdit()">
+            <!--             <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
-            </button>
-            <button
-              class="btn-primary edit-button"
-              (click)="saveEditedMessage(topicMessage?.id!)"
-            >
+            </button> -->
+            <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
+            <img class="save-icon" (click)="saveEditedMessage(topicMessage?.id!)" src="assets/img/check-mark.svg"
+              alt="Speichern">
+            <!--             <button class="btn-primary edit-button" (click)="saveEditedMessage(topicMessage?.id!)">
               Speichern
-            </button>
+            </button> -->
           </div>
         </form>
         <img [src]="topicMessage?.senderPicture" />
       </div>
-      <div
-        (click)="toggleEditArea(topicMessage?.id!, topicMessage?.text!)"
-        class="message-edit-dialog"
-        *ngIf="showEditDialog === topicMessage?.id!"
-      >
+      <div (click)="toggleEditArea(topicMessage?.id!, topicMessage?.text!)" class="message-edit-dialog"
+        *ngIf="showEditDialog === topicMessage?.id!">
         <span>Nachricht bearbeiten</span>
       </div>
       <div class="emoji-container" *ngIf="isPickerVisible === topicMessage?.id">
-        <emoji-mart
-          [set]="'apple'"
-          [emojiSize]="32"
-          (emojiClick)="
+        <emoji-mart [set]="'apple'" [emojiSize]="32" (emojiClick)="
             addEmojiToMessage($event.emoji.native, topicMessage?.id!)
-          "
-        ></emoji-mart>
+          "></emoji-mart>
       </div>
-      <div
-        @slideIn
-        class="reaction-bar"
-        *ngIf="hoveredTopic && !showEditArea"
-        [ngClass]="{
+      <div @slideIn class="reaction-bar" *ngIf="hoveredTopic && !showEditArea" [ngClass]="{
           'reaction-bar-current':
             topicMessage?.senderId === global.currentUserData.id,
           'reaction-bar-user':
             topicMessage?.senderId !== global.currentUserData.id
-        }"
-      >
+        }">
         <div class="used-emojis">
-          <span
-            *ngFor="let emoji of currentUserLastEmojis"
-            class="emoji"
-            (click)="addEmojiToMessage(emoji, topicMessage?.id!)"
-          >
+          <span *ngFor="let emoji of currentUserLastEmojis" class="emoji"
+            (click)="addEmojiToMessage(emoji, topicMessage?.id!)">
             {{ emoji }}
           </span>
         </div>
         <div class="img-container" (click)="togglePicker(topicMessage?.id!)">
-          <svg
-            width="25"
-            height="24"
-            viewBox="0 0 25 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            class="icon"
-          >
-            <mask
-              id="mask0_86084_18390"
-              style="mask-type: alpha"
-              maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="25"
-              height="24"
-            >
+          <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+            <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+              height="24">
               <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
             </mask>
             <g mask="url(#mask0_86084_18390)">
               <path
                 d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                fill="black"
-              />
+                fill="black" />
             </g>
           </svg>
         </div>
-        <div
-          (click)="toggleEditDialog(topicMessage?.id!)"
-          class="img-container"
-          *ngIf="topicMessage?.senderId === global.currentUserData.id"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            fill="#000000"
-            class="icon"
-          >
+        <div (click)="toggleEditDialog(topicMessage?.id!)" class="img-container"
+          *ngIf="topicMessage?.senderId === global.currentUserData.id">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
+            class="icon">
             <path
-              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"
-            />
+              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
           </svg>
         </div>
       </div>
-      <div
-        class="topic"
-        [ngClass]="{
+      <div class="topic" [ngClass]="{
           'topic-from-current':
             topicMessage?.senderId === global.currentUserData.id,
           'topic-from-user':
             topicMessage?.senderId !== global.currentUserData.id
-        }"
-      >
+        }">
         <div class="avatar-container">
           <img [src]="topicMessage?.senderPicture" />
         </div>
         <div class="topic-content">
-          <div
-            class="sender-info"
-            [ngClass]="{
+          <div class="sender-info" [ngClass]="{
               reverse: topicMessage?.senderId === global.currentUserData.id
-            }"
-          >
+            }">
             <h3>{{ topicMessage?.senderName }}</h3>
             <p class="time">
               {{ topicMessage?.timestamp | date : "HH:mm" }} Uhr
             </p>
           </div>
-          <p
-            class="message"
-            [ngClass]="{
+          <p class="message" [ngClass]="{
               'from-current':
                 topicMessage?.senderId === global.currentUserData.id,
               'from-user': topicMessage?.senderId !== global.currentUserData.id
-            }"
-          >
-            {{ topicMessage?.text }}
+            }">
+            <!--        {{ topicMessage?.text }} -->
+            <ng-container *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
+              <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                (click)="handleMentionClick(mentionName)">
+                {{ mentionName }}
+              </span>
+              <span *ngIf="!isMention(mentionName)">
+                {{ mentionName }}
+              </span>
+            </ng-container>
+
           </p>
-          <div
-            class="reaction-info"
-            [ngClass]="{
+          <div class="reaction-info" [ngClass]="{
               'flex-end': topicMessage?.senderId === global.currentUserData.id
-            }"
-          >
-            <div
-              class="reaction-from-container"
-              *ngIf="
+            }">
+            <div class="reaction-from-container" *ngIf="
                 hoveredReactionMessageId === topicMessage?.id && hoveredEmoji
-              "
-            >
+              ">
               <span class="emoji-from"> {{ hoveredEmoji }} </span>
               <p class="reaction-text">
                 {{ getReactionText(topicMessage!, hoveredEmoji) }}
               </p>
             </div>
-            <span
-              *ngFor="let reaction of topicMessage?.reactions | keyvalue"
-              class="reaction"
-              (mouseenter)="onReactionHover(topicMessage!, reaction.key)"
-              (mouseleave)="
+            <span *ngFor="let reaction of topicMessage?.reactions | keyvalue" class="reaction"
+              (mouseenter)="onReactionHover(topicMessage!, reaction.key)" (mouseleave)="
                 hoveredReactionMessageId = null; hoveredEmoji = null
-              "
-              (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)"
-            >
+              " (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)">
               {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div
-              class="img-container"
-              *ngIf="hasReactions(topicMessage?.reactions!)"
-              (click)="togglePicker(topicMessage?.id!)"
-            >
-              <svg
-                width="25"
-                height="24"
-                viewBox="0 0 25 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-              >
-                <mask
-                  id="mask0_86084_18390"
-                  style="mask-type: alpha"
-                  maskUnits="userSpaceOnUse"
-                  x="0"
-                  y="0"
-                  width="25"
-                  height="24"
-                >
+            <!--             <div class="img-container" *ngIf="hasReactions(topicMessage?.reactions!)"
+              (click)="togglePicker(topicMessage?.id!)">
+              <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class="icon">
+                <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+                  height="24">
                   <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
                 </mask>
                 <g mask="url(#mask0_86084_18390)">
                   <path
                     d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                    fill="black"
-                  />
+                    fill="black" />
                 </g>
               </svg>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -277,232 +180,142 @@
       <h3 *ngIf="messages.length > 1">{{ messages.length }} Antworten</h3>
       <div class="line"></div>
     </div>
-    <div
-      class="answers-container"
-      (mouseenter)="hoveredMessageId = message.id"
-      (mouseleave)="hoveredMessageId = null"
-      *ngFor="let message of messages"
-    >
+    <div class="answers-container" (mouseenter)="hoveredMessageId = message.id" (mouseleave)="hoveredMessageId = null"
+      *ngFor="let message of messages">
       <div class="edit-message-container" *ngIf="showEditArea === message.id">
         <form>
           <div class="img-container textarea" (click)="togglePicker(message.id)">
-            <svg
-              width="25"
-              height="24"
-              viewBox="0 0 25 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="icon"
-            >
-              <mask
-                id="mask0_86084_18390"
-                style="mask-type: alpha"
-                maskUnits="userSpaceOnUse"
-                x="0"
-                y="0"
-                width="25"
-                height="24"
-              >
+            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+              <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+                height="24">
                 <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
               </mask>
               <g mask="url(#mask0_86084_18390)">
                 <path
                   d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                  fill="black"
-                />
+                  fill="black" />
               </g>
             </svg>
           </div>
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
-        {{ message.text }} </textarea
-          >
+        {{ message.text }} </textarea>
           <div class="button-row edit-message-button-row">
-            <button class="btn-secondary edit-button" (click)="cancelEdit()">
+            <!--         <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
             </button>
-            <button
-              class="btn-primary edit-button"
-              (click)="saveEditedMessage(message.id)"
-            >
+            <button class="btn-primary edit-button" (click)="saveEditedMessage(message.id)">
               Speichern
-            </button>
+            </button> -->
+            <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
+            <img class="save-icon" (click)="saveEditedMessage(topicMessage?.id!)" src="assets/img/check-mark.svg"
+              alt="Speichern">
           </div>
         </form>
         <img [src]="message.senderPicture" />
       </div>
-      <div
-        (click)="toggleEditArea(message.id, message.text)"
-        class="message-edit-dialog"
-        *ngIf="showEditDialog === message.id"
-      >
+      <div (click)="toggleEditArea(message.id, message.text)" class="message-edit-dialog"
+        *ngIf="showEditDialog === message.id">
         <span>Nachricht bearbeiten</span>
       </div>
       <div class="emoji-container" *ngIf="isPickerVisible === message.id">
-        <emoji-mart
-          [set]="'apple'"
-          [emojiSize]="32"
-          (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"
-        ></emoji-mart>
+        <emoji-mart [set]="'apple'" [emojiSize]="32"
+          (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
       </div>
-      <div
-        @slideIn
-        class="reaction-bar"
-        *ngIf="hoveredMessageId === message.id && !showEditArea"
-        [ngClass]="{
+      <div @slideIn class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" [ngClass]="{
           'reaction-bar-current':
             message.senderId === global.currentUserData.id,
           'reaction-bar-user': message.senderId !== global.currentUserData.id
-        }"
-      >
+        }">
         <div class="used-emojis">
-          <span
-            *ngFor="let emoji of currentUserLastEmojis"
-            class="emoji"
-            (click)="addEmojiToMessage(emoji, message.id)"
-          >
+          <span *ngFor="let emoji of currentUserLastEmojis" class="emoji"
+            (click)="addEmojiToMessage(emoji, message.id)">
             {{ emoji }}
           </span>
         </div>
         <div class="img-container" (click)="togglePicker(message.id)">
-          <svg
-            width="25"
-            height="24"
-            viewBox="0 0 25 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            class="icon"
-          >
-            <mask
-              id="mask0_86084_18390"
-              style="mask-type: alpha"
-              maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="25"
-              height="24"
-            >
+          <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
+            <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+              height="24">
               <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
             </mask>
             <g mask="url(#mask0_86084_18390)">
               <path
                 d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                fill="black"
-              />
+                fill="black" />
             </g>
           </svg>
         </div>
-        <div
-          (click)="toggleEditDialog(message.id)"
-          class="img-container"
-          *ngIf="message.senderId === global.currentUserData.id"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            fill="#000000"
-            class="icon"
-          >
+        <div (click)="toggleEditDialog(message.id)" class="img-container"
+          *ngIf="message.senderId === global.currentUserData.id">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
+            class="icon">
             <path
-              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"
-            />
+              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
           </svg>
         </div>
       </div>
-      <div
-        class="answer"
-        [ngClass]="{
+      <div class="answer" [ngClass]="{
           'answer-from-current': message.senderId === global.currentUserData.id,
           'answer-from-user': message.senderId !== global.currentUserData.id
-        }"
-      >
+        }">
         <div class="avatar-container">
           <img [src]="message.senderPicture" alt="" />
         </div>
         <div class="answer-content">
-          <div
-            class="sender-info"
-            [ngClass]="{
+          <div class="sender-info" [ngClass]="{
               reverse: message.senderId === global.currentUserData.id
-            }"
-          >
+            }">
             <h3>{{ message.senderName }}</h3>
             <p class="time">{{ message.timestamp | date : "HH:mm" }} Uhr</p>
           </div>
-          <div
-            class="answer-message"
-            [ngClass]="{
+          <div class="answer-message" [ngClass]="{
               'from-current': message.senderId === global.currentUserData.id,
               'from-user': message.senderId !== global.currentUserData.id
-            }"
-          >
-            {{ message.text }}
+            }">
+            <!--             {{ message.text }} -->
+            <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+              <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                (click)="handleMentionClick(mentionName)">
+                {{ mentionName }}
+              </span>
+              <span *ngIf="!isMention(mentionName)">
+                {{ mentionName }}
+              </span>
+            </ng-container>
           </div>
-          <div
-            class="reaction-info"
-            [ngClass]="{
+          <div class="reaction-info" [ngClass]="{
               'flex-end': message.senderId === global.currentUserData.id
-            }"
-          >
-            <div
-              class="reaction-from-container"
-              *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji"
-            >
+            }">
+            <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji">
               <span class="emoji-from"> {{ hoveredEmoji }} </span>
               <p class="reaction-text">
                 {{ getReactionText(message, hoveredEmoji) }}
               </p>
             </div>
-            <span
-              *ngFor="let reaction of message.reactions | keyvalue"
-              class="reaction"
-              (mouseenter)="onReactionHover(message, reaction.key)"
-              (mouseleave)="
+            <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
+              (mouseenter)="onReactionHover(message, reaction.key)" (mouseleave)="
                 hoveredReactionMessageId = null; hoveredEmoji = null
-              "
-              (click)="addEmojiToMessage(reaction.key, message.id!)"
-            >
+              " (click)="addEmojiToMessage(reaction.key, message.id!)">
               {{ reaction.key }} {{ reaction.value.length }}
             </span>
-            <div
-              class="img-container"
-              *ngIf="hasReactions(message.reactions)"
-              (click)="togglePicker(message.id)"
-            >
-              <svg
-                width="25"
-                height="24"
-                viewBox="0 0 25 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-              >
-                <mask
-                  id="mask0_86084_18390"
-                  style="mask-type: alpha"
-                  maskUnits="userSpaceOnUse"
-                  x="0"
-                  y="0"
-                  width="25"
-                  height="24"
-                >
+            <!--             <div class="img-container" *ngIf="hasReactions(message.reactions)" (click)="togglePicker(message.id)">
+              <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class="icon">
+                <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
+                  height="24">
                   <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
                 </mask>
                 <g mask="url(#mask0_86084_18390)">
                   <path
                     d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                    fill="black"
-                  />
+                    fill="black" />
                 </g>
               </svg>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
     </div>
   </div>
-  <app-input-field
-    [isChannelThreadOpen]="isChannelThreadOpen"
-  ></app-input-field>
+  <app-input-field [isChannelThreadOpen]="isChannelThreadOpen"></app-input-field>
 </div>

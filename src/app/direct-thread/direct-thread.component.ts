@@ -29,17 +29,20 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
-import { firstValueFrom, Subscription, first, BehaviorSubject } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import {
-  slideFromRight,
-  fadeIn,
-} from './../../assets/direct-thread.animations';
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import {
+  animate,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 
 @Component({
   selector: 'app-direct-thread',
@@ -50,10 +53,34 @@ import { FormsModule } from '@angular/forms';
     InputFieldComponent,
     FormsModule,
     MatCardModule,
+    MentionMessageBoxComponent
   ],
   templateUrl: './direct-thread.component.html',
-  styleUrl: './direct-thread.component.scss',
-  animations: [slideFromRight, fadeIn],
+  styleUrls: ['./direct-thread.component.scss'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in-out', style({ opacity: 1 })),
+      ]),
+    ]),
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-50%)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 1, transform: 'translateX(0)' })
+        ),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateX(0)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 0, transform: 'translateX(-50%)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class DirectThreadComponent implements OnInit {
   @Output() closeDirectThread = new EventEmitter<void>();
@@ -100,11 +127,15 @@ export class DirectThreadComponent implements OnInit {
   editWasClicked = false;
   showEditOption: { [messageId: string]: boolean } = {};
   hoveredReactionIcon: boolean = false;
+  wasClickedInDirectThread = false;
+  getAllUsersName: any[] = [];
+  @Output() userSelectedFromDirectThread = new EventEmitter<any>();
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
-    this.initializeUser();
-    this.subscribeToThreadMessages();
+    await this.initializeUser();
+    await this.subscribeToThreadMessages();
+    await this.getAllUsersname();
     this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
@@ -151,11 +182,66 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
+  selectUserForChat(user: any) {
+    this.userSelectedFromDirectThread.emit(user);
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedInDirectThread = true;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
+  }
+
+  closeMentionBoxHandler() {
+    this.wasClickedInDirectThread = false;
+  }
+
+  splitMessage(text: string) {
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
+    return text.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  }
+
+  async getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
+  }
+
   cancelEdit() {
     this.editMessageId = null;
     this.editableMessageText = '';
     this.editWasClicked = false;
     this.isFirstClick = true;
+  }
+
+
+  onCancelMessageBox(): void {
+    this.wasClickedInDirectThread = false;
   }
 
   async saveOrDeleteMessage(message: any) {
@@ -174,6 +260,7 @@ export class DirectThreadComponent implements OnInit {
         const editMessage = {
           text: this.editableMessageText,
           editedTextShow: true,
+          editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, editMessage);
       }
@@ -247,10 +334,6 @@ export class DirectThreadComponent implements OnInit {
     }, 100);
   }
 
-  hasCurrentMessage(message: any) {
-    return message.senderId === this.currentUserId;
-  }
-
   toggleOptionBar(messageId: string, show: boolean): void {
     if (this.editWasClicked && this.editMessageId !== messageId) {
       return;
@@ -269,7 +352,7 @@ export class DirectThreadComponent implements OnInit {
     this.showReactionPopUpBoth[messageId] = show;
   }
 
-  private subscribeToThreadMessages() {
+  async subscribeToThreadMessages() {
     this.threadControlService.firstThreadMessageId$.subscribe(
       async (firstInitialisedThreadMsg) => {
         if (firstInitialisedThreadMsg) {
@@ -289,10 +372,6 @@ export class DirectThreadComponent implements OnInit {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-  }
-
-  isLeftReactions(message: any): boolean {
-    return message.senderId === this.selectedUser?.uid;
   }
 
   async initializeUser() {
@@ -338,7 +417,7 @@ export class DirectThreadComponent implements OnInit {
         if (docData?.['firstMessageCreated']) {
           this.currentThreadMessage = {
             id: docSnapshot.id,
-            ...docSnapshot.data(),
+            ...docData, 
           };
           return;
         }
@@ -352,36 +431,57 @@ export class DirectThreadComponent implements OnInit {
         this.firestore,
         `messages/${firstInitialisedThreadMsg}/threadMessages`
       );
-      this.settingDataforFireBase(threadMessagesRef);
+      await this.settingDataforFireBase(
+        threadMessagesRef,
+        this.currentThreadMessage 
+      );
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }
   }
+  
 
-  async settingDataforFireBase(threadMessagesRef: any) {
+  async settingDataforFireBase(
+    threadMessagesRef: any,
+    threadMessageData: any 
+  ) {
     try {
+/*       if (
+        !this.selectedUser ||
+        !this.selectedUser.uid ||
+        !this.global.currentUserData
+      ) {
+        throw new Error(
+          `Ungültige Daten: selectedUser = ${JSON.stringify(
+            this.selectedUser
+          )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
+        );
+      } */
+      debugger;
       const messageData = {
-        senderId: this.global.currentUserData.id,
-        senderName: this.global.currentUserData.name,
-        senderPicture: this.global.currentUserData.picture || '',
+        senderId: threadMessageData.senderId,
+        senderName: threadMessageData.senderName,
+        senderPicture: threadMessageData.senderPicture || '',
         timestamp: new Date(),
         selectedFiles: this.selectFiles || [],
         editedTextShow: false,
-        recipientId: this.selectedUser.uid,
-        recipientName: this.selectedUser.name,
+        recipientId: threadMessageData.recipientId,
+        recipientName: threadMessageData.recipientName,
         recipientStickerCount: 0,
         recipientSticker: '',
         text: this.currentThreadMessage?.text || '',
         firstMessageCreated: true,
         reactions: '',
       };
+  
       const docRef = await addDoc(threadMessagesRef, messageData);
-      console.log('erstellte Nachricht-ID:', docRef.id);
+      console.log('Erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
     } catch (error) {
-      console.error('fehler beim hinzufügen der nachricht:', error);
+      console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
   }
+  
 
   async getThreadMessages(messageId: any) {
     try {
@@ -410,13 +510,6 @@ export class DirectThreadComponent implements OnInit {
     }
   }
 
-  onHover(iconKey: string, newSrc: string): void {
-    this.icons[iconKey] = newSrc;
-    if (iconKey === 'iconAddReaction') {
-      this.hoveredReactionIcon = true;
-    }
-  }
-
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
@@ -427,7 +520,7 @@ export class DirectThreadComponent implements OnInit {
     this.isEmojiPickerVisible = false;
   }
 
-  closePickerEdit(){
+  closePickerEdit() {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerEditVisible = false;
   }
@@ -559,7 +652,7 @@ export class DirectThreadComponent implements OnInit {
     }, 0);
   }
 
-  handlingExistingUserReaction(
+  async handlingExistingUserReaction(
     threadMessageId: string,
     userId: string,
     emoji: Emoji
@@ -627,38 +720,9 @@ export class DirectThreadComponent implements OnInit {
     message.isHovered = false;
   }
 
-  onMouseIcon(iconKey: string, newSrc: string): void {
-    this.icons[iconKey] = newSrc;
-    if (iconKey === 'iconAddReaction') {
-      this.hoveredReactionIcon = true;
-    }
-  }
-
-  onLeaveIcon() {
-    this.hoveredReactionIcon = false;
-  }
-
   onClose() {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
     this.global.currentThreadMessageSubject.next(null);
-    this.hiddenThreadFullBox();
-    this.checkResponsiveWidtSize();
-  } 
-
-  checkResponsiveWidtSize(){
-    if(window.innerWidth<=720 && this.global.openChannelOrUserThread)
-      this.global.openChannelOrUserThread=false
-      this.global.openChannelorUserBox=true
-  } 
-  
-   hiddenThreadFullBox(){
-    if(window.innerWidth<=1349 && window.innerWidth > 720 &&  this.global.checkWideChannelOrUserThreadBox){
-      this.global.checkWideChannelOrUserThreadBox=false;
-      this.global.checkWideChannelorUserBox=true;
-    }
-
-   }
-   
-
+  }
 }

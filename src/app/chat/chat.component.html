@@ -1,6 +1,6 @@
 <div class="full-app-content">
 
-    <app-mention-message-box *ngIf="global.openMentionMessageBox" (enterChatUser)="enterChatByUserName($event)">
+    <app-mention-message-box    (closeMentionBox)="onCancelMessageBox()" *ngIf="wasClickedChatInput" (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
 
@@ -42,9 +42,9 @@
                     </div>
                     <div class="button-box">
                         <div class="edit-button">
-                        <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
-                        <button class="btn-primary"
-                            (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
+                            <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
+                            <button class="btn-primary"
+                                (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
                         </div>
                     </div>
                 </div>
@@ -392,7 +392,7 @@
                 </div>
             </div>
         </div>
-        <app-channel-chat *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
+        <app-channel-chat (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
         <div class="self-name-and-img">
@@ -416,6 +416,6 @@
             <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und dir statt
         </div>
     </div>
-    <app-input-field [selectedChannel]="selectedChannel" [selectedUser]="selectedUser"
-        (messageSent)="onMessageSent()"></app-input-field>
+    <app-input-field (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
+        [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 </div>

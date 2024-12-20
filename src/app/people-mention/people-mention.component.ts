@@ -20,6 +20,7 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
   firestore = inject(Firestore);
   allUsers: any[] = []
   searchUserName: string = '';
+  @Output() cardClosed = new EventEmitter<void>();
 
   ngOnInit(): void {
     this.getAllUsers()
@@ -29,8 +30,9 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
     this.getFilteredUsers()
   }
 
+ 
   cancelCard() {
-    this.global.openMentionPeopleCard = false
+    this.cardClosed.emit();
   }
 
 

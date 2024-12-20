@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges,inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  inject,
+  Input,
+} from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { CommonModule } from '@angular/common';
@@ -7,27 +14,30 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [MatCardModule, CommonModule],
   templateUrl: './mention-message-box.component.html',
-  styleUrl: './mention-message-box.component.scss'
+  styleUrl: './mention-message-box.component.scss',
 })
-
-
-
 export class MentionMessageBoxComponent implements OnInit {
+  global = inject(GlobalVariableService);
+  @Output() enterChatUser = new EventEmitter<any>();
+  @Output() closeMentionBox = new EventEmitter<void>();
+  @Input() mention: string = '';
+  @Output() cancelMessageBoxCard = new EventEmitter<any>();
 
-  global=inject(GlobalVariableService);
-  @Output() enterChatUser=new EventEmitter<any>();
-
-  ngOnInit(): void {
-    if (this.global.getUserByName) {
-    }
-  }
+  ngOnInit(): void {}
 
   cancelCard() {
-    this.global.openMentionMessageBox = false
-  }
-  
-  enterChat(user:any){
-     this.enterChatUser.emit(user)
+    this.cancelMessageBoxCard.emit();
   }
 
+  onOutsideClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedInside = target.closest('.main-card');
+    if (!clickedInside) {
+      this.cancelCard();
+    }
+  }
+  enterChat(user: any) {
+    this.enterChatUser.emit(user);
+    this.closeMentionBox.emit(); 
+  }
 }

@@ -107,17 +107,19 @@ export class ChatComponent implements OnInit, OnChanges {
   isEmojiPickerVisibleEdit: boolean = false;
   @Output() userMention = new EventEmitter<any>();
   getAllUsersName: any[] = [];
-  overlayStatusService =inject(OverlayStatusService);
+  overlayStatusService = inject(OverlayStatusService);
   overlayOpen = false;
+  isMentionCardOpenInChat: boolean = false;
+  isMentionCardOpen: boolean = false;
+  wasClickedChatInput = false;
 
   constructor() {}
 
-  ngOnInit(): void {
-    this.getAllUsersname();
+  async ngOnInit(): Promise<void> {
+    await this.getAllUsersname();
   }
 
-
-  subscribeToThreadAnswers() {
+  async subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
       this.threadControlService.getReplyCount(message.id).subscribe((count) => {
         this.replyCounts.set(message.id, count);
@@ -133,15 +135,17 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisible = false;
   }
 
-
   openEmojiPicker() {
-    debugger;
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
 
   getReplyCountValue(messageId: string): number {
     return this.replyCounts.get(messageId) ?? 0;
+  }
+
+  handleMentionCardOpened(isOpen: boolean) {
+    this.isMentionCardOpenInChat = isOpen;
   }
 
   onUserNameClick() {
@@ -186,7 +190,10 @@ export class ChatComponent implements OnInit, OnChanges {
     this.editableMessageText = '';
     this.checkEditbox = false;
     this.isFirstClick = true;
-    console.log(this.isFirstClick);
+  }
+
+  onCancelMessageBox(): void {
+    this.wasClickedChatInput = false;
   }
 
   resetIcon(message: any) {
@@ -217,13 +224,13 @@ export class ChatComponent implements OnInit, OnChanges {
     return `${day}.${month}.${year}`;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-      this.getMessages();
+      await this.getMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      this.getMessages().then(() => this.checkForSelfChat());
+      await this.getMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
@@ -237,7 +244,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
-      this.getMessages();
+      await this.getMessages();
       this.chatMessage = '';
     }
   }
@@ -371,44 +378,64 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async getMessages() {
-    const docRef = collection(this.firestore, 'messages');
-    const q = query(
-      docRef,
-      where('recipientId', 'in', [
-        this.selectedUser?.id,
-        this.global.currentUserData?.id,
-      ]),
-      where('senderId', 'in', [
-        this.selectedUser?.id,
-        this.global.currentUserData?.id,
-      ])
-    );
-    onSnapshot(q, (querySnapshot) => {
-      this.messagesData = [];
-      querySnapshot.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
-        }
-        if (
-          (messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.selectedUser.id) ||
-          (messageData['senderId'] === this.selectedUser.id &&
-            messageData['recipientId'] === this.global.currentUserData.id) ||
-          (this.global.statusCheck &&
-            messageData['senderId'] === this.global.currentUserData.id &&
-            messageData['recipientId'] === this.global.currentUserData.id)
-        ) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
-      });
-      this.subscribeToThreadAnswers();
-      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-      this.checkForSelfChat();
-      if (this.shouldScroll) {
-        this.scrollAutoDown();
+    try {
+      if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
+        return;
       }
-    });
+      const docRef = collection(this.firestore, 'messages');
+      const q = query(
+        docRef,
+        where('recipientId', 'in', [
+          this.selectedUser.id,
+          this.global.currentUserData.id,
+        ]),
+        where('senderId', 'in', [
+          this.selectedUser.id,
+          this.global.currentUserData.id,
+        ])
+      );
+      onSnapshot(
+        q,
+        async (querySnapshot) => {
+          try {
+            this.messagesData = [];
+            querySnapshot.forEach((doc) => {
+              const messageData = doc.data();
+              if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+                messageData['timestamp'] = messageData['timestamp'].toDate();
+              }
+              if (
+                (messageData['senderId'] === this.global.currentUserData.id &&
+                  messageData['recipientId'] === this.selectedUser.id) ||
+                (messageData['senderId'] === this.selectedUser.id &&
+                  messageData['recipientId'] ===
+                    this.global.currentUserData.id) ||
+                (this.global.statusCheck &&
+                  messageData['senderId'] === this.global.currentUserData.id &&
+                  messageData['recipientId'] === this.global.currentUserData.id)
+              ) {
+                this.messagesData.push({ id: doc.id, ...messageData });
+              }
+            });
+            await this.subscribeToThreadAnswers();
+            this.messagesData.sort(
+              (a: any, b: any) => a.timestamp - b.timestamp
+            );
+            this.checkForSelfChat();
+            if (this.shouldScroll) {
+              this.scrollAutoDown();
+            }
+          } catch (innerError) {
+            console.error('rrror while  querySnapshot:', innerError);
+          }
+        },
+        (error) => {
+          console.error('rrror in onSnapshot:', error);
+        }
+      );
+    } catch (error) {
+      console.error('error initialie messages query:', error);
+    }
   }
 
   async openThread(messageId: any) {
@@ -428,43 +455,45 @@ export class ChatComponent implements OnInit, OnChanges {
       }
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
-    }  
-      
-      this.openvollThreadBox();
-      this.hiddenFullChannelOrUserThreadBox();
-      this.checkWidthSize();
-      this.checkThreadOpen();
-  } 
-
-    checkThreadOpen(){
-      if(window.innerWidth<=750 && this.global.openChannelorUserBox ){
-        this.global.openChannelorUserBox=false
-      }
     }
 
+    this.openvollThreadBox();
+    this.hiddenFullChannelOrUserThreadBox();
+    this.checkWidthSize();
+    this.checkThreadOpen();
+  }
 
-  checkWidthSize(){
-    if(window.innerWidth<=750){
-       return this.global.openChannelOrUserThread=true 
-    }else{
-      return this.global.openChannelOrUserThread=false;    
-    }
-  }  
-
-  openvollThreadBox() {
-    if(window.innerWidth<=1349 && window.innerWidth > 720){
-      return this.global.checkWideChannelOrUserThreadBox=true;
-    }else{
-      return this.global.checkWideChannelOrUserThreadBox=false;
-    }
-  } 
-    
-  hiddenFullChannelOrUserThreadBox(){
-    if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelorUserBox){
-      this.global.checkWideChannelorUserBox=false;
+  checkThreadOpen() {
+    if (window.innerWidth <= 750 && this.global.openChannelorUserBox) {
+      this.global.openChannelorUserBox = false;
     }
   }
-   
+
+  checkWidthSize() {
+    if (window.innerWidth <= 750) {
+      return (this.global.openChannelOrUserThread = true);
+    } else {
+      return (this.global.openChannelOrUserThread = false);
+    }
+  }
+
+  openvollThreadBox() {
+    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
+      return (this.global.checkWideChannelOrUserThreadBox = true);
+    } else {
+      return (this.global.checkWideChannelOrUserThreadBox = false);
+    }
+  }
+
+  hiddenFullChannelOrUserThreadBox() {
+    if (
+      window.innerWidth <= 1349 &&
+      window.innerWidth > 720 &&
+      this.global.checkWideChannelorUserBox
+    ) {
+      this.global.checkWideChannelorUserBox = false;
+    }
+  }
 
   splitMessage(text: string) {
     const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
@@ -479,8 +508,16 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.getAllUsersName.some((user) => user.userName === mentionName);
   }
 
-  handleMentionClick(mention: string) {
-    this.global.openMentionMessageBox = false;
+  closeMentionBoxHandler() {
+    this.wasClickedChatInput = false;
+  }
+
+  onInputClick() {
+    this.wasClickedChatInput = true;
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedChatInput = true;
     const cleanName = mention.substring(1);
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
@@ -496,7 +533,7 @@ export class ChatComponent implements OnInit, OnChanges {
     });
   }
 
-  getAllUsersname() {
+  async getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
       this.getAllUsersName = [];
@@ -533,7 +570,6 @@ export class ChatComponent implements OnInit, OnChanges {
       this.isEmojiPickerVisible = false;
     }
   }
-
 
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
@@ -853,33 +889,16 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
+  chatByUserName: any;
+  @Output() enterChatUser = new EventEmitter<any>();
 
-      chatByUserName:any
-      @Output() enterChatUser=new EventEmitter<any>()
+  enterChatByUserName(user: any) {
+    this.chatByUserName = user;
+    this.enterChatUser.emit(this.chatByUserName);
+    this.selectUser(user);
+  }
 
-       enterChatByUserName(user:any){
-        this.chatByUserName=user
-        this.enterChatUser.emit(this.chatByUserName)
-        
-       }
-
-    } 
-
-  
-
-
-  
-
- 
-      
-    
-
-
-    
-  
-
-
-
-
-
-
+  selectUser(user: any) {
+    this.selectedUser = user;
+  }
+}
