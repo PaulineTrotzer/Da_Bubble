@@ -126,6 +126,17 @@ export class HomeComponent implements OnInit {
       this.workspaceComponent.enterByUsername(user, false);
     }
   }
+  handleUserSelectionFromChannelThread(user: any) {
+    this.selectedUser = user;
+    this.onHeaderUser = user;
+    this.selectedChannel = null;
+    this.onHeaderChannel = null;
+
+    if (this.workspaceComponent) {
+      this.workspaceComponent.enterByUsername(user, false);
+    }
+  }
+  
   
 
 

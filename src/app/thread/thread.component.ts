@@ -28,10 +28,15 @@ export class ThreadComponent {
   @Input() channelThreadId: any;
   @Input() selectedChannel: any;
   @Output() userSelectedFromThread = new EventEmitter<any>();
+  @Output() userSelectedFromChannelThread = new EventEmitter<any>();
 
 
   handleDirectThreadUserSelection(user: any) {
     this.userSelectedFromThread.emit(user);
+  }
+
+  handleChannelThreadSelection(channel: any) {
+    this.userSelectedFromChannelThread.emit(channel);
   }
 
   onDirectThreadClosed() {

@@ -14,9 +14,11 @@
             [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
             (threadOpened)="onThreadOpened()">
         </app-start-screen>
+
         <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
             [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
-            [selectedChannel]="selectedChannel" (userSelectedFromThread)="handleUserSelectionFromThread($event)"></app-thread>
+            [selectedChannel]="selectedChannel" (userSelectedFromThread)="handleUserSelectionFromThread($event)"
+            (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)"></app-thread>
     </div>
 </div>
 

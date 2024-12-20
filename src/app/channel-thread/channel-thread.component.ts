@@ -1,4 +1,11 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   collection,
   doc,
@@ -19,6 +26,7 @@ import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 
 interface Message {
   id: string;
@@ -33,23 +41,42 @@ interface Message {
 @Component({
   selector: 'app-channel-thread',
   standalone: true,
-  imports: [CommonModule, InputFieldComponent, PickerComponent, FormsModule],
+  imports: [
+    CommonModule,
+    InputFieldComponent,
+    PickerComponent,
+    FormsModule,
+    MentionMessageBoxComponent,
+  ],
   templateUrl: './channel-thread.component.html',
   styleUrl: './channel-thread.component.scss',
   animations: [
-      trigger('slideIn', [
-        transition(':enter', [style({opacity: 0, transform: 'translateX(-50%)'}), animate('150ms ease-in-out', style({opacity: 100, transform: 'translateX(0)'}))]),
-        transition(':enter', [style({opacity: 100, transform: 'translateX(0)'}), animate('150ms ease-in-out', style({opacity: 0, transform: 'translateX(-50%)'}))])
-      ])
-    ]
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-50%)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 100, transform: 'translateX(0)' })
+        ),
+      ]),
+      transition(':enter', [
+        style({ opacity: 100, transform: 'translateX(0)' }),
+        animate(
+          '150ms ease-in-out',
+          style({ opacity: 0, transform: 'translateX(-50%)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class ChannelThreadComponent implements OnInit {
   channelMessageId: any;
   @Input() selectedChannel: any;
+  firestore = inject(Firestore);
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
-  overlay = inject(OverlayStatusService)
+  overlay = inject(OverlayStatusService);
   topicMessage: Message | null = null;
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
@@ -58,13 +85,18 @@ export class ChannelThreadComponent implements OnInit {
   showEditArea: string | null = null;
   hoveredMessageId: string | null = null;
   hoveredTopic: boolean = false;
-  currentUserLastEmojis: string [] = [];
+  currentUserLastEmojis: string[] = [];
   hoveredReactionMessageId: string | null = null;
   hoveredEmoji: string | null = null;
   editingMessageId: string | null = null;
   reactionUserNames: { [userId: string]: string } = {};
   messageToEdit: string = '';
   unsubscribe: (() => void) | undefined;
+  @Output() userSelectedFromChannelThread = new EventEmitter<any>();
+  @Output() userSelectedFromMentionMessagebox = new EventEmitter<any>();
+  @Output() enterChatUser = new EventEmitter<any>();
+  wasClickedInChannelThread = false;
+  getAllUsersName: any[] = [];
 
   constructor() {}
 
@@ -76,8 +108,73 @@ export class ChannelThreadComponent implements OnInit {
         await this.loadThreadMessages();
         this.toggleChannelThread(true);
         await this.loadCurrentUserEmojis();
+        await this.getAllUsersname();
       }
     });
+  }
+
+  async getAllUsersname() {
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.getAllUsersName = [];
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const userName = dataUser['name'];
+        this.getAllUsersName.push({ userName });
+      });
+    });
+  }
+
+  splitMessage(text: string) {
+    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
+    return text?.split(regex);
+  }
+
+  isMention(part: string): boolean {
+    if (!part.startsWith('@')) {
+      return false;
+    }
+    const mentionName = part.substring(1);
+    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  }
+
+  async handleMentionClick(mention: string) {
+    this.wasClickedInChannelThread = true;
+    const cleanName = mention.substring(1);
+    const userRef = collection(this.firestore, 'users');
+    onSnapshot(userRef, (querySnapshot) => {
+      this.global.getUserByName = {};
+      querySnapshot.forEach((doc) => {
+        const dataUser = doc.data();
+        const dataUserName = dataUser['name'];
+        if (dataUserName === cleanName) {
+          this.global.getUserByName = { id: doc.id, ...dataUser };
+        }
+        this.global.openMentionMessageBox = true;
+      });
+    });
+  }
+
+  closeMentionBoxHandler() {
+    this.wasClickedInChannelThread = false;
+  }
+
+
+  selectUserForChat(user: any) {
+    this.userSelectedFromChannelThread.emit(user);
+  }
+
+  onCancelMessageBox(): void {
+    this.wasClickedInChannelThread = false;
+  }
+
+  enterChatByUserName(user: any) {
+    this.enterChatUser.emit(user);
+    this.wasClickedInChannelThread = false;
+  }
+
+  onMentionMessageboxClick(user: any) {
+    this.userSelectedFromMentionMessagebox.emit(user);
   }
 
   toggleChannelThread(status: boolean) {
@@ -90,9 +187,9 @@ export class ChannelThreadComponent implements OnInit {
         this.db,
         'channels',
         this.selectedChannel.id,
-        'messages', 
+        'messages',
         this.channelMessageId
-      ); 
+      );
       onSnapshot(docRef, (doc) => {
         const data = doc.data();
         if (data) {
@@ -147,50 +244,67 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   async addLastUsedEmoji(emoji: any) {
-    const auth = getAuth()
-    const currentUserId = auth.currentUser?.uid
-    if(currentUserId) {
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+    if (currentUserId) {
       const docRef = doc(this.db, 'users', currentUserId);
       await updateDoc(docRef, {
-        lastEmojis: [emoji.native, ...(await this.getExistingEmojis(docRef))].slice(0, 2),
-      })
+        lastEmojis: [
+          emoji.native,
+          ...(await this.getExistingEmojis(docRef)),
+        ].slice(0, 2),
+      });
     }
   }
 
   async addToReactionInfo(emoji: any, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-    
+
     if (!currentUserId) return;
-   
-    const messageDocRef = messageId === this.topicMessage?.id 
-      ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
-      : doc(this.db, 'channels', this.selectedChannel.id, 'messages', this.channelMessageId, 'thread', messageId);
-   
+
+    const messageDocRef =
+      messageId === this.topicMessage?.id
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
+        : doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            this.channelMessageId,
+            'thread',
+            messageId
+          );
+
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       if (!messageSnapshot.exists()) return;
-   
+
       const messageData = messageSnapshot.data();
       let reactions = messageData?.['reactions'] || {};
-   
-      const hasReacted = Object.values(reactions).some(userIds => 
+
+      const hasReacted = Object.values(reactions).some((userIds) =>
         (userIds as string[]).includes(currentUserId)
       );
-   
+
       if (hasReacted) return;
-   
+
       if (!reactions[emoji.native]) {
         reactions[emoji.native] = [];
       }
-   
+
       reactions[emoji.native].push(currentUserId);
       await updateDoc(messageDocRef, { reactions });
-   
     } catch (error) {
       console.error('Error updating reactions:', error);
     }
-   }
+  }
 
   async getExistingEmojis(userDocRef: DocumentReference): Promise<string[]> {
     const userDoc = await getDoc(userDocRef);
@@ -199,58 +313,61 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   togglePicker(messageId: string) {
-    this.isPickerVisible = this.isPickerVisible === messageId ? null : messageId;
+    this.isPickerVisible =
+      this.isPickerVisible === messageId ? null : messageId;
     this.editingMessageId = this.isPickerVisible ? messageId : null;
     this.overlay.setOverlayStatus(true);
   }
 
   closePicker() {
-    this.overlay.setOverlayStatus(false)
+    this.overlay.setOverlayStatus(false);
   }
 
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-   
+
     if (!currentUserId) return;
-   
-    const messageDocRef = messageId === this.topicMessage?.id 
-      ? doc(
-          this.db, 
-          'channels',
-          this.selectedChannel.id,
-          'messages',
-          messageId
-        )
-      : doc(
-          this.db,
-          'channels', 
-          this.selectedChannel.id,
-          'messages',
-          this.channelMessageId,
-          'thread',
-          messageId
-        );
-   
+
+    const messageDocRef =
+      messageId === this.topicMessage?.id
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
+        : doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            this.channelMessageId,
+            'thread',
+            messageId
+          );
+
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
-   
+
       if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
-        reactions[emoji] = reactions[emoji].filter((userId: string) => userId !== currentUserId);
-   
+        reactions[emoji] = reactions[emoji].filter(
+          (userId: string) => userId !== currentUserId
+        );
+
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
         }
-   
+
         await updateDoc(messageDocRef, { reactions });
       }
     } catch (error) {
       console.error('Error removing reaction:', error);
     }
-   }
-  
+  }
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {
     return reactions && Object.keys(reactions).length > 0;
@@ -259,10 +376,10 @@ export class ChannelThreadComponent implements OnInit {
   async loadCurrentUserEmojis() {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
+
     if (currentUserId) {
       const userDocRef = doc(this.db, 'users', currentUserId);
-  
+
       onSnapshot(userDocRef, (docSnapshot) => {
         const userData = docSnapshot.data();
         if (userData?.['lastEmojis']) {
@@ -277,26 +394,33 @@ export class ChannelThreadComponent implements OnInit {
   async addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
+
     if (this.editingMessageId === messageId) {
       this.messageToEdit += emoji;
     } else if (currentUserId) {
-      const messageDocRef = messageId === this.topicMessage?.id
-        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
-        : doc(
-            this.db,
-            'channels',
-            this.selectedChannel.id,
-            'messages',
-            this.channelMessageId,
-            'thread',
-            messageId
-          );
-  
+      const messageDocRef =
+        messageId === this.topicMessage?.id
+          ? doc(
+              this.db,
+              'channels',
+              this.selectedChannel.id,
+              'messages',
+              messageId
+            )
+          : doc(
+              this.db,
+              'channels',
+              this.selectedChannel.id,
+              'messages',
+              this.channelMessageId,
+              'thread',
+              messageId
+            );
+
       getDoc(messageDocRef).then((messageSnapshot) => {
         const messageData = messageSnapshot.data();
         const reactions = messageData?.['reactions'] || {};
-  
+
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
           if ((userIds as string[]).includes(currentUserId)) {
@@ -304,7 +428,7 @@ export class ChannelThreadComponent implements OnInit {
             break;
           }
         }
-  
+
         if (oldReaction === emoji) {
           reactions[emoji] = reactions[emoji].filter(
             (userId: string) => userId !== currentUserId
@@ -322,35 +446,34 @@ export class ChannelThreadComponent implements OnInit {
               delete reactions[oldReaction];
             }
           }
-  
+
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
-  
+
         updateDoc(messageDocRef, { reactions });
       });
     }
-  
+
     this.isPickerVisible = null;
     this.closePicker();
   }
-  
-   
-   onReactionHover(message: Message, emoji: string) {
+
+  onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
-    
+
     const auth = getAuth();
     const reactors = message.reactions[emoji] || [];
     const unknownUsers = reactors
-      .filter(userId => userId !== auth.currentUser?.uid)
-      .filter(userId => !this.reactionUserNames[userId]);
-    
+      .filter((userId) => userId !== auth.currentUser?.uid)
+      .filter((userId) => !this.reactionUserNames[userId]);
+
     if (unknownUsers.length > 0) {
       Promise.all(
-        unknownUsers.map(async userId => {
+        unknownUsers.map(async (userId) => {
           const userDoc = await getDoc(doc(this.db, 'users', userId));
           const userData = userDoc.data();
           if (userData?.['name']) {
@@ -360,7 +483,7 @@ export class ChannelThreadComponent implements OnInit {
       );
     }
   }
-  
+
   getReactionText(message: Message, emoji: string | null): string {
     if (!emoji || !message.reactions) return '';
 
@@ -371,14 +494,15 @@ export class ChannelThreadComponent implements OnInit {
     if (reactors.length === 0) return '';
 
     const currentUserReacted = reactors.includes(currentUserId);
-    const otherReactors = reactors.filter(userId => userId !== currentUserId);
+    const otherReactors = reactors.filter((userId) => userId !== currentUserId);
 
     if (currentUserReacted && reactors.length === 1) {
       return 'Du hast reagiert.';
     }
 
     if (currentUserReacted && otherReactors.length > 0) {
-      const otherUserName = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+      const otherUserName =
+        this.reactionUserNames[otherReactors[0]] || 'Jemand';
       return `${otherUserName} und Du haben reagiert.`;
     }
 
@@ -387,7 +511,7 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   toggleEditDialog(messageId: string) {
-    this.showEditDialog = this.showEditDialog === messageId ? null : messageId
+    this.showEditDialog = this.showEditDialog === messageId ? null : messageId;
   }
 
   cancelEdit() {
@@ -395,24 +519,26 @@ export class ChannelThreadComponent implements OnInit {
     this.messageToEdit = '';
   }
 
-
   async saveEditedMessage(messageId: string) {
     try {
-      const messageDocRef = messageId === this.topicMessage?.id ? doc(
-        this.db,
-        'channels',
-        this.selectedChannel.id,
-        'messages',
-        messageId
-      ) : doc(
-        this.db,
-        'channels',
-        this.selectedChannel.id,
-        'messages',
-        this.channelMessageId,
-        'thread',
-        messageId
-      )
+      const messageDocRef =
+        messageId === this.topicMessage?.id
+          ? doc(
+              this.db,
+              'channels',
+              this.selectedChannel.id,
+              'messages',
+              messageId
+            )
+          : doc(
+              this.db,
+              'channels',
+              this.selectedChannel.id,
+              'messages',
+              this.channelMessageId,
+              'thread',
+              messageId
+            );
 
       await updateDoc(messageDocRef, { text: this.messageToEdit });
 
@@ -425,9 +551,8 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
 
-
   toggleEditArea(messageId: string, messageText: string) {
-    if(this.showEditArea === messageId) {
+    if (this.showEditArea === messageId) {
       this.showEditArea = null;
       this.messageToEdit = '';
     } else {

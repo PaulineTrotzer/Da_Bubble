@@ -93,8 +93,6 @@ export class ChannelChatComponent implements OnInit {
   globalService = inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-/*   chatByUserName: any; */
-
   constructor() {}
 
   async ngOnInit(): Promise<void> {

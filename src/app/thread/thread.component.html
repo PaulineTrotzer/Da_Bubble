@@ -1,2 +1,5 @@
-<app-direct-thread (userSelectedFromDirectThread)="handleDirectThreadUserSelection($event)" (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser" *ngIf="directThreadId"></app-direct-thread>
-<app-channel-thread *ngIf="channelThreadId" [selectedChannel]="selectedChannel"></app-channel-thread>
+<app-direct-thread (userSelectedFromDirectThread)="handleDirectThreadUserSelection($event)"
+    (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser"
+    *ngIf="directThreadId"></app-direct-thread>
+<app-channel-thread *ngIf="channelThreadId" (userSelectedFromChannelThread)="handleChannelThreadSelection($event)"
+    [selectedChannel]="selectedChannel"></app-channel-thread>

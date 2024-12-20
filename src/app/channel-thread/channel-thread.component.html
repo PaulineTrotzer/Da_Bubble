@@ -21,6 +21,12 @@
         </div>
       </div>
     </header>
+
+    <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInChannelThread"
+    (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
+  </app-mention-message-box>
+
+
     <div class="topic-container" (mouseenter)="hoveredTopic = true" (mouseleave)="hoveredTopic = false">
       <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
         <form>
@@ -37,9 +43,10 @@
               </g>
             </svg>
           </div>
-          
+
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
           {{ topicMessage?.text! }} </textarea>
+
           <div class="button-row edit-message-button-row">
             <!--             <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
@@ -120,7 +127,17 @@
                 topicMessage?.senderId === global.currentUserData.id,
               'from-user': topicMessage?.senderId !== global.currentUserData.id
             }">
-            {{ topicMessage?.text }}
+            <!--        {{ topicMessage?.text }} -->
+            <ng-container *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
+              <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                (click)="handleMentionClick(mentionName)">
+                {{ mentionName }}
+              </span>
+              <span *ngIf="!isMention(mentionName)">
+                {{ mentionName }}
+              </span>
+            </ng-container>
+
           </p>
           <div class="reaction-info" [ngClass]="{
               'flex-end': topicMessage?.senderId === global.currentUserData.id
@@ -183,7 +200,7 @@
           <textarea name="message" id="message" [(ngModel)]="messageToEdit">
         {{ message.text }} </textarea>
           <div class="button-row edit-message-button-row">
-    <!--         <button class="btn-secondary edit-button" (click)="cancelEdit()">
+            <!--         <button class="btn-secondary edit-button" (click)="cancelEdit()">
               Abbrechen
             </button>
             <button class="btn-primary edit-button" (click)="saveEditedMessage(message.id)">
@@ -255,7 +272,16 @@
               'from-current': message.senderId === global.currentUserData.id,
               'from-user': message.senderId !== global.currentUserData.id
             }">
-            {{ message.text }}
+            <!--             {{ message.text }} -->
+            <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+              <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                (click)="handleMentionClick(mentionName)">
+                {{ mentionName }}
+              </span>
+              <span *ngIf="!isMention(mentionName)">
+                {{ mentionName }}
+              </span>
+            </ng-container>
           </div>
           <div class="reaction-info" [ngClass]="{
               'flex-end': message.senderId === global.currentUserData.id
