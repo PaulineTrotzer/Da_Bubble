@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
-import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, onSnapshot, setDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
@@ -31,6 +31,7 @@ import { ChatComponent } from '../chat/chat.component';
 import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component';
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
+import { AuthService } from '../services/auth.service';
 
 interface ChannelData {
   userIds: string[];
@@ -107,20 +108,20 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   loginAuthService = inject(LoginAuthService);
   enterChatByUser: any;
 
-
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
-  
-  ngOnInit(): void {
+
+  async ngOnInit(): Promise<void> {
     this.global.channelSelected = false;
     this.userId = this.route.snapshot.paramMap.get('id');
     this.user = this.userId;
-    this.getcurrentUserById(this.userId);
+    await this.getcurrentUserById(this.userId);
     this.subscribeToProfileSelection();
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
   }
+
 
   ngOnDestroy(): void {
     if (this.loginStatusSub) {
@@ -146,7 +147,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-   subscribeToWelcomeChannel(): void {
+  subscribeToWelcomeChannel(): void {
     this.welcomeChannelSubscription = this.global.welcomeChannel$.subscribe(
       (welcomeChannelStatus) => {
         this.afterLoginSheet = welcomeChannelStatus;
@@ -343,16 +344,15 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Output() userSelectedFromStartscreen = new EventEmitter<any>();
   @Output() channelSelectedFromStartscreen = new EventEmitter<any>();
 
-  
   enterByUsername(user: any, isChannel: boolean = false) {
     this.enterChatByUser = user;
     this.selectedUser = this.enterChatByUser;
     if (isChannel) {
-      this.channelSelectedFromStartscreen.emit(user); 
-      this.global.setCurrentChannel(user); 
+      this.channelSelectedFromStartscreen.emit(user);
+      this.global.setCurrentChannel(user);
     } else {
       this.userSelectedFromStartscreen.emit(user);
-      this.global.clearCurrentChannel(); 
+      this.global.clearCurrentChannel();
     }
 
     this.checkProfileType();

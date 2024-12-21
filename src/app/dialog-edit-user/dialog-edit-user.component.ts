@@ -57,7 +57,6 @@ export class DialogEditUserComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    console.log('this.global.googleAccountLogIn', this.global.googleAccountLogIn);
     this.route.paramMap.subscribe(async (paramMap) => {
       this.userID = paramMap.get('id');
       if (this.userID) {
@@ -98,15 +97,12 @@ export class DialogEditUserComponent implements OnInit {
   selectAvatar(picture: string) {
     this.chossePicture = picture;
     this.selectedFile = null;
-
-    console.log(this.chossePicture);
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      console.log(input.files[0]);
       this.chossePicture = '';
       this.user.picture = '';
       const reader = new FileReader();
@@ -119,16 +115,16 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   async saveUser() {
-    const edititingAvatar = await this.editAvatar();
+    const editingAvatar = await this.editAvatar(); 
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
       await updateDoc(userRef, {
-        name: this.user.name,
-        email: this.user.email,
+        name: this.currentUser.name,
+        email: this.currentUser.email,
       });
       this.closeEditModus();
     } catch (error) {
-      console.error('error updating user:', error);
+      console.error('Fehler beim Aktualisieren des Benutzers:', error);
     }
   }
 

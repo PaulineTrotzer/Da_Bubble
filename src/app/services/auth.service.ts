@@ -38,8 +38,6 @@ export class AuthService {
   globalVariable = inject(GlobalVariableService);
 
   constructor() {
-    this.initAuthListener();
-
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -52,17 +50,24 @@ export class AuthService {
   initAuthListener() {
     const auth = getAuth();
 
-
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
+        this.currentUser = user;
         this.globalVariable.googleAccountLogIn = true;
-        localStorage.setItem('googleAccountLogIn', 'true');
+        await this.updateStatus(user.uid, 'online');
+        if (user.isAnonymous) {
+          this.LogInAuth.setIsGuestLogin(true);
+        } else {
+          this.LogInAuth.setIsGuestLogin(false);
+        }
       } else {
         this.globalVariable.googleAccountLogIn = false;
-        localStorage.removeItem('googleAccountLogIn');
+        this.currentUser = null;
       }
     });
   }
+
+
   async deleteGuest(userId: any) {
     await deleteDoc(doc(this.firestore, 'users', userId));
   }
@@ -88,11 +93,11 @@ export class AuthService {
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-    provider.addScope('email'); 
+    provider.addScope('email');
     try {
       const result = await signInWithPopup(auth, provider);
       const currentUser = auth.currentUser;
-  
+
       if (currentUser) {
         const googleProviderData = result.user.providerData.find(
           (data) => data.providerId === 'google.com'
@@ -104,11 +109,11 @@ export class AuthService {
           name: result.user.displayName,
           email: email,
         });
-        this.addGoogleUserToFirestore(this.user);
+        await this.saveUserAfterLogin(this.user);
         this.globalVariable.googleAccountLogIn = true;
         this.LogInAuth.setLoginSuccessful(true);
         this.router.navigate(['/welcome', this.user.uid]);
-  
+
         setTimeout(() => {
           this.LogInAuth.setLoginSuccessful(false);
         }, 1500);
@@ -117,15 +122,21 @@ export class AuthService {
       console.error('Fehler beim Login:', error);
     }
   }
-  
 
-  async addGoogleUserToFirestore(user: User) {
+  async saveUserAfterLogin(user: any) {
     const userRef = doc(this.firestore, 'users', user.uid);
-    await setDoc(userRef, {
-      name: user.name,
-      email: user.email,
-      picture: user.picture,
-    });
+    const userSnapshot = await getDoc(userRef);
+    if (!userSnapshot.exists()) {
+      await setDoc(userRef, {
+        name: user.name || 'Benutzer',
+        email: user.email,
+        picture: user.picture || '',
+        createdAt: new Date(),
+      });
+      console.log('user erstellt.');
+    } else {
+      console.log('user bereits vorhanden, keine Überschreibung.');
+    }
   }
 
   async logOut() {
@@ -140,9 +151,10 @@ export class AuthService {
         if (currentUser?.isAnonymous) {
           this.deleteGuest(currentUser.uid);
         }
+        this.globalVariable.googleAccountLogIn = false;
+        this.currentUser = null;
         await signOut(auth);
       }
-      this.globalVariable.googleAccountLogIn = false;
       this.overlayStatusService.setOverlayStatus(false);
       this.router.navigate(['/']);
     } catch (error) {
@@ -152,7 +164,7 @@ export class AuthService {
 
   async SignGuestIn() {
     const auth = getAuth();
-   /*  this.globalVariable.isGuest = true; */
+    /*  this.globalVariable.isGuest = true; */
     try {
       const result = await signInAnonymously(auth);
       const guestUser = new User({
@@ -192,9 +204,9 @@ export class AuthService {
     }
   }
 
-  async addUserToFirestore(user: User) {
+/*   async addUserToFirestore(user: User) {
     const usersCollection = collection(this.firestore, 'users');
     const docRef = await addDoc(usersCollection, user.toJSON());
-    return docRef;
+    return docRef; */
   }
-}
+

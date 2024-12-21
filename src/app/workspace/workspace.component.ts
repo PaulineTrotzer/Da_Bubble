@@ -118,68 +118,69 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-
-selectUser(user: any) {
-  this.selectedChannel = null;
-  this.userSelected.emit(user);
-  this.id = user.id;
-  this.global.currentThreadMessageSubject.next('');
-  this.global.channelThreadSubject.next(null);
-  const actuallyId = this.id;
-  if (this.userId && this.messageCountsArr?.messageCount && this.messageCountsArr.messageCount[actuallyId] > 0) {
-    const docRef = doc(this.firestore, 'messageCounts', this.userId);
-    const resetMessageCount: any = {};
-    resetMessageCount[`messageCount.${actuallyId}`] = 0;
-    updateDoc(docRef, resetMessageCount);
-  } 
-   this.global.statusCheck =false;
-   this.openvollWidtChannelOrUserBox();
-   this.hiddenVoolThreadBox();
-   this.checkWidtSize();
-   this.cheackChatOpen();
-}   
-
-openvollWidtChannelOrUserBox() {
-  if(window.innerWidth<=1349 && window.innerWidth > 720){
-    return this.global.checkWideChannelorUserBox=true;
-  }else{
-    return this.global.checkWideChannelorUserBox=false;
+  selectUser(user: any) {
+    this.selectedChannel = null;
+    this.userSelected.emit(user);
+    this.id = user.id;
+    this.global.currentThreadMessageSubject.next('');
+    this.global.channelThreadSubject.next(null);
+    const actuallyId = this.id;
+    if (
+      this.userId &&
+      this.messageCountsArr?.messageCount &&
+      this.messageCountsArr.messageCount[actuallyId] > 0
+    ) {
+      const docRef = doc(this.firestore, 'messageCounts', this.userId);
+      const resetMessageCount: any = {};
+      resetMessageCount[`messageCount.${actuallyId}`] = 0;
+      updateDoc(docRef, resetMessageCount);
+    }
+    this.global.statusCheck = false;
+    this.openvollWidtChannelOrUserBox();
+    this.hiddenVoolThreadBox();
+    this.checkWidtSize();
+    this.cheackChatOpen();
   }
-} 
-  
-hiddenVoolThreadBox(){
-  if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelOrUserThreadBox){
-    this.global.checkWideChannelOrUserThreadBox=false;
+
+  openvollWidtChannelOrUserBox() {
+    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
+      return (this.global.checkWideChannelorUserBox = true);
+    } else {
+      return (this.global.checkWideChannelorUserBox = false);
+    }
   }
-}
 
-cheackChatOpen(){
-if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
-  this.global.openChannelOrUserThread=false;
-}
-}    
+  hiddenVoolThreadBox() {
+    if (
+      window.innerWidth <= 1349 &&
+      window.innerWidth > 720 &&
+      this.global.checkWideChannelOrUserThreadBox
+    ) {
+      this.global.checkWideChannelOrUserThreadBox = false;
+    }
+  }
 
-checkWidtSize(){
-if(window.innerWidth<=720){
-return  this.global.openChannelorUserBox = true;
-}else{
-return  this.global.openChannelorUserBox = false;
-}
-}
+  cheackChatOpen() {
+    if (window.innerWidth <= 720 && this.global.openChannelOrUserThread) {
+      this.global.openChannelOrUserThread = false;
+    }
+  }
 
+  checkWidtSize() {
+    if (window.innerWidth <= 720) {
+      return (this.global.openChannelorUserBox = true);
+    } else {
+      return (this.global.openChannelorUserBox = false);
+    }
+  }
 
+  // async updateRoomStatus(userId: string, status: boolean) {
+  //   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
+  //   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
+  //   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
+  //   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
+  // }
 
-
-// async updateRoomStatus(userId: string, status: boolean) {
-//   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
-//   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
-//   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
-//   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
-// }
-  
-
-
-           
   selectCurrentUser() {
     this.selectedChannel = null;
     this.selectedUser = this.global.currentUserData;
@@ -208,6 +209,7 @@ return  this.global.openChannelorUserBox = false;
     if (willkommenChannel) {
       this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
+      console.log((this.global.channelSelected = false));
     }
   }
 
@@ -222,10 +224,7 @@ return  this.global.openChannelorUserBox = false;
     this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
       this.allChannels = snapshot.docs.map((doc) => new Channel(doc.data()));
       this.sortChannels();
-  
-      if (!this.selectedChannel && !this.global.channelSelected) {
-        this.findWelcomeChannel();
-      }
+      this.findWelcomeChannel();
     });
   }
 
@@ -295,28 +294,29 @@ return  this.global.openChannelorUserBox = false;
     this.messageDrawerOpen = !this.messageDrawerOpen;
   }
 
-
-   isUserChanged(userOrChannel: any, isChannel: boolean): boolean {
+  isUserChanged(userOrChannel: any, isChannel: boolean): boolean {
     if (isChannel) {
-      return false; 
+      return false;
     }
     return userOrChannel.id !== this.selectedUser?.id;
   }
-  
-   setUser(userOrChannel: any): void {
+
+  setUser(userOrChannel: any): void {
     this.selectedUser = userOrChannel;
     this.selectUser(this.selectedUser);
-    const foundUser = this.allUsers.find((user: { id: any }) => user.id === this.selectedUser.id);
+    const foundUser = this.allUsers.find(
+      (user: { id: any }) => user.id === this.selectedUser.id
+    );
     if (foundUser) {
       this.selectedUser = foundUser;
     }
   }
-  
-   setChannel(userOrChannel: any): void {
+
+  setChannel(userOrChannel: any): void {
     this.selectedChannel = userOrChannel;
     this.selectChannel(this.selectedChannel);
   }
-  
+
   enterByUsername(userOrChannel: any, isChannel: boolean = false) {
     if (isChannel && (!userOrChannel || !userOrChannel.name)) {
       console.warn('Invalid channel passed to enterByUsername. Aborting.');
@@ -330,5 +330,4 @@ return  this.global.openChannelorUserBox = false;
       this.setChannel(userOrChannel);
     }
   }
-  
 }

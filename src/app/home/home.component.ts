@@ -144,13 +144,7 @@ export class HomeComponent implements OnInit {
       this.workspaceComponent.enterByUsername(user, false);
     }
   }
-  
-  
 
-
- /*  handleUserSelectionFromDirectThread(){
-
-  } */
 
   onThreadOpened() {
     this.isThreadOpen = true;

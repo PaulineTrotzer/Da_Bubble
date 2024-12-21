@@ -67,21 +67,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   global=inject(GlobalVariableService);
   overlay = inject(OverlayStatusService);
   @Output() headerUserSelected = new EventEmitter<any>();
-  getChannels:any[]=[];
-  filterChannel:any[]=[];
-  noChannelFounded:boolean=false;
-  listlastResultResult:boolean=false;
-  showUserList:boolean=false;
-  showChannelList:boolean=false;
-  channelIdHover:string='';
-  hoverResultnameId:string='';
-  getSeperateUser:any={};
-  @Output() headerChannelSelcted = new EventEmitter<any>();
-  getAllUsersCollection:any[]=[];
-  filteredUsers: any[] = [];
-  noUserFounded:boolean=false;
-  userIdHover:string='';
-
+  
 
   constructor(private route: ActivatedRoute,private eRef: ElementRef ) {}
 
@@ -155,10 +141,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
   
+   listlastResultResult:boolean=false;
+
   handleFocus(): void { 
       this.listlastResultResult=true
   }
    
+
+  showUserList:boolean=false;
+  showChannelList:boolean=false;
+
    checkInputValue(){
     if(this.searcheNameOrChannel.startsWith('@') && this.searcheNameOrChannel.trim() !== ''){
       this.showUserList=true;
@@ -175,6 +167,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+   getAllUsersCollection:any[]=[] 
+   filteredUsers: any[] = [];
+   noUserFounded:boolean=false;
+   userIdHover:string=''
 
   checkUserId(user: any) {
     this.userIdHover = user.id;
@@ -194,6 +190,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.getAllUsersCollection.push({id:doc.id,...allUsers})
       }
     })
+    // console.log(this.getAllUsersCollection)
     this.filterUsers();
     })
   } 
@@ -212,28 +209,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
      
-  checkWidtSize(){
-    if(window.innerWidth<=720){
-      return  this.global.openChannelorUserBox = true;
-    }else{
-      return  this.global.openChannelorUserBox = false;
-     }
-   } 
-
-   checkThredBox() {
-    if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
-      this.global.openChannelOrUserThread=false;
-      this.global.openChannelorUserBox=true;
-    }
-   }
-
-   hiddenThreadFullBox(){
-    if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelOrUserThreadBox){
-      this.global.checkWideChannelorUserBox=true;
-      this.global.checkWideChannelOrUserThreadBox=false;
-    }
-  }
-
+ 
 
   async enterChatUser(user: any) {  
      const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
@@ -243,11 +219,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.searcheNameOrChannel = '';
         this.listlastResultResult = false;
         this.hoverResultnameId = '';
-        this.hiddenThreadFullBox();
-        this.checkThredBox();
-        this.checkWidtSize();
-} 
+}
   
+
+ 
+    getChannels:any[]=[];
+    filterChannel:any[]=[];
+    noChannelFounded:boolean=false;
 
   async getAllChannels () {
       const channelRef = collection(this.firestore, 'channels');
@@ -264,9 +242,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
           });
           this.getChannels.push(channel);
         });
+      
       });
     }
   
+
     filterChannels(){
        const  searchChannel=this.searcheNameOrChannel.toLowerCase().replace('#','').trim()
        this.filterChannel=this.getChannels.filter((channel)=>
@@ -278,6 +258,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
     }
 
+    channelIdHover:string='';
+
   checkChannelId(channel: any) {
     this.channelIdHover = channel.id;
   }
@@ -286,34 +268,45 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.channelIdHover='';
     } 
   
+    @Output() headerChannelSelcted = new EventEmitter<any>();
+
   async  enterChannel(channel:any){
+    console.log(channel.messages)
       const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
       await setDoc(channelRef, {searchHeaderResult: arrayUnion(channel)}, { merge: true });
       this.headerChannelSelcted.emit(channel);
       this.showChannelList=false;
       this.searcheNameOrChannel='';
       this.listlastResultResult=false;
-      this.hiddenThreadFullBox();
-      this.checkThredBox();
-      this.checkWidtSize();
+     
     }
+
+
+
+
+
+    getSeperateUser:any={};
     
     getUser(currentId:any){
       const docRef=doc(this.firestore,'searchHeaderResult',currentId);
       if (!this.userID) {
+        console.error("UserID is undefined");
         return;
-    } 
+    }
       onSnapshot(docRef,(docSnapshot)=>{
          if(docSnapshot.exists()){
             const data=docSnapshot.data();
-            const id = docSnapshot.id;
+            const id = docSnapshot.id
             this.getSeperateUser={id:id,...data};
          }else{
-          this.getSeperateUser={};
+          this.getSeperateUser={}
+          console.log(this.getSeperateUser)
          }
       })
     }
     
+     hoverResultnameId:string='' 
+
     checkuserResultId(user:any){
       this.hoverResultnameId=user.id
     } 
@@ -327,12 +320,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
        this.hoverResultChannelId=channel.id 
     } 
 
+    
     leaveCheckChannelResultId(){
       this.hoverResultChannelId=''
     }
+ 
 
      deleteUser(user:any){
+        console.log(user)
+        console.log('delete')
         const docRef=doc(this.firestore,'searchHeaderResult',this.userID)
         updateDoc(docRef,{searchHeaderResult:arrayRemove(user)})
      }
+
+
+    
+
+
+
+
 }
