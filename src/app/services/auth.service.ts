@@ -52,21 +52,17 @@ export class AuthService {
   initAuthListener() {
     const auth = getAuth();
 
-    onAuthStateChanged(auth, async (user) => {
+
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        this.currentUser = user;
-        await this.updateStatus(user.uid, 'online');
-        if (user.isAnonymous) {
-          this.LogInAuth.setIsGuestLogin(true);
-        } else {
-          this.LogInAuth.setIsGuestLogin(false);
-        }
+        this.globalVariable.googleAccountLogIn = true;
+        localStorage.setItem('googleAccountLogIn', 'true');
       } else {
-        this.currentUser = null;
+        this.globalVariable.googleAccountLogIn = false;
+        localStorage.removeItem('googleAccountLogIn');
       }
     });
   }
-
   async deleteGuest(userId: any) {
     await deleteDoc(doc(this.firestore, 'users', userId));
   }

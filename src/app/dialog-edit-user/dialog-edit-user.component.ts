@@ -21,7 +21,6 @@ import {
   uploadBytes,
   getDownloadURL,
 } from '@angular/fire/storage';
-import { LoginAuthService } from '../services/login-auth.service';
 
 @Component({
   selector: 'app-dialog-edit-user',
@@ -58,6 +57,7 @@ export class DialogEditUserComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    console.log('this.global.googleAccountLogIn', this.global.googleAccountLogIn);
     this.route.paramMap.subscribe(async (paramMap) => {
       this.userID = paramMap.get('id');
       if (this.userID) {

@@ -11,14 +11,10 @@ import {
   collection,
   query,
   where,
-  doc,
-  setDoc,
-  getDoc
 } from '@angular/fire/firestore';
 import { signInWithEmailAndPassword } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { AuthService } from '../services/auth.service';
-import { updateDoc } from '@firebase/firestore';
 import { MatCardModule, MatCardContent } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
@@ -129,6 +125,7 @@ export class LoginComponent implements OnInit {
   }
    
   async googleLogIn() {
+    this.global.googleAccountLogIn = true;
     this.auth.googleLogIn();
   }
     
