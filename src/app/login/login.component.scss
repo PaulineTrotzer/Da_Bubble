@@ -107,7 +107,6 @@ h2 {
   height: 60px;
   border-radius: 100px;
   border-style: none;
-  cursor: pointer;
   &:hover {
     border: 2px solid;
     border-color: grey;
@@ -232,7 +231,7 @@ input[type="text"]:focus::placeholder {
   display: flex;
   gap: 26px;
   position: relative;
-  bottom: 42px;
+  bottom: 15px;
 }
 
 .error-message {

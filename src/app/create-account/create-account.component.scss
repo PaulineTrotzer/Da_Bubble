@@ -39,27 +39,26 @@ header {
   align-items: center;
   position: relative;
   font-family: "Nunito";
-  margin: 8px 0;
+  margin: 8px 0 35px 0;
   .img-container {
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
     left: 8px;
-    height: 40px;
+    height: 35px;
     width: 40px;
     border-radius: 100%;
     &:hover {
       background-color: rgb(236, 238, 254);
       cursor: pointer;
-
       .icon path {
         fill: #444df2;
       }
     }
   }
   h2 {
-    font-size: 28px;
+    font-size: 41px;
     color: #444df2;
   }
 }
@@ -68,7 +67,7 @@ header {
   text-align: center;
   span {
     font-family: "Nunito";
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
   }
 }
@@ -79,7 +78,16 @@ form {
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  margin-top: 16px;
+  margin-top: 30px;
+}
+
+form {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-top: 30px;
 }
 
 .form-row {
@@ -89,9 +97,11 @@ form {
   position: relative;
   width: 100%;
   z-index: 1;
+  margin-bottom: 16px;
+
   input {
     border-radius: 100px;
-    border: none;
+    border: 1px solid transparent;
     background-color: #eceefe;
     padding: 18px 32px 18px 64px;
     width: 100%;
@@ -99,15 +109,16 @@ form {
     position: relative;
     font-family: "Nunito";
     font-weight: 700;
+    &:focus {
+      border-color: #444df2;
+      z-index: 2; 
+    }
   }
   img {
     position: absolute;
     left: 16px;
+    z-index: 3;
   }
-}
-
-.form-row {
-  position: relative;
   &::before {
     content: "";
     position: absolute;
@@ -117,12 +128,17 @@ form {
     bottom: -2px;
     border-radius: 100px;
     z-index: -1;
+    border: 1px solid transparent;
   }
   &:hover::before {
-    border: 1px solid #686868;
-    transition: border 125ms ease-in-out;
+    border-color: #686868; 
+  }
+  input:focus ~ &::before,
+  &:has(input:focus)::before {
+    border-color: transparent;
   }
 }
+
 
 .checkbox-row {
   display: flex;
@@ -130,7 +146,7 @@ form {
   justify-content: flex-start;
   width: 100%;
   position: relative;
-  top: 0;
+  top: 30px;
   left: 0;
   gap: 12px;
 }
@@ -199,7 +215,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   height: 50px;
-  margin-bottom: 48px;
+  margin-bottom: 15px;
   gap: 16px;
   a {
     font-size: 18px;
@@ -242,7 +258,7 @@ input[type="checkbox"] {
 
 .error-message {
   position: absolute;
-  top: 56px;
+  top: 66px;
   left: 22px;
   font-size: 12px;
   color: red;
@@ -311,7 +327,7 @@ input[type="checkbox"] {
     position: relative;
     .header-content {
       position: absolute;
-      top: 75px;
+      top: 25px;
       left: 75px;
     }
   }
