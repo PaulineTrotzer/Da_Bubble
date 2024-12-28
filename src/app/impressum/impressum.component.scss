@@ -85,6 +85,10 @@ h1 {
   font-size: 23px;
 }
 
+.phone {
+  white-space: nowrap;
+}
+
 h2 {
   margin: 55px 0 20px 0;
   color: #444df2;
@@ -104,11 +108,9 @@ h2 {
   font-size: 20px;
 }
 
-.one-adress{
-    font-size: 18px;
+.one-adress {
+  font-size: 18px;
 }
-
-
 
 a {
   text-decoration: none;
@@ -121,15 +123,6 @@ a {
   }
 }
 
-@media (max-width: 470px) {
-  .image-box {
-    img {
-      width: 204px;
-      height: 56px;
-    }
-  }
-}
-
 @media (max-width: 460px) {
   a {
     font-size: 12px;
@@ -137,15 +130,38 @@ a {
 }
 
 @media (max-width: 405px) {
+  .impressum-card {
+    position: absolute;
+    top: 205px;
+    left: 50%; 
+    transform: translateX(-50%);
+    padding: 33px 45px;
+  }
   h1 {
     font-size: 30px;
+    margin: 24p 0 20px 0;
   }
 
   h2 {
     font-size: 25px;
+    margin: 35px 0 20px 0;
   }
 
-  p {
-    font-size: 18px;
+  .develope {
+    font-size: 20px;
+  }
+
+  .names {
+    margin-top: 10px;
+    font-size: 17px;
+  }
+
+  .one-adress {
+    margin-top: 32px;
+    font-size: 15px;
+  }
+
+  .phone {
+    font-size: 14px;
   }
 }
