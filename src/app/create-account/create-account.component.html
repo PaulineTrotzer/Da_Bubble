@@ -87,7 +87,7 @@
     <a routerLink="/privacy-policy" routerLinkActive="active">Datenschutz</a>
   </div>
 
-  <mat-card *ngIf="linkWasSend" appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
+  <mat-card  appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
     <mat-card-content class="link-card-content">
       <img class="link-img" src="../../assets/img/send.png">
       <span class="link-sended-text">Link wurde an {{userData.email}} gesendet</span>
