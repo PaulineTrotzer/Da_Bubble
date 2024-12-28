@@ -54,7 +54,7 @@
         <label for="password"></label>
         <input name=password [(ngModel)]="userData.password" #password="ngModel" type="password" id="password"
           placeholder="Passwort" (focus)="passwordIcon.src = './assets/img/lock_filled_black.svg'"
-          (blur)="passwordIcon.src = './assets/img/lock.svg'"  (input)="resetUserError()"required />
+          (blur)="passwordIcon.src = './assets/img/lock.svg'" (input)="resetUserError()" required />
         <img #passwordIcon class="icon" #password src="./assets/img/lock.svg" alt="" />
         <span class="error-message" *ngIf="!password.valid && password.touched">*Ein Passwort ist erforderlich.</span>
       </div>
@@ -71,8 +71,8 @@
           *Bitte Datenschutzerklärung akzeptieren</span>
       </div>
       <div class="button-container">
-        <button type="submit" value="submit" [disabled]="userForm.invalid"
-          (mouseenter)="toggleHover()" (mouseleave)="toggleHover()" [ngClass]="{
+        <button type="submit" value="submit" [disabled]="userForm.invalid" (mouseenter)="toggleHover()"
+          (mouseleave)="toggleHover()" [ngClass]="{
             'btn-primary': userForm.valid,
             'btn-primary-disabled': userForm.invalid,
             'btn-primary-hover': isHovered
@@ -87,7 +87,7 @@
     <a routerLink="/privacy-policy" routerLinkActive="active">Datenschutz</a>
   </div>
 
-  <mat-card  appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
+  <mat-card *ngIf="linkWasSend" appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
     <mat-card-content class="link-card-content">
       <img class="link-img" src="../../assets/img/send.png">
       <span class="link-sended-text">Link wurde an {{userData.email}} gesendet</span>
