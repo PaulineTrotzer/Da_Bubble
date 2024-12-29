@@ -231,23 +231,25 @@
                       message.senderSticker === ''
                     ">
                                         <!-- <img [src]="message.recipientSticker" /> -->
-                                        <span>{{message.recipientSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            {{ message.recipientName }} hat drauf reagiert</span>
+                                            {{ message.recipientName }} hat mit
+                                            <span>{{message.recipientSticker}}</span> reagiert</span>
                                     </div>
                                     <div class="sticker-info" *ngIf="
                       message.senderSticker !== '' &&
                       message.recipientSticker === '' 
                     ">
                                         <!-- <img *ngIf="message.senderSticker" [src]="getEmojiImageUrl(message.senderSticker)" alt="Emoji"> -->
-                                        <span>{{message.senderSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            Du hast drauf reagiert</span>
+                                            Du hast mit <span>{{message.senderSticker}}</span> reagiert</span>
                                     </div>
                                     <div class="sticker-info"
                                         *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== '' ">
-                                        <span>{{message.recipientSticker}}</span>
-                                        <span class="sticker-sender-name">{{ message.recipientName }} und Du drauf
+
+                                        <span class="sticker-sender-name">{{ message.recipientName }} und Du haben mit
+                                            <span>{{message.recipientSticker}}</span>
                                             reagiert</span>
                                     </div>
 
@@ -256,9 +258,10 @@
                       message.senderSticker !== '' &&
                       message.senderSticker !== message.recipientSticker
                     ">
-                                        <span>{{message.recipientSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            {{ hoveredRecipienUser }} hat drauf reagiert
+                                            {{ hoveredRecipienUser }} hat mit <span>{{message.recipientSticker}}</span>
+                                            reagiert
                                         </span>
                                     </div>
 
@@ -267,9 +270,10 @@
                       message.recipientSticker !== message.senderSticker &&
                       message.recipientSticker !== '' && message.senderSticker!==''
                     ">
-                                        <span>{{message.senderSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            {{ hoveredCurrentUser }} hast drauf reagiert
+                                            {{ hoveredCurrentUser }} hast mit <span>{{message.senderSticker}}</span>
+                                            reagiert
                                         </span>
                                     </div>
                                 </div>
@@ -282,22 +286,25 @@
                       message.recipientSticker !== '' &&
                       message.senderSticker === ''
                     ">
-                                        <span>{{message.recipientSticker}}</span>
-                                        <span class="sticker-sender-name">Du hast drauf reagiert</span>
+
+                                        <span class="sticker-sender-name">Du hast mit
+                                            <span>{{message.recipientSticker}}</span> reagiert</span>
                                     </div>
 
                                     <div class="sticker-info" *ngIf="
                       message.senderSticker !== '' &&
                       message.recipientSticker === ''
                     ">
-                                        <span>{{message.senderSticker}}</span>
-                                        <span class="sticker-sender-name">{{ message.senderName }} hat drauf reagiert
+
+                                        <span class="sticker-sender-name">{{ message.senderName }} hat mit
+                                            <span>{{message.senderSticker}}</span> reagiert
                                         </span>
                                     </div>
                                     <div class="sticker-info"
                                         *ngIf="message.recipientSticker === message.senderSticker">
-                                        <span>{{message.recipientSticker}}</span>
-                                        <span class="sticker-sender-name">{{ message.senderName }} und Du drauf
+
+                                        <span class="sticker-sender-name">{{ message.senderName }} und Du haben mit
+                                            <span>{{message.recipientSticker}}</span>
                                             reagiert</span>
                                     </div>
 
@@ -306,9 +313,10 @@
                       message.recipientSticker !== message.senderSticker &&
                       message.senderSticker !== '' && message.recipientSticker !== ''
                     ">
-                                        <span>{{message.recipientSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            {{ hoveredName }} hast drauf reagiert
+                                            {{ hoveredName }} hast darauf mit <span>{{message.recipientSticker}}</span>
+                                            reagiert
                                         </span>
                                     </div>
 
@@ -318,9 +326,10 @@
                       message.recipientSticker !== message.senderSticker &&
                       message.recipientSticker !== '' && message.senderSticker!==''
                     ">
-                                        <span>{{message.senderSticker}}</span>
+
                                         <span class="sticker-sender-name">
-                                            {{ hoveredSenderName }} hat drauf reagiert
+                                            {{ hoveredSenderName }} hat darauf mit
+                                            <span>{{message.senderSticker}}</span> reagiert
                                         </span>
                                     </div>
                                 </div>

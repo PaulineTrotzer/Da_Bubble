@@ -666,11 +666,10 @@ app-input-field {
 .show-comment-stricker {
   display: flex;
   border: 1px solid #adb0d9;
-  padding: 1px;
   border-radius: 16px;
   padding: 5px;
   gap: 6px;
-
+  align-items: center;
   &:hover {
     border-color: #444df2;
   }
@@ -684,7 +683,8 @@ app-input-field {
   background-color: #444df2;
   color: #ffffff;
   position: absolute;
-  width: 167px;
+  width: fit-content;
+  padding: 3px;
   top: -94px;
   left: 27px;
   opacity: 0;
@@ -708,11 +708,12 @@ app-input-field {
   background-color: #444df2;
   color: #ffffff;
   position: absolute;
-  width: 167px;
+  width: fit-content;
   top: -94px;
   left: -132px;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
+  padding: 3px;
 }
 
 .sticker-senderName-user.hovered {

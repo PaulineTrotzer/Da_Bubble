@@ -207,8 +207,9 @@
   cursor: pointer;
   img {
     height: 50px;
-    min-width: 50px;
+    width: 50px;
     border-radius: 30px;
+    object-fit: cover;
   }
   h4 {
     font-family: "Nunito";
