@@ -56,7 +56,8 @@ export class CreateAccountComponent implements OnInit {
   }
 
   async createAuthUser(email: string, password: string) {
-    if (this.userLoggedIn && email == this.newUser.email) {
+    debugger;
+    if (this.userLoggedIn && this.userLoggedIn === email.trim().toLowerCase()) {
       this.userError = true;
       return;
     }
@@ -78,7 +79,6 @@ export class CreateAccountComponent implements OnInit {
       this.openLinkSend();
       await sendEmailVerification(authUser);
       await this.addUserToFirestore(this.newUser);
-      // this.router.navigate(['/avatar', authUser.uid]);
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         this.linkAlreadySended = true;
@@ -122,5 +122,6 @@ export class CreateAccountComponent implements OnInit {
 
   resetUserError() {
     this.linkAlreadySended = false;
+    this.userError = false;
   }
 }

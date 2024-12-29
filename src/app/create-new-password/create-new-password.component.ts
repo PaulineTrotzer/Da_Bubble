@@ -79,21 +79,20 @@ export class CreateNewPasswordComponent {
     }
   }
 
-
-
-
-  checkPassworFields() {
-    if (this.password && this.confirmPassword && this.password === this.confirmPassword) {
-      this.disabled = false;
-      this.checkPasswordinfo = false;
+  checkPasswordFields() {
+    if (this.password && this.confirmPassword) {
+      this.disabled = false; 
+      this.checkPasswordinfo = false; 
     } else {
-      this.checkPasswordinfo = true;
-      this.disabled = true;
+      this.disabled = true; 
     }
   }
 
-
   async createNewPassword() {
+    if (this.password !== this.confirmPassword) {
+      this.checkPasswordinfo = true; 
+      return;
+    }
     const auth = getAuth();
     if (!this.oobCode) {
       return;
@@ -104,13 +103,13 @@ export class CreateNewPasswordComponent {
       const userUID = user.uid;
     }
     this.resetFields();
-    this.sendInfo=true;
+    this.sendInfo = true;
     this.openDiv();
     setTimeout(() => {
       this.router.navigate(['/']);
-  }, 1500); 
+    }, 1500);
   }
-
+  
   
   async verifyEmail() {
     debugger;
