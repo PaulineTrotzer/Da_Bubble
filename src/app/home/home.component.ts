@@ -27,7 +27,6 @@ export class HomeComponent implements OnInit {
   selectedUser: any;
   selectedChannel: any;
   mentionUser: any;
-  globalService = inject(GlobalVariableService);
   isThreadOpen = false;
   successfullyLogged = false;
   LogInAuth = inject(LoginAuthService);
@@ -41,14 +40,22 @@ export class HomeComponent implements OnInit {
   channelThreadId: string | null = null;
   isWorkspaceOpen: boolean = true;
   isHovered: boolean = false;
+  googleAccountLogIn: boolean = false;  
   @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
+  loginAuthService =inject(LoginAuthService);
 
   ngOnInit(): void {
+    this.loginAuthService.googleAccountLogIn$.subscribe(status => {
+      this.googleAccountLogIn = status;
+      console.log('Google Login Status aus Service:', this.googleAccountLogIn); 
+    });
+
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
     this.setDirectThread();
     this.setChannelThread();
   }
+
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -80,7 +87,7 @@ export class HomeComponent implements OnInit {
 
   onHeaderUserSelected(user: any) {
     this.onHeaderUser = user;
-    this.globalService.clearCurrentChannel();
+    this.global.clearCurrentChannel();
 
     if (this.workspaceComponent) {
       this.workspaceComponent.selectUser(user);
@@ -89,7 +96,7 @@ export class HomeComponent implements OnInit {
 
   onHeaderchannelSelected(channel: any) {
     this.onHeaderChannel = channel;
-    this.globalService.setCurrentChannel(channel);
+    this.global.setCurrentChannel(channel);
 
     if (this.workspaceComponent) {
       this.workspaceComponent.selectChannel(channel);
@@ -98,12 +105,12 @@ export class HomeComponent implements OnInit {
 
   onUserSelected(user: any) {
     this.selectedUser = user;
-    this.globalService.clearCurrentChannel();
+    this.global.clearCurrentChannel();
   }
 
   onChannelSelected(channel: any) {
     this.selectedChannel = channel;
-    this.globalService.setCurrentChannel(channel);
+    this.global.setCurrentChannel(channel);
   }
 
   handleUserSelectionFromStartscreen(user: any) {

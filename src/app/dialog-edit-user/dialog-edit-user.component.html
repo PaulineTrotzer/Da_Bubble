@@ -40,15 +40,15 @@
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
 
-        <input *ngIf="!guestAccount && !global.googleAccountLogIn" class="user-mail-input"
+        <input *ngIf="!guestAccount && !googleAccountLogIn" class="user-mail-input"
             [(ngModel)]="currentUser.email" placeholder="{{user.email}}" />
 
         <input *ngIf="guestAccount" class="user-mail-input" [value]="currentUser.email" readonly />
         <span *ngIf="guestAccount" class="error-msg">Kein Zugriff als Gast</span>
 
 
-        <input *ngIf="global.googleAccountLogIn" class="user-mail-input" [value]="currentUser.email" disabled />
-        <span *ngIf="global.googleAccountLogIn" class="error-msg">Mail kann nicht geändert werden</span>
+        <input *ngIf="googleAccountLogIn" class="user-mail-input" [value]="currentUser.email" disabled />
+        <span *ngIf="googleAccountLogIn" class="error-msg">Mail kann nicht geändert werden</span>
     </div>
 
     <div class="button-flex">

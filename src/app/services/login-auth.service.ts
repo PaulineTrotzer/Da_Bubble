@@ -12,6 +12,9 @@ export class LoginAuthService {
   private isGuestLoginSubject = new BehaviorSubject<boolean>(false);
   isGuestLogin$ = this.isGuestLoginSubject.asObservable();
 
+  private googleAccountLogInSubject = new BehaviorSubject<boolean>(false);
+  googleAccountLogIn$ = this.googleAccountLogInSubject.asObservable();
+
 
   setLoginSuccessful(status: boolean) {
     this.loginSuccessfulSubject.next(status);
@@ -19,5 +22,15 @@ export class LoginAuthService {
 
   setIsGuestLogin(status: boolean) {
     this.isGuestLoginSubject.next(status);
+  }
+
+  getGoogleAccountLogIn(): boolean {
+    return this.googleAccountLogInSubject.getValue();
+  }
+
+
+  setGoogleAccountLogIn(status: boolean) {
+    console.log('Setze GoogleAccountLogIn auf: ', status);
+    this.googleAccountLogInSubject.next(status);
   }
 }

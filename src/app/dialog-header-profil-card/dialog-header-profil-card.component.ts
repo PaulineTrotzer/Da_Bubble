@@ -32,6 +32,7 @@ export class DialogHeaderProfilCardComponent implements OnInit {
   clicked = true;
   guestAccount = false;
   @Output() closeProfile = new EventEmitter<void>();
+  authService = inject(LoginAuthService);
 
   constructor(private route: ActivatedRoute) {}
 
@@ -48,15 +49,14 @@ export class DialogHeaderProfilCardComponent implements OnInit {
     });
     this.loginAuthService.isGuestLogin$.subscribe((status) => {
       this.guestLogin = status;
-      console.log('aha',this.guestLogin);
+      console.log('aha', this.guestLogin);
     });
-
   }
 
   async checkLoginStatus(userResult: User) {
     if (this.guestLogin) {
       this.guestAccount = true;
-    } else if (this.globalService.googleAccountLogIn) {
+    } else if (this.authService.getGoogleAccountLogIn()) {
       this.googleAccount = true;
     } else {
       this.noGuestAccount = true;
@@ -73,5 +73,4 @@ export class DialogHeaderProfilCardComponent implements OnInit {
     this.openEdit = true;
     this.profileCardopen = false;
   }
-
 }

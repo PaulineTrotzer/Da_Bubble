@@ -36,6 +36,7 @@ export class AuthService {
   global = inject(GlobalService);
   loggedOut = false;
   globalVariable = inject(GlobalVariableService);
+  loginAuthService = inject(LoginAuthService);
 
   constructor() {
     window.addEventListener('beforeunload', async (event) => {
@@ -53,20 +54,29 @@ export class AuthService {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        this.globalVariable.googleAccountLogIn = true;
-        await this.updateStatus(user.uid, 'online');
-        if (user.isAnonymous) {
-          this.LogInAuth.setIsGuestLogin(true);
+        if (
+          user.providerData.some(
+            (provider) => provider.providerId === 'google.com'
+          )
+        ) {
+          this.loginAuthService.setGoogleAccountLogIn(true);
         } else {
-          this.LogInAuth.setIsGuestLogin(false);
+          this.loginAuthService.setGoogleAccountLogIn(false);
+        }
+
+        await this.updateStatus(user.uid, 'online');
+
+        if (user.isAnonymous) {
+          this.loginAuthService.setIsGuestLogin(true);
+        } else {
+          this.loginAuthService.setIsGuestLogin(false);
         }
       } else {
-        this.globalVariable.googleAccountLogIn = false;
+        this.loginAuthService.setGoogleAccountLogIn(false);
         this.currentUser = null;
       }
     });
   }
-
 
   async deleteGuest(userId: any) {
     await deleteDoc(doc(this.firestore, 'users', userId));
@@ -89,7 +99,6 @@ export class AuthService {
       );
     }
   }
-
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
@@ -110,10 +119,9 @@ export class AuthService {
           email: email,
         });
         await this.saveUserAfterLogin(this.user);
-        this.globalVariable.googleAccountLogIn = true;
+        this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
         this.router.navigate(['/welcome', this.user.uid]);
-
         setTimeout(() => {
           this.LogInAuth.setLoginSuccessful(false);
         }, 1500);
@@ -132,14 +140,23 @@ export class AuthService {
         email: user.email,
         picture: user.picture || '',
         createdAt: new Date(),
+        googleAccount: true,
       });
-      console.log('user erstellt.');
+      console.log('User erstellt.');
     } else {
-      console.log('user bereits vorhanden, keine Überschreibung.');
+      const existingUserData = userSnapshot.data();
+      if (!existingUserData?.['googleAccount']) {
+        console.log(
+          'User bereits vorhanden, keine Überschreibung des Google Accounts.'
+        );
+      } else {
+        console.log('User ist bereits ein Google-Account Nutzer.');
+      }
     }
   }
 
   async logOut() {
+    this.loginAuthService.setGoogleAccountLogIn(false);
     const auth = getAuth();
     const currentUser = auth.currentUser;
     try {
@@ -151,7 +168,6 @@ export class AuthService {
         if (currentUser?.isAnonymous) {
           this.deleteGuest(currentUser.uid);
         }
-        this.globalVariable.googleAccountLogIn = false;
         this.currentUser = null;
         await signOut(auth);
       }
@@ -164,7 +180,6 @@ export class AuthService {
 
   async SignGuestIn() {
     const auth = getAuth();
-    /*  this.globalVariable.isGuest = true; */
     try {
       const result = await signInAnonymously(auth);
       const guestUser = new User({
@@ -203,5 +218,4 @@ export class AuthService {
       return null;
     }
   }
-  }
-
+}

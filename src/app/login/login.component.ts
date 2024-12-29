@@ -69,8 +69,12 @@ export class LoginComponent implements OnInit {
   }
 
   async logIn() {
+    debugger;
+    console.log('Vor dem Login: ', this.loginAuthService.getGoogleAccountLogIn());
     this.isGuestLogin = false;
+    this.loginAuthService.setGoogleAccountLogIn(false);
     const auth = getAuth();
+    console.log('Nach dem Setzen: ', this.loginAuthService.getGoogleAccountLogIn());
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -94,6 +98,7 @@ export class LoginComponent implements OnInit {
       this.formFailed = true;
     }
   }
+  
 
   async proofMail(email: string): Promise<boolean> {
     const docRef = collection(this.firestore, 'users');
@@ -126,75 +131,8 @@ export class LoginComponent implements OnInit {
   }
    
   async googleLogIn() {
-    this.global.googleAccountLogIn = true;
-    this.auth.googleLogIn();
+    await this.auth.googleLogIn();  
   }
-    
-  // async googleLogIn() {
-  //   await this.googleAccountDaten();
-  //   this.router.navigate(['/welcome', this.googleUserUid]);
-  // }
-  
-
-  // async googleAccountDaten(): Promise<void> {
-  //   const provider = new GoogleAuthProvider();
-  //   const auth = getAuth();
-  //   try {
-  //     const result = await signInWithPopup(auth, provider);
-  //     const user = result.user;
-  //     if (user) {
-  //       const userRef = doc(this.firestore, 'users', user.uid);
-  //       const userDoc = await getDoc(userRef);
-  //       if (userDoc.exists()) {
-  //         await this.checkExsistingGoogleData(user)
-  //       } else {
-  //         await this.checkSetNewGoogleAccount(user)
-  //       }
-  //       this.googleUserUid = user.uid;
-  //       // this.global.googleAccountLogIn=true;
-  //     }
-  //   } catch (error:any) { 
-  //     console.error('Fehler bei der Google-Anmeldung:', error);
-  //   }
-  // }
-
-
-
-
-  // async checkExsistingGoogleData(user: any) {
-  //   const userRef = doc(this.firestore, 'users', user.uid);
-  //   const userDoc = await getDoc(userRef);
-  //   const existingData: any = userDoc.data();
-  //   await setDoc(
-  //     userRef,
-  //     {
-  //       uid: user.uid,
-  //       name: existingData['name'] || user.displayName || 'Unbekannter Nutzer',
-  //       email: existingData['email'] || user.email,
-  //       picture: existingData['picture'] || user.photoURL || null,
-  //       blockInputField:existingData['blockInputField']
-  //     },
-  //     { merge: true }
-  //   );
-  // }
-
-  // async checkSetNewGoogleAccount(user: any) {
-  //   const userRef = doc(this.firestore, 'users', user.uid);
-  //   await setDoc(
-  //     userRef,
-  //     {
-  //       uid: user.uid,
-  //       name: user.displayName || 'Unbekannter Nutzer',
-  //       email: user.email,
-  //       picture: user.photoURL || null,
-  //       blockInputField:true  
-  //     },
-  //     { merge: true }
-  //   );
-  // }
-
-
-
 
 }
 

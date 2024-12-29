@@ -21,6 +21,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from '@angular/fire/storage';
+import { LoginAuthService } from '../services/login-auth.service';
 
 @Component({
   selector: 'app-dialog-edit-user',
@@ -30,6 +31,8 @@ import {
   styleUrl: './dialog-edit-user.component.scss',
 })
 export class DialogEditUserComponent implements OnInit {
+  googleAccountLogIn: boolean = false; 
+  loginAuthService=inject(LoginAuthService);
   user: User = new User();
   editModusOpen = true;
   userID: any;
@@ -53,6 +56,7 @@ export class DialogEditUserComponent implements OnInit {
     '../../assets/img/avatar/avatar6.png',
   ];
   storage = inject(Storage);
+  userData: any = {};
 
   constructor(private route: ActivatedRoute) {}
 
@@ -67,9 +71,11 @@ export class DialogEditUserComponent implements OnInit {
         }
       }
     });
+    this.loginAuthService.googleAccountLogIn$.subscribe(status => {
+      this.googleAccountLogIn = status;
+    });
   }
 
-  userData: any = {};
 
   async getUserById(userId: string) {
     const userDocref = doc(this.firestore, 'users', userId);
@@ -78,12 +84,12 @@ export class DialogEditUserComponent implements OnInit {
         const data = docSnapshot.data();
         const id = docSnapshot.id;
         if (data['blockInputField'] === true) {
-          this.global.googleAccountLogIn = true;
+          this.googleAccountLogIn = true;
           this.userData = { id: id, ...data };
         }
       } else {
         this.userData = {};
-        this.global.googleAccountLogIn = false;
+        this.googleAccountLogIn = false;
       }
     });
   }
@@ -147,6 +153,6 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   showEditableInput(): boolean {
-    return !this.guestAccount && !this.global.googleAccountLogIn;
+    return !this.guestAccount && !this.googleAccountLogIn;
   }
 }

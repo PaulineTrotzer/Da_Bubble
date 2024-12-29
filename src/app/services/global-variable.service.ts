@@ -15,7 +15,6 @@ export class GlobalVariableService {
   welcomeChannel: boolean = false;
   openMentionMessageBox: boolean = false;
   getUserByName: any = {};
-  googleAccountLogIn: boolean = false;
   createNewPassword: boolean = false;
   verifyEmail: boolean = true;
   checkoben:boolean=false

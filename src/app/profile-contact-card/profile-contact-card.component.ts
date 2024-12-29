@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import {
+  Component,
+  inject,
+  Output,
+  EventEmitter,
+  OnInit,
+  Input,
+} from '@angular/core';
 import { User } from '../models/user.class';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Firestore } from '@angular/fire/firestore';
@@ -20,29 +27,25 @@ export class ProfileContactCardComponent implements OnInit {
   userservice = inject(UserService);
   userID: any;
   @Output() closeProfile = new EventEmitter<void>();
-  @Input() selectedContact?: User; 
-   @Output() contactSelected = new EventEmitter<User>(); 
-  userService =inject(UserService);
+  @Input() selectedContact?: User;
+  @Output() contactSelected = new EventEmitter<User>();
+  userService = inject(UserService);
 
   constructor() {}
-
 
   ngOnInit(): void {
     if (this.selectedContact) {
       this.user = this.selectedContact;
-      this.userService.setSelectedUser(this.user); // Setze den selectedUser im UserService
-      this.contactSelected.emit(this.user); 
+      this.userService.setSelectedUser(this.user);
+      this.contactSelected.emit(this.user);
     }
   }
-  
+
   updateContact(contact: User) {
     this.selectedContact = contact;
-    this.userService.setSelectedUser(contact); // Aktualisiere den selectedUser
+    this.userService.setSelectedUser(contact);
   }
-  
 
-
-  
   closeProfileCard() {
     this.contactCardopen = false;
     this.overlayStatusService.setOverlayStatus(false);
