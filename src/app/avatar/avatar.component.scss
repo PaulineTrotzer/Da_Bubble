@@ -40,11 +40,9 @@
 .card-content {
   padding: 0;
 }
-
 .mat-mdc-card-content:first-child {
   padding-top: 0;
 }
-
 .mat-mdc-card-content:last-child {
   padding-bottom: 0;
 }
@@ -65,18 +63,13 @@
 }
 
 .svg-box {
-  cursor: pointer;
-  width: 1px;
-}
-
-.svg-box {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
   border-radius: 100%;
-
+  cursor: pointer;
   &:hover {
     background-color: rgb(236, 238, 254);
     cursor: pointer;
@@ -108,7 +101,6 @@
     border-radius: 90px;
     object-fit: cover;
   }
-
   &:hover {
     box-sizing: border-box;
     outline: 7px solid #e6e6e6;
@@ -179,7 +171,6 @@ label {
   color: #797ef3;
   padding: 12px 25px;
   background-color: white;
-
   &:hover {
     font-family: "Nunito";
     font-size: 18px;
@@ -199,17 +190,6 @@ label {
   display: flex;
   justify-content: flex-end;
   margin-top: 22px;
-}
-
-.btn-primary:hover {
-  font-family: "Nunito";
-  font-size: 18px;
-  font-weight: 700;
-  border-radius: 25px;
-  padding: 12px 25px;
-  background-color: #797ef3;
-  color: white;
-  cursor: pointer;
 }
 
 .impressum-privacy-box {
@@ -258,27 +238,6 @@ label {
 }
 
 .email-sended-info {
-  max-width: 441px;
-  background-color: #444df2;
-  color: white;
-  box-shadow: 0px 6px 10px 0px #00000033;
-  border-bottom-right-radius: unset;
-  padding: 25px 25px;
-  z-index: 4;
-  position: absolute;
-  top: 91%;
-  left: auto;
-  right: -29px;
-  transform: translateX(500px);
-  transition: transform 0.5s ease-in-out;
-}
-
-.email-sended-info.hidden {
-  opacity: 0;
-  transform: translateX(500px);
-}
-
-.email-sended-info {
   width: fit-content;
   background-color: #444df2;
   color: white;
@@ -286,21 +245,18 @@ label {
   border-bottom-right-radius: unset;
   padding: 8px 20px;
   z-index: 4;
-  position: absolute;
-  top: 91%;
-  left: auto;
-  right: -29px;
-  transform: translateX(500px);
-  transition: transform 0.5s ease-in-out;
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  opacity: 1;
 }
 
 .email-sended-info.hidden {
   opacity: 0;
-  transform: translateX(500px);
 }
 
 .email-sended-info.visible {
-  transform: translateX(-100px);
+opacity: 1;
 }
 
 .email-card-content {
@@ -319,37 +275,10 @@ label {
 }
 
 @media (max-width: 1349px) {
-  .email-sended-info {
-    padding: 10px 10px;
-    top: 92%;
-    right: -71px;
-  }
-
   .email-card-content {
     span {
       font-size: 22px;
     }
-
-    img {
-      width: 20px;
-      height: 20px;
-    }
-  }
-}
-
-@media (max-width: 650px) {
-  .email-sended-info {
-    padding: 5px 5px;
-    top: 95%;
-    right: -83px;
-  }
-
-  .email-card-content {
-    gap: 11px;
-    span {
-      font-size: 16px;
-    }
-
     img {
       width: 20px;
       height: 20px;
@@ -358,10 +287,13 @@ label {
 }
 
 @media (max-width: 610px) {
-  .email-sended-info {
-    padding: 5px 5px;
-    top: 93%;
-    right: -83px;
+  .upload-label {
+    padding: 5px 9px;
+    font-size: 16px;
+    &:hover {
+      padding: 5px 9px;
+      font-size: 16px;
+    }
   }
 }
 
@@ -370,47 +302,14 @@ label {
     position: absolute;
     top: 25px;
     left: unset;
-
-    img {
-      width: 204px;
-      height: 56px;
-    }
   }
 }
 
-@media (max-width: 650px) {
-  .email-sended-info {
-    padding: 5px 5px;
-    top: 95%;
-    right: -83px;
-  }
-
-  .email-card-content {
-    gap: 11px;
-    span {
-      font-size: 16px;
-    }
-
-    img {
-      width: 20px;
-      height: 20px;
-    }
-  }
-}
-
-@media (max-width: 610px) {
-  .email-sended-info {
-    padding: 5px 5px;
-    top: 93%;
-    right: -83px;
-  }
-}
 
 @media (max-width: 679px) {
   .main-picture-box {
-    padding: 0 21px;
+    padding: 0 12px;
   }
-
   .title-div {
     padding-left: 10px;
   }
@@ -419,17 +318,15 @@ label {
 @media (max-width: 610px) {
   .title-div {
     h1 {
-      font-size: 32px;
+      font-size: 29px;
     }
   }
-
   .picture-frame {
     img {
       width: 120px;
       height: 120px;
     }
   }
-
   .avatar-box {
     img {
       width: 48px;
@@ -437,48 +334,50 @@ label {
     }
   }
 
-  @media (max-width: 578px) {
-    label {
-      padding: 7px 9px;
+  @media (max-width: 543px) {
+    .picture-info-text {
+      font-size: 16px;
     }
   }
 }
 
-@media (max-width: 543px) {
-  .picture-info-text {
-    font-size: 16px;
-  }
-
-  .user-info {
-    font-size: 16px;
-  }
-}
-
 @media (max-width: 458px) {
+ .email-card-content{
+  span{
+    font-size: 18px;
+  }
+  }
   .mat-card {
     padding: 26px 0;
   }
-
+  .btn-primary {
+    padding: 7px 20px;
+    margin-top: 15px;
+    &:hover {
+      padding: 7px 20px;
+    }
+  }
+  .user-name {
+    h2 {
+      font-size: 27px;
+    }
+  }
   .avatar-title {
     display: none;
   }
-
   .avatar-abstract-title {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
   }
-
-  .title-div {
-    align-items: baseline;
-  }
-}
-
-@media (max-width: 389px) {
   .avatar-box {
+    gap: 6px;
     img {
       width: 40px;
       height: 40px;
     }
+  }
+  .title-div {
+    align-items: baseline;
   }
 }

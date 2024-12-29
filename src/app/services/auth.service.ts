@@ -203,10 +203,5 @@ export class AuthService {
       return null;
     }
   }
-
-/*   async addUserToFirestore(user: User) {
-    const usersCollection = collection(this.firestore, 'users');
-    const docRef = await addDoc(usersCollection, user.toJSON());
-    return docRef; */
   }
 

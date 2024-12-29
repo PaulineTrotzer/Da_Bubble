@@ -359,6 +359,10 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 470px) {
+  .error{
+    padding: 4px;
+    font-size: 16px;
+  }
   .link-card-content {
     text-align: center;
   }
