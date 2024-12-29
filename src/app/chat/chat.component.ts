@@ -113,15 +113,14 @@ export class ChatComponent implements OnInit, OnChanges {
   isMentionCardOpen: boolean = false;
   wasClickedChatInput = false;
 
-
   constructor() {}
 
   async ngOnInit(): Promise<void> {
     await this.getAllUsersname();
   }
 
-    onCancelMentionBox() {
-    this.wasClickedChatInput = false; 
+  onCancelMentionBox() {
+    this.wasClickedChatInput = false;
     console.log('Mention Message Box wurde geschlossen.');
   }
 
@@ -144,6 +143,17 @@ export class ChatComponent implements OnInit, OnChanges {
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  openEmojiPickerEdit() {
+    this.isEmojiPickerVisibleEdit = true;
+    this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  closePickerEdit() {
+    debugger;
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isEmojiPickerVisibleEdit = false;
   }
 
   getReplyCountValue(messageId: string): number {
@@ -666,9 +676,12 @@ export class ChatComponent implements OnInit, OnChanges {
     this.checkEmojiId = message.id;
     this.isEmojiPickerVisible = !this.isEmojiPickerVisible;
     if (this.isEmojiPickerVisible) {
+      this.overlayStatusService.setOverlayStatus(true);
       setTimeout(() => {
         this.isEmojiPickerVisible = true;
       }, 0);
+    } else {
+      this.overlayStatusService.setOverlayStatus(false);
     }
   }
 
@@ -871,10 +884,18 @@ export class ChatComponent implements OnInit, OnChanges {
 
   toggleEmojiEditPicker() {
     this.isEmojiPickerVisibleEdit = !this.isEmojiPickerVisibleEdit;
-    if (this.isEmojiPickerVisible) {
+
+    // Setze den Overlay-Status basierend auf der Sichtbarkeit des Emoji-Pickers im Edit-Modus
+    if (this.isEmojiPickerVisibleEdit) {
+      // Emoji-Picker wird angezeigt, also Overlay aktivieren
+      this.overlayStatusService.setOverlayStatus(true);
+      // Optional: Stelle sicher, dass der Emoji-Picker sichtbar bleibt (falls es Verzögerungen gibt)
       setTimeout(() => {
         this.isEmojiPickerVisibleEdit = true;
       }, 0);
+    } else {
+      // Emoji-Picker wird ausgeblendet, also Overlay deaktivieren
+      this.overlayStatusService.setOverlayStatus(false);
     }
   }
 

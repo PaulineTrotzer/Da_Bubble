@@ -24,9 +24,7 @@
                     <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
                         [(ngModel)]="editableMessageText"></textarea>
                     <div class="edit-emoji-main">
-                        <emoji-mart *ngIf="isEmojiPickerVisibleEdit" (emojiClick)="editMessageAdd($event)" size="18"
-                            class="emoji-picker-edit"></emoji-mart>
-                        <div class="add-reaction" (click)="toggleEmojiEditPicker()">
+                        <div class="add-reaction" (click)="openEmojiPickerEdit()">
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -48,6 +46,10 @@
                                 (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
                         </div>
                     </div>
+                </div>
+                <div (click)="closePicker()" class="emoji-picker-container" *ngIf="isEmojiPickerVisibleEdit">
+                    <emoji-mart (emojiClick)="editMessageAdd($event); closePickerEdit()" size="18"
+                        class="emoji-picker"></emoji-mart>
                 </div>
                 <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
                       'comment-box-user':message.senderId !== global.currentUserData.id,
@@ -398,7 +400,7 @@
                             </div>
                         </div>
                     </div>
-
+              
                 </div>
             </div>
         </div>

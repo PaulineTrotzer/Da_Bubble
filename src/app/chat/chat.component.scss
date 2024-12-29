@@ -820,7 +820,15 @@ app-mention-message-box {
   }
 }
 
-.emoji-picker-container {
+.emoji-picker {
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.emoji-picker-container{
   position: fixed;
   top: 0;
   left: 0;
@@ -831,21 +839,6 @@ app-mention-message-box {
   align-items: center;
   z-index: 9999;
 }
-
-.emoji-picker {
-  width: 300px;
-  height: 400px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.emoji-picker-user{
-  position: absolute;
-  z-index: 500;
-  left: -340px;
-  top: 14px; 
-} 
 
 
 .comment-senderSticker-box{
@@ -885,11 +878,6 @@ app-mention-message-box {
   height: 40px;
  } 
 
- .emoji-picker-edit{
-  position: absolute;
-  left: 37px;
-  top: 5px;
- }
 
 .thread-answer-display {
   display: flex;
