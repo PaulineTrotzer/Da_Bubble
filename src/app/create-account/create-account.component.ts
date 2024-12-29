@@ -1,13 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import {
-  ActivatedRoute,
-  Router,
-  RouterModule,
-  RouterOutlet,
-} from '@angular/router';
-import { AvatarComponent } from '../avatar/avatar.component';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import {
@@ -16,6 +10,7 @@ import {
   sendEmailVerification,
 } from '@angular/fire/auth';
 import { MatCardModule, MatCardContent } from '@angular/material/card';
+import { GlobalVariableService } from '../services/global-variable.service';
 
 @Component({
   selector: 'app-create-account',
@@ -24,8 +19,6 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
     CommonModule,
     FormsModule,
     RouterModule,
-    RouterOutlet,
-    AvatarComponent,
     RouterModule,
     MatCardModule,
   ],
@@ -33,7 +26,7 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
   styleUrl: './create-account.component.scss',
 })
 export class CreateAccountComponent implements OnInit {
-  userError = false;
+  linkAlreadySended = false;
   isHovered: boolean = false;
   isClicked: boolean = false;
   isChecked: boolean = false;
@@ -48,6 +41,9 @@ export class CreateAccountComponent implements OnInit {
   };
   newUser: User = new User();
   linkWasSend = false;
+  global = inject(GlobalVariableService);
+  userError = false;
+  userLoggedIn = localStorage.getItem('userLoggedIn');
 
   constructor(private route: ActivatedRoute) {}
 
@@ -60,6 +56,10 @@ export class CreateAccountComponent implements OnInit {
   }
 
   async createAuthUser(email: string, password: string) {
+    if (this.userLoggedIn && email == this.newUser.email) {
+      this.userError = true;
+      return;
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         this.auth,
@@ -67,7 +67,6 @@ export class CreateAccountComponent implements OnInit {
         password
       );
       const authUser = userCredential.user;
-
       this.newUser = new User({
         uid: authUser.uid,
         name: this.userData.name,
@@ -77,12 +76,12 @@ export class CreateAccountComponent implements OnInit {
         status: 'offline',
       });
       this.openLinkSend();
-      const docRef = await this.addUserToFirestore(this.newUser);
       await sendEmailVerification(authUser);
+      await this.addUserToFirestore(this.newUser);
       // this.router.navigate(['/avatar', authUser.uid]);
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
-        this.userError = true;
+        this.linkAlreadySended = true;
       } else {
         console.error('Fehler beim Erstellen des Benutzers:', error);
       }
@@ -121,7 +120,7 @@ export class CreateAccountComponent implements OnInit {
     }, 1500);
   }
 
-  resetUserError(){
-    this.userError = false;
+  resetUserError() {
+    this.linkAlreadySended = false;
   }
 }

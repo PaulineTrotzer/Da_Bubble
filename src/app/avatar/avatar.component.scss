@@ -10,14 +10,14 @@
 
 .image-box {
   position: absolute;
-  top: 75px;
+  top: 30px;
   left: 75px;
   display: flex;
   align-items: center;
   gap: 16px;
-
   img {
     height: 70px;
+    object-fit: contain;
   }
 }
 
@@ -54,8 +54,7 @@
   display: flex;
   align-items: center;
   gap: 19px;
-  margin: 0 auto;
-
+  margin-bottom: 28px;
   h1 {
     font-size: 46px;
     font-weight: 700;
@@ -107,6 +106,7 @@
     width: 168px;
     height: 168px;
     border-radius: 90px;
+    object-fit: cover;
   }
 
   &:hover {
@@ -119,8 +119,7 @@
 
 .user-name {
   text-align: center;
-  margin-top: 32px;
-
+  margin: 32px 0 32px 0;
   h2 {
     color: #000000;
     font-size: 32px;
@@ -140,7 +139,7 @@
 }
 
 .avatar-box {
-  margin-top: 16px;
+  margin: 16px 0 22px 0;
   display: flex;
   gap: 8px;
   img {
@@ -311,12 +310,12 @@ label {
   gap: 28px;
 }
 
-.sended-text{
+.sended-text {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Nunito';
-  font-size: 22px; 
+  font-family: "Nunito";
+  font-size: 22px;
 }
 
 @media (max-width: 1349px) {

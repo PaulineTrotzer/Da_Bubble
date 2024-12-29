@@ -83,6 +83,7 @@ export class LoginComponent implements OnInit {
       }, 2500);
       const user = userCredential.user;
       const userID = await this.userDocId(user.uid);
+      localStorage.setItem('userLoggedIn', this.loginData.email);
       this.auth.currentUser = auth.currentUser;
       this.router.navigate(['/welcome', userID]);
       if (userID) {

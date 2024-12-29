@@ -28,7 +28,9 @@
         DABubble-Konto</span>
     </div>
 
-    <div *ngIf="userError" class="err-user-exists">Ein User mit dieser Email existiert bereits</div>
+    <div *ngIf="linkAlreadySended" class="error err-link-sended">Ein Link zur Verifizierung wurde bereits gesendet</div>
+    <div *ngIf="userError" class="error err-user-exists">Ein User mit dieser Email existiert bereits</div>
+
 
     <form (ngSubmit)="onSubmit(userForm)" #userForm="ngForm">
       <div class="form-row">

@@ -317,8 +317,11 @@ input[type="checkbox"] {
   font-size: 17px;
 }
 
-.err-user-exists {
-  background-color: red;
+.err-link-sended {
+  background-color: #4200ffc7;
+}
+
+.error {
   height: fit-content;
   padding: 10px;
   border-radius: 5px;
@@ -328,6 +331,12 @@ input[type="checkbox"] {
   margin: 20px 0;
   font-weight: 700;
   letter-spacing: 1px;
+  .err-link-sended {
+    background-color: #4200ffc7;
+  }
+}
+.err-user-exists {
+  background-color: red;
 }
 
 @media (max-width: 930px) {
@@ -350,7 +359,7 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 470px) {
-  .link-card-content{
+  .link-card-content {
     text-align: center;
   }
   .link-sended-info {
