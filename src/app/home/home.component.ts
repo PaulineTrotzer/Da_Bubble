@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { LoginAuthService } from '../services/login-auth.service';
 import { MatCardModule } from '@angular/material/card';
 import { Subscription } from 'rxjs';
+import { getAuth, onAuthStateChanged } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-home',
@@ -40,22 +41,35 @@ export class HomeComponent implements OnInit {
   channelThreadId: string | null = null;
   isWorkspaceOpen: boolean = true;
   isHovered: boolean = false;
-  googleAccountLogIn: boolean = false;  
+  googleAccountLogIn: boolean = false;
   @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
-  loginAuthService =inject(LoginAuthService);
+  loginAuthService = inject(LoginAuthService);
+  isOverlayVisible = true;
 
   ngOnInit(): void {
-    this.loginAuthService.googleAccountLogIn$.subscribe(status => {
+    this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
-      console.log('Google Login Status aus Service:', this.googleAccountLogIn); 
     });
-
+    this.initAuthListener();
     this.subscribeToLoginStatus();
     this.subscribeToGuestLoginStatus();
     this.setDirectThread();
     this.setChannelThread();
   }
 
+  initAuthListener() {
+    const auth = getAuth();
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        this.isOverlayVisible = true;
+        setTimeout(() => {
+          this.isOverlayVisible = false;
+        }, 1100);
+      } else {
+        this.isOverlayVisible = false;
+      }
+    });
+  }
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -130,7 +144,7 @@ export class HomeComponent implements OnInit {
 
     this.workspaceComponent.enterByUsername(channel, true);
   }
-  
+
   handleUserSelectionFromThread(user: any) {
     this.selectedUser = user;
     this.onHeaderUser = user;
@@ -152,7 +166,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
   onThreadOpened() {
     this.isThreadOpen = true;
   }
@@ -162,22 +175,25 @@ export class HomeComponent implements OnInit {
   }
 
   toggleWorkspace() {
-    if(window.innerWidth<=720 && this.global.openChannelorUserBox ){
-      this.global.openChannelorUserBox=false;
-    }else if(window.innerWidth<=720 && this.global.openChannelOrUserThread){
-      this.global.openChannelOrUserThread=false;
-      this.isWorkspaceOpen=true;
-    }
-    else {
+    if (window.innerWidth <= 720 && this.global.openChannelorUserBox) {
+      this.global.openChannelorUserBox = false;
+    } else if (
+      window.innerWidth <= 720 &&
+      this.global.openChannelOrUserThread
+    ) {
+      this.global.openChannelOrUserThread = false;
+      this.isWorkspaceOpen = true;
+    } else {
       this.isWorkspaceOpen = !this.isWorkspaceOpen;
     }
   }
 
   getImageSource(): string {
-    const state = this.isWorkspaceOpen && !this.global.openChannelorUserBox ? 'hide' : 'show';
-    const variant = this.isHovered  ? 'hover' : 'black';
+    const state =
+      this.isWorkspaceOpen && !this.global.openChannelorUserBox
+        ? 'hide'
+        : 'show';
+    const variant = this.isHovered ? 'hover' : 'black';
     return `../../assets/img/${state}-workspace-${variant}.png`;
   }
-
-
 }

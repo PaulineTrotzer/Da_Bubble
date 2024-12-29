@@ -54,6 +54,15 @@
         </span>
     </mat-card-content>
 </mat-card>
+
+<div class="overlay-contacts" *ngIf="isOverlayVisible && !successfullyLogged">
+    <p>Lade Kontakte...</p>
+    <div class="loading-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
 <div class="workspace-opener" [class.hovered]="isHovered" (click)="toggleWorkspace()" (mouseenter)="isHovered = true"
     (mouseleave)="isHovered = false">
     <p>{{!global.openChannelorUserBox && isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p>

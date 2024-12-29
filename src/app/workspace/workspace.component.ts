@@ -68,7 +68,7 @@ export class WorkspaceComponent implements OnInit {
   messageCountsArr: any = {};
   selectedUser: any;
   authService = inject(AuthService);
-  isOverlayVisible = true;
+
 
   constructor(
     public global: GlobalVariableService,
@@ -100,9 +100,6 @@ export class WorkspaceComponent implements OnInit {
     this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe((status) => {
       this.isGuestLogin = status;
       console.log('Guest login status:', this.isGuestLogin);
-      setTimeout(() => {
-        this.isOverlayVisible = false;
-      }, 1100); 
     });
   }
 

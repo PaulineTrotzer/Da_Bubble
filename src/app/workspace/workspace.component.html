@@ -179,15 +179,8 @@
 
             </div>
 
-                <div class="overlay" *ngIf="isOverlayVisible">
-                  <p>Lade Kontakte...</p>
-                  <div class="loading-dots">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                  </div>
-                </div>
-                <div *ngIf="!isOverlayVisible && checkUsersExsists && !isGuestLogin" class="all-user-contacts">
+     
+            <div *ngIf="checkUsersExsists && !isGuestLogin" class="all-user-contacts">
               <div class="all-user" *ngFor="let user of allUsers" (click)="selectUser(user)">
                 <div class="active-user-div" [class.active]="selectedUser?.id === user.id">
                   <img [src]="user.picture">
