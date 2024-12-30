@@ -140,7 +140,7 @@ mat-card {
   border-radius: 100%;
   margin-left: -12px;
   border: 2px solid white;
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .avatar:first-child {
@@ -157,10 +157,8 @@ mat-card {
   z-index: 2;
 }
 
-
-@media(max-width:1349px){
-  .big-chat-card{
+@media (max-width: 1349px) {
+  .big-chat-card {
     min-width: unset;
   }
-
 }

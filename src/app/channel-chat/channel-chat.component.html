@@ -20,7 +20,7 @@
         'emoji-container-current':
           message.senderId === global.currentUserData.id
       }">
-      <emoji-mart [set]="'apple'" [emojiSize]="32"
+      <emoji-mart [set]="'apple'" [emojiSize]="35"
         (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
     </div>
     <div class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" @slideIn>

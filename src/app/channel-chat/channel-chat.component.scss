@@ -233,17 +233,20 @@
 }
 
 .emoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
-    sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   display: flex;
-  height: 32px;
-  width: 32px;
+  justify-content: center; /* Horizontale Zentrierung */
+  align-items: center; /* Vertikale Zentrierung */
+  width: 35px;
+  height: 35px; /* Setze eine feste Höhe, um das Emoji gleichmäßig zu positionieren */
   padding: 4px;
   border-radius: 100%;
+  line-height: 1; /* Verhindert vertikale Verschiebung durch Textgröße */
+  text-align: center; /* Horizontale Ausrichtung des Textes */
+  
   &:hover {
     background-color: #eceefe;
-  }
-}
+  }}
 
 .reaction {
   padding: 5px 10px;
