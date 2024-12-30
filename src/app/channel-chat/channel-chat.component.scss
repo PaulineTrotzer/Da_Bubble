@@ -97,6 +97,7 @@
     .message-content {
       display: flex;
       gap: 16px;
+      height: 110px;
     }
     .reaction-info {
       display: flex;
@@ -233,25 +234,32 @@
 }
 
 .emoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
   display: flex;
-  justify-content: center; /* Horizontale Zentrierung */
-  align-items: center; /* Vertikale Zentrierung */
+  justify-content: center;
+  align-items: center;
   width: 35px;
-  height: 35px; /* Setze eine feste Höhe, um das Emoji gleichmäßig zu positionieren */
+  height: 35px;
   padding: 4px;
   border-radius: 100%;
-  line-height: 1; /* Verhindert vertikale Verschiebung durch Textgröße */
-  text-align: center; /* Horizontale Ausrichtung des Textes */
-  
+  line-height: 1;
+  text-align: center;
+
   &:hover {
     background-color: #eceefe;
-  }}
+  }
+}
 
 .reaction {
-  padding: 5px 10px;
+  display: flex;
   border: 1px solid #adb0d9;
-  border-radius: 20px;
+  border-radius: 16px;
+  padding: 5px;
+  gap: 6px;
+  align-items: center;
+  position: relative;
+  top: 6px;
 }
 
 .text-content {
@@ -274,6 +282,18 @@
   z-index: 5;
   left: 200px;
   top: 32px;
+  span {
+    padding: 7px;
+  }
+  &:hover {
+    background-color: white;
+    span {
+      color: #444df2;
+      background-color: #eceefe;
+      border: 0 solid;
+      border-radius: 30px;
+    }
+  }
 }
 
 .textarea {

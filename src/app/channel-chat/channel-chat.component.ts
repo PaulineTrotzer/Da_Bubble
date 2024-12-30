@@ -221,6 +221,9 @@ export class ChannelChatComponent implements OnInit {
     this.editingMessageId = isEditing ? messageId : null; // Track editing mode
     this.overlay.setOverlayStatus(true);
   }
+  
+
+
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();

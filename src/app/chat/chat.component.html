@@ -59,7 +59,7 @@
                     <mat-card-content style="padding: 5px 5px;" class="comment-content">
                         <div *ngIf="message.senderSticker!==''    " class="comment-senderSticker-box"
                             (click)="emojiSender(message)">
-                            <span>{{message.senderSticker}}</span>
+                            <span class="last-used-emoji">{{message.senderSticker}}</span>
                         </div>
 
                         <div class="comment-recipientSticker-box"
