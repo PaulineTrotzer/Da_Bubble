@@ -85,6 +85,7 @@ header {
     height: 70px;
     width: 70px;
     border-radius: 100%;
+    object-fit: cover;
   }
 }
 
@@ -191,7 +192,7 @@ header {
 }
 
 .reaction-bar-current {
-  top: -22px;
+  top: -38px;
   left: 12px;
   border-top-right-radius: 25px;
   border-top-left-radius: 25px;
@@ -323,7 +324,9 @@ header {
   height: 100%;
   width: 100%;
   border-radius: 100%;
+  object-fit: cover;
 }
+
 
 .button-row {
   display: flex;
@@ -331,7 +334,7 @@ header {
   justify-content: flex-end;
   gap: 32px;
   position: absolute;
-  bottom: 8px;
+  bottom: 23px;
   .save-icon {
     object-fit: contain;
     width: 24px;
@@ -353,7 +356,7 @@ header {
 }
 
 textarea {
-  padding: 20px;
+ padding: 20px 0px 0px 65px;
   border-radius: 20px;
   border: 1px solid #adb0d9;
   resize: none;
@@ -366,8 +369,10 @@ textarea {
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
   width: 100%;
-  height: 100%;
+  height: 105px;
   font-size: 16px;
+  position: relative;
+  top: 45px;
   &:focus{
     font-size: 16px;
   }
@@ -375,7 +380,7 @@ textarea {
 
 .textarea {
   position: absolute;
-  bottom: 4px;
+  bottom: 16px;
   left: 54px;
   background-color: white;
 }
