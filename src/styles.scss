@@ -8,6 +8,11 @@
   margin: 0;
 }
 
+.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface{
+  height: 500px;
+  width: 390px;
+  padding-top: 15px;
+}
 
 html,
 body {
@@ -40,7 +45,8 @@ img {
 }
 
 .edit-dialog {
-  width: 100%;
+  height: 500px;
+  width: 390px;
 
   .mat-mdc-dialog-surface {
     border-top-left-radius: 0;
@@ -52,9 +58,11 @@ img {
 }
 
 .member-dialog {
-  width: 100%;
-  height: 100%;
+  height: 500px;
+  width: 390px;
   .mat-mdc-dialog-surface {
+    height: 500px;
+    width: 390px;
     border-top-left-radius: 30px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 30px;
@@ -64,7 +72,8 @@ img {
 }
 
 .add-member-dialog {
-  width: 100%;
+  height: 500px;
+  width: 390px;
 
   .mat-mdc-dialog-surface {
     border-top-left-radius: 30px;

@@ -1,8 +1,8 @@
 .card {
-  padding: 40px;
+  padding: 0 45px;
   display: flex;
   flex-direction: column;
-  gap: 45px;
+  gap: 32px;
 }
 
 .heading {
@@ -11,27 +11,49 @@
   align-items: center;
 }
 
+h3 {
+  font-size: 23px;
+}
+
+.email-logo {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 2px;
+}
+
+.email-title {
+  font-size: 17px;
+}
+
 .profile-img-container {
   display: flex;
   justify-content: center;
   img {
-    height: 200px;
-    width: 200px;
-    border-radius: 100%;
+    width: 100px;
+    height: 100px;
+    border-radius: 100px;
+    object-fit: cover;
   }
 }
 
-.status-container,
+.status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
 .email-data {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 4px;
 }
 
 .status-row {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 13px;
 }
 
 .online {
@@ -69,12 +91,15 @@
 }
 
 .email {
-  color: #1381FF;
+  color: #444df2;
 }
 
 .contact-container {
   display: flex;
-  gap: 15px;
+  gap: 7px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .img-container {

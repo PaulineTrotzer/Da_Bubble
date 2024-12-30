@@ -22,25 +22,27 @@
         <img [src]="global.getUserByName?.picture" alt="">
       </div>
 
-      <div class="name-box">
-        <h2>{{global.getUserByName?.name}}</h2>
-      </div>
-      <div class="status-box">
-        <div>
-          <span
-            [ngClass]="{'online':global.getUserByName?.status==='online','offline':global.getUserByName?.status==='offline'}"></span>
+      <div class="personal-info-flex">
+        <div class="name-box">
+          <h2>{{global.getUserByName?.name}}</h2>
         </div>
-        <span [ngClass]="{'onlineSpan':global.getUserByName?.status==='online',
+        <div class="status-box">
+          <div>
+            <span
+              [ngClass]="{'online':global.getUserByName?.status==='online','offline':global.getUserByName?.status==='offline'}"></span>
+          </div>
+          <span [ngClass]="{'onlineSpan':global.getUserByName?.status==='online',
                 'offlineSpan':global.getUserByName?.status==='offline' 
 
               }">{{global.getUserByName?.status==='online'?'Active':'Offline'}}</span>
-      </div>
-      <div class="email-box">
-        <div class="email-info">
-          <img src="./assets/img/mail.svg" alt="">
-          <span>E-Mail-Adresse </span>
         </div>
-        <span class="user-email">{{global.getUserByName?.email}}</span>
+        <div class="email-box">
+          <div class="email-info">
+            <img src="./assets/img/mail.svg" alt="">
+            <span>E-Mail-Adresse </span>
+          </div>
+          <span class="user-email">{{global.getUserByName?.email}}</span>
+        </div>
       </div>
 
       <div class="btn-div">

@@ -34,7 +34,7 @@
     <img src="{{member.picture}}">
   </div>
   <div class="status-container">
-    <h2> {{member.name}} </h2>
+    <h3> {{member.name}} </h3>
     <div class="status-row">
       <span [ngClass]="{'online' : member.status === 'online', 'offline' : member.status === 'offline'}"></span>
       <span [ngClass]="{'online-text' : member.status === 'online', 'offline-text' : member.status === 'offline'}">Aktiv</span>
@@ -42,10 +42,10 @@
   </div>
   <div class="contact-container">
     <div class="email-logo">
+      <h3 class="email-title">E-Mail-Adresse</h3>
       <img src="../../assets/img/mail-black.svg" alt="">
     </div>
     <div class="email-data">
-      <h3>E-Mail-Adresse</h3>
       <span class="email"> {{member.email}} </span>
     </div>
   </div>
