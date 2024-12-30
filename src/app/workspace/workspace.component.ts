@@ -124,28 +124,35 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectUser(user: any) {
-    this.userSelected.emit(user);
-    this.id = user.id;
-    this.global.currentThreadMessageSubject.next('');
-    this.global.channelThreadSubject.next(null);
-    const actuallyId = this.id;
-    if (
-      this.userId &&
-      this.messageCountsArr?.messageCount &&
-      this.messageCountsArr.messageCount[actuallyId] > 0
-    ) {
-      const docRef = doc(this.firestore, 'messageCounts', this.userId);
-      const resetMessageCount: any = {};
-      resetMessageCount[`messageCount.${actuallyId}`] = 0;
-      updateDoc(docRef, resetMessageCount);
-    }
-    this.global.statusCheck = false;
-    this.openvollWidtChannelOrUserBox();
-    this.hiddenVoolThreadBox();
-    this.checkWidtSize();
-    this.cheackChatOpen();
+    this.selectedUser = null; // Reset den aktuellen User
+    this.selectedChannel = null; // Optional: Channel ebenfalls zurücksetzen
+    setTimeout(() => {
+      this.selectedUser = user; // Setze den neuen User
+      this.userSelected.emit(user); // Emitte das Event
+      this.id = user.id;
+  
+      // Weitere Logik bleibt unverändert
+      this.global.currentThreadMessageSubject.next('');
+      this.global.channelThreadSubject.next(null);
+      const actuallyId = this.id;
+      if (
+        this.userId &&
+        this.messageCountsArr?.messageCount &&
+        this.messageCountsArr.messageCount[actuallyId] > 0
+      ) {
+        const docRef = doc(this.firestore, 'messageCounts', this.userId);
+        const resetMessageCount: any = {};
+        resetMessageCount[`messageCount.${actuallyId}`] = 0;
+        updateDoc(docRef, resetMessageCount);
+      }
+      console.log('User selected:', user);
+      this.global.statusCheck = false;
+      this.openvollWidtChannelOrUserBox();
+      this.hiddenVoolThreadBox();
+      this.checkWidtSize();
+      this.cheackChatOpen();
+    });
   }
-
   openvollWidtChannelOrUserBox() {
     if (window.innerWidth <= 1349 && window.innerWidth > 720) {
       return (this.global.checkWideChannelorUserBox = true);
@@ -291,17 +298,22 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
-    this.selectedUser = null;
-    this.selectedChannel = channel;
-    this.global.channelSelected = true;
-    this.channelSelected.emit(channel);
-    this.global.currentThreadMessageSubject.next('');
-    this.global.channelThreadSubject.next(null);
-    this.global.setCurrentChannel(channel);
-    this.openvollWidtChannelOrUserBox();
-    this.hiddenVoolThreadBox();
-    this.checkWidtSize();
-    this.cheackChatOpen();
+    this.selectedUser = null; // Reset den aktuellen User
+    this.selectedChannel = null; // Reset den aktuellen Channel
+    setTimeout(() => {
+      this.selectedChannel = channel; // Setze den neuen Channel
+      this.channelSelected.emit(channel); // Emitte das Event
+      this.global.channelSelected = true;
+  
+      // Weitere Logik bleibt unverändert
+      this.global.currentThreadMessageSubject.next('');
+      this.global.channelThreadSubject.next(null);
+      this.global.setCurrentChannel(channel);
+      this.openvollWidtChannelOrUserBox();
+      this.hiddenVoolThreadBox();
+      this.checkWidtSize();
+      this.cheackChatOpen();
+    });
   }
 
   toggleChannelDrawer() {

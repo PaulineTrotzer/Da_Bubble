@@ -15,7 +15,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
-import { Firestore, doc, getDoc, onSnapshot, setDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+} from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
@@ -32,6 +38,7 @@ import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component'
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { AuthService } from '../services/auth.service';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 interface ChannelData {
   userIds: string[];
@@ -107,21 +114,66 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   private guestLoginStatusSub: Subscription | undefined;
   loginAuthService = inject(LoginAuthService);
   enterChatByUser: any;
+  userChannelService = inject(UserChannelSelectService);
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
 
   async ngOnInit(): Promise<void> {
-    this.global.channelSelected = false;
-    this.userId = this.route.snapshot.paramMap.get('id');
-    this.user = this.userId;
-    await this.getcurrentUserById(this.userId);
+    this.initializeGlobalState();
+    await this.loadUserData();
     this.subscribeToProfileSelection();
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
+    this.subscribeToUserChanges();
+    this.subscribeToChannelChanges();
   }
 
+  initializeGlobalState(): void {
+    this.global.channelSelected = false;
+  }
+
+  async loadUserData(): Promise<void> {
+    this.userId = this.route.snapshot.paramMap.get('id');
+    this.user = this.userId;
+    await this.getcurrentUserById(this.userId);
+  }
+
+  subscribeToUserChanges(): void {
+    this.userChannelService.selectedUser$.subscribe((user) => {
+      this.selectedUser = user;
+      if (this.selectedUser) {
+        this.resetChannelSelection();
+        this.checkProfileType();
+      }
+    });
+  }
+
+  subscribeToChannelChanges(): void {
+    this.userChannelService.selectedChannel$.subscribe((channel) => {
+      this.selectedChannel = channel;
+      if (this.selectedChannel) {
+        this.resetUserSelection();
+        this.fetchChannelMembers();
+        this.global.setCurrentChannel(this.selectedChannel);
+      }
+    });
+  }
+
+  resetChannelSelection(): void {
+    this.global.channelSelected = false;
+    this.selectedChannel = null;
+    this.onHeaderChannel = null;
+    this.global.clearCurrentChannel();
+    this.afterLoginSheet = false;
+  }
+
+  resetUserSelection(): void {
+    this.selectedUser = null;
+    this.onHeaderUser = null;
+    this.global.channelSelected = true;
+  }
 
   ngOnDestroy(): void {
     if (this.loginStatusSub) {
@@ -174,7 +226,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() onHeaderChannel: any;
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedUser'] && this.selectedUser) {
+    /*    if (changes['selectedUser'] && this.selectedUser) {
       this.global.channelSelected = false;
       this.selectedChannel = null;
       this.onHeaderChannel = null;
@@ -190,7 +242,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.global.channelSelected = true;
       this.global.setCurrentChannel(this.selectedChannel);
     }
-
+ */
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.selectedChannel = null;
       this.onHeaderChannel = null;

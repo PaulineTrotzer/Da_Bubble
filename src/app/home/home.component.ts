@@ -9,6 +9,7 @@ import { LoginAuthService } from '../services/login-auth.service';
 import { MatCardModule } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { getAuth, onAuthStateChanged } from '@angular/fire/auth';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 @Component({
   selector: 'app-home',
@@ -45,6 +46,7 @@ export class HomeComponent implements OnInit {
   @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
   loginAuthService = inject(LoginAuthService);
   isOverlayVisible = true;
+  userChannelService=inject(UserChannelSelectService);
 
   ngOnInit(): void {
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
@@ -70,6 +72,26 @@ export class HomeComponent implements OnInit {
       }
     });
   }
+
+  ngAfterViewInit() {
+    // Abonnieren der Events von der WorkspaceComponent
+    this.workspaceComponent.userSelected.subscribe((user: any) => {
+      this.selectedUser = user;
+      console.log('User received in HomeComponent:', this.selectedUser);
+
+      // Den User im Service speichern
+      this.userChannelService.setSelectedUser(user);
+    });
+
+    this.workspaceComponent.channelSelected.subscribe((channel: any) => {
+      this.selectedChannel = channel;
+      console.log('Channel received in HomeComponent:', this.selectedChannel);
+
+      // Den Channel im Service speichern
+      this.userChannelService.setSelectedChannel(channel);
+    });
+  }
+
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -117,6 +139,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  /* Output vn Startscreen*/
   onUserSelected(user: any) {
     this.selectedUser = user;
     this.global.clearCurrentChannel();
@@ -126,7 +149,7 @@ export class HomeComponent implements OnInit {
     this.selectedChannel = channel;
     this.global.setCurrentChannel(channel);
   }
-
+  /*--*/
   handleUserSelectionFromStartscreen(user: any) {
     this.selectedUser = user;
     this.onHeaderUser = user;
