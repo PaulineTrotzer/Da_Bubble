@@ -545,6 +545,7 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   async saveEditedMessage(messageId: string) {
+    debugger;
     try {
       const messageDocRef =
         messageId === this.topicMessage?.id
