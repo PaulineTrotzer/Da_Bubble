@@ -36,6 +36,7 @@ interface Message {
   senderName: string;
   senderPicture: string;
   reactions: { [emoji: string]: string[] };
+  isEdited: boolean
 }
 
 @Component({
@@ -545,7 +546,6 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   async saveEditedMessage(messageId: string) {
-    debugger;
     try {
       const messageDocRef =
         messageId === this.topicMessage?.id
@@ -565,18 +565,19 @@ export class ChannelThreadComponent implements OnInit {
               'thread',
               messageId
             );
-
-      await updateDoc(messageDocRef, { text: this.messageToEdit });
-
+      await updateDoc(messageDocRef, {
+        text: this.messageToEdit,
+        isEdited: true
+      });
       this.showEditArea = null;
       this.messageToEdit = '';
-
+  
       console.log(`Message ${messageId} updated successfully.`);
     } catch (error) {
       console.error('Error saving edited message:', error);
     }
   }
-
+  
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {
       this.showEditArea = null;

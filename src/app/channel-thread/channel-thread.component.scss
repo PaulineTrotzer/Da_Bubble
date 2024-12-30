@@ -10,6 +10,13 @@
   overflow: auto;
 }
 
+.edited-indicator {
+  display: flex;
+  align-self: end;
+  font-size: 14px;
+}
+
+
 .channel-name {
   font-family: "Nunito";
   color: #797ef3;
