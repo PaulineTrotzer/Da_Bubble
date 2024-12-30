@@ -74,20 +74,12 @@ export class HomeComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    // Abonnieren der Events von der WorkspaceComponent
     this.workspaceComponent.userSelected.subscribe((user: any) => {
       this.selectedUser = user;
-      console.log('User received in HomeComponent:', this.selectedUser);
-
-      // Den User im Service speichern
       this.userChannelService.setSelectedUser(user);
     });
-
     this.workspaceComponent.channelSelected.subscribe((channel: any) => {
       this.selectedChannel = channel;
-      console.log('Channel received in HomeComponent:', this.selectedChannel);
-
-      // Den Channel im Service speichern
       this.userChannelService.setSelectedChannel(channel);
     });
   }

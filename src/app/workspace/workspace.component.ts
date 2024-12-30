@@ -69,7 +69,6 @@ export class WorkspaceComponent implements OnInit {
   selectedUser: any;
   authService = inject(AuthService);
 
-
   constructor(
     public global: GlobalVariableService,
     private cdr: ChangeDetectorRef,
@@ -95,12 +94,12 @@ export class WorkspaceComponent implements OnInit {
     await this.subscribeToGuestLoginStatus();
   }
 
-
   async subscribeToGuestLoginStatus(): Promise<void> {
-    this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe((status) => {
-      this.isGuestLogin = status;
-      console.log('Guest login status:', this.isGuestLogin);
-    });
+    this.guestLoginStatusSub = this.logInAuth.isGuestLogin$.subscribe(
+      (status) => {
+        this.isGuestLogin = status;
+      }
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -110,28 +109,22 @@ export class WorkspaceComponent implements OnInit {
     ) {
       this.selectedUser = this.selectedUserHome;
       this.userSelected.emit(this.selectedUser);
-      console.log('User has been updated:', this.selectedUser);
     }
-
     if (
       changes['selectedChannelHome'] &&
       !changes['selectedChannelHome'].firstChange
     ) {
       this.selectedChannel = this.selectedChannelHome;
       this.channelSelected.emit(this.selectedChannel);
-      console.log('Channel has been updated:', this.selectedChannel);
     }
   }
 
   selectUser(user: any) {
-    this.selectedUser = null; // Reset den aktuellen User
-    this.selectedChannel = null; // Optional: Channel ebenfalls zurücksetzen
+    this.selectedChannel = null;
     setTimeout(() => {
-      this.selectedUser = user; // Setze den neuen User
-      this.userSelected.emit(user); // Emitte das Event
+      this.selectedUser = user;
+      this.userSelected.emit(user);
       this.id = user.id;
-  
-      // Weitere Logik bleibt unverändert
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
       const actuallyId = this.id;
@@ -298,14 +291,12 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
-    this.selectedUser = null; // Reset den aktuellen User
-    this.selectedChannel = null; // Reset den aktuellen Channel
+    this.selectedUser = null;
+    this.selectedChannel = null;
     setTimeout(() => {
-      this.selectedChannel = channel; // Setze den neuen Channel
-      this.channelSelected.emit(channel); // Emitte das Event
+      this.selectedChannel = channel;
+      this.channelSelected.emit(channel);
       this.global.channelSelected = true;
-  
-      // Weitere Logik bleibt unverändert
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
       this.global.setCurrentChannel(channel);
@@ -331,13 +322,20 @@ export class WorkspaceComponent implements OnInit {
   }
 
   setUser(userOrChannel: any): void {
+    debugger;
     this.selectedUser = userOrChannel;
-    this.selectUser(this.selectedUser);
-    const foundUser = this.allUsers.find(
-      (user: { id: any }) => user.id === this.selectedUser.id
-    );
-    if (foundUser) {
-      this.selectedUser = foundUser;
+
+    // Sicherstellen, dass selectedUser nicht null oder undefined ist
+    if (this.selectedUser && this.selectedUser.id) {
+      this.selectUser(this.selectedUser);
+      const foundUser = this.allUsers.find(
+        (user: { id: any }) => user.id === this.selectedUser.id
+      );
+      if (foundUser) {
+        this.selectedUser = foundUser;
+      }
+    } else {
+      console.error('selectedUser is null or undefined:', this.selectedUser);
     }
   }
 

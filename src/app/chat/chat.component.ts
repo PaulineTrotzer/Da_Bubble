@@ -121,7 +121,6 @@ export class ChatComponent implements OnInit, OnChanges {
 
   onCancelMentionBox() {
     this.wasClickedChatInput = false;
-    console.log('Mention Message Box wurde geschlossen.');
   }
 
   async subscribeToThreadAnswers() {
@@ -567,7 +566,6 @@ export class ChatComponent implements OnInit, OnChanges {
     const textarea = event.target as HTMLTextAreaElement;
     const height = (textarea.scrollTop = textarea.scrollHeight);
     this.scrollHeightInput = height;
-    console.log(this.scrollHeightInput);
   }
 
   @HostListener('document:click', ['$event'])
@@ -801,11 +799,9 @@ export class ChatComponent implements OnInit, OnChanges {
         updateDoc(docRef, { senderStickerCount: 1, recipientSticker: '' });
       }
     } else if (this.global.currentUserData?.id !== message.senderId) {
-      console.log('emoj');
       const docRef = doc(this.firestore, 'messages', message.id);
       if (message.senderSticker) {
         const senderemoji = message.senderSticker;
-        console.log('nuynna');
         updateDoc(docRef, {
           recipientSticker: senderemoji,
           senderStickerCount: 2,
@@ -828,7 +824,6 @@ export class ChatComponent implements OnInit, OnChanges {
   emojirecipient(message: any) {
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
-      console.log('emoj');
       if (
         message.recipientSticker &&
         message.senderSticker &&
@@ -846,7 +841,6 @@ export class ChatComponent implements OnInit, OnChanges {
       if (message.senderSticker === '' && message.senderStickerCount === null) {
         if (message.recipientSticker) {
           const senderemoji = message.recipientSticker;
-          console.log('hi World');
           updateDoc(docRef, {
             senderSticker: senderemoji,
             senderStickerCount: 2,
@@ -923,6 +917,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.chatByUserName = user;
     this.enterChatUser.emit(this.chatByUserName);
     this.selectUser(user);
+    this.wasClickedChatInput = false;
   }
 
   selectUser(user: any) {

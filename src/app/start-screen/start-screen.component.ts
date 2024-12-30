@@ -20,7 +20,6 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  setDoc,
 } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
@@ -37,7 +36,6 @@ import { ChatComponent } from '../chat/chat.component';
 import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component';
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
-import { AuthService } from '../services/auth.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 interface ChannelData {
@@ -224,25 +222,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   @Input() onHeaderChannel: any;
-
   ngOnChanges(changes: SimpleChanges) {
-    /*    if (changes['selectedUser'] && this.selectedUser) {
-      this.global.channelSelected = false;
-      this.selectedChannel = null;
-      this.onHeaderChannel = null;
-      this.checkProfileType();
-      this.global.clearCurrentChannel();
-      this.afterLoginSheet = false;
-    }
-
-    if (changes['selectedChannel'] && this.selectedChannel) {
-      this.selectedUser = null;
-      this.onHeaderUser = null;
-      this.fetchChannelMembers();
-      this.global.channelSelected = true;
-      this.global.setCurrentChannel(this.selectedChannel);
-    }
- */
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.selectedChannel = null;
       this.onHeaderChannel = null;
@@ -252,7 +232,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.global.clearCurrentChannel();
       this.afterLoginSheet = false;
     }
-
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
       this.selectedUser = null;
       this.onHeaderUser = null;
