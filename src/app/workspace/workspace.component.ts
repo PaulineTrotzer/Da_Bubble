@@ -213,7 +213,6 @@ export class WorkspaceComponent implements OnInit {
     if (willkommenChannel) {
       this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
-      console.log('Channel wurde ausgewählt:', willkommenChannel);
     } else {
       console.warn('Kein Willkommen-Channel gefunden!');
     }

@@ -70,6 +70,7 @@ interface Message {
   ],
 })
 export class ChannelThreadComponent implements OnInit {
+  visiblePickerValue = false;
   channelMessageId: any;
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
@@ -159,7 +160,6 @@ export class ChannelThreadComponent implements OnInit {
     this.wasClickedInChannelThread = false;
   }
 
-
   selectUserForChat(user: any) {
     this.userSelectedFromChannelThread.emit(user);
   }
@@ -236,19 +236,23 @@ export class ChannelThreadComponent implements OnInit {
     this.global.channelThreadSubject.next(null);
     this.hiddenThreadFullBox();
     this.checkResponsiveWidtSize();
-  } 
+  }
 
-  hiddenThreadFullBox(){
-    if(window.innerWidth<=1349 && window.innerWidth > 720 &&  this.global.checkWideChannelOrUserThreadBox){
-      this.global.checkWideChannelOrUserThreadBox=false;
-      this.global.checkWideChannelorUserBox=true;
+  hiddenThreadFullBox() {
+    if (
+      window.innerWidth <= 1349 &&
+      window.innerWidth > 720 &&
+      this.global.checkWideChannelOrUserThreadBox
+    ) {
+      this.global.checkWideChannelOrUserThreadBox = false;
+      this.global.checkWideChannelorUserBox = true;
     }
   }
-  checkResponsiveWidtSize(){
-    if(window.innerWidth<=720 && this.global.openChannelOrUserThread)
-      this.global.openChannelOrUserThread=false
-      this.global.openChannelorUserBox=true
-  } 
+  checkResponsiveWidtSize() {
+    if (window.innerWidth <= 720 && this.global.openChannelOrUserThread)
+      this.global.openChannelOrUserThread = false;
+    this.global.openChannelorUserBox = true;
+  }
 
   async addEmoji(event: any, messageId: string) {
     const emoji = event.emoji;
@@ -325,15 +329,22 @@ export class ChannelThreadComponent implements OnInit {
     const userData = userDoc.data();
     return userData?.['lastEmojis'] || [];
   }
-
   togglePicker(messageId: string) {
-    this.isPickerVisible =
-      this.isPickerVisible === messageId ? null : messageId;
-    this.editingMessageId = this.isPickerVisible ? messageId : null;
-    this.overlay.setOverlayStatus(true);
+    if (this.isPickerVisible === messageId) {
+      this.isPickerVisible = null;
+      this.visiblePickerValue = false;
+      this.overlay.setOverlayStatus(false);
+    } else {
+      this.isPickerVisible = messageId;
+      this.visiblePickerValue = true;
+      this.editingMessageId = messageId;
+      this.overlay.setOverlayStatus(true);
+    }
   }
 
   closePicker() {
+    this.isPickerVisible = null;
+    this.visiblePickerValue = false;
     this.overlay.setOverlayStatus(false);
   }
 
@@ -472,16 +483,10 @@ export class ChannelThreadComponent implements OnInit {
     }
 
     this.isPickerVisible = null;
-    this.closePicker(); 
-  } 
- 
+    this.closePicker();
+  }
 
-
- 
-
-  
-   
-   onReactionHover(message: Message, emoji: string) {
+  onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
 
@@ -581,9 +586,4 @@ export class ChannelThreadComponent implements OnInit {
       this.toggleEditDialog(messageId);
     }
   }
-
-
-  
-
-
 }

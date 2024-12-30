@@ -381,7 +381,6 @@ export class ChannelChatComponent implements OnInit {
 
   openThread(messageId: string) {
     this.global.setChannelThread(messageId);
-    console.log(messageId);
     this.openvollThreadBox();
     this.hiddenFullChannelOrUserThreadBox();
     this.checkWidthSize();

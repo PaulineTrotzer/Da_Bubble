@@ -65,8 +65,8 @@
         *ngIf="showEditDialog === topicMessage?.id!">
         <span>Nachricht bearbeiten</span>
       </div>
-      <div class="emoji-container" *ngIf="isPickerVisible === topicMessage?.id">
-        <emoji-mart [set]="'apple'" [emojiSize]="32" (emojiClick)="
+      <div (click)="closePicker()" class="emoji-container" *ngIf="isPickerVisible === topicMessage?.id && visiblePickerValue">
+        <emoji-mart size="18" (emojiClick)="
             addEmojiToMessage($event.emoji.native, topicMessage?.id!)
           "></emoji-mart>
       </div>
@@ -217,8 +217,8 @@
         *ngIf="showEditDialog === message.id">
         <span>Nachricht bearbeiten</span>
       </div>
-      <div class="emoji-container" *ngIf="isPickerVisible === message.id">
-        <emoji-mart [set]="'apple'" [emojiSize]="32"
+      <div (click)="closePicker()"class="emoji-container" *ngIf="isPickerVisible === message.id && visiblePickerValue">
+        <emoji-mart size="18"
           (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
       </div>
       <div @slideIn class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" [ngClass]="{
