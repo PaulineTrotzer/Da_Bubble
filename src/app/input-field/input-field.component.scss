@@ -79,7 +79,7 @@
 
   .plus {
     &:hover {
-      scale: 1.1;
+      scale: 1.05;
       filter: brightness(0) saturate(100%) invert(14%) sepia(70%) saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
     }
   }
@@ -100,7 +100,7 @@
 
   img {
     &:hover {
-      scale: 1.1;
+      scale: 1.05;
       filter: brightness(0) saturate(100%) invert(14%) sepia(70%) saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
     }
   }
