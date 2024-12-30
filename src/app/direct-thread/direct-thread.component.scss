@@ -47,7 +47,6 @@
   }
   &:hover {
     background-color: white;
-
     span {
       color: #444df2;
       background-color: #eceefe;
@@ -69,15 +68,15 @@
   display: flex;
   gap: 8px;
   position: relative;
-  right: 18px;
-  bottom: 30px;
+  right: 35px;
+  bottom: 44px;
   justify-content: end;
   align-items: center;
 }
 
 .two-both-selectedUser-reaction-left {
   position: relative;
-  bottom: 55px;
+  bottom: 60px;
   left: 32px;
 }
 
@@ -87,8 +86,8 @@
   gap: 8px;
   justify-content: start;
   position: relative;
-  bottom: 55px;
-  left: 30px;
+  bottom: 63px;
+  left: 35px;
 }
 
 .current-thread-header {
@@ -364,6 +363,7 @@ h3 {
   justify-content: flex-end;
   position: relative;
   bottom: 45px;
+  margin-left: 70px;
 }
 
 .reaction-name-info-ct-sender {
@@ -489,7 +489,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 10px 30px 42px 30px;
+  padding: 10px 30px 55px 30px;
   margin: 16px 0;
 }
 
@@ -580,8 +580,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 10px 0;
-  margin: 16px 0;
+  padding: 14px 0 43px 0;
 }
 
 .message-text {

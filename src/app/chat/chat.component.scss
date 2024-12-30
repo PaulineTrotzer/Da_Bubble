@@ -640,6 +640,16 @@ app-mention-message-box {
   height: 40px;
 }
 
+.thread-answer-display{
+  display: flex;
+  gap: 5px;
+  color: #444df2;
+  font-weight: 500;
+  &:hover{
+    transform: scale(1.05);
+  }
+}
+
 .answer-counter {
   font-weight: 700;
   pointer-events: all;

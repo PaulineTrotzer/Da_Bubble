@@ -233,6 +233,10 @@
   cursor: pointer;
   &.active {
     background-color: #eceefe;
+    width: 245px;
+    &:hover{
+      width: 245px;
+    }
   }
 }
 
