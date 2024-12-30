@@ -66,13 +66,18 @@ span {
 .add-user-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
+  justify-content: start;
+  gap: 15px;
+  padding: 6px 32px;
   border-radius: 100px;
   cursor: pointer;
+  width: fit-content;
+  margin-top: 13px;
+  p {
+    font-size: 17px;
+  }
   &:hover {
-    background: #ECEEFE;
+    background: #eceefe;
   }
   &:hover p {
     color: #444df2;
