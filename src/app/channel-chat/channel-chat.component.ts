@@ -37,6 +37,7 @@ interface Message {
   senderPicture: string;
   reactions: { [emoji: string]: string[] };
   selectedFiles?: any[];
+  isEdited: boolean;
 }
 
 @Component({
@@ -70,6 +71,7 @@ interface Message {
   ],
 })
 export class ChannelChatComponent implements OnInit {
+  isEdited = false;
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
@@ -221,9 +223,6 @@ export class ChannelChatComponent implements OnInit {
     this.editingMessageId = isEditing ? messageId : null; // Track editing mode
     this.overlay.setOverlayStatus(true);
   }
-  
-
-
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();
@@ -380,46 +379,47 @@ export class ChannelChatComponent implements OnInit {
     return reactions && Object.keys(reactions).length > 0;
   }
 
-  openThread(messageId: string){
-    this.global.setChannelThread(messageId)
-    console.log(messageId) 
+  openThread(messageId: string) {
+    this.global.setChannelThread(messageId);
+    console.log(messageId);
     this.openvollThreadBox();
     this.hiddenFullChannelOrUserThreadBox();
-     this.checkWidthSize();
-     this.checkThreadOpen();
-  } 
- 
+    this.checkWidthSize();
+    this.checkThreadOpen();
+  }
 
-  checkThreadOpen(){
-    if(window.innerWidth<=750 && this.global.openChannelorUserBox ){
-      this.global.openChannelorUserBox=false
+  checkThreadOpen() {
+    if (window.innerWidth <= 750 && this.global.openChannelorUserBox) {
+      this.global.openChannelorUserBox = false;
     }
   }
 
-checkWidthSize(){
-  if(window.innerWidth<=750){
-     return this.global.openChannelOrUserThread=true 
-  }else{
-    return this.global.openChannelOrUserThread=false;    
+  checkWidthSize() {
+    if (window.innerWidth <= 750) {
+      return (this.global.openChannelOrUserThread = true);
+    } else {
+      return (this.global.openChannelOrUserThread = false);
+    }
   }
-}
- 
 
-openvollThreadBox() {
-  if(window.innerWidth<=1349 && window.innerWidth > 720){
-    return this.global.checkWideChannelOrUserThreadBox=true;
-  }else{
-    return this.global.checkWideChannelOrUserThreadBox=false;
+  openvollThreadBox() {
+    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
+      return (this.global.checkWideChannelOrUserThreadBox = true);
+    } else {
+      return (this.global.checkWideChannelOrUserThreadBox = false);
+    }
   }
-} 
-  
-hiddenFullChannelOrUserThreadBox(){
-  if(window.innerWidth<=1349 && window.innerWidth > 720 && this.global.checkWideChannelorUserBox){
-    this.global.checkWideChannelorUserBox=false;
-  }
-}
 
-  
+  hiddenFullChannelOrUserThreadBox() {
+    if (
+      window.innerWidth <= 1349 &&
+      window.innerWidth > 720 &&
+      this.global.checkWideChannelorUserBox
+    ) {
+      this.global.checkWideChannelorUserBox = false;
+    }
+  }
+
   displayDayInfo(index: number): boolean {
     if (index === 0) return true;
     const currentMessage = this.messagesData[index];
@@ -471,6 +471,7 @@ hiddenFullChannelOrUserThreadBox(){
     } else {
       this.showEditArea = messageId;
       this.messageToEdit = messageText;
+      this.isEdited = true;
       this.toggleEditDialog(messageId);
     }
   }
@@ -484,12 +485,12 @@ hiddenFullChannelOrUserThreadBox(){
         'messages',
         messageId
       );
-
-      await updateDoc(messageDocRef, { text: this.messageToEdit });
-
+      await updateDoc(messageDocRef, {
+        text: this.messageToEdit,
+        isEdited: true,
+      });
       this.showEditArea = null;
       this.messageToEdit = '';
-
       console.log(`Message ${messageId} updated successfully.`);
     } catch (error) {
       console.error('Error saving edited message:', error);

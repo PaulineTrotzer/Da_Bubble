@@ -294,6 +294,7 @@ app-input-field {
   width: 70px;
   height: 70px;
   border-radius: 50px;
+  object-fit: cover;
 }
 
 .picture-box-current {
@@ -575,6 +576,7 @@ app-input-field {
 
 .text-info-edit {
   position: relative;
+  font-size: 14px;
 }
 
 .mention-message {

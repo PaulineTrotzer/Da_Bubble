@@ -67,6 +67,7 @@
         (click)="toggleEditArea(message.id, message.text)">
         <span>Nachricht bearbeiten</span>
       </div>
+
     </div>
     <div class="message">
       <div class="message-content">
@@ -76,9 +77,7 @@
             <h3>{{ message.senderName }}</h3>
             <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
           </div>
-
-
-
+    
           <div class="text-content">
             <div class="text">
               <ng-container *ngFor="let mentionName of splitMessage(message.text)">
@@ -92,7 +91,10 @@
               </ng-container>
             </div>
           </div>
+          <span *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
+   
 
+          
           <div class="reaction-info">
             <div *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji" class="reaction-from-container"
               [ngClass]="{
