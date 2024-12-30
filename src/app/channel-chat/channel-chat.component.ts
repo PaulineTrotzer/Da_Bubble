@@ -188,18 +188,15 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No channel selected');
       return;
     }
-
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-
     const messagesRef = collection(
       this.firestore,
       'channels',
       this.selectedChannel.id,
       'messages'
     );
-
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
     onSnapshot(q, (querySnapshot: any) => {
       this.messagesData = querySnapshot.docs.map((doc: any) => {

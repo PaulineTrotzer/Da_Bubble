@@ -74,35 +74,6 @@ app-input-field {
   cursor: pointer;
 }
 
-.time-display-flex {
-  display: flex;
-  position: relative;
-  bottom: 64px;
-
-  img {
-    width: 100%;
-  }
-
-  div {
-    width: fit-content;
-    padding-left: 12px;
-    padding-right: 12px;
-    height: 35px;
-    font-size: 18px;
-    border: 1px solid #adb0d9;
-    border-radius: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -11px;
-    background-color: white;
-    white-space: nowrap;
-  }
-}
-
 ::-webkit-scrollbar {
   width: 0;
   background-color: transparent;
@@ -136,7 +107,7 @@ app-input-field {
   position: absolute;
   top: 140px;
   width: 100%;
-  max-height: 482px;
+  max-height: 650px;
   overflow-y: auto;
   margin-top: -28px;
 }
@@ -148,21 +119,17 @@ app-input-field {
   padding: 5px 0;
   top: -13px;
   margin-top: 37px;
-
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
-
     .comment-box-current {
       left: 50px;
       opacity: 1;
       cursor: pointer;
     }
-
     .show-comment-stricker {
       background-color: #ffffff;
     }
-
     .show-stricker-svgbox {
       background-color: #ffffff;
       border-radius: 100%;
@@ -186,25 +153,20 @@ app-input-field {
   padding: 5px 0;
   top: -13px;
   margin-top: 37px;
-
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
-
     .comment-box-user {
       right: 50px;
       opacity: 1;
       cursor: pointer;
     }
-
     .message-card-user {
       background-color: #ffffff;
     }
-
     .show-comment-stricker {
       background-color: #ffffff;
     }
-
     .show-stricker-svgbox {
       background-color: #ffffff;
       border-radius: 100%;
@@ -283,7 +245,6 @@ app-input-field {
   width: fit-content;
   overflow-wrap: break-word;
   max-height: max-content;
-
 }
 
 .card-content-current {
@@ -305,96 +266,9 @@ app-input-field {
   align-items: center;
   gap: 21px;
   position: relative;
-
   img {
     width: 23px;
     height: 21px;
-  }
-}
-
-.show-stricker {
-  position: relative;
-}
-
-.show-stricker-svgbox {
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: unset !important;
-    border-radius: unset !important;
-
-    .show-sticker-card {
-      opacity: 1;
-    }
-
-    svg {
-      path {
-        fill: #444df2;
-      }
-    }
-  }
-}
-
-.show-sticker-card {
-  position: absolute;
-  top: -153px;
-  left: 29px;
-  background-color: #444df2;
-  border-top-right-radius: 30px;
-  border-top-left-radius: 30px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 30px;
-  padding: 0;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.show-sticker-card.opacity {
-  .show-sticker-card.opacity {
-    position: absolute;
-    top: -153px;
-    left: 29px;
-    opacity: 1;
-  }
-}
-
-.show-sticker-cardContent {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 0 5px;
-}
-
-.show-sticker-box {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background-color: #ffffff;
-    border-radius: 100%;
-  }
-}
-
-.show-sticker-box.backColor-current {
-  background-color: #ffffff;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
-  }
-}
-
-.show-sticker-box.backColor-user {
-  background-color: #ffffff;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
   }
 }
 
@@ -455,47 +329,15 @@ app-input-field {
 .comment-content {
   display: flex;
   align-items: center;
-}
-
-.comment-stricker {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    background-color: #eceefe;
-    border-radius: 100%;
-  }
-}
-
-.comment-stricker.backColor-current {
-  background-color: #eceefe;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
-  }
-}
-
-.comment-stricker.backColor-user {
-  background-color: #eceefe;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
-  }
+  gap: 1px;
 }
 
 .add-reaction {
   width: 40px;
   height: 40px;
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-
     svg {
       path {
         fill: #444df2;
@@ -511,11 +353,9 @@ app-input-field {
 .open-thread {
   width: 40px;
   height: 40px;
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-
     svg {
       path {
         fill: #444df2;
@@ -530,12 +370,7 @@ app-input-field {
       opacity: 1;
     }
   }
-
-
 }
-
-
-
 
 .edit-icon {
   width: 40px;
@@ -544,7 +379,6 @@ app-input-field {
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-
     svg {
       path {
         fill: #444df2;
@@ -553,7 +387,7 @@ app-input-field {
   }
 }
 
-.edit-messages-card{
+.edit-messages-card {
   position: absolute;
   left: 25px;
   top: 22px;
@@ -579,7 +413,6 @@ app-input-field {
   span {
     padding: 7px;
   }
-
   &:hover {
     span {
       color: #444df2;
@@ -609,8 +442,6 @@ app-input-field {
   font-family: Nunito, "Helvetica Neue";
   font-size: 18px;
   overflow-y: auto;
-  
-
   &:focus {
     border-color: #444df2;
     outline: none;
@@ -622,46 +453,15 @@ app-input-field {
   top: 94px;
   left: 5px;
   display: flex;
-
   align-items: center;
   gap: 11px;
   justify-content: flex-end;
   width: 86%;
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 63px;
   gap: 10px;
 }
 
-.comment-icon-box {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    background-color: #eceefe;
-    border-radius: 100%;
-  }
-}
-
-.comment-icon-box.backColor-current {
-  background-color: #eceefe;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
-  }
-}
-
-.comment-icon-box.backColor-user {
-  background-color: #eceefe;
-  border-radius: 100%;
-
-  &:hover {
-    background-color: #444df2;
-  }
-}
 
 .show-comment-stricker {
   display: flex;
@@ -777,8 +577,7 @@ app-mention-message-box {
   right: 33%;
 }
 
-
-.show-selected-files{
+.show-selected-files {
   width: 100%;
   display: flex;
   align-items: center;
@@ -786,36 +585,14 @@ app-mention-message-box {
   flex-direction: column;
 }
 
-
-.file-info{
-  
-  img{
-     width: 100px;
-     height: 100px; 
-  }
-  &:hover{
-    img{
-      transform: scale(1.2);
-    }
-  }
-} 
-
-
-.emoji-at-ct {
-  display: flex;
-  align-items: center;
-
-  div {
-    &:hover {
-      background-color: #eceefe;
-      border-radius: 20px;
-      height: 38px;
-    }
-  }
+.file-info {
   img {
-    &:hover {
-      scale: 1.1;
-      filter: brightness(0) saturate(100%) invert(14%) sepia(70%) saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
+    width: 100px;
+    height: 100px;
+  }
+  &:hover {
+    img {
+      transform: scale(1.2);
     }
   }
 }
@@ -828,7 +605,7 @@ app-mention-message-box {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.emoji-picker-container{
+.emoji-picker-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -841,58 +618,26 @@ app-mention-message-box {
 }
 
 
-.comment-senderSticker-box{
+.comment-recipientSticker-box {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 40px;
   height: 40px;
-
-  &:hover{
-     border-radius: 40px;
-      background-color: #eceefe;
-       cursor: pointer;  
+  &:hover {
+    border-radius: 40px;
+    background-color: #eceefe;
+    cursor: pointer;
   }
- } 
+}
 
- .comment-recipientSticker-box{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-
-  &:hover{
-     border-radius: 40px;
-      background-color: #eceefe;
-       cursor: pointer;  
-  }
- }
-
- .edit-emoji-main{
+.edit-emoji-main {
   position: relative;
   top: -52px;
   left: 1%;
   z-index: 40;
   width: 40px;
   height: 40px;
- } 
-
-
-.thread-answer-display {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 16px;
-  color: grey;
-  pointer-events: all;
-  width: fit-content;
-  height: 22px;
-  cursor: pointer;
-  &:hover{
-    transform: scale(1.1);
-    color: #444df2;
-  }
 }
 
 .answer-counter {
@@ -900,8 +645,7 @@ app-mention-message-box {
   pointer-events: all;
 }
 
-
-.edit-button{
+.edit-button {
   display: flex;
   gap: 32px;
 }

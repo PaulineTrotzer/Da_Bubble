@@ -38,15 +38,16 @@
   max-width: 770px;
   overflow-wrap: break-word;
   max-height: max-content;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
   span {
     padding: 7px;
   }
   &:hover {
     background-color: white;
-    border-top-right-radius: 30px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+
     span {
       color: #444df2;
       background-color: #eceefe;
