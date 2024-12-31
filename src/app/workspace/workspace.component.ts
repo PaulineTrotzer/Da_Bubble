@@ -76,18 +76,17 @@ export class WorkspaceComponent implements OnInit {
   ) {
     this.authService.initAuthListener();
   }
+
   async ngOnInit(): Promise<void> {
     await Promise.all([
       this.initializeChannelsAndUsers(),
       this.observeUserChanges(),
       this.subscribeToGuestLoginStatus(),
     ]);
-
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.initializeUserData(this.userId);
     }
-
     this.subscribeToWorkspaceChanges();
   }
 
@@ -184,6 +183,8 @@ export class WorkspaceComponent implements OnInit {
       this.cheackChatOpen();
     });
   }
+
+  
   openvollWidtChannelOrUserBox() {
     if (window.innerWidth <= 1349 && window.innerWidth > 720) {
       return (this.global.checkWideChannelorUserBox = true);

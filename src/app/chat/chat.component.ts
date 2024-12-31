@@ -39,6 +39,7 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
 import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
+import { WorkspaceService } from '../services/workspace.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -112,11 +113,34 @@ export class ChatComponent implements OnInit, OnChanges {
   isMentionCardOpenInChat: boolean = false;
   isMentionCardOpen: boolean = false;
   wasClickedChatInput = false;
+  workspaceService = inject(WorkspaceService);
+  workspaceSubscription: Subscription | undefined;
 
   constructor() {}
 
   async ngOnInit(): Promise<void> {
+    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+      (user) => {
+        if (user) {
+          this.selectedUser = user; // Setze den neuen Benutzer
+          this.getMessages(); // Lade die Nachrichten für den ausgewählten Benutzer
+        }
+      }
+    );
+
+    this.workspaceSubscription.add(
+      this.workspaceService.selectedChannel$.subscribe((channel) => {
+        if (channel) {
+          this.selectedChannel = channel;
+        }
+      })
+    );
     await this.getAllUsersname();
+  }
+
+  ngOnDestroy() {
+    // Vermeide Speicherlecks
+    this.workspaceSubscription?.unsubscribe();
   }
 
   onCancelMentionBox() {

@@ -32,7 +32,6 @@ import { SendMessageInfo } from '../models/send-message-info.interface';
 import { UserService } from '../services/user.service';
 import { ThreadControlService } from '../services/thread-control.service';
 import { Subscription } from 'rxjs';
-
 import {
   Storage,
   ref,
@@ -138,7 +137,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
-  private async processSendMessage(): Promise<void> {
+   async processSendMessage(): Promise<void> {
+    debugger;
+    console.log('user click',this.selectedUser);
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
@@ -155,9 +156,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
           this.senderStickerCount,
           this.recipientStickerCount
         );
-
         messageData.selectedFiles = fileData;
-
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
@@ -251,20 +250,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         console.error('User ID or selected user ID is missing.');
         return;
       }
-      // const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
-      // const clickedUserDocRef = doc(this.firestore, 'roomStatus', this.selectedUser.id);
-      // const [currentUserStatus, clickedUserStatus] = await Promise.all([
-      //   getDoc(currentUserDocRef),
-      //   getDoc(clickedUserDocRef),
-      // ]);
-      // if (currentUserStatus.exists() && clickedUserStatus.exists()) {
-      //   const currentUserInRoom = currentUserStatus.data()['isInRoom'];
-      //   const clickedUserInRoom = clickedUserStatus.data()['isInRoom'];
-      //   if (currentUserInRoom && clickedUserInRoom) {
-      //     console.log('Beide Benutzer sind im selben Raum. Nachrichtenzähler wird nicht erhöht.');
-      //     return;
-      //   }
-      // }
       const messageCountDocRef = doc(
         this.firestore,
         'messageCounts',
@@ -388,17 +373,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.chatMessage += `${mentionTag}  `;
       this.updateFormattedMessage();
     }
-    
-    // Sende das Ereignis mit dem Mention-Wert an das Parent
     this.mentionUserOut.emit(mention);
   }
 
   handleCardClosed() {
-    this.isMentionPeopleCardVisible = false; // Schließt die Karte
+    this.isMentionPeopleCardVisible = false;
   }
 
-
-  // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
     const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
@@ -489,12 +470,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       date1.getFullYear() === date2.getFullYear()
     );
   }
-
-  // getConversationId(): string {
-  //   const ids = [this.global.currentUserData?.id, this.selectedUser?.id];
-  //   ids.sort();
-  //   return ids.join('_');
-  // }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
