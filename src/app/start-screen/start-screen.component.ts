@@ -79,6 +79,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedChannel: any;
   @Input() mentionUser: string = '';
   @Input() onHeaderUser: any;
+  @Output() enterChat = new EventEmitter<any>();
 
   channelMembers: any[] = [];
   messagesData: any = [];
@@ -116,6 +117,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
+  }
+
+  handleEnterChat(member: any) {
+    this.enterChat.emit(member); // Event an HomeComponent weiterleiten
   }
 
   async ngOnInit(): Promise<void> {

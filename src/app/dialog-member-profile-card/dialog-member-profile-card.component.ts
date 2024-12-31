@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dialog-member-profile-card',
@@ -13,6 +13,7 @@ export class DialogMemberProfileCardComponent implements OnInit {
   constructor(){}
   member = inject(MAT_DIALOG_DATA)
   dialog = inject(MatDialog)
+  dialogRef = inject(MatDialogRef<DialogMemberProfileCardComponent>); 
 
   ngOnInit(): void {
     
@@ -20,5 +21,9 @@ export class DialogMemberProfileCardComponent implements OnInit {
 
   closeDialog() {
     this.dialog.closeAll()
+  }
+
+  enterByUsername() {
+    this.dialogRef.close(this.member);
   }
 }

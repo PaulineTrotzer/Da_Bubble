@@ -3,10 +3,8 @@ import {
   Unsubscribe,
   collection,
   doc,
-  getDoc,
   onSnapshot,
   updateDoc,
-  setDoc,
 } from '@angular/fire/firestore';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
@@ -30,6 +28,7 @@ import { Channel } from '../models/channel.class';
 import { LoginAuthService } from '../services/login-auth.service';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { WorkspaceService } from '../services/workspace.service';
 
 @Component({
   selector: 'app-workspace',
@@ -68,6 +67,7 @@ export class WorkspaceComponent implements OnInit {
   messageCountsArr: any = {};
   selectedUser: any;
   authService = inject(AuthService);
+  workspaceService = inject(WorkspaceService);
 
   constructor(
     public global: GlobalVariableService,
@@ -76,14 +76,28 @@ export class WorkspaceComponent implements OnInit {
   ) {
     this.authService.initAuthListener();
   }
-
   async ngOnInit(): Promise<void> {
-    await this.getAllChannels();
-    await this.getAllUsers();
+    await Promise.all([
+      this.initializeChannelsAndUsers(),
+      this.observeUserChanges(),
+      this.subscribeToGuestLoginStatus(),
+    ]);
+
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
-      this.getUserById(this.userId);
-      this.getUserMessageCount(this.userId);
+      this.initializeUserData(this.userId);
+    }
+
+    this.subscribeToWorkspaceChanges();
+  }
+
+  async initializeChannelsAndUsers() {
+    await this.getAllChannels();
+    await this.getAllUsers();
+  }
+
+  observeUserChanges() {
+    if (this.userId) {
       this.userService.observingUserChanges(
         this.userId,
         (updatedUser: User) => {
@@ -91,7 +105,31 @@ export class WorkspaceComponent implements OnInit {
         }
       );
     }
-    await this.subscribeToGuestLoginStatus();
+  }
+
+  async initializeUserData(userId: string) {
+    await this.getUserById(userId);
+    this.getUserMessageCount(userId);
+  }
+
+  subscribeToWorkspaceChanges() {
+    this.workspaceService.selectedUser$.subscribe((user) => {
+      if (user) {
+        this.selectUser(user);
+      }
+    });
+
+    this.workspaceService.selectedChannel$.subscribe((channel) => {
+      if (channel) {
+        this.selectedChannel = channel;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.channelsUnsubscribe) {
+      this.channelsUnsubscribe();
+    }
   }
 
   async subscribeToGuestLoginStatus(): Promise<void> {
@@ -178,13 +216,6 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  // async updateRoomStatus(userId: string, status: boolean) {
-  //   const currentUserDocRef = doc(this.firestore, 'roomStatus', this.userId);
-  //   await setDoc(currentUserDocRef, { isInRoom: status },{ merge: true });
-  //   const clickedUserDocRef = doc(this.firestore, 'roomStatus', userId);
-  //   await setDoc(clickedUserDocRef, { isInRoom: status },{ merge: true });
-  // }
-
   selectCurrentUser() {
     this.selectedChannel = null;
     this.selectedUser = this.global.currentUserData;
@@ -218,11 +249,6 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  ngOnDestroy(): void {
-    if (this.channelsUnsubscribe) {
-      this.channelsUnsubscribe();
-    }
-  }
   async getAllChannels() {
     try {
       const colRef = collection(this.firestore, 'channels');
@@ -321,10 +347,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   setUser(userOrChannel: any): void {
-    debugger;
     this.selectedUser = userOrChannel;
-
-    // Sicherstellen, dass selectedUser nicht null oder undefined ist
     if (this.selectedUser && this.selectedUser.id) {
       this.selectUser(this.selectedUser);
       const foundUser = this.allUsers.find(

@@ -13,7 +13,7 @@
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"
                 [selectedUserHome]="selectedUser" [selectedChannelHome]="selectedChannel"></app-workspace>
 
-            <app-start-screen [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
+            <app-start-screen (enterChat)="handleEnterChat($event)" [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
             'hiddenFullWidth':global.checkWideChannelOrUserThreadBox,
              'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
               'hidden':global.openChannelOrUserThread}"
@@ -44,7 +44,7 @@
                     {{
                     isGuestLogin
                     ? 'Gast'
-                    : googleAccountLogIn 
+                    : googleAccountLogIn
                     ? 'Google Nutzer'
                     : global.currentUserData.email
                     }}
@@ -58,11 +58,11 @@
 <div class="overlay-contacts" *ngIf="isOverlayVisible && !successfullyLogged">
     <p>Lade Kontakte...</p>
     <div class="loading-dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
-  </div>
+</div>
 <div class="workspace-opener" [class.hovered]="isHovered" (click)="toggleWorkspace()" (mouseenter)="isHovered = true"
     (mouseleave)="isHovered = false">
     <p>{{!global.openChannelorUserBox && isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p>

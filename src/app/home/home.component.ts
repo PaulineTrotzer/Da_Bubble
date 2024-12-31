@@ -59,6 +59,13 @@ export class HomeComponent implements OnInit {
     this.setChannelThread();
   }
 
+
+  handleEnterChat(member: any) {
+    if (this.workspaceComponent) {
+      this.workspaceComponent.enterByUsername(member, false);
+    }
+  }
+
   initAuthListener() {
     const auth = getAuth();
     onAuthStateChanged(auth, async (user) => {
