@@ -322,7 +322,6 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      this.dataLoaded = true;
       await this.getMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
@@ -338,7 +337,6 @@ export class ChatComponent implements OnInit, OnChanges {
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
       await this.getMessages();
-      this.dataLoaded = true;
       this.chatMessage = '';
     }
   }
