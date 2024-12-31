@@ -123,8 +123,8 @@ export class ChatComponent implements OnInit, OnChanges {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
-          this.selectedUser = user; // Setze den neuen Benutzer
-          await this.getSelectedMessages(); // Lade die Nachrichten für den ausgewählten Benutzer
+          this.selectedUser = user;
+          await this.getSelectedMessages();
         }
       }
     );
@@ -169,7 +169,6 @@ export class ChatComponent implements OnInit, OnChanges {
               (a: any, b: any) => a.timestamp - b.timestamp
             );
             this.dataLoaded = true;
-            console.log('Aktuelle Nachrichten:', this.messagesData);
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
@@ -323,6 +322,7 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
+      this.dataLoaded = true;
       await this.getMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
@@ -338,13 +338,14 @@ export class ChatComponent implements OnInit, OnChanges {
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
       await this.getMessages();
+      this.dataLoaded = true;
       this.chatMessage = '';
     }
   }
 
   checkForSelfChat() {
     if (
-      this.selectedUser?.id === this.global.currentUserData?.id &&
+      this.selectedUser?.uid === this.global.currentUserData?.id &&
       this.messagesData.length === 0
     ) {
       this.showWelcomeChatText = true;
@@ -357,7 +358,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   checkTwoPersonConversation() {
     if (
-      this.selectedUser?.id !== this.global.currentUserData?.id &&
+      this.selectedUser?.uid !== this.global.currentUserData?.id &&
       this.messagesData.length === 0
     ) {
       this.showTwoPersonConversationTxt = true;
@@ -518,6 +519,7 @@ export class ChatComponent implements OnInit, OnChanges {
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
+            this.dataLoaded = true;
           } catch (innerError) {
             console.error('rrror while  querySnapshot:', innerError);
           }
