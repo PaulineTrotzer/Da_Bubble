@@ -137,40 +137,42 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
-   async processSendMessage(): Promise<void> {
-    debugger;
-    console.log('user click',this.selectedUser);
-    if (this.selectedChannel && !this.isChannelThreadOpen) {
-      await this.sendChannelMessage();
-    } else if (this.isDirectThreadOpen) {
-      await this.sendDirectThreadMessage();
-      await this.setMessageCount();
-    } else if (this.isChannelThreadOpen) {
-      await this.sendChannelThreadMessage();
-    } else {
-      try {
-        const fileData = await this.uploadFilesToFirebaseStorage();
-
-        const messageData = this.messageData(
-          this.chatMessage,
-          this.senderStickerCount,
-          this.recipientStickerCount
-        );
-        messageData.selectedFiles = fileData;
-        const messagesRef = collection(this.firestore, 'messages');
-        const docRef = await addDoc(messagesRef, messageData);
-        const messageWithId = { ...messageData, id: docRef.id };
-        this.messagesData.push(messageWithId);
-        await this.setMessageCount();
-        this.messageSent.emit();
-        this.chatMessage = '';
-        this.formattedChatMessage = '';
-        this.selectFiles = [];
-      } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error);
+  async processSendMessage(): Promise<void> {
+    try {
+      if (!this.selectedUser?.uid || !this.global.currentUserData?.id) {
+        console.error('Fehlende Benutzer-IDs: Sender oder Empfänger');
+        return; 
       }
+      const fileData = await this.uploadFilesToFirebaseStorage();
+      const messageData = this.messageData(
+        this.chatMessage,
+        this.senderStickerCount,
+        this.recipientStickerCount
+      );
+      messageData.senderId = this.global.currentUserData?.id;
+      messageData.recipientId = this.selectedUser?.uid;
+      messageData.selectedFiles = fileData;
+      const messagesRef = collection(this.firestore, 'messages');
+      const docRef = await addDoc(messagesRef, messageData);
+      if (!docRef.id) {
+        console.error('Fehler: Nachricht konnte nicht gespeichert werden.');
+        return;
+      }
+      const messageWithId = { ...messageData, id: docRef.id };
+      this.messagesData.push(messageWithId);
+      await this.setMessageCount();
+      this.messageSent.emit();
+      this.chatMessage = '';
+      this.formattedChatMessage = '';
+      this.selectFiles = [];
+    } catch (error) {
+      console.error('Fehler beim Senden der Nachricht:', error);
     }
   }
+  
+  
+  
+
 
   async sendChannelThreadMessage() {
     if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {
@@ -246,14 +248,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   async setMessageCount() {
     try {
-      if (!this.userId || !this.selectedUser?.id) {
+      if (!this.userId || !this.selectedUser?.uid) {
         console.error('User ID or selected user ID is missing.');
         return;
       }
       const messageCountDocRef = doc(
         this.firestore,
         'messageCounts',
-        this.selectedUser?.id
+        this.selectedUser?.uid
       );
       const userUpdate: any = {};
       userUpdate[`messageCount.${this.userId}`] = increment(1);

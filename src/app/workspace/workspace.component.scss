@@ -222,6 +222,13 @@
   }
 }
 
+.all-user-contacts{
+  display: flex;
+  flex-direction: column;
+  width: 245px;
+}
+
+
 .active-user-div {
   display: flex;
   align-items: center;
