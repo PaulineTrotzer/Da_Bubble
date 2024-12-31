@@ -663,6 +663,17 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
+  letPickerVisible(event: MouseEvent) {
+    event.stopPropagation();
+    this.isEmojiPickerVisible = true; 
+  }
+
+  letEditPickerVisible(event: MouseEvent){
+    event.stopPropagation();
+    this.isEmojiPickerVisibleEdit = true; 
+  }
+  
+
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
     this.shouldScroll = false;
@@ -746,9 +757,10 @@ export class ChatComponent implements OnInit, OnChanges {
       this.shouldScroll = true;
     }, 100);
     await updateDoc(strickerRef, stikerObj);
+    this.closePicker();
   }
 
-  toggleEmojiPicker(message: any) {
+/*   toggleEmojiPicker(message: any) {
     this.checkEmojiId = message.id;
     this.isEmojiPickerVisible = !this.isEmojiPickerVisible;
     if (this.isEmojiPickerVisible) {
@@ -760,7 +772,7 @@ export class ChatComponent implements OnInit, OnChanges {
       this.overlayStatusService.setOverlayStatus(false);
     }
   }
-
+ */
   removeSenderSticker(message: any) {
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
@@ -802,13 +814,6 @@ export class ChatComponent implements OnInit, OnChanges {
           recipientStickerCount: 1,
         });
       }
-      //     else if(message.senderStickerCount===2 && message.senderSticker && message.recipientSticker && message.recipientStickerCount===null){
-      //       updateDoc(docRef,{
-      //         senderSticker:'',
-      //         recipientStickerCount:1,
-      //         senderStickerCount:1,
-      //       })
-      // }
     } else if (this.global.currentUserData?.id !== message.senderId) {
       if (
         message.recipientSticker &&
@@ -954,7 +959,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = false;
   }
 
-  toggleEmojiEditPicker() {
+/*   toggleEmojiEditPicker() {
     this.isEmojiPickerVisibleEdit = !this.isEmojiPickerVisibleEdit;
 
     // Setze den Overlay-Status basierend auf der Sichtbarkeit des Emoji-Pickers im Edit-Modus
@@ -969,7 +974,7 @@ export class ChatComponent implements OnInit, OnChanges {
       // Emoji-Picker wird ausgeblendet, also Overlay deaktivieren
       this.overlayStatusService.setOverlayStatus(false);
     }
-  }
+  } */
 
   @HostListener('document:click', ['$event'])
   onEMojiEditClick(event: MouseEvent) {

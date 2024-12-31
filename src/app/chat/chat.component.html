@@ -47,8 +47,8 @@
                         </div>
                     </div>
                 </div>
-                <div (click)="closePicker()" class="emoji-picker-container" *ngIf="isEmojiPickerVisibleEdit">
-                    <emoji-mart (emojiClick)="editMessageAdd($event); closePickerEdit()" size="18"
+                <div (click)="closePickerEdit()" class="emoji-picker-container" *ngIf="isEmojiPickerVisibleEdit">
+                    <emoji-mart (click)="letEditPickerVisible($event)" (emojiClick)="editMessageAdd($event)" size="18"
                         class="emoji-picker"></emoji-mart>
                 </div>
                 <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
@@ -86,7 +86,7 @@
 
                         <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                             <div class="emoji-picker">
-                                <emoji-mart class="emoji-picker" (emojiClick)="addEmoji($event,message); closePicker()"
+                                <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event,message)"
                                     size="18"></emoji-mart>
                             </div>
                         </div>
