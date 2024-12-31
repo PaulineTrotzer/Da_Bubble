@@ -69,7 +69,7 @@ export class DialogChannelUserComponent implements OnInit{
       maxHeight: '705px',
     });
 
-    // Verarbeite das zurückgegebene Ergebnis (das `member`)
+
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.workspaceService.setSelectedUser(result); // Übergibt das Ergebnis an den Service

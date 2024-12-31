@@ -419,7 +419,7 @@
             gerne Dinge mit dir selbst besprechen.
         </span>
     </div>
-    <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt">
+    <div class="two-chat-opener-ct"  *ngIf="showTwoPersonConversationTxt && messagesData?.length === 0 && dataLoaded">
         <div class="img-and-name">
             <img class="self-chat-img" src={{selectedUser?.picture}}>
             <p>{{selectedUser?.name}}</p>

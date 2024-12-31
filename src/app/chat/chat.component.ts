@@ -115,15 +115,16 @@ export class ChatComponent implements OnInit, OnChanges {
   wasClickedChatInput = false;
   workspaceService = inject(WorkspaceService);
   workspaceSubscription: Subscription | undefined;
+  dataLoaded: boolean = false;
 
   constructor() {}
 
   async ngOnInit(): Promise<void> {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
-      (user) => {
+      async (user) => {
         if (user) {
           this.selectedUser = user; // Setze den neuen Benutzer
-          this.getMessages(); // Lade die Nachrichten für den ausgewählten Benutzer
+          await this.getSelectedMessages(); // Lade die Nachrichten für den ausgewählten Benutzer
         }
       }
     );
@@ -138,8 +139,61 @@ export class ChatComponent implements OnInit, OnChanges {
     await this.getAllUsersname();
   }
 
+  async getSelectedMessages() {
+    try {
+      if (!this.selectedUser?.uid || !this.global.currentUserData?.id) {
+        console.warn(
+          'Kein Benutzer ausgewählt oder keine gültigen Benutzer-Daten.'
+        );
+        return;
+      }
+      const docRef = collection(this.firestore, 'messages');
+      const q = query(
+        docRef,
+        where('recipientId', '==', this.selectedUser.uid),
+        where('senderId', '==', this.global.currentUserData.id)
+      );
+      onSnapshot(
+        q,
+        async (querySnapshot) => {
+          try {
+            this.messagesData = [];
+            querySnapshot.forEach((doc) => {
+              const messageData = doc.data();
+              if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+                messageData['timestamp'] = messageData['timestamp'].toDate();
+              }
+              this.messagesData.push({ id: doc.id, ...messageData });
+            });
+            this.messagesData.sort(
+              (a: any, b: any) => a.timestamp - b.timestamp
+            );
+            this.dataLoaded = true;
+            console.log('Aktuelle Nachrichten:', this.messagesData);
+            if (this.shouldScroll) {
+              this.scrollAutoDown();
+            }
+          } catch (innerError) {
+            console.error(
+              'Fehler beim Verarbeiten der Nachrichten:',
+              innerError
+            );
+          }
+        },
+        (error) => {
+          console.error('Fehler beim Abrufen der Nachrichten:', error);
+        }
+      );
+    } catch (error) {
+      console.error('Fehler bei getActualMessages:', error);
+    }
+  }
+
+  hasMessages(): boolean {
+    return this.messagesData && this.messagesData.length > 0;
+  }
+
   ngOnDestroy() {
-    // Vermeide Speicherlecks
     this.workspaceSubscription?.unsubscribe();
   }
 

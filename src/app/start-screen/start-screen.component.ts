@@ -119,9 +119,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  handleEnterChat(member: any) {
-    this.enterChat.emit(member); // Event an HomeComponent weiterleiten
-  }
 
   async ngOnInit(): Promise<void> {
     this.initializeGlobalState();
