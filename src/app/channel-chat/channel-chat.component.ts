@@ -94,6 +94,7 @@ export class ChannelChatComponent implements OnInit {
   @Output() enterChatFromChannel = new EventEmitter<any>();
   globalService = inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
+  clicked = false;
 
   constructor() {}
 
@@ -218,9 +219,19 @@ export class ChannelChatComponent implements OnInit {
   }
 
   togglePicker(messageId: string, isEditing: boolean = false) {
-    this.isPickerVisible =
-      this.isPickerVisible === messageId ? null : messageId;
-    this.editingMessageId = isEditing ? messageId : null; // Track editing mode
+    // Wenn der Picker bereits für diese Nachricht sichtbar ist, wird er ausgeblendet.
+    const isAlreadyVisible = this.isPickerVisible === messageId;
+    
+    // Setze die Sichtbarkeit des Pickers (toggle).
+    this.isPickerVisible = isAlreadyVisible ? null : messageId;
+  
+    // Wenn der Picker angezeigt wird, setze clicked auf true.
+    this.clicked = !isAlreadyVisible;
+  
+    // Setze den Bearbeitungsmodus, wenn notwendig.
+    this.editingMessageId = isEditing ? messageId : null;
+  
+    // Aktiviere den Overlay-Status.
     this.overlay.setOverlayStatus(true);
   }
 
@@ -369,10 +380,19 @@ export class ChannelChatComponent implements OnInit {
     this.overlay.setOverlayStatus(false);
   }
 
-  closePicker() {
+  closePicker(event: MouseEvent) {
+    event.stopPropagation(); 
+    
     this.isPickerVisible = null;
-    this.editingMessageId = null;
-    this.overlay.setOverlayStatus(false);
+    this.clicked = false;
+  }
+
+  
+
+  letPickerVisible(event: MouseEvent, messageId: string) {
+    event.stopPropagation();
+    this.isPickerVisible = messageId;
+    this.overlay.setOverlayStatus(true);
   }
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {

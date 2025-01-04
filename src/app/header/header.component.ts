@@ -191,23 +191,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.getAllUsersCollection.push({ id: doc.id, ...allUsers });
         }
       });
-      // console.log(this.getAllUsersCollection)
       this.filterUsers();
     });
   }
 
   filterUsers() {
     const searchValue = this.searcheNameOrChannel
-      .toLowerCase()
-      .replace('@', '')
-      .trim();
-    this.filteredUsers = this.getAllUsersCollection.filter(
-      (user) => user.name.toLowerCase().includes(searchValue),
-      (this.noUserFounded = false)
-    );
-    if (this.filteredUsers.length === 0) {
-      this.noUserFounded = true;
-    }
+      ? this.searcheNameOrChannel.toLowerCase().replace('@', '').trim()
+      : ''; 
+    this.filteredUsers = this.getAllUsersCollection.filter((user) => {
+      if (user?.name && typeof user.name === 'string') {
+        return user.name.toLowerCase().includes(searchValue);
+      }
+      return false; 
+    });
+    this.noUserFounded = this.filteredUsers.length === 0;
   }
 
   async enterChatUser(user: any) {

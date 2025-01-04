@@ -307,13 +307,20 @@ export class WorkspaceComponent implements OnInit {
     const usersCollection = collection(this.firestore, 'users');
     onSnapshot(usersCollection, (snapshot) => {
       this.allUsers = [];
+      this.checkUsersExsists = false; 
+  
       snapshot.forEach((doc) => {
-        this.checkUsersExsists = true;
-        if (doc.id !== this.userId) {
-          this.allUsers.push({ id: doc.id, ...doc.data() });
+        const userData = { id: doc.id, ...doc.data() };
+        if (doc.id !== this.userId && this.isValidUser(userData)) {
+          this.allUsers.push(userData);
+          this.checkUsersExsists = true;
         }
       });
     });
+  }
+
+  private isValidUser(user: any): boolean {
+    return !!(user.name && user.picture && user.status);
   }
 
   selectChannel(channel: any) {

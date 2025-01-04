@@ -1,7 +1,7 @@
 <div class="chat-box">
 
-  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()"  *ngIf="wasClickedInChannelInput"
-    (enterChatUser)="enterChatByUserName($event)"   (closeMentionBox)="closeMentionBoxHandler()" >
+  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInChannelInput"
+    (enterChatUser)="enterChatByUserName($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
 
   <div class="message-container" [ngClass]="{
@@ -15,13 +15,15 @@
         <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
       </div>
     </div>
-    <div class="emoji-container" *ngIf="isPickerVisible === message.id" [ngClass]="{
+    <div class="emoji-container" *ngIf="isPickerVisible === message.id && clicked" [ngClass]="{
         'emoji-container-user': message.senderId !== global.currentUserData.id,
         'emoji-container-current':
           message.senderId === global.currentUserData.id
       }">
-      <emoji-mart [set]="'apple'" size="18"
-        (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
+      <div *ngIf="clicked" class="emoji-picker-container" (click)="closePicker($event)">
+        <emoji-mart [set]="'apple'" size="18" (click)="letPickerVisible($event, message.id)"
+          (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
+      </div>
     </div>
     <div class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" @slideIn>
       <div class="used-emojis">
@@ -77,7 +79,7 @@
             <h3>{{ message.senderName }}</h3>
             <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
           </div>
-    
+
           <div class="text-content">
             <div class="text">
               <ng-container *ngFor="let mentionName of splitMessage(message.text)">
@@ -92,9 +94,9 @@
             </div>
           </div>
           <span *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
-   
 
-          
+
+
           <div class="reaction-info">
             <div *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji" class="reaction-from-container"
               [ngClass]="{

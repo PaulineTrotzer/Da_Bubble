@@ -43,6 +43,7 @@ export class CreateNewPasswordComponent {
   }
 
   ngOnInit() {
+    debugger;
     this.route.queryParams.subscribe(params => {
       this.oobCode = params['oobCode'];
       this.mode = params['mode'];
