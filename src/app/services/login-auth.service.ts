@@ -24,6 +24,10 @@ export class LoginAuthService {
     this.isGuestLoginSubject.next(status);
   }
 
+  getIsGuestLogin(): boolean {
+    return this.isGuestLoginSubject.value; 
+  }
+
   getGoogleAccountLogIn(): boolean {
     return this.googleAccountLogInSubject.getValue();
   }

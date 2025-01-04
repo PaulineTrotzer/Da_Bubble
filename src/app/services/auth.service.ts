@@ -179,6 +179,7 @@ export class AuthService {
   }
 
   async SignGuestIn() {
+    debugger;
     const auth = getAuth();
     try {
       const result = await signInAnonymously(auth);

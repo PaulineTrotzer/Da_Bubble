@@ -15,12 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
-import {
-  Firestore,
-  doc,
-  getDoc,
-  onSnapshot,
-} from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.class';
@@ -118,7 +113,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
-
 
   async ngOnInit(): Promise<void> {
     this.initializeGlobalState();
@@ -286,7 +280,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       maxHeight: '320px',
     });
   }
-
   async fetchChannelMembers() {
     if (!this.selectedChannel?.id) {
       this.channelMembers = [];
@@ -299,11 +292,19 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
         'channels',
         this.selectedChannel.id
       );
+
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
-          console.log('aram');
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
+
+          // Überprüfe, ob userIds leer oder ungültig ist
+          if (!userIds || userIds.length === 0) {
+            console.log('Keine Benutzer im Kanal vorhanden.');
+            this.channelMembers = []; // Leere Mitgliederliste setzen
+            return; // Frühzeitig die Funktion verlassen
+          }
+
           const membersPromises = userIds.map(async (userId: string) => {
             const userRef = doc(this.firestore, 'users', userId);
             const userSnap = await getDoc(userRef);
@@ -324,7 +325,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
         }
       });
     } catch (error) {
-      console.error('Error fetching channel members:', error);
+      console.error('Fehler beim Abrufen der Kanalmitglieder:', error);
     }
   }
 

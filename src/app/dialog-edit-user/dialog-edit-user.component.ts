@@ -121,6 +121,7 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   async saveUser() {
+    debugger;
     const editingAvatar = await this.editAvatar(); 
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
@@ -135,14 +136,19 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   async editAvatar() {
-    if (this.selectedFile) {
-      const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
-      const storageRef = ref(this.storage, filePath);
-      await uploadBytes(storageRef, this.selectedFile);
-      const downloadURL = await getDownloadURL(storageRef);
-      await this.updateUserAvatar(downloadURL);
-    } else if (this.chossePicture) {
-      await this.updateUserAvatar(this.chossePicture);
+    try {
+      if (this.selectedFile) {
+        const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
+        const storageRef = ref(this.storage, filePath);
+        await uploadBytes(storageRef, this.selectedFile);
+        const downloadURL = await getDownloadURL(storageRef);
+        await this.updateUserAvatar(downloadURL);
+      } else if (this.chossePicture) {
+        await this.updateUserAvatar(this.chossePicture);
+      }
+    } catch (error) {
+      console.error('Error while uploading avatar:', error);
+      alert('There was an error while uploading the avatar. Please try again.');
     }
   }
 

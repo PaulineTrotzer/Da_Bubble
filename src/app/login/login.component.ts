@@ -69,7 +69,10 @@ export class LoginComponent implements OnInit {
   }
 
   async logIn() {
-    debugger;
+    if (this.loginAuthService.getIsGuestLogin()) {
+      console.log('Gast-Login aktiv, Login wird abgebrochen');
+      return;
+    }
     console.log('Vor dem Login: ', this.loginAuthService.getGoogleAccountLogIn());
     this.isGuestLogin = false;
     this.loginAuthService.setGoogleAccountLogIn(false);
@@ -126,8 +129,8 @@ export class LoginComponent implements OnInit {
     this.formFailed = false;
   }
 
-  guestLogin() {
-    this.auth.SignGuestIn();
+  async guestLogin() {
+    await this.auth.SignGuestIn();
   }
    
   async googleLogIn() {
