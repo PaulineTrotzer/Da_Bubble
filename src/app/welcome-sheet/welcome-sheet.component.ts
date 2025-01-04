@@ -13,16 +13,18 @@ import { Subscription } from 'rxjs';
 export class WelcomeSheetComponent implements OnInit {
   isGuestAccount = false;
   LogInAuth = inject(LoginAuthService);
-  private guestLoginStatusSub: Subscription | undefined;
+  guestLoginStatusSub: Subscription | undefined;
 
   ngOnInit(): void {
     this.subscribeToGuestLoginStatus();
+    console.log('isGuestAccount', this.isGuestAccount);
   }
 
   subscribeToGuestLoginStatus(): void {
     this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestAccount = status;
+        console.log('after', this.isGuestAccount);
       }
     );
   }

@@ -251,7 +251,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
       (channel) => channel.name === 'Willkommen'
     );
     if (willkommenChannel && !this.selectedChannel) {
-      // Only select the "Willkommen" channel if no other channel is selected
       this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
     } else {
@@ -262,16 +261,11 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   async getAllChannels() {
     try {
       const colRef = collection(this.firestore, 'channels');
-      console.log('Collection reference created:', colRef);
-
       this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
-        console.log('Snapshot received:', snapshot);
-
         this.allChannels = snapshot.docs.map((doc) => {
           console.log('Channel data:', doc.data());
           return new Channel(doc.data());
         });
-
         this.sortChannels();
         this.findWelcomeChannel();
       });
@@ -333,7 +327,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   }
 
   selectChannel(channel: any) {
-    debugger;
     this.selectedUser = null;
     this.selectedChannel = null;
     setTimeout(() => {
