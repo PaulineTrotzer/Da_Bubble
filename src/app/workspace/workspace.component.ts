@@ -19,6 +19,7 @@ import {
   SimpleChanges,
   ChangeDetectorRef,
   NgZone,
+  OnChanges,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -37,7 +38,7 @@ import { WorkspaceService } from '../services/workspace.service';
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
-export class WorkspaceComponent implements OnInit {
+export class WorkspaceComponent implements OnInit, OnChanges {
   selectedChannel: any = null;
   channelDrawerOpen: boolean = true;
   messageDrawerOpen: boolean = true;
@@ -184,7 +185,6 @@ export class WorkspaceComponent implements OnInit {
     });
   }
 
-  
   openvollWidtChannelOrUserBox() {
     if (window.innerWidth <= 1349 && window.innerWidth > 720) {
       return (this.global.checkWideChannelorUserBox = true);
@@ -233,16 +233,25 @@ export class WorkspaceComponent implements OnInit {
       height: '539px',
       width: '872px',
     });
+
     dialogRef.afterClosed().subscribe((result) => {
+      if (!result) {
+        console.warn('Kein Ergebnis vom Dialog zurückgegeben');
+        return;
+      }
+
+      console.log('Dialog Ergebnis:', result);
       this.getAllChannels();
+      const isChannel = result.hasOwnProperty('userIds');
+      this.enterByUsername(result, isChannel);
     });
   }
-
   findWelcomeChannel() {
     const willkommenChannel = this.allChannels.find(
       (channel) => channel.name === 'Willkommen'
     );
-    if (willkommenChannel) {
+    if (willkommenChannel && !this.selectedChannel) {
+      // Only select the "Willkommen" channel if no other channel is selected
       this.global.channelSelected = false;
       this.selectChannel(willkommenChannel);
     } else {
@@ -307,8 +316,8 @@ export class WorkspaceComponent implements OnInit {
     const usersCollection = collection(this.firestore, 'users');
     onSnapshot(usersCollection, (snapshot) => {
       this.allUsers = [];
-      this.checkUsersExsists = false; 
-  
+      this.checkUsersExsists = false;
+
       snapshot.forEach((doc) => {
         const userData = { id: doc.id, ...doc.data() };
         if (doc.id !== this.userId && this.isValidUser(userData)) {
@@ -324,6 +333,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
+    debugger;
     this.selectedUser = null;
     this.selectedChannel = null;
     setTimeout(() => {
@@ -375,6 +385,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   enterByUsername(userOrChannel: any, isChannel: boolean = false) {
+    debugger;
     if (isChannel && (!userOrChannel || !userOrChannel.name)) {
       console.warn('Invalid channel passed to enterByUsername. Aborting.');
       return;
@@ -385,6 +396,7 @@ export class WorkspaceComponent implements OnInit {
     }
     if (isChannel) {
       this.setChannel(userOrChannel);
+      this.selectChannel(userOrChannel);
     }
   }
 }

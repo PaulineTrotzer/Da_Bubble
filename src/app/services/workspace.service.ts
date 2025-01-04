@@ -29,4 +29,8 @@ export class WorkspaceService {
   setSelectedChannel(channel: any) {
     this.selectedChannelSubject.next(channel);
   }
+
+  updateChannel(channel: any) {
+    this.selectedChannelSubject.next(channel);
+  }
 }
