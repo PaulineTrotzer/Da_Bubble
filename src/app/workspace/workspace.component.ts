@@ -54,11 +54,10 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   userService = inject(UserService);
   @Output() userSelected = new EventEmitter<any>();
   @Output() channelSelected = new EventEmitter<Channel>();
-
   @Input() selectedUserHome: any;
   @Input() selectedChannelHome: any;
   readonly dialog = inject(MatDialog);
-  private channelsUnsubscribe: Unsubscribe | undefined;
+  channelsUnsubscribe: Unsubscribe | undefined;
   logInAuth = inject(LoginAuthService);
   isGuestLogin = true;
   guestLoginStatusSub: Subscription | undefined;
@@ -69,6 +68,8 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   selectedUser: any;
   authService = inject(AuthService);
   workspaceService = inject(WorkspaceService);
+  filteredChannels: Channel[] = [];
+  userChannels: string[] = [];
 
   constructor(
     public global: GlobalVariableService,
@@ -91,9 +92,34 @@ export class WorkspaceComponent implements OnInit, OnChanges {
     this.subscribeToWorkspaceChanges();
   }
 
+  filterChannels(channels: any) {
+    debugger;
+    if (!this.userId) {
+      console.warn('Keine userID gefunden, Filterung wird übersprungen.');
+      return;
+    }
+
+    const willkommenChannel = channels.find(
+      (channel: { name: string }) => channel.name === 'Willkommen'
+    );
+
+    this.filteredChannels = channels.filter(
+      (channel: { userIds: string | any[] }) =>
+        channel.userIds && channel.userIds.includes(this.userId)
+    );
+    if (
+      willkommenChannel &&
+      !this.filteredChannels.includes(willkommenChannel)
+    ) {
+      this.filteredChannels.unshift(willkommenChannel);
+    }
+  }
+
   async initializeChannelsAndUsers() {
     await this.getAllChannels();
+    console.log('All Channels nach getAllChannels:', this.allChannels);
     await this.getAllUsers();
+    console.log('User Channels nach getAllUsers:', this.userChannels);
   }
 
   observeUserChanges() {
@@ -176,7 +202,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
         resetMessageCount[`messageCount.${actuallyId}`] = 0;
         updateDoc(docRef, resetMessageCount);
       }
-      console.log('User selected:', user);
       this.global.statusCheck = false;
       this.openvollWidtChannelOrUserBox();
       this.hiddenVoolThreadBox();
@@ -239,35 +264,42 @@ export class WorkspaceComponent implements OnInit, OnChanges {
         console.warn('Kein Ergebnis vom Dialog zurückgegeben');
         return;
       }
-
-      console.log('Dialog Ergebnis:', result);
       this.getAllChannels();
       const isChannel = result.hasOwnProperty('userIds');
       this.enterByUsername(result, isChannel);
     });
   }
+
   findWelcomeChannel() {
     const willkommenChannel = this.allChannels.find(
       (channel) => channel.name === 'Willkommen'
     );
-    if (willkommenChannel && !this.selectedChannel) {
-      this.global.channelSelected = false;
-      this.selectChannel(willkommenChannel);
+
+    if (willkommenChannel) {
+      if (!this.filteredChannels.includes(willkommenChannel)) {
+        this.filteredChannels.unshift(willkommenChannel);
+      }
+      if (!this.selectedChannel) {
+        this.selectChannel(willkommenChannel);
+      }
     } else {
       console.warn('Kein Willkommen-Channel gefunden!');
     }
   }
 
-  async getAllChannels() {
+  async getAllChannels(): Promise<void> {
     try {
       const colRef = collection(this.firestore, 'channels');
       this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
-        this.allChannels = snapshot.docs.map((doc) => {
-          console.log('Channel data:', doc.data());
-          return new Channel(doc.data());
-        });
-        this.sortChannels();
-        this.findWelcomeChannel();
+        const newChannels = snapshot.docs.map((doc) => doc.data() as Channel);
+        if (newChannels.length > 0) {
+          this.allChannels = newChannels;
+          this.filterChannels(this.allChannels);
+          this.sortChannels();
+          this.findWelcomeChannel();
+        } else {
+          console.warn('Keine Kanäle gefunden!');
+        }
       });
     } catch (error) {
       console.error('Fehler in getAllChannels:', error);
@@ -378,7 +410,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   }
 
   enterByUsername(userOrChannel: any, isChannel: boolean = false) {
-    debugger;
     if (isChannel && (!userOrChannel || !userOrChannel.name)) {
       console.warn('Invalid channel passed to enterByUsername. Aborting.');
       return;

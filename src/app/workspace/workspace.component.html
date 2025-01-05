@@ -77,7 +77,7 @@
             'channels-drawer-closed': !channelDrawerOpen
           }">
           <div class="channels">
-            <div class="channel-row" *ngFor="let channel of allChannels" (click)="selectChannel(channel)">
+            <div class="channel-row" *ngFor="let channel of filteredChannels" (click)="selectChannel(channel)">
               <span [ngClass]="{'active': global.currentChannel?.id === channel.id}">
                 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">

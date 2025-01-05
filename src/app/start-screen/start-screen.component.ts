@@ -37,7 +37,6 @@ import { MemberDataService } from '../services/member-data.service';
 interface ChannelData {
   userIds: string[];
 }
-
 @Component({
   selector: 'app-start-screen',
   standalone: true,
@@ -76,8 +75,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mentionUser: string = '';
   @Input() onHeaderUser: any;
   @Output() enterChat = new EventEmitter<any>();
-
-
   channelMembers: any[] = [];
   messagesData: any = [];
   commentImages: string[] = [
@@ -320,6 +317,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           this.channelMembers = members.filter(
             (member: any) => member !== null
           );
+          this.memberDataService.setMembers(members);
           this.cdr.detectChanges();
         }
       });

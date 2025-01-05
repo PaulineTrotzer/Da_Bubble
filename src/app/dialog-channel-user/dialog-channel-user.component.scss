@@ -55,8 +55,9 @@ span {
   border-radius: 35px;
   img {
     height: 50px;
-    min-width: 50px;
+    width: 50px;
     border-radius: 100%;
+    object-fit: cover;
   }
   &:hover {
     background: #eceefe;

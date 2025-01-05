@@ -57,8 +57,6 @@ export class DialogAddUserComponent implements OnInit {
     this.getAllUsers();
   }
 
-
-
   async onSubmit(form: any) {
     if (this.addAllUsers && form.valid) {
       await this.addAllUsersToChannel();
@@ -68,7 +66,7 @@ export class DialogAddUserComponent implements OnInit {
     this.dialogRef.close(true);
   }
 
-  private async addAllUsersToChannel() {
+   async addAllUsersToChannel() {
     const userIds = this.allUsers.map((user) => user.uid);
     await this.updateChannelUserIds(userIds);
   }
@@ -76,7 +74,6 @@ export class DialogAddUserComponent implements OnInit {
    async addSelectedUsersToChannel() {
     const selectedUsersWithCurrentUser = [...this.selectedUsers, this.global.currentUserData];
     const userIds = selectedUsersWithCurrentUser.map((user) => user.uid);
-
     await this.updateChannelUserIds(userIds);
   }
 
@@ -97,8 +94,6 @@ export class DialogAddUserComponent implements OnInit {
   
         const members = querySnapshot.docs.map((doc) => doc.data());
         this.memberDataService.setMembers(members);
-  
-        console.log('Users added successfully to the channel');
       }
     } catch (error) {
       console.error('Error adding users to the channel:', error);
