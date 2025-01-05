@@ -10,6 +10,11 @@
         <img [src]="chossePicture || user.picture || previewUrl">
     </div>
 
+    <div *ngIf="loadingSpinner" class="loading-indicator">
+        <span>Bild wird hochgeladen...</span>
+        <div class="spinner"></div>
+    </div>
+
     <div *ngIf="!guestAccount" class="avatar-box">
         <div *ngFor="let avatar of avatarBox">
             <img [src]="avatar" (click)="selectAvatar(avatar)">
@@ -40,8 +45,8 @@
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
 
-        <input *ngIf="!guestAccount && !googleAccountLogIn" class="user-mail-input"
-            [(ngModel)]="currentUser.email" placeholder="{{user.email}}" />
+        <input *ngIf="!guestAccount && !googleAccountLogIn" class="user-mail-input" [(ngModel)]="currentUser.email"
+            placeholder="{{user.email}}" />
 
         <input *ngIf="guestAccount" class="user-mail-input" [value]="currentUser.email" readonly />
         <span *ngIf="guestAccount" class="error-msg">Kein Zugriff als Gast</span>
@@ -50,6 +55,8 @@
         <input *ngIf="googleAccountLogIn" class="user-mail-input" [value]="currentUser.email" disabled />
         <span *ngIf="googleAccountLogIn" class="error-msg">Mail kann nicht geändert werden</span>
     </div>
+
+
 
     <div class="button-flex">
         <button (click)="closeEditModus()" class="btn-secondary">Abbrechen</button>

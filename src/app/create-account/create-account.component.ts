@@ -81,7 +81,7 @@ export class CreateAccountComponent implements OnInit {
       await this.addUserToFirestore(this.newUser);
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
-       // this.linkAlreadySended = true;
+       this.linkAlreadySended = true;
       } else {
         console.error('Fehler beim Erstellen des Benutzers:', error);
       }

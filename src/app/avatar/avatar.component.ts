@@ -34,6 +34,7 @@ export class AvatarComponent implements OnInit {
   sendInfo: boolean = false;
   userService = inject(UserService);
   defaultPicture: any | null = '../../assets/img/picture_frame.png';
+  loading = false;
 
   avatarBox: string[] = [
     '../../assets/img/avatar/avatar1.png',
@@ -81,25 +82,26 @@ export class AvatarComponent implements OnInit {
   }
 
   async saveAvatar() {
-    if (!this.userId) {
-      return;
-    }
-    if (this.selectedFile) {
-      try {
+    if (!this.userId) return;
+  
+    this.loading = true; // Ladeanzeige starten
+    try {
+      if (this.selectedFile) {
         const filePath = `avatars/${this.userId}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
         await uploadBytes(storageRef, this.selectedFile);
         const downloadURL = await getDownloadURL(storageRef);
         await this.updateUserAvatar(downloadURL);
-        this.sendInfo = true;
-        this.checkSendIfo();
-      } catch (error) {
-        console.error('Error uploading file:', error);
+      } else if (this.choosePicture) {
+        await this.updateUserAvatar(this.choosePicture);
+      } else if (this.defaultPicture) {
+        await this.updateUserAvatar(this.defaultPicture);
       }
-    } else if (this.choosePicture) {
-      await this.updateUserAvatar(this.choosePicture);
-    } else if (this.defaultPicture) {
-      await this.updateUserAvatar(this.defaultPicture);
+      this.sendInfo = true;
+    } catch (error) {
+      console.error('Fehler beim Hochladen des Avatars:', error);
+    } finally {
+      this.loading = false; // Ladeanzeige stoppen
     }
   }
 
@@ -112,8 +114,7 @@ export class AvatarComponent implements OnInit {
     this.checkSendIfo();
     setTimeout(() => {
       this.router.navigate(['/']);
-    }, 1500);
-    
+    }, 1200);
   }
 
   checkSendIfo(): void {

@@ -40,6 +40,12 @@
                     <div class="avatar-box">
                         <img *ngFor="let avatar of avatarBox" [src]="avatar" (click)="chossePicture(avatar)">
                     </div>
+
+                    <div *ngIf="loading" class="loading-indicator">
+                        <span>Avatar wird hochgeladen...</span>
+                        <div class="spinner"></div>
+                    </div>
+
                     <div class="added-avatar">
                         <div class="picture-info-text">oder Bild</div>
                         <div>

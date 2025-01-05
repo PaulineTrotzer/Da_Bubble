@@ -31,8 +31,8 @@ import { LoginAuthService } from '../services/login-auth.service';
   styleUrl: './dialog-edit-user.component.scss',
 })
 export class DialogEditUserComponent implements OnInit {
-  googleAccountLogIn: boolean = false; 
-  loginAuthService=inject(LoginAuthService);
+  googleAccountLogIn: boolean = false;
+  loginAuthService = inject(LoginAuthService);
   user: User = new User();
   editModusOpen = true;
   userID: any;
@@ -57,6 +57,7 @@ export class DialogEditUserComponent implements OnInit {
   ];
   storage = inject(Storage);
   userData: any = {};
+  loadingSpinner = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -71,11 +72,10 @@ export class DialogEditUserComponent implements OnInit {
         }
       }
     });
-    this.loginAuthService.googleAccountLogIn$.subscribe(status => {
+    this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
     });
   }
-
 
   async getUserById(userId: string) {
     const userDocref = doc(this.firestore, 'users', userId);
@@ -121,17 +121,21 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   async saveUser() {
-    debugger;
-    const editingAvatar = await this.editAvatar(); 
+    this.loadingSpinner = true; // Ladeanzeige starten
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
-      await updateDoc(userRef, {
+      const editingAvatar = this.editAvatar();
+      const updatingUser = updateDoc(userRef, {
         name: this.currentUser.name,
         email: this.currentUser.email,
       });
+
+      await Promise.all([editingAvatar, updatingUser]); // Beide Vorgänge abwarten
       this.closeEditModus();
     } catch (error) {
-      console.error('Fehler beim Aktualisieren des Benutzers:', error);
+      console.error('Fehler beim Speichern des Benutzers:', error);
+    } finally {
+      this.loadingSpinner = false; // Ladeanzeige stoppen
     }
   }
 
@@ -140,6 +144,8 @@ export class DialogEditUserComponent implements OnInit {
       if (this.selectedFile) {
         const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
+  
+        this.loadingSpinner = true; // Ladeanzeige starten
         await uploadBytes(storageRef, this.selectedFile);
         const downloadURL = await getDownloadURL(storageRef);
         await this.updateUserAvatar(downloadURL);
@@ -147,9 +153,21 @@ export class DialogEditUserComponent implements OnInit {
         await this.updateUserAvatar(this.chossePicture);
       }
     } catch (error) {
-      console.error('Error while uploading avatar:', error);
-      alert('There was an error while uploading the avatar. Please try again.');
+      console.error('Fehler beim Hochladen des Avatars:', error);
+      alert('Beim Hochladen des Avatars ist ein Fehler aufgetreten.');
+    } finally {
+      this.loadingSpinner = false; // Ladeanzeige stoppen
     }
+  }
+
+  async uploadAvatar(): Promise<string> {
+    if (!this.selectedFile) {
+      throw new Error('Kein Datei ausgewählt');
+    }
+    const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
+    const storageRef = ref(this.storage, filePath);
+    await uploadBytes(storageRef, this.selectedFile);
+    return await getDownloadURL(storageRef);
   }
 
   async updateUserAvatar(avatarUrl: string) {
