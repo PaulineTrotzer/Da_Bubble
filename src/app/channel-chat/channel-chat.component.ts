@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -75,7 +76,6 @@ export class ChannelChatComponent implements OnInit {
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
-  overlay = inject(OverlayStatusService);
   messagesData: Message[] = [];
   showThreadInfo: boolean = false;
   showEditDialog: string | null = null;
@@ -95,14 +95,28 @@ export class ChannelChatComponent implements OnInit {
   globalService = inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
   clicked = false;
+  overlayStatusService = inject(OverlayStatusService);
 
-  constructor() {}
+  constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadChannelMessages();
     await this.loadCurrentUserEmojis();
     await this.getAllUsersname();
     await this.loadUserNames();
+    document.addEventListener(
+      'click',
+      this.closePickerIfClickedOutside.bind(this)
+    );
+  }
+
+  closePickerIfClickedOutside(event: MouseEvent) {
+    const emojiPickerContainer = this.elRef.nativeElement.querySelector(
+      '.emoji-picker-container'
+    );
+    if (emojiPickerContainer && !emojiPickerContainer.contains(event.target)) {
+      this.closeEmojiPicker(event);
+    }
   }
 
   onCancelMessageBox(): void {
@@ -216,24 +230,42 @@ export class ChannelChatComponent implements OnInit {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+    document.removeEventListener(
+      'click',
+      this.closePickerIfClickedOutside.bind(this)
+    );
   }
 
-  togglePicker(messageId: string, isEditing: boolean = false) {
-    // Wenn der Picker bereits für diese Nachricht sichtbar ist, wird er ausgeblendet.
-    const isAlreadyVisible = this.isPickerVisible === messageId;
-    
-    // Setze die Sichtbarkeit des Pickers (toggle).
-    this.isPickerVisible = isAlreadyVisible ? null : messageId;
-  
-    // Wenn der Picker angezeigt wird, setze clicked auf true.
-    this.clicked = !isAlreadyVisible;
-  
-    // Setze den Bearbeitungsmodus, wenn notwendig.
-    this.editingMessageId = isEditing ? messageId : null;
-  
-    // Aktiviere den Overlay-Status.
-    this.overlay.setOverlayStatus(true);
+  openEmojiPicker(messageId: string) {
+    this.isPickerVisible = messageId;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.clicked = true;
+    this.editingMessageId = null; 
   }
+
+  openEmojiPickerEdit(messageId: string) {
+    this.isPickerVisible = messageId;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.clicked = true;
+    this.editingMessageId = messageId; 
+  }
+
+  closeEmojiPicker(event: MouseEvent) {
+    event.stopPropagation();
+    this.overlayStatusService.setOverlayStatus(false);
+    this.clicked = false;
+    this.editingMessageId = null;
+    this.isPickerVisible = null;
+  }
+/* 
+  togglePicker(messageId: string, isEditing: boolean = false) {
+    const isAlreadyVisible = this.isPickerVisible === messageId;
+
+    this.isPickerVisible = isAlreadyVisible ? null : messageId;
+
+    this.clicked = !isAlreadyVisible;
+    this.editingMessageId = isEditing ? messageId : null;
+  } */
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();
@@ -377,22 +409,24 @@ export class ChannelChatComponent implements OnInit {
     }
 
     this.isPickerVisible = null;
-    this.overlay.setOverlayStatus(false);
+    this.overlayStatusService.setOverlayStatus(false);
   }
 
   closePicker(event: MouseEvent) {
-    event.stopPropagation(); 
-    
+    event.stopPropagation();
+
     this.isPickerVisible = null;
     this.clicked = false;
   }
 
-  
+  onPickerClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
 
   letPickerVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
-    this.overlay.setOverlayStatus(true);
+    this.overlayStatusService.setOverlayStatus(true);
   }
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {

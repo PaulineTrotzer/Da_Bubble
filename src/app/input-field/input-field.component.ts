@@ -138,35 +138,29 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async processSendMessage(): Promise<void> {
-    try {
-      if (!this.selectedUser?.uid || !this.global.currentUserData?.id) {
-        console.error('Fehlende Benutzer-IDs: Sender oder Empfänger');
-        return; 
-      }
-      const fileData = await this.uploadFilesToFirebaseStorage();
-      const messageData = this.messageData(
-        this.chatMessage,
-        this.senderStickerCount,
-        this.recipientStickerCount
-      );
-      messageData.senderId = this.global.currentUserData?.id;
-      messageData.recipientId = this.selectedUser?.uid;
-      messageData.selectedFiles = fileData;
-      const messagesRef = collection(this.firestore, 'messages');
-      const docRef = await addDoc(messagesRef, messageData);
-      if (!docRef.id) {
-        console.error('Fehler: Nachricht konnte nicht gespeichert werden.');
-        return;
-      }
-      const messageWithId = { ...messageData, id: docRef.id };
-      this.messagesData.push(messageWithId);
+    if (this.selectedChannel && !this.isChannelThreadOpen) {
+      await this.sendChannelMessage();
+    } else if (this.isDirectThreadOpen) {
+      await this.sendDirectThreadMessage();
       await this.setMessageCount();
-      this.messageSent.emit();
-      this.chatMessage = '';
-      this.formattedChatMessage = '';
-      this.selectFiles = [];
-    } catch (error) {
-      console.error('Fehler beim Senden der Nachricht:', error);
+    } else if (this.isChannelThreadOpen) {
+      await this.sendChannelThreadMessage();
+    } else {
+      try {
+        const fileData = await this.uploadFilesToFirebaseStorage();
+        const messageData = this.messageData(
+          this.chatMessage,
+          this.senderStickerCount,
+          this.recipientStickerCount
+        );
+        messageData.selectedFiles = fileData;
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+        const messageWithId = { ...messageData, id: docRef.id };
+        console.log('Nachricht gesendet:', messageWithId); // Hinzufügen einer Erfolgsnachricht
+      } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error); // Fehlerbehandlung
+      }
     }
   }
   
@@ -300,7 +294,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Channel is not selected or message is empty');
       return;
     }
-
     const channelMessagesRef = collection(
       this.firestore,
       'channels',

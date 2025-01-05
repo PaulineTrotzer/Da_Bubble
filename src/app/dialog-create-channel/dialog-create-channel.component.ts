@@ -80,11 +80,9 @@ export class DialogCreateChannelComponent implements OnInit {
     const result = {
       name: this.channel.name,
       userIds: this.channel.userIds,
-      id: this.channel.id, // falls nötig
+      id: this.channel.id, 
     };
-
-    // Dialog mit den Ergebnissen schließen
-    this.dialogRef.close(result); // Hier `dialogRef.close(result)` verwenden
+    this.dialogRef.close(result);
   }
 
 
