@@ -100,6 +100,7 @@ export class ChannelThreadComponent implements OnInit {
   wasClickedInChannelThread = false;
   getAllUsersName: any[] = [];
   isClicked = false;
+  isClickedEdit = false;
 
   constructor() {}
 
@@ -332,7 +333,7 @@ export class ChannelThreadComponent implements OnInit {
     return userData?.['lastEmojis'] || [];
   }
 
-  togglePicker(messageId: string) {
+/*   togglePicker(messageId: string) {
     if (this.isPickerVisible === messageId) {
       this.isPickerVisible = null;
       this.visiblePickerValue = false;
@@ -343,7 +344,7 @@ export class ChannelThreadComponent implements OnInit {
       this.editingMessageId = messageId;
       this.overlayStatusService.setOverlayStatus(true);
     }
-  }
+  } */
 
   letPickerVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
@@ -359,12 +360,21 @@ export class ChannelThreadComponent implements OnInit {
     this.editingMessageId = null;
   }
 
+  openEmojiPickerEdit(messageId: string) {
+    this.isPickerVisible = messageId;
+    this.visiblePickerValue = true;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.isClicked = true;
+    this.editingMessageId = messageId;
+  }
+
   closeEmojiPicker(event: MouseEvent) {
     event.stopPropagation();
     this.overlayStatusService.setOverlayStatus(false);
     this.isClicked = false;
     this.editingMessageId = null;
     this.isPickerVisible = null;
+    this.isClickedEdit = false;
   }
 
   closePicker() {

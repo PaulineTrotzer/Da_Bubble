@@ -16,7 +16,6 @@
   font-size: 13px;
 }
 
-
 .channel-name {
   font-family: "Nunito";
   color: #797ef3;
@@ -33,6 +32,10 @@
   align-items: center;
   justify-content: center;
   background-color: white;
+  z-index: 2;
+  position: relative;
+  left: 6px;
+  bottom: 2px;
   cursor: pointer;
   &:hover {
     background-color: #eceefe;
@@ -117,7 +120,7 @@ header {
     white-space: nowrap;
     color: #adb0d9;
     font-family: Nunito;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 24.55px;
     text-align: left;
@@ -227,22 +230,25 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
+  height: 38px;
 }
 
 .emoji {
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
     sans-serif;
   display: flex;
-  height: 32px;
-  width: 32px;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  height: 35px;
   padding: 4px;
   border-radius: 100%;
+  line-height: 1;
+  text-align: center;
   &:hover {
     background-color: #eceefe;
   }
-  cursor: pointer;
 }
-
 .reaction-info {
   display: flex;
   align-items: center;
@@ -304,7 +310,6 @@ header {
   z-index: 9999;
 }
 
-
 .message-edit-dialog {
   background-color: white;
   position: absolute;
@@ -347,14 +352,11 @@ header {
   object-fit: cover;
 }
 
-
 .button-row {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 32px;
-  position: absolute;
-  bottom: 23px;
+  gap: 6px;
+  z-index: 2;
+  padding-right: 8px;
   .save-icon {
     object-fit: contain;
     width: 24px;
@@ -375,8 +377,22 @@ header {
   }
 }
 
+.bottom-row-edit {
+  display: flex;
+  align-items: end;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 textarea {
- padding: 20px 0px 0px 65px;
+  padding: 10px;
   border-radius: 20px;
   border: 1px solid #adb0d9;
   resize: none;
@@ -393,25 +409,27 @@ textarea {
   font-size: 16px;
   position: relative;
   top: 45px;
-  &:focus{
+  &:focus {
     font-size: 16px;
   }
 }
 
+.message-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+}
+
 .textarea {
-  position: absolute;
-  bottom: 16px;
-  left: 54px;
-  background-color: white;
+  svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 form {
   width: 100%;
-}
-
-.edit-message-button-row {
-  gap: 8px;
-  right: 148px;
 }
 
 .edit-button {
