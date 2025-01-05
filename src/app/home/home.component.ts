@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { getAuth, onAuthStateChanged } from '@angular/fire/auth';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
+import { Firestore, collection, doc, getDocs, onSnapshot } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
@@ -47,6 +48,7 @@ export class HomeComponent implements OnInit {
   loginAuthService = inject(LoginAuthService);
   isOverlayVisible = true;
   userChannelService=inject(UserChannelSelectService);
+  firestore=inject(Firestore);
 
   ngOnInit(): void {
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
@@ -57,6 +59,25 @@ export class HomeComponent implements OnInit {
     this.subscribeToGuestLoginStatus();
     this.setDirectThread();
     this.setChannelThread();
+  }
+
+  async loadUserData(userId: string) {
+    const userRef = collection(this.firestore, 'users');
+    const userDocRef = doc(userRef, userId);
+  
+    // Echtzeit-Listener, der alle Änderungen an diesem spezifischen Dokument verfolgt
+    onSnapshot(userDocRef, (docSnapshot: { data: () => any; }) => {
+      const dataUser = docSnapshot.data();
+      if (dataUser) {
+        const userName = dataUser['name'];
+        const userPicture = dataUser['profilePicture'];  
+        const uid = dataUser['uid'];
+  
+        if (uid === userId) {
+          this.selectedUser = { userName, userPicture, uid };
+        }
+      }
+    });
   }
 
 
@@ -74,8 +95,13 @@ export class HomeComponent implements OnInit {
         setTimeout(() => {
           this.isOverlayVisible = false;
         }, 1100);
+        
+        // Wenn der Benutzer eingeloggt ist, Benutzerinformationen laden
+        this.loadUserData(user.uid);
       } else {
         this.isOverlayVisible = false;
+        // Benutzer abgemeldet, daher können wir die Benutzerinformation zurücksetzen
+        this.selectedUser = null;
       }
     });
   }

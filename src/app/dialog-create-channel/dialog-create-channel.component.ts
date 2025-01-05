@@ -85,7 +85,6 @@ export class DialogCreateChannelComponent implements OnInit {
     this.dialogRef.close(result);
   }
 
-
   async addChannel() {
     const channelsRef = collection(this.db, 'channels');
     const channelQuery = query(
@@ -93,17 +92,20 @@ export class DialogCreateChannelComponent implements OnInit {
       where('name', '==', this.channel.name)
     );
     const querySnapshot = await getDocs(channelQuery);
-
+  
     if (!querySnapshot.empty) {
       this.channelExists = true;
       return;
     }
-
+  
     const docRef = await addDoc(channelsRef, this.channel.toJSON());
     this.channel.id = docRef.id;
     await updateDoc(doc(channelsRef, docRef.id), { id: docRef.id });
     this.workspaceService.updateChannel(this.channel);
-
+  
+    // Dialog nach dem Erstellen des Channels öffnen
+    this.openDialog(this.channel.id);
+  
     this.closeDialog();
   }
 

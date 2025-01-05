@@ -89,7 +89,8 @@ form {
   cursor: pointer;
   img {
     height: 50px;
-    min-width: 50px;
+    width: 50px;
+    object-fit: cover;
     border-radius: 100%;
   }
 }

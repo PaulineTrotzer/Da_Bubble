@@ -22,12 +22,12 @@ import {
 } from '@angular/fire/firestore';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { getAuth } from '@angular/fire/auth';
+import { Auth, authState, getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
-import { GlobalService } from '../global.service';
+
 
 interface Message {
   id: string;
@@ -73,6 +73,7 @@ interface Message {
 })
 export class ChannelChatComponent implements OnInit {
   isEdited = false;
+  @Input() inputMessagesData: any[] = []; 
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
@@ -96,19 +97,33 @@ export class ChannelChatComponent implements OnInit {
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
   clicked = false;
   overlayStatusService = inject(OverlayStatusService);
+ auth = inject(Auth);
 
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadChannelMessages();
     await this.loadCurrentUserEmojis();
-    await this.getAllUsersname();
+   // await this.getAllUsersname();
     await this.loadUserNames();
     document.addEventListener(
       'click',
       this.closePickerIfClickedOutside.bind(this)
     );
   }
+
+
+  async ngOnChanges(changes: SimpleChanges) {
+    if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
+      console.log('Input Nachrichten geändert:', this.inputMessagesData);
+      this.messagesData = this.inputMessagesData;  // Weisen Sie die Eingabedaten der lokalen Variable zu
+      this.loadUserNames();  // Lade Benutzernamen, wenn Nachrichten vorhanden sind
+    }
+      if (changes['selectedChannel'] && this.selectedChannel) {
+        await this.loadChannelMessages();
+      }
+  }
+
 
   closePickerIfClickedOutside(event: MouseEvent) {
     const emojiPickerContainer = this.elRef.nativeElement.querySelector(
@@ -126,18 +141,23 @@ export class ChannelChatComponent implements OnInit {
   enterChatByUserName(user: any) {
     this.enterChatFromChannel.emit(user);
   }
-
+/* 
   async getAllUsersname() {
+    debugger;
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
       this.getAllUsersName = [];
       querySnapshot.forEach((doc) => {
         const dataUser = doc.data();
-        const userName = dataUser['name'];
-        this.getAllUsersName.push({ userName });
+        if (dataUser) {
+          const userName = dataUser['name'];
+          const userPicture = dataUser['profilePicture'];
+          this.getAllUsersName.push({ userName, userPicture });
+        }
       });
     });
-  }
+  } */
+  
 
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelInput = true;
@@ -174,31 +194,45 @@ export class ChannelChatComponent implements OnInit {
   }
 
   async loadUserNames() {
-    const auth = getAuth();
-    const userDocs = await Promise.all(
-      this.messagesData
-        .flatMap((message) =>
-          Object.values(message.reactions || {})
-            .flat()
-            .filter((userId) => userId !== auth.currentUser?.uid)
-        )
-        .filter((userId, index, self) => self.indexOf(userId) === index)
-        .map((userId) => getDoc(doc(this.firestore, 'users', userId)))
-    );
-
-    userDocs.forEach((doc) => {
-      const userData = doc.data();
-      if (userData?.['name']) {
-        this.reactionUserNames[doc.id] = userData['name'];
-      }
-    });
-  }
-
-  async ngOnChanges(changes: SimpleChanges): Promise<void> {
-    if (changes['selectedChannel'] && this.selectedChannel) {
-      await this.loadChannelMessages();
+    try {
+      console.log("loadUserNames Funktion wird aufgerufen");
+      console.log("messagesData:", this.messagesData); // Überprüfe den Inhalt
+  
+      const auth = getAuth();
+      const userDocs = await Promise.all(
+        this.messagesData
+          .flatMap((message) => {
+            console.log('Message Reactions:', message.reactions);  // Debugging
+            return Object.values(message.reactions || {})
+              .flat()
+              .filter((userId) => userId !== auth.currentUser?.uid);
+          })
+          .filter((userId, index, self) => self.indexOf(userId) === index)
+          .map((userId) => {
+            console.log('Fetching user with ID:', userId);  // Debugging
+            return getDoc(doc(this.firestore, 'users', userId));
+          })
+      );
+  
+      userDocs.forEach((doc) => {
+        console.log('Fetched Document:', doc);  // Debugging
+  
+        if (doc.exists()) {
+          const userData = doc.data();
+          console.log('User Data:', userData);  // Debugging
+          if (userData?.['name']) {
+            this.reactionUserNames[doc.id] = userData['name'];
+          }
+        } else {
+          console.log(`No user found for ID: ${doc.id}`);
+        }
+      });
+    } catch (error) {
+      console.error("Error loading user names:", error);
     }
   }
+  
+
 
   async loadChannelMessages() {
     if (!this.selectedChannel) {
@@ -257,15 +291,7 @@ export class ChannelChatComponent implements OnInit {
     this.editingMessageId = null;
     this.isPickerVisible = null;
   }
-/* 
-  togglePicker(messageId: string, isEditing: boolean = false) {
-    const isAlreadyVisible = this.isPickerVisible === messageId;
 
-    this.isPickerVisible = isAlreadyVisible ? null : messageId;
-
-    this.clicked = !isAlreadyVisible;
-    this.editingMessageId = isEditing ? messageId : null;
-  } */
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();

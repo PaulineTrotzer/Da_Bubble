@@ -32,6 +32,7 @@ import { WelcomeSheetComponent } from '../welcome-sheet/welcome-sheet.component'
 import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
+import { MemberDataService } from '../services/member-data.service';
 
 interface ChannelData {
   userIds: string[];
@@ -76,6 +77,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() onHeaderUser: any;
   @Output() enterChat = new EventEmitter<any>();
 
+
   channelMembers: any[] = [];
   messagesData: any = [];
   commentImages: string[] = [
@@ -109,6 +111,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   loginAuthService = inject(LoginAuthService);
   enterChatByUser: any;
   userChannelService = inject(UserChannelSelectService);
+  memberDataService=inject(MemberDataService);
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
@@ -285,26 +288,22 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.channelMembers = [];
       return;
     }
-
+  
     try {
-      const channelRef = doc(
-        this.firestore,
-        'channels',
-        this.selectedChannel.id
-      );
-
+      const channelRef = doc(this.firestore, 'channels', this.selectedChannel.id);
+  
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
-
-          // Überprüfe, ob userIds leer oder ungültig ist
+  
+          // Überprüfen, ob userIds ein nicht-leeres Array ist
           if (!userIds || userIds.length === 0) {
             console.log('Keine Benutzer im Kanal vorhanden.');
             this.channelMembers = []; // Leere Mitgliederliste setzen
-            return; // Frühzeitig die Funktion verlassen
+            return;
           }
-
+  
           const membersPromises = userIds.map(async (userId: string) => {
             const userRef = doc(this.firestore, 'users', userId);
             const userSnap = await getDoc(userRef);
@@ -316,7 +315,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
             }
             return null;
           });
-
+  
           const members = await Promise.all(membersPromises);
           this.channelMembers = members.filter(
             (member: any) => member !== null
@@ -328,7 +327,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       console.error('Fehler beim Abrufen der Kanalmitglieder:', error);
     }
   }
-
+  
   async getcurrentUserById(userId: string) {
     try {
       const userRef = doc(this.firestore, 'users', userId);

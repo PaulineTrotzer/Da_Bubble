@@ -117,6 +117,8 @@ export class ChannelThreadComponent implements OnInit {
     });
   }
 
+  
+
   async getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
     onSnapshot(userRef, (querySnapshot) => {
@@ -349,7 +351,16 @@ export class ChannelThreadComponent implements OnInit {
   letPickerVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
+    this.visiblePickerValue = true;
+    this.isClicked = true;
     this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  letPickerEditVisible(event: MouseEvent, messageId: string) {
+    console.log("Clicked:", messageId);
+    this.isClickedEdit = true;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.showEditArea = messageId;
   }
 
   openEmojiPicker(messageId: string) {

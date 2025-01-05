@@ -404,7 +404,7 @@
                 </div>
             </div>
         </div>
-        <app-channel-chat (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
+        <app-channel-chat [inputMessagesData]="messagesData"  (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
             [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">

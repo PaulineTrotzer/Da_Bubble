@@ -13,11 +13,17 @@ import {
   doc,
   Firestore,
   getDoc,
+  getDocs,
   onSnapshot,
+  query,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
+import { GlobalVariableService } from '../services/global-variable.service';
+import { User } from '../models/user.class';
+import { MemberDataService } from '../services/member-data.service';
 
 @Component({
   selector: 'app-dialog-add-user',
@@ -28,9 +34,10 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class DialogAddUserComponent implements OnInit {
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { channelId: string, userId: string},
+    @Inject(MAT_DIALOG_DATA) public data: { channelId: string; userId: string },
     private db: Firestore,
     private dialogRef: MatDialogRef<DialogAddUserComponent>,
+    private route: ActivatedRoute
   ) {}
   readonly dialog = inject(MatDialog);
   isHovered: boolean = false;
@@ -41,10 +48,37 @@ export class DialogAddUserComponent implements OnInit {
   allUsers: any[] = [];
   filteredUsers: any[] = [];
   selectedUsers: any[] = [];
+  currentUser: any;
+  currentUserId: any;
+  global = inject(GlobalVariableService);
+  firestore=inject(Firestore);
+  memberDataService=inject(MemberDataService);
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.getCreatedChannel(this.data.channelId);
     this.getAllUsers();
+    await this.loadUserData();
+  }
+
+  async loadUserData(): Promise<void> {
+    this.currentUserId = this.route.snapshot.paramMap.get('id');
+    this.currentUser = this.currentUserId;
+    await this.getcurrentUserById(this.currentUserId);
+  }
+
+  async getcurrentUserById(userId: string) {
+    try {
+      const userRef = doc(this.firestore, 'users', userId);
+      const userSnapshot = await getDoc(userRef);
+      if (userSnapshot.exists()) {
+        this.global.currentUserData = {
+          id: userSnapshot.id,
+          ...userSnapshot.data(),
+        };
+      }
+    } catch (error) {
+      console.error('Fehler beim Abruf s Benutzers:', error);
+    }
   }
 
   async onSubmit(form: any) {
@@ -57,38 +91,59 @@ export class DialogAddUserComponent implements OnInit {
   }
 
   private async addAllUsersToChannel() {
-    const userIds = this.allUsers.map(user => user.uid);
+    const userIds = this.allUsers.map((user) => user.uid);
     await this.updateChannelUserIds(userIds);
   }
 
   private async addSelectedUsersToChannel() {
-    const userIds = this.selectedUsers.map(user => user.uid);
+    const userIds = this.selectedUsers.map((user) => user.uid);
+    if (this.currentUser) {
+      userIds.push(this.currentUser.uid);
+    }
     await this.updateChannelUserIds(userIds);
   }
 
-  private async updateChannelUserIds(userIds: string[]) {
+   async updateChannelUserIds(userIds: string[]) {
     const channelRef = doc(this.db, 'channels', this.data.channelId);
     try {
+      // Update der User-IDs im Kanal-Dokument
       await updateDoc(channelRef, {
         userIds: arrayUnion(...userIds),
-        createdBy: this.data.userId || ''
+        createdBy: this.data.userId || '',
       });
-      console.log('Users added successfully to the channel');
+  
+      // Hole die aktuellen Benutzer des Kanals und setze sie im Service
+      const updatedChannelDoc = await getDoc(channelRef);
+      if (updatedChannelDoc.exists()) {
+        const channelData = updatedChannelDoc.data();
+        const userIdsInChannel = channelData?.['userIds'] || [];
+  
+        // Hole die Benutzerdaten aus Firestore
+        const usersRef = collection(this.db, 'users');
+        const usersQuery = query(usersRef, where('uid', 'in', userIdsInChannel));
+        const querySnapshot = await getDocs(usersQuery);
+  
+        const members = querySnapshot.docs.map((doc) => doc.data());
+        
+        // Setze die Mitglieder im Service
+        this.memberDataService.setMembers(members);
+  
+        console.log('Users added successfully to the channel');
+      }
     } catch (error) {
       console.error('Error adding users to the channel:', error);
     }
   }
-
+  
   closeDialog() {
     this.dialog.closeAll();
   }
 
   getAllUsers() {
     const colRef = collection(this.db, 'users');
-    const docRef = onSnapshot(colRef, (user) => {
-      user.forEach((doc) => {
-        this.allUsers.push(doc.data());
-      });
+    onSnapshot(colRef, (snapshot) => {
+      this.allUsers = snapshot.docs.map((doc) => doc.data());
+
     });
   }
 
@@ -104,9 +159,7 @@ export class DialogAddUserComponent implements OnInit {
       this.filteredUsers = [];
       const searchTerm = this.searchInput.toLowerCase();
       this.filteredUsers = this.allUsers.filter((user) => {
-        return (
-          user.name && user.name.toLowerCase().includes(searchTerm)
-        );
+        return user.name && user.name.toLowerCase().includes(searchTerm);
       });
     }
   }
@@ -154,9 +207,9 @@ export class DialogAddUserComponent implements OnInit {
 
   updateDialogHeight() {
     if (this.selectUsers) {
-      this.dialogRef.updateSize('710px', '354px'); // Set height to 500px when selectUsers is true
+      this.dialogRef.updateSize('710px', '354px');
     } else {
-      this.dialogRef.updateSize('710px', '310px'); // Set height to 300px when selectUsers is false
+      this.dialogRef.updateSize('710px', '310px');
     }
   }
 }
