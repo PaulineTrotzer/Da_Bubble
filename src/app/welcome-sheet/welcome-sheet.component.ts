@@ -17,14 +17,12 @@ export class WelcomeSheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribeToGuestLoginStatus();
-    console.log('isGuestAccount', this.isGuestAccount);
   }
 
   subscribeToGuestLoginStatus(): void {
     this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestAccount = status;
-        console.log('after', this.isGuestAccount);
       }
     );
   }

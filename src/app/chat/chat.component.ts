@@ -218,7 +218,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.overlayStatusService.setOverlayStatus(false);
   }
 
   openEmojiPickerEdit() {
@@ -227,7 +227,6 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   closePickerEdit() {
-    debugger;
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerVisibleEdit = false;
   }

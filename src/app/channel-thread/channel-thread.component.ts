@@ -36,7 +36,7 @@ interface Message {
   senderName: string;
   senderPicture: string;
   reactions: { [emoji: string]: string[] };
-  isEdited: boolean
+  isEdited: boolean;
 }
 
 @Component({
@@ -78,7 +78,7 @@ export class ChannelThreadComponent implements OnInit {
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
-  overlay = inject(OverlayStatusService);
+  overlayStatusService = inject(OverlayStatusService);
   topicMessage: Message | null = null;
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
@@ -99,6 +99,7 @@ export class ChannelThreadComponent implements OnInit {
   @Output() enterChatUser = new EventEmitter<any>();
   wasClickedInChannelThread = false;
   getAllUsersName: any[] = [];
+  isClicked = false;
 
   constructor() {}
 
@@ -330,23 +331,46 @@ export class ChannelThreadComponent implements OnInit {
     const userData = userDoc.data();
     return userData?.['lastEmojis'] || [];
   }
+
   togglePicker(messageId: string) {
     if (this.isPickerVisible === messageId) {
       this.isPickerVisible = null;
       this.visiblePickerValue = false;
-      this.overlay.setOverlayStatus(false);
+      this.overlayStatusService.setOverlayStatus(false);
     } else {
       this.isPickerVisible = messageId;
       this.visiblePickerValue = true;
       this.editingMessageId = messageId;
-      this.overlay.setOverlayStatus(true);
+      this.overlayStatusService.setOverlayStatus(true);
     }
+  }
+
+  letPickerVisible(event: MouseEvent, messageId: string) {
+    event.stopPropagation();
+    this.isPickerVisible = messageId;
+    this.overlayStatusService.setOverlayStatus(true);
+  }
+
+  openEmojiPicker(messageId: string) {
+    this.visiblePickerValue = true;
+    this.isPickerVisible = messageId;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.isClicked = true;
+    this.editingMessageId = null;
+  }
+
+  closeEmojiPicker(event: MouseEvent) {
+    event.stopPropagation();
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isClicked = false;
+    this.editingMessageId = null;
+    this.isPickerVisible = null;
   }
 
   closePicker() {
     this.isPickerVisible = null;
     this.visiblePickerValue = false;
-    this.overlay.setOverlayStatus(false);
+    this.overlayStatusService.setOverlayStatus(false);
   }
 
   async removeReaction(emoji: string, messageId: string) {
@@ -567,17 +591,17 @@ export class ChannelThreadComponent implements OnInit {
             );
       await updateDoc(messageDocRef, {
         text: this.messageToEdit,
-        isEdited: true
+        isEdited: true,
       });
       this.showEditArea = null;
       this.messageToEdit = '';
-  
+
       console.log(`Message ${messageId} updated successfully.`);
     } catch (error) {
       console.error('Error saving edited message:', error);
     }
   }
-  
+
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {
       this.showEditArea = null;

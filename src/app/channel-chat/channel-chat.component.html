@@ -93,7 +93,8 @@
               </ng-container>
             </div>
           </div>
-          <span *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
+          <span *ngIf="message.isEdited && global.currentUserData.id == message.senderId" class="edited-label-cu-view">(Bearbeitet)</span>
+          <span *ngIf="message.isEdited && global.currentUserData.id != message.senderId" class="edited-label-selu-view">(Bearbeitet)</span>
 
 
 

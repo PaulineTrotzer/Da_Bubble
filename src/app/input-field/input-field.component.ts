@@ -78,7 +78,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   @Output() mentionCardOpened = new EventEmitter<boolean>();
   isMentionPeopleCardVisible: boolean = false;
   isMentionCardOpen: boolean = true;
-  @Output() mentionUserOut = new EventEmitter<string>(); 
+  @Output() mentionUserOut = new EventEmitter<string>();
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -157,16 +157,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
-        console.log('Nachricht gesendet:', messageWithId); // Hinzufügen einer Erfolgsnachricht
+        console.log('Nachricht gesendet:', messageWithId);
       } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error); // Fehlerbehandlung
+        console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
   }
-  
-  
-  
-
 
   async sendChannelThreadMessage() {
     if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {
@@ -374,7 +370,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   handleCardClosed() {
     this.isMentionPeopleCardVisible = false;
   }
-
 
   updateFormattedMessage() {
     const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;

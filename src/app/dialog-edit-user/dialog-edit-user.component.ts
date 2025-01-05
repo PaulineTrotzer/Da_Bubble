@@ -135,7 +135,7 @@ export class DialogEditUserComponent implements OnInit {
     } catch (error) {
       console.error('Fehler beim Speichern des Benutzers:', error);
     } finally {
-      this.loadingSpinner = false; // Ladeanzeige stoppen
+      this.loadingSpinner = false; 
     }
   }
 
@@ -145,7 +145,7 @@ export class DialogEditUserComponent implements OnInit {
         const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
   
-        this.loadingSpinner = true; // Ladeanzeige starten
+        this.loadingSpinner = true; 
         await uploadBytes(storageRef, this.selectedFile);
         const downloadURL = await getDownloadURL(storageRef);
         await this.updateUserAvatar(downloadURL);
@@ -156,7 +156,7 @@ export class DialogEditUserComponent implements OnInit {
       console.error('Fehler beim Hochladen des Avatars:', error);
       alert('Beim Hochladen des Avatars ist ein Fehler aufgetreten.');
     } finally {
-      this.loadingSpinner = false; // Ladeanzeige stoppen
+      this.loadingSpinner = false; 
     }
   }
 

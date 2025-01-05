@@ -30,7 +30,7 @@
     <div class="topic-container" (mouseenter)="hoveredTopic = true" (mouseleave)="hoveredTopic = false">
       <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
         <form>
-          <div class="img-container textarea" (click)="togglePicker(topicMessage?.id!)">
+          <div class="img-container textarea" (click)="openEmojiPicker(topicMessage?.id!)">
             <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
               <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
                 height="24">
@@ -59,9 +59,9 @@
         *ngIf="showEditDialog === topicMessage?.id!">
         <span>Nachricht bearbeiten</span>
       </div>
-      <div (click)="closePicker()" class="emoji-container"
+      <div (click)="closeEmojiPicker($event)" class="emoji-picker-container"
         *ngIf="isPickerVisible === topicMessage?.id && visiblePickerValue">
-        <emoji-mart size="18" (emojiClick)="
+        <emoji-mart (click)="letPickerVisible($event, topicMessage!.id!)" size="18" (emojiClick)="
             addEmojiToMessage($event.emoji.native, topicMessage?.id!)
           "></emoji-mart>
       </div>
@@ -77,7 +77,7 @@
             {{ emoji }}
           </span>
         </div>
-        <div class="img-container" (click)="togglePicker(topicMessage?.id!)">
+        <div class="img-container" (click)="openEmojiPicker(topicMessage?.id!)">
           <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
             <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
               height="24">
@@ -195,7 +195,7 @@
         <span>Nachricht bearbeiten</span>
       </div>
 
-      <div (click)="closePicker()" class="emoji-container" *ngIf="isPickerVisible === message.id && visiblePickerValue">
+      <div (click)="closeEmojiPicker($event)" class="emoji-container" *ngIf="isPickerVisible === message.id && visiblePickerValue && isClicked">
         <emoji-mart size="18" (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
       </div>
       <div @slideIn class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" [ngClass]="{
@@ -209,7 +209,7 @@
             {{ emoji }}
           </span>
         </div>
-        <div class="img-container" (click)="togglePicker(message.id)">
+        <div class="img-container" (click)="openEmojiPicker(message.id)">
           <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
             <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
               height="24">
@@ -260,7 +260,7 @@
               </span>
             </ng-container>
           </div>
-          
+
           <div *ngIf="message.isEdited" class="edited-indicator">
             <span>(Bearbeitet)</span>
           </div>

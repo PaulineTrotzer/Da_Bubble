@@ -83,8 +83,7 @@ export class AvatarComponent implements OnInit {
 
   async saveAvatar() {
     if (!this.userId) return;
-  
-    this.loading = true; // Ladeanzeige starten
+    this.loading = true; 
     try {
       if (this.selectedFile) {
         const filePath = `avatars/${this.userId}/${this.selectedFile.name}`;
@@ -101,7 +100,7 @@ export class AvatarComponent implements OnInit {
     } catch (error) {
       console.error('Fehler beim Hochladen des Avatars:', error);
     } finally {
-      this.loading = false; // Ladeanzeige stoppen
+      this.loading = false; 
     }
   }
 
