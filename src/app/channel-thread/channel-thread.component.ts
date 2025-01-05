@@ -101,6 +101,7 @@ export class ChannelThreadComponent implements OnInit {
   getAllUsersName: any[] = [];
   isClicked = false;
   isClickedEdit = false;
+  threadMessageId: string | null = null;
 
   constructor() {}
 
@@ -108,6 +109,7 @@ export class ChannelThreadComponent implements OnInit {
     this.global.channelThread$.subscribe(async (threadId) => {
       if (threadId) {
         this.channelMessageId = threadId;
+        this.threadMessageId = threadId;
         await this.getTopic();
         await this.loadThreadMessages();
         this.toggleChannelThread(true);
@@ -116,8 +118,6 @@ export class ChannelThreadComponent implements OnInit {
       }
     });
   }
-
-  
 
   async getAllUsersname() {
     const userRef = collection(this.firestore, 'users');
@@ -335,19 +335,6 @@ export class ChannelThreadComponent implements OnInit {
     return userData?.['lastEmojis'] || [];
   }
 
-/*   togglePicker(messageId: string) {
-    if (this.isPickerVisible === messageId) {
-      this.isPickerVisible = null;
-      this.visiblePickerValue = false;
-      this.overlayStatusService.setOverlayStatus(false);
-    } else {
-      this.isPickerVisible = messageId;
-      this.visiblePickerValue = true;
-      this.editingMessageId = messageId;
-      this.overlayStatusService.setOverlayStatus(true);
-    }
-  } */
-
   letPickerVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
@@ -357,7 +344,7 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   letPickerEditVisible(event: MouseEvent, messageId: string) {
-    console.log("Clicked:", messageId);
+    console.log('Clicked:', messageId);
     this.isClickedEdit = true;
     this.overlayStatusService.setOverlayStatus(true);
     this.showEditArea = messageId;
@@ -461,35 +448,45 @@ export class ChannelThreadComponent implements OnInit {
       console.warn('No current user logged in');
     }
   }
-
   async addEmojiToMessage(emoji: string, messageId: string) {
+    debugger;
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
 
     if (this.editingMessageId === messageId) {
       this.messageToEdit += emoji;
     } else if (currentUserId) {
-      const messageDocRef =
-        messageId === this.topicMessage?.id
-          ? doc(
-              this.db,
-              'channels',
-              this.selectedChannel.id,
-              'messages',
-              messageId
-            )
-          : doc(
-              this.db,
-              'channels',
-              this.selectedChannel.id,
-              'messages',
-              this.channelMessageId,
-              'thread',
-              messageId
-            );
+      // Überprüfen, ob die Nachricht zu einem Thread gehört
+      const isInThread = messageId === this.threadMessageId;
+      console.log('isit?', isInThread);
 
-      getDoc(messageDocRef).then((messageSnapshot) => {
+      const messageDocRef = isInThread
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
+        : doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            this.channelMessageId,
+            'thread',
+            messageId
+          );
+
+      console.log('Pfad zur Nachricht:', messageDocRef.path);
+
+      // Hole das Dokument und prüfe, ob es existiert
+      const messageSnapshot = await getDoc(messageDocRef);
+
+      if (messageSnapshot.exists()) {
+        // Nur wenn das Dokument existiert
         const messageData = messageSnapshot.data();
+        console.log('Nachricht Daten:', messageData);
         const reactions = messageData?.['reactions'] || {};
 
         let oldReaction: string | null = null;
@@ -506,7 +503,6 @@ export class ChannelThreadComponent implements OnInit {
           );
           if (reactions[emoji].length === 0) {
             delete reactions[emoji];
-            this.hoveredReactionMessageId = null;
           }
         } else {
           if (oldReaction) {
@@ -517,15 +513,17 @@ export class ChannelThreadComponent implements OnInit {
               delete reactions[oldReaction];
             }
           }
-
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
 
-        updateDoc(messageDocRef, { reactions });
-      });
+        // Aktualisiere nur, wenn das Dokument existiert
+        await updateDoc(messageDocRef, { reactions });
+      } else {
+        console.error('Dokument existiert nicht!');
+      }
     }
 
     this.isPickerVisible = null;
@@ -616,8 +614,6 @@ export class ChannelThreadComponent implements OnInit {
       });
       this.showEditArea = null;
       this.messageToEdit = '';
-
-      console.log(`Message ${messageId} updated successfully.`);
     } catch (error) {
       console.error('Error saving edited message:', error);
     }

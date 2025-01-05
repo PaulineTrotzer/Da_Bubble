@@ -387,22 +387,10 @@ header {
   height: fit-content;
 }
 
-
 .textarea-wrapper {
   position: relative;
   width: 100%;
 }
-
-.textarea-wrapper-topic {
-  position: relative;
-  width: 100%;
-}
-
-.textarea-wrapper textarea {
-  flex: 1; /* Textarea takes the remaining space */
-  margin-right: 10px; /* Space between textarea and image */
-}
-
 
 textarea {
   padding: 10px;
@@ -417,7 +405,7 @@ textarea {
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
-/*   width: 100%; */
+  width: 100%;
   height: 105px;
   font-size: 16px;
   position: relative;
