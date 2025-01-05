@@ -19,10 +19,8 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
-import { User } from '../models/user.class';
 import { MemberDataService } from '../services/member-data.service';
 
 @Component({
@@ -57,29 +55,9 @@ export class DialogAddUserComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.getCreatedChannel(this.data.channelId);
     this.getAllUsers();
-    await this.loadUserData();
   }
 
-  async loadUserData(): Promise<void> {
-    this.currentUserId = this.route.snapshot.paramMap.get('id');
-    this.currentUser = this.currentUserId;
-    await this.getcurrentUserById(this.currentUserId);
-  }
 
-  async getcurrentUserById(userId: string) {
-    try {
-      const userRef = doc(this.firestore, 'users', userId);
-      const userSnapshot = await getDoc(userRef);
-      if (userSnapshot.exists()) {
-        this.global.currentUserData = {
-          id: userSnapshot.id,
-          ...userSnapshot.data(),
-        };
-      }
-    } catch (error) {
-      console.error('Fehler beim Abruf s Benutzers:', error);
-    }
-  }
 
   async onSubmit(form: any) {
     if (this.addAllUsers && form.valid) {
@@ -95,37 +73,29 @@ export class DialogAddUserComponent implements OnInit {
     await this.updateChannelUserIds(userIds);
   }
 
-  private async addSelectedUsersToChannel() {
-    const userIds = this.selectedUsers.map((user) => user.uid);
-    if (this.currentUser) {
-      userIds.push(this.currentUser.uid);
-    }
+   async addSelectedUsersToChannel() {
+    const selectedUsersWithCurrentUser = [...this.selectedUsers, this.global.currentUserData];
+    const userIds = selectedUsersWithCurrentUser.map((user) => user.uid);
+
     await this.updateChannelUserIds(userIds);
   }
 
    async updateChannelUserIds(userIds: string[]) {
     const channelRef = doc(this.db, 'channels', this.data.channelId);
     try {
-      // Update der User-IDs im Kanal-Dokument
       await updateDoc(channelRef, {
         userIds: arrayUnion(...userIds),
         createdBy: this.data.userId || '',
       });
-  
-      // Hole die aktuellen Benutzer des Kanals und setze sie im Service
       const updatedChannelDoc = await getDoc(channelRef);
       if (updatedChannelDoc.exists()) {
         const channelData = updatedChannelDoc.data();
         const userIdsInChannel = channelData?.['userIds'] || [];
-  
-        // Hole die Benutzerdaten aus Firestore
         const usersRef = collection(this.db, 'users');
         const usersQuery = query(usersRef, where('uid', 'in', userIdsInChannel));
         const querySnapshot = await getDocs(usersQuery);
   
         const members = querySnapshot.docs.map((doc) => doc.data());
-        
-        // Setze die Mitglieder im Service
         this.memberDataService.setMembers(members);
   
         console.log('Users added successfully to the channel');

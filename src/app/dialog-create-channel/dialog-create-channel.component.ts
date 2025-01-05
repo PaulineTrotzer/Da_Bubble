@@ -102,8 +102,6 @@ export class DialogCreateChannelComponent implements OnInit {
     this.channel.id = docRef.id;
     await updateDoc(doc(channelsRef, docRef.id), { id: docRef.id });
     this.workspaceService.updateChannel(this.channel);
-  
-    // Dialog nach dem Erstellen des Channels öffnen
     this.openDialog(this.channel.id);
   
     this.closeDialog();
