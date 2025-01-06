@@ -34,7 +34,6 @@ export class LoginAuthService {
 
 
   setGoogleAccountLogIn(status: boolean) {
-    console.log('Setze GoogleAccountLogIn auf: ', status);
     this.googleAccountLogInSubject.next(status);
   }
 }

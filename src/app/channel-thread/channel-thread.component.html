@@ -35,13 +35,13 @@
         <div class="message-wrapper">
           <img [src]="topicMessage?.senderPicture" />
 
-        <div class="textarea-wrapper-topic">
-          <ng-container *ngIf="topicMessage?.text && topicMessage!.text!.length > 0">
-            <textarea name="message" id="message" [(ngModel)]="messageToEdit">
+          <div class="textarea-wrapper-topic">
+            <ng-container *ngIf="topicMessage?.text && topicMessage!.text!.length > 0">
+              <textarea name="message" id="message" [(ngModel)]="messageToEdit">
             {{ topicMessage?.text! }} </textarea>
-          </ng-container>
+            </ng-container>
 
-    
+
 
             <div class="bottom-row-edit">
               <div class="button-row edit-message-button-row">
@@ -201,7 +201,7 @@
                   alt="Speichern">
               </div>
 
-              <div class="img-container textarea" (click)="openEmojiPickerEdit(message.id)">
+              <div class="img-container textarea" (click)="openEmojiPickerEditAnswers(message.id)">
                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">
                   <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0"
@@ -215,8 +215,8 @@
                   </g>
                 </svg>
               </div>
-              <div (click)="closeEmojiPicker($event)" class="emoji-container" *ngIf="isClickedEdit">
-                <emoji-mart (click)="letPickerEditVisible($event, message.id)" size="18"
+              <div (click)="closeEmojiPicker($event)" class="emoji-container" *ngIf="isClickedEditAnswers">
+                <emoji-mart (click)="letPickerEditVisibleForAnswers($event, message.id)" size="18"
                   (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
               </div>
             </div>
@@ -232,7 +232,8 @@
 
       <div (click)="closeEmojiPicker($event)" class="emoji-container"
         *ngIf="isPickerVisible === message.id && visiblePickerValue && isClicked">
-        <emoji-mart size="18" (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
+        <emoji-mart (click)="letPickerVisible($event,message.id)" size="18"
+          (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
       </div>
       <div @slideIn class="reaction-bar" *ngIf="hoveredMessageId === message.id && !showEditArea" [ngClass]="{
           'reaction-bar-current':

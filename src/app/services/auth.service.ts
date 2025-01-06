@@ -12,7 +12,6 @@ import {
   where,
   query,
   getDocs,
-  addDoc,
   updateDoc,
   deleteDoc,
 } from '@angular/fire/firestore';
@@ -169,6 +168,7 @@ export class AuthService {
           this.deleteGuest(currentUser.uid);
         }
         this.currentUser = null;
+        this.loginAuthService.setIsGuestLogin(false);
         await signOut(auth);
       }
       this.overlayStatusService.setOverlayStatus(false);
@@ -179,35 +179,35 @@ export class AuthService {
   }
 
   async SignGuestIn() {
-    debugger;
     const auth = getAuth();
     try {
       const result = await signInAnonymously(auth);
       const guestUser = new User({
-        uid: result.user.uid,
+        uid: result.user.uid, 
         name: 'Gast',
         email: `guest_${result.user.uid}@anonymous.com`,
         picture: './assets/img/picture_frame.png',
         status: 'online',
       });
-      const userRef = doc(this.firestore, 'users', guestUser.uid);
+      const userRef = doc(this.firestore, `users/${guestUser.uid}`);
       const docSnap = await getDoc(userRef);
-
       if (!docSnap.exists()) {
         await setDoc(userRef, guestUser.toJSON());
       }
-
+      this.globalVariable.setCurrentUserData(guestUser);
       this.LogInAuth.setIsGuestLogin(true);
       this.overlayStatusService.setOverlayStatus(true);
       this.LogInAuth.setLoginSuccessful(true);
       setTimeout(() => {
         this.LogInAuth.setLoginSuccessful(false);
+        this.overlayStatusService.setOverlayStatus(false);
       }, 1500);
       this.router.navigate(['/welcome', guestUser.uid]);
     } catch (error) {
       console.error('Error during anonymous sign-in:', error);
     }
-  }
+  }  
+
 
   async findUserByMail(identifier: string) {
     const usersCollection = collection(this.firestore, 'users');

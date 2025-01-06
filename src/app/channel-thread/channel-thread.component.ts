@@ -101,6 +101,7 @@ export class ChannelThreadComponent implements OnInit {
   getAllUsersName: any[] = [];
   isClicked = false;
   isClickedEdit = false;
+  isClickedEditAnswers = false;
   threadMessageId: string | null = null;
 
   constructor() {}
@@ -293,6 +294,8 @@ export class ChannelThreadComponent implements OnInit {
             'channels',
             this.selectedChannel.id,
             'messages',
+            this.channelMessageId,
+            'thread',
             messageId
           )
         : doc(
@@ -300,8 +303,6 @@ export class ChannelThreadComponent implements OnInit {
             'channels',
             this.selectedChannel.id,
             'messages',
-            this.channelMessageId,
-            'thread',
             messageId
           );
 
@@ -344,10 +345,22 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   letPickerEditVisible(event: MouseEvent, messageId: string) {
-    console.log('Clicked:', messageId);
+    event.stopPropagation();
     this.isClickedEdit = true;
     this.overlayStatusService.setOverlayStatus(true);
     this.showEditArea = messageId;
+  }
+
+  letPickerEditVisibleForAnswers(event: MouseEvent, messageId: string) {
+    event.stopPropagation();
+    this.isClickedEditAnswers = true;
+    this.overlayStatusService.setOverlayStatus(true);
+    this.showEditArea = messageId;
+  }
+
+  openEmojiPickerEditAnswers(messageId: string) {
+    this.visiblePickerValue = true;
+    this.isClicked = true;
   }
 
   openEmojiPicker(messageId: string) {
@@ -449,17 +462,13 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
   async addEmojiToMessage(emoji: string, messageId: string) {
-    debugger;
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
 
     if (this.editingMessageId === messageId) {
       this.messageToEdit += emoji;
     } else if (currentUserId) {
-      // Überprüfen, ob die Nachricht zu einem Thread gehört
       const isInThread = messageId === this.threadMessageId;
-      console.log('isit?', isInThread);
-
       const messageDocRef = isInThread
         ? doc(
             this.db,
@@ -477,14 +486,8 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-
-      console.log('Pfad zur Nachricht:', messageDocRef.path);
-
-      // Hole das Dokument und prüfe, ob es existiert
       const messageSnapshot = await getDoc(messageDocRef);
-
       if (messageSnapshot.exists()) {
-        // Nur wenn das Dokument existiert
         const messageData = messageSnapshot.data();
         console.log('Nachricht Daten:', messageData);
         const reactions = messageData?.['reactions'] || {};

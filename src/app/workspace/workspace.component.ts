@@ -93,12 +93,10 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   }
 
   filterChannels(channels: any) {
-    debugger;
     if (!this.userId) {
       console.warn('Keine userID gefunden, Filterung wird übersprungen.');
       return;
     }
-
     const willkommenChannel = channels.find(
       (channel: { name: string }) => channel.name === 'Willkommen'
     );
@@ -117,9 +115,7 @@ export class WorkspaceComponent implements OnInit, OnChanges {
 
   async initializeChannelsAndUsers() {
     await this.getAllChannels();
-    console.log('All Channels nach getAllChannels:', this.allChannels);
     await this.getAllUsers();
-    console.log('User Channels nach getAllUsers:', this.userChannels);
   }
 
   observeUserChanges() {
@@ -315,6 +311,7 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   }
 
   async getUserById(userId: string) {
+
     const userDocref = doc(this.firestore, 'users', userId);
     onSnapshot(userDocref, (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -325,6 +322,7 @@ export class WorkspaceComponent implements OnInit, OnChanges {
         this.global.currentUserData = {};
       }
     });
+    console.log('name is', this.global.currentUserData.name);
   }
 
   getUserMessageCount(userId: string) {

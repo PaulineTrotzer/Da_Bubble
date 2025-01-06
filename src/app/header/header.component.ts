@@ -19,7 +19,6 @@ import {
   doc,
   arrayRemove,
   arrayUnion,
-  deleteDoc,
   setDoc,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
@@ -90,10 +89,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscribeOverlayService();
     this.getAllUsers();
     this.getAllChannels();
-
-    if (this.getSeperateUser) {
-      console.log(this.getSeperateUser['searchHeaderResult']);
-    }
   }
 
   subscribeOverlayService() {
@@ -304,7 +299,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.getSeperateUser = { id: id, ...data };
       } else {
         this.getSeperateUser = {};
-        console.log(this.getSeperateUser);
       }
     });
   }

@@ -4,7 +4,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
-import { GoogleAuthProvider, signInWithPopup, } from 'firebase/auth';
 import {
   Firestore,
   getDocs,
@@ -16,10 +15,8 @@ import { signInWithEmailAndPassword } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { AuthService } from '../services/auth.service';
 import { MatCardModule, MatCardContent } from '@angular/material/card';
-import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { OverlayStatusService } from '../services/overlay-status.service';
-// import { GlobalService } from '../global.service';
 import { GlobalVariableService } from '../services/global-variable.service';
 @Component({
   selector: 'app-login',
@@ -52,10 +49,10 @@ export class LoginComponent implements OnInit {
   loginAuthService = inject(LoginAuthService);
   overlayStatusService = inject(OverlayStatusService);
   global = inject(GlobalVariableService);
-  googleUserUid: any = ''
-  constructor() { }
+  googleUserUid: any = '';
+  constructor() {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   async onSubmit(ngForm: NgForm) {
     if (ngForm.submitted && ngForm.form.valid) {
@@ -73,11 +70,9 @@ export class LoginComponent implements OnInit {
       console.log('Gast-Login aktiv, Login wird abgebrochen');
       return;
     }
-    console.log('Vor dem Login: ', this.loginAuthService.getGoogleAccountLogIn());
     this.isGuestLogin = false;
     this.loginAuthService.setGoogleAccountLogIn(false);
     const auth = getAuth();
-    console.log('Nach dem Setzen: ', this.loginAuthService.getGoogleAccountLogIn());
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -101,7 +96,6 @@ export class LoginComponent implements OnInit {
       this.formFailed = true;
     }
   }
-  
 
   async proofMail(email: string): Promise<boolean> {
     const docRef = collection(this.firestore, 'users');
@@ -131,16 +125,13 @@ export class LoginComponent implements OnInit {
 
   async guestLogin() {
     await this.auth.SignGuestIn();
+    this.loginData = {
+      email: '',
+      password: '',
+    };
   }
-   
+
   async googleLogIn() {
-    await this.auth.googleLogIn();  
+    await this.auth.googleLogIn();
   }
-
 }
-
-
-
-
-
-
