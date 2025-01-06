@@ -232,8 +232,6 @@
                       message.recipientSticker !== '' &&
                       message.senderSticker === ''
                     ">
-                                        <!-- <img [src]="message.recipientSticker" /> -->
-
                                         <span class="sticker-sender-name">
                                             {{ message.recipientName }} hat mit
                                             <span>{{message.recipientSticker}}</span> reagiert</span>
@@ -242,8 +240,6 @@
                       message.senderSticker !== '' &&
                       message.recipientSticker === '' 
                     ">
-                                        <!-- <img *ngIf="message.senderSticker" [src]="getEmojiImageUrl(message.senderSticker)" alt="Emoji"> -->
-
                                         <span class="sticker-sender-name">
                                             Du hast mit <span>{{message.senderSticker}}</span> reagiert</span>
                                     </div>
@@ -348,7 +344,6 @@
                 hoveredSenderName = null;
                 hoveredCurrentUser = null
               ">
-                            <!-- <img [src]="message.senderSticker" /> -->
                             <span>{{message.senderSticker}} </span>
                             <span>{{ message.senderStickerCount || 1 }}</span>
                         </div>
@@ -409,8 +404,8 @@
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
         <div class="self-name-and-img">
-            <img class="self-chat-img" src={{selectedUser?.picture}}>
-            <p>{{selectedUser?.name }}</p>
+            <img class="self-chat-img" src={{global.currentUserData.picture}}>
+            <p>{{global.currentUserData?.name }}</p>
             <p class="you">(Du)</p>
         </div>
         <span class="self-chat-txt">
