@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule, Router } from '@angular/router';
@@ -50,6 +50,7 @@ export class LoginComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   global = inject(GlobalVariableService);
   googleUserUid: any = '';
+  @ViewChild('loginForm', { static: false }) loginForm!: NgForm;
   constructor() {}
 
   ngOnInit() {}
@@ -124,13 +125,13 @@ export class LoginComponent implements OnInit {
   }
 
   async guestLogin() {
-    await this.auth.SignGuestIn();
-    this.loginData = {
+    this.loginForm.reset();
+    this.loginForm.setValue({
       email: '',
-      password: '',
-    };
+      password: ''
+    });
+    await this.auth.SignGuestIn();
   }
-
   async googleLogIn() {
     await this.auth.googleLogIn();
   }

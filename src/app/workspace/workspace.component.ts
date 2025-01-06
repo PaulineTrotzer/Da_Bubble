@@ -67,9 +67,12 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   messageCountsArr: any = {};
   selectedUser: any;
   authService = inject(AuthService);
+  loginAuthService=inject(LoginAuthService);
   workspaceService = inject(WorkspaceService);
   filteredChannels: Channel[] = [];
   userChannels: string[] = [];
+  currentUserData: any;
+  
 
   constructor(
     public global: GlobalVariableService,
@@ -79,18 +82,23 @@ export class WorkspaceComponent implements OnInit, OnChanges {
     this.authService.initAuthListener();
   }
 
-  async ngOnInit(): Promise<void> {
-    await Promise.all([
-      this.initializeChannelsAndUsers(),
-      this.observeUserChanges(),
-      this.subscribeToGuestLoginStatus(),
-    ]);
+  ngOnInit(): void {
+    this.global.currentUserData$.subscribe((data: any) => {
+      this.currentUserData = data;
+      console.log('Aktuelle Benutzerdaten:', this.currentUserData);
+    });
+    this.initializeChannelsAndUsers();
+    this.observeUserChanges();
+    this.subscribeToGuestLoginStatus();
+
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.initializeUserData(this.userId);
     }
+
     this.subscribeToWorkspaceChanges();
   }
+
 
   filterChannels(channels: any) {
     if (!this.userId) {
@@ -270,7 +278,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
     const willkommenChannel = this.allChannels.find(
       (channel) => channel.name === 'Willkommen'
     );
-
     if (willkommenChannel) {
       if (!this.filteredChannels.includes(willkommenChannel)) {
         this.filteredChannels.unshift(willkommenChannel);
@@ -290,7 +297,16 @@ export class WorkspaceComponent implements OnInit, OnChanges {
         const newChannels = snapshot.docs.map((doc) => doc.data() as Channel);
         if (newChannels.length > 0) {
           this.allChannels = newChannels;
-          this.filterChannels(this.allChannels);
+  
+          // Unterscheidung zwischen Gast und registriertem Benutzer
+          if (this.logInAuth.getIsGuestLogin()) {
+            // Gastlogin: Keine Filterung, alle Kanäle anzeigen
+            this.filteredChannels = [...this.allChannels];
+          } else {
+            // Registrierter Benutzer: Kanäle filtern
+            this.filterChannels(this.allChannels);
+          }
+  
           this.sortChannels();
           this.findWelcomeChannel();
         } else {
@@ -301,7 +317,8 @@ export class WorkspaceComponent implements OnInit, OnChanges {
       console.error('Fehler in getAllChannels:', error);
     }
   }
-
+  
+  
   sortChannels() {
     this.allChannels.sort((a, b) => {
       if (a.name === 'Willkommen') return -1;

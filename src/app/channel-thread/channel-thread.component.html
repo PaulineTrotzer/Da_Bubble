@@ -298,7 +298,10 @@
             </ng-container>
           </div>
 
-          <div *ngIf="message.isEdited" class="edited-indicator">
+          <div [ngClass]="{
+            'edited-indicator-user-display': message.isEdited && message.senderId !== global.currentUserData.id,
+            'edited-indicator': message.isEdited && (message.senderId === global.currentUserData.id)
+        }">
             <span>(Bearbeitet)</span>
           </div>
           <div class="reaction-info" [ngClass]="{

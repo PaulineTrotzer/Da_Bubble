@@ -36,11 +36,20 @@ export class GlobalVariableService {
   public channelThreadSubject = new BehaviorSubject<string | null>(null);
   channelThread$ = this.channelThreadSubject.asObservable();
 
+  private currentUserDataSubject = new BehaviorSubject<any>(null);  
+  currentUserData$ = this.currentUserDataSubject.asObservable(); 
+
   constructor() {}
 
+
   async setCurrentUserData(userData: any) {
-    this.currentUserData = userData;
+    this.currentUserDataSubject.next(userData);  // Hier den BehaviorSubject aktualisieren
     this.statusCheck = true;
+  }
+
+  getCurrentUserId() {
+    const currentUserData = this.currentUserDataSubject.value;
+    return currentUserData ? currentUserData.id : null;
   }
 
   setCurrentChannel(channel: any) {

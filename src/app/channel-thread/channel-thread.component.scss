@@ -16,6 +16,12 @@
   font-size: 13px;
 }
 
+.edited-indicator-user-display {
+  display: flex;
+  align-self: start;
+  font-size: 13px;
+}
+
 .channel-name {
   font-family: "Nunito";
   color: #797ef3;
@@ -90,7 +96,7 @@ header {
 
 .avatar-container {
   display: flex;
-  align-self: center;
+  align-self: start;
   img {
     height: 70px;
     width: 70px;

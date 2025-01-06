@@ -49,33 +49,28 @@ export class AuthService {
 
   initAuthListener() {
     const auth = getAuth();
-
+  
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        if (
-          user.providerData.some(
-            (provider) => provider.providerId === 'google.com'
-          )
-        ) {
-          this.loginAuthService.setGoogleAccountLogIn(true);
-        } else {
-          this.loginAuthService.setGoogleAccountLogIn(false);
-        }
-
-        await this.updateStatus(user.uid, 'online');
-
+        this.globalVariable.setCurrentUserData(user);
         if (user.isAnonymous) {
           this.loginAuthService.setIsGuestLogin(true);
         } else {
           this.loginAuthService.setIsGuestLogin(false);
         }
+  
+        await this.updateStatus(user.uid, 'online');
       } else {
-        this.loginAuthService.setGoogleAccountLogIn(false);
         this.currentUser = null;
+        this.globalVariable.setCurrentUserData(null);  
+  
+        this.loginAuthService.setGoogleAccountLogIn(false);
+        this.loginAuthService.setIsGuestLogin(false);
       }
     });
   }
+  
 
   async deleteGuest(userId: any) {
     await deleteDoc(doc(this.firestore, 'users', userId));
@@ -168,6 +163,7 @@ export class AuthService {
           this.deleteGuest(currentUser.uid);
         }
         this.currentUser = null;
+        this.globalVariable.setCurrentUserData(null);
         this.loginAuthService.setIsGuestLogin(false);
         await signOut(auth);
       }
@@ -183,18 +179,20 @@ export class AuthService {
     try {
       const result = await signInAnonymously(auth);
       const guestUser = new User({
-        uid: result.user.uid, 
+        uid: result.user.uid,
         name: 'Gast',
         email: `guest_${result.user.uid}@anonymous.com`,
         picture: './assets/img/picture_frame.png',
         status: 'online',
       });
+      this.guestUser = guestUser;
       const userRef = doc(this.firestore, `users/${guestUser.uid}`);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
         await setDoc(userRef, guestUser.toJSON());
       }
-      this.globalVariable.setCurrentUserData(guestUser);
+      debugger;
+      this.globalVariable.setCurrentUserData(this.guestUser);
       this.LogInAuth.setIsGuestLogin(true);
       this.overlayStatusService.setOverlayStatus(true);
       this.LogInAuth.setLoginSuccessful(true);
@@ -206,8 +204,7 @@ export class AuthService {
     } catch (error) {
       console.error('Error during anonymous sign-in:', error);
     }
-  }  
-
+  }
 
   async findUserByMail(identifier: string) {
     const usersCollection = collection(this.firestore, 'users');
