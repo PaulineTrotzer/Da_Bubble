@@ -11,6 +11,7 @@ import {
   Output,
   EventEmitter,
   HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { FormsModule } from '@angular/forms';
@@ -116,6 +117,7 @@ export class ChatComponent implements OnInit, OnChanges {
   workspaceService = inject(WorkspaceService);
   workspaceSubscription: Subscription | undefined;
   dataLoaded: boolean = false;
+  cdr=inject(ChangeDetectorRef);
 
   constructor() {}
 
@@ -485,6 +487,7 @@ export class ChatComponent implements OnInit, OnChanges {
           this.global.currentUserData.id,
         ])
       );
+  
       onSnapshot(
         q,
         async (querySnapshot) => {
@@ -499,8 +502,7 @@ export class ChatComponent implements OnInit, OnChanges {
                 (messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.selectedUser.id) ||
                 (messageData['senderId'] === this.selectedUser.id &&
-                  messageData['recipientId'] ===
-                    this.global.currentUserData.id) ||
+                  messageData['recipientId'] === this.global.currentUserData.id) ||
                 (this.global.statusCheck &&
                   messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.global.currentUserData.id)
@@ -508,6 +510,7 @@ export class ChatComponent implements OnInit, OnChanges {
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
+            await this.updateMessagesWithNewPhoto();
             await this.subscribeToThreadAnswers();
             this.messagesData.sort(
               (a: any, b: any) => a.timestamp - b.timestamp
@@ -518,15 +521,38 @@ export class ChatComponent implements OnInit, OnChanges {
             }
             this.dataLoaded = true;
           } catch (innerError) {
-            console.error('rrror while  querySnapshot:', innerError);
+            console.error('Error while querySnapshot:', innerError);
           }
         },
         (error) => {
-          console.error('rrror in onSnapshot:', error);
+          console.error('Error in onSnapshot:', error);
         }
       );
     } catch (error) {
-      console.error('error initialie messages query:', error);
+      console.error('Error initializing messages query:', error);
+    }
+  }
+  
+
+  async updateMessagesWithNewPhoto() {
+    try {
+      const newPhotoUrl = this.global.currentUserData?.picture; // Die URL des neuen Fotos aus den Benutzerdaten
+      if (newPhotoUrl) {
+        for (let message of this.messagesData) {
+          if (message.senderId === this.global.currentUserData.id) {
+            if (message.senderPicture !== newPhotoUrl) {
+              const messageRef = doc(this.firestore, 'messages', message.id);
+              await updateDoc(messageRef, {
+                photoUrl: newPhotoUrl,
+              });
+              message.senderPicture = newPhotoUrl;
+            }
+          }
+        }
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
     }
   }
 

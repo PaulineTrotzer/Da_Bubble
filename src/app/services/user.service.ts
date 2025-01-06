@@ -8,9 +8,13 @@ import {
   collection,
   QuerySnapshot,
   DocumentData,
+  docData,
+  getDocs,
+  query,
+  where,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { OverlayStatusService } from './overlay-status.service';
 
 @Injectable({
@@ -65,6 +69,36 @@ export class UserService {
         });
       }
     );
+  }
+
+  getUserAvatar(userId: string): Observable<string> {
+    const userRef = doc(this.firestore, 'users', userId);
+    return docData(userRef).pipe(
+      map((userData: any) => userData?.picture || '') // Gibt die Avatar-URL zurück
+    );
+  }
+  async updateMessagesWithNewPhoto(newPhotoUrl: string, userId: string) {
+    if (newPhotoUrl) {
+      try {
+        // Abrufen der Nachrichten des Benutzers
+        const messagesRef = collection(this.firestore, 'messages');
+        const q = query(
+          messagesRef,
+          where('senderId', '==', userId) // Nur Nachrichten des Benutzers
+        );
+  
+        // Alle Nachrichten des Benutzers durchgehen und das Avatar aktualisieren
+        const querySnapshot = await getDocs(q);
+        for (const doc of querySnapshot.docs) {
+          const messageRef = doc.ref;
+          await updateDoc(messageRef, {
+            photoUrl: newPhotoUrl, // Update des Foto-URLs der Nachricht
+          });
+        }
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
+      }
+    }
   }
 
   setSelectedUser(user: User) {
