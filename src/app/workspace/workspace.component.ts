@@ -16,10 +16,6 @@ import {
   Output,
   EventEmitter,
   Input,
-  SimpleChanges,
-  ChangeDetectorRef,
-  NgZone,
-  OnChanges,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -38,7 +34,7 @@ import { WorkspaceService } from '../services/workspace.service';
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
-export class WorkspaceComponent implements OnInit, OnChanges {
+export class WorkspaceComponent implements OnInit {
   selectedChannel: any = null;
   channelDrawerOpen: boolean = true;
   messageDrawerOpen: boolean = true;
@@ -67,35 +63,30 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   messageCountsArr: any = {};
   selectedUser: any;
   authService = inject(AuthService);
-  loginAuthService=inject(LoginAuthService);
+  loginAuthService = inject(LoginAuthService);
   workspaceService = inject(WorkspaceService);
   filteredChannels: Channel[] = [];
   userChannels: string[] = [];
   currentUserData: any;
-  
 
   constructor(
     public global: GlobalVariableService,
-    private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
   ) {
     this.authService.initAuthListener();
   }
 
+
   ngOnInit(): void {
     this.global.currentUserData$.subscribe((data: any) => {
       this.currentUserData = data;
-      console.log('Aktuelle Benutzerdaten:', this.currentUserData);
     });
     this.initializeChannelsAndUsers();
     this.observeUserChanges();
     this.subscribeToGuestLoginStatus();
-
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.initializeUserData(this.userId);
     }
-
     this.subscribeToWorkspaceChanges();
   }
 
@@ -170,6 +161,8 @@ export class WorkspaceComponent implements OnInit, OnChanges {
     );
   }
 
+
+/* 
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['selectedUserHome'] &&
@@ -185,7 +178,7 @@ export class WorkspaceComponent implements OnInit, OnChanges {
       this.selectedChannel = this.selectedChannelHome;
       this.channelSelected.emit(this.selectedChannel);
     }
-  }
+  } */
 
   selectUser(user: any) {
     this.selectedChannel = null;
@@ -297,18 +290,13 @@ export class WorkspaceComponent implements OnInit, OnChanges {
         const newChannels = snapshot.docs.map((doc) => doc.data() as Channel);
         if (newChannels.length > 0) {
           this.allChannels = newChannels;
-  
-          // Unterscheidung zwischen Gast und registriertem Benutzer
-          if (this.logInAuth.getIsGuestLogin()) {
-            // Gastlogin: Keine Filterung, alle Kanäle anzeigen
-            this.filteredChannels = [...this.allChannels];
-          } else {
-            // Registrierter Benutzer: Kanäle filtern
-            this.filterChannels(this.allChannels);
-          }
-  
           this.sortChannels();
           this.findWelcomeChannel();
+          if (this.logInAuth.getIsGuestLogin()) {
+            this.filteredChannels = [...this.allChannels];
+          } else {
+            this.filterChannels(this.allChannels);
+          }
         } else {
           console.warn('Keine Kanäle gefunden!');
         }
@@ -317,8 +305,7 @@ export class WorkspaceComponent implements OnInit, OnChanges {
       console.error('Fehler in getAllChannels:', error);
     }
   }
-  
-  
+
   sortChannels() {
     this.allChannels.sort((a, b) => {
       if (a.name === 'Willkommen') return -1;
@@ -328,7 +315,6 @@ export class WorkspaceComponent implements OnInit, OnChanges {
   }
 
   async getUserById(userId: string) {
-
     const userDocref = doc(this.firestore, 'users', userId);
     onSnapshot(userDocref, (docSnapshot) => {
       if (docSnapshot.exists()) {

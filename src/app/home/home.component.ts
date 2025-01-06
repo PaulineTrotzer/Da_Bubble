@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { getAuth, onAuthStateChanged } from '@angular/fire/auth';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { Firestore, collection, doc, getDocs, onSnapshot } from '@angular/fire/firestore';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -49,6 +50,7 @@ export class HomeComponent implements OnInit {
   isOverlayVisible = true;
   userChannelService=inject(UserChannelSelectService);
   firestore=inject(Firestore);
+  authService=inject(AuthService);
 
   ngOnInit(): void {
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
@@ -59,13 +61,12 @@ export class HomeComponent implements OnInit {
     this.subscribeToGuestLoginStatus();
     this.setDirectThread();
     this.setChannelThread();
+    this.authService.initAuthListener();
   }
 
   async loadUserData(userId: string) {
     const userRef = collection(this.firestore, 'users');
     const userDocRef = doc(userRef, userId);
-  
-    // Echtzeit-Listener, der alle Änderungen an diesem spezifischen Dokument verfolgt
     onSnapshot(userDocRef, (docSnapshot: { data: () => any; }) => {
       const dataUser = docSnapshot.data();
       if (dataUser) {
@@ -96,11 +97,9 @@ export class HomeComponent implements OnInit {
           this.isOverlayVisible = false;
         }, 1100);
         
-        // Wenn der Benutzer eingeloggt ist, Benutzerinformationen laden
         this.loadUserData(user.uid);
       } else {
         this.isOverlayVisible = false;
-        // Benutzer abgemeldet, daher können wir die Benutzerinformation zurücksetzen
         this.selectedUser = null;
       }
     });

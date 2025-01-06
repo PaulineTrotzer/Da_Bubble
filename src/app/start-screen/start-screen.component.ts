@@ -33,6 +33,7 @@ import { Subscription } from 'rxjs';
 import { LoginAuthService } from '../services/login-auth.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { MemberDataService } from '../services/member-data.service';
+import { AuthService } from '../services/auth.service';
 
 interface ChannelData {
   userIds: string[];
@@ -109,6 +110,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   enterChatByUser: any;
   userChannelService = inject(UserChannelSelectService);
   memberDataService = inject(MemberDataService);
+  authService=inject(AuthService);
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
@@ -122,6 +124,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.subscribeToLoginStatus();
     this.subscribeToUserChanges();
     this.subscribeToChannelChanges();
+    this.authService.initAuthListener();
   }
 
   initializeGlobalState(): void {

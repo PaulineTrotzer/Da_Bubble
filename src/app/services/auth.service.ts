@@ -20,6 +20,8 @@ import { GlobalService } from '../global.service';
 import { LoginAuthService } from './login-auth.service';
 import { onAuthStateChanged } from '@angular/fire/auth';
 import { GlobalVariableService } from './global-variable.service';
+import { WorkspaceComponent } from '../workspace/workspace.component';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +38,7 @@ export class AuthService {
   loggedOut = false;
   globalVariable = inject(GlobalVariableService);
   loginAuthService = inject(LoginAuthService);
+  workspaceInitializedSubject = new BehaviorSubject<boolean>(false);
 
   constructor() {
     window.addEventListener('beforeunload', async (event) => {
@@ -45,11 +48,26 @@ export class AuthService {
         await this.updateStatus(currentUser.uid, 'offline');
       }
     });
+    if (localStorage.getItem('workspaceInitialized') === 'true') {
+      this.workspaceInitializedSubject.next(true);
+    } else {
+      this.workspaceInitializedSubject.next(false);
+    }
+
+  }
+
+  setWorkspaceInitialized() {
+    localStorage.setItem('workspaceInitialized', 'true');
+    this.workspaceInitializedSubject.next(true);
+  }
+
+  get workspaceInitialized$() {
+    return this.workspaceInitializedSubject.asObservable();
   }
 
   initAuthListener() {
     const auth = getAuth();
-  
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
@@ -59,18 +77,17 @@ export class AuthService {
         } else {
           this.loginAuthService.setIsGuestLogin(false);
         }
-  
+
         await this.updateStatus(user.uid, 'online');
       } else {
         this.currentUser = null;
-        this.globalVariable.setCurrentUserData(null);  
-  
+        this.globalVariable.setCurrentUserData(null);
+
         this.loginAuthService.setGoogleAccountLogIn(false);
         this.loginAuthService.setIsGuestLogin(false);
       }
     });
   }
-  
 
   async deleteGuest(userId: any) {
     await deleteDoc(doc(this.firestore, 'users', userId));

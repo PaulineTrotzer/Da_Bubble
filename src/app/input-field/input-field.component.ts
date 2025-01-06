@@ -39,6 +39,7 @@ import {
   uploadString,
 } from '@angular/fire/storage';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-input-field',
@@ -79,13 +80,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   isMentionPeopleCardVisible: boolean = false;
   isMentionCardOpen: boolean = true;
   @Output() mentionUserOut = new EventEmitter<string>();
+  authService=inject(AuthService);
 
+
+  
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
     }
   }
 
   ngOnInit(): void {
+    this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId && this.selectedUser?.id) {
     }
@@ -137,7 +142,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
-  async processSendMessage(): Promise<void> {
+   async processSendMessage(): Promise<void> {
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
@@ -148,21 +153,30 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
+
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
+
         messageData.selectedFiles = fileData;
+
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
-        console.log('Nachricht gesendet:', messageWithId);
+        this.messagesData.push(messageWithId);
+        await this.setMessageCount();
+        this.messageSent.emit();
+        this.chatMessage = '';
+        this.formattedChatMessage = '';
+        this.selectFiles = [];
       } catch (error) {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
   }
+
 
   async sendChannelThreadMessage() {
     if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {

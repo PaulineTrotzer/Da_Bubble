@@ -132,6 +132,7 @@ export class LoginComponent implements OnInit {
     });
     await this.auth.SignGuestIn();
   }
+  
   async googleLogIn() {
     await this.auth.googleLogIn();
   }
