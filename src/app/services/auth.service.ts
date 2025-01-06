@@ -20,7 +20,6 @@ import { GlobalService } from '../global.service';
 import { LoginAuthService } from './login-auth.service';
 import { onAuthStateChanged } from '@angular/fire/auth';
 import { GlobalVariableService } from './global-variable.service';
-import { WorkspaceComponent } from '../workspace/workspace.component';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -48,22 +47,8 @@ export class AuthService {
         await this.updateStatus(currentUser.uid, 'offline');
       }
     });
-    if (localStorage.getItem('workspaceInitialized') === 'true') {
-      this.workspaceInitializedSubject.next(true);
-    } else {
-      this.workspaceInitializedSubject.next(false);
-    }
-
   }
 
-  setWorkspaceInitialized() {
-    localStorage.setItem('workspaceInitialized', 'true');
-    this.workspaceInitializedSubject.next(true);
-  }
-
-  get workspaceInitialized$() {
-    return this.workspaceInitializedSubject.asObservable();
-  }
 
   initAuthListener() {
     const auth = getAuth();

@@ -30,7 +30,7 @@ export class WorkspaceService {
     this.selectedChannelSubject.next(channel);
   }
 
-  updateChannel(channel: any) {
+    updateChannel(channel: any) {
     this.selectedChannelSubject.next(channel);
   }
 }

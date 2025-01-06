@@ -161,6 +161,10 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
+  get filteredUsers() {
+    return this.allUsers.filter((user: { name: string; }) => user.name !== 'Gast');
+  }
+
 
 /* 
   ngOnChanges(changes: SimpleChanges): void {

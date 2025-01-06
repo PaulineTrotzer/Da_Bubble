@@ -93,8 +93,10 @@
               </ng-container>
             </div>
           </div>
-          <span *ngIf="message.isEdited && global.currentUserData.id == message.senderId" class="edited-label-cu-view">(Bearbeitet)</span>
-          <span *ngIf="message.isEdited && global.currentUserData.id != message.senderId" class="edited-label-selu-view">(Bearbeitet)</span>
+          <span *ngIf="message.isEdited && global.currentUserData.id == message.senderId"
+            class="edited-label-cu-view">(Bearbeitet)</span>
+          <span *ngIf="message.isEdited && global.currentUserData.id != message.senderId"
+            class="edited-label-selu-view">(Bearbeitet)</span>
 
 
 
@@ -109,6 +111,10 @@
               <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message,
                 hoveredEmoji) }}</span>
             </div>
+
+          </div>
+
+          <div class="reactions-container">
             <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
               (mouseenter)="onReactionHover(message, reaction.key)"
               (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"

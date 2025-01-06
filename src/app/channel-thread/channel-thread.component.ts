@@ -217,6 +217,7 @@ export class ChannelThreadComponent implements OnInit {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+  
     const messagesRef = collection(
       this.db,
       'channels',
@@ -225,7 +226,7 @@ export class ChannelThreadComponent implements OnInit {
       this.channelMessageId,
       'thread'
     );
-
+  
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
     onSnapshot(q, (querySnapshot: any) => {
       this.messages = querySnapshot.docs.map((doc: any) => {
@@ -233,10 +234,14 @@ export class ChannelThreadComponent implements OnInit {
         if (data.timestamp && data.timestamp.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
+        if (data.isEdited === undefined) {
+          data.isEdited = false;  
+        }
         return { id: doc.id, ...data };
       });
     });
   }
+  
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
@@ -591,36 +596,67 @@ export class ChannelThreadComponent implements OnInit {
     this.messageToEdit = '';
   }
 
+  getEditedClass(message: any) {
+    if (message.isEdited && message.senderId !== this.global.currentUserData?.id) {
+      return 'edited-indicator-user-display';
+    } else if (message.isEdited && message.senderId === this.global.currentUserData?.id) {
+      return 'edited-indicator';
+    }
+    return '';
+  }
+
+  getEditedClassTopicMessage(topicMessage:any) {
+    if (!topicMessage?.isEdited) {
+      return ''; // Keine Klasse, wenn die topicMessage nicht bearbeitet wurde
+    }
+  
+    // Wenn die topicMessage bearbeitet wurde
+    if (topicMessage.senderId === this.global.currentUserData?.id) {
+      return 'edited-indicator-topic'; // Bearbeitet vom aktuellen Benutzer
+    } else {
+      return 'edited-indicator-topic-user-display'; // Bearbeitet von einem anderen Benutzer
+    }
+  }
+
   async saveEditedMessage(messageId: string) {
     try {
-      const messageDocRef =
-        messageId === this.topicMessage?.id
-          ? doc(
-              this.db,
-              'channels',
-              this.selectedChannel.id,
-              'messages',
-              messageId
-            )
-          : doc(
-              this.db,
-              'channels',
-              this.selectedChannel.id,
-              'messages',
-              this.channelMessageId,
-              'thread',
-              messageId
-            );
+      const isTopicMessage = messageId === this.topicMessage?.id;
+  
+      const messageDocRef = isTopicMessage
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
+        : doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            this.channelMessageId,
+            'thread',
+            messageId
+          );
+  
       await updateDoc(messageDocRef, {
         text: this.messageToEdit,
         isEdited: true,
       });
+  
+      // Aktualisiere den lokalen Status der topicMessage
+      if (isTopicMessage) {
+        this.topicMessage!.isEdited = true; // Markiere die topicMessage als bearbeitet
+      }
+  
       this.showEditArea = null;
       this.messageToEdit = '';
     } catch (error) {
       console.error('Error saving edited message:', error);
     }
   }
+  
 
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {

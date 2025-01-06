@@ -42,8 +42,7 @@
             </ng-container>
 
 
-
-            <div class="bottom-row-edit">
+            <div class="bottom-row-edit topic-area">
               <div class="button-row edit-message-button-row">
                 <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
                 <img class="save-icon" (click)="saveEditedMessage(topicMessage?.id!)" src="assets/img/check-mark.svg"
@@ -124,6 +123,9 @@
           'topic-from-user':
             topicMessage?.senderId !== global.currentUserData.id
         }">
+
+
+
         <div class="avatar-container">
           <img [src]="topicMessage?.senderPicture" />
         </div>
@@ -150,8 +152,11 @@
                 {{ mentionName }}
               </span>
             </ng-container>
-
           </p>
+          <div *ngIf="topicMessage?.isEdited" [ngClass]="getEditedClassTopicMessage(topicMessage)">
+            <span>(Bearbeitet)</span>
+          </div>
+
           <div class="reaction-info" [ngClass]="{
               'flex-end': topicMessage?.senderId === global.currentUserData.id
             }">
@@ -298,10 +303,7 @@
             </ng-container>
           </div>
 
-          <div [ngClass]="{
-            'edited-indicator-user-display': message.isEdited && message.senderId !== global.currentUserData.id,
-            'edited-indicator': message.isEdited && (message.senderId === global.currentUserData.id)
-        }">
+          <div *ngIf="message.isEdited" [ngClass]="getEditedClass(message)">
             <span>(Bearbeitet)</span>
           </div>
           <div class="reaction-info" [ngClass]="{
