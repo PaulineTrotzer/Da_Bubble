@@ -144,6 +144,7 @@ export class WorkspaceComponent implements OnInit {
     this.workspaceService.selectedChannel$.subscribe((channel) => {
       if (channel) {
         this.selectedChannel = channel;
+        this.selectChannel(channel)
       }
     });
   }
