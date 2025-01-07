@@ -111,12 +111,20 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   userChannelService = inject(UserChannelSelectService);
   memberDataService = inject(MemberDataService);
   authService=inject(AuthService);
+  statusCheck= false;
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
 
   async ngOnInit(): Promise<void> {
+    this.userservice.selectedUser$.subscribe((user) => {
+      this.selectedUser = user;
+      this.cdr.detectChanges();
+      console.log(this.global.statusCheck);
+      console.log('Aktueller ausgewählter Benutzer:', this.selectedUser);
+    });
+    this.checkStatus();
     this.initializeGlobalState();
     await this.loadUserData();
     this.resetUserSelection();
@@ -127,6 +135,17 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.subscribeToChannelChanges();
     this.authService.initAuthListener();
   }
+
+  checkStatus(): void {
+    if (this.global.statusCheck && this.global.currentUserData.name == this.selectedUser.name) {
+      console.log('Status ist TRUE');
+      this.statusCheck = true;
+    } else {
+      console.log('Status ist FALSE');
+      this.statusCheck = false;
+    }
+  }
+
 
   initializeGlobalState(): void {
     this.global.channelSelected = false;
@@ -242,9 +261,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.onHeaderChannel);
     }
-    if (changes['selectedUser']) {
-      console.log('selectedUser hat sich geändert:', this.selectedUser);
-      this.selectedUser = this.selectedUser;
+    if (changes['selectedUser'] && this.selectedUser) {
+
     }
 
   }
@@ -348,9 +366,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        this.userservice.observingUserChanges(userId, (updatedUser: User) => {
+/*         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
-        });
+        }); */
       }
     } catch (error) {
       console.error('Fehler beim Abruf s Benutzers:', error);

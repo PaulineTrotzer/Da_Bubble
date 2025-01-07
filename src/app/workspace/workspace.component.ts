@@ -16,6 +16,7 @@ import {
   Output,
   EventEmitter,
   Input,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -70,13 +71,11 @@ export class WorkspaceComponent implements OnInit {
   userChannels: string[] = [];
   currentUserData: any;
   channelService = inject(UserChannelSelectService);
+  cdr = inject(ChangeDetectorRef);
 
-  constructor(
-    public global: GlobalVariableService,
-  ) {
+  constructor(public global: GlobalVariableService) {
     this.authService.initAuthListener();
   }
-
 
   ngOnInit(): void {
     this.global.currentUserData$.subscribe((data: any) => {
@@ -164,11 +163,12 @@ export class WorkspaceComponent implements OnInit {
   }
 
   get filteredUsers() {
-    return this.allUsers.filter((user: { name: string; }) => user.name !== 'Gast');
+    return this.allUsers.filter(
+      (user: { name: string }) => user.name !== 'Gast'
+    );
   }
 
-
-/* 
+  /* 
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['selectedUserHome'] &&
@@ -187,7 +187,9 @@ export class WorkspaceComponent implements OnInit {
   } */
 
   selectUser(user: any) {
-
+    debugger;
+    console.log('su is', user);
+    this.userService.setSelectedUser(user);
     this.selectedChannel = null;
     setTimeout(() => {
       this.selectedUser = user;
@@ -195,6 +197,7 @@ export class WorkspaceComponent implements OnInit {
       this.id = user.id;
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
+
       const actuallyId = this.id;
       if (
         this.userId &&
@@ -207,12 +210,12 @@ export class WorkspaceComponent implements OnInit {
         updateDoc(docRef, resetMessageCount);
       }
       this.global.statusCheck = false;
-      debugger;
       this.channelService.setSelectedUser(user);
       this.openvollWidtChannelOrUserBox();
       this.hiddenVoolThreadBox();
       this.checkWidtSize();
       this.cheackChatOpen();
+      this.cdr.detectChanges();
     });
   }
 
