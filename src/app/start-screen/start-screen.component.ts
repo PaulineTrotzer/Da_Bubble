@@ -119,6 +119,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.initializeGlobalState();
     await this.loadUserData();
+    this.resetUserSelection();
     this.subscribeToProfileSelection();
     this.subscribeToWelcomeChannel();
     this.subscribeToLoginStatus();
@@ -138,11 +139,14 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   subscribeToUserChanges(): void {
+    debugger;
     this.userChannelService.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
+      console.log('Selected User:', this.selectedUser); // Debugging-Ausgabe
       if (this.selectedUser) {
         this.resetChannelSelection();
         this.checkProfileType();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -161,7 +165,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   resetChannelSelection(): void {
     this.global.channelSelected = false;
     this.selectedChannel = null;
-    this.onHeaderChannel = null;
+/*     this.onHeaderChannel = null; */
     this.global.clearCurrentChannel();
     this.afterLoginSheet = false;
   }
@@ -238,6 +242,11 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.onHeaderChannel);
     }
+    if (changes['selectedUser']) {
+      console.log('selectedUser hat sich geändert:', this.selectedUser);
+      this.selectedUser = this.selectedUser;
+    }
+
   }
 
   resetChannelMessages() {

@@ -26,6 +26,7 @@ import { LoginAuthService } from '../services/login-auth.service';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { WorkspaceService } from '../services/workspace.service';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 @Component({
   selector: 'app-workspace',
@@ -68,6 +69,7 @@ export class WorkspaceComponent implements OnInit {
   filteredChannels: Channel[] = [];
   userChannels: string[] = [];
   currentUserData: any;
+  channelService = inject(UserChannelSelectService);
 
   constructor(
     public global: GlobalVariableService,
@@ -185,6 +187,7 @@ export class WorkspaceComponent implements OnInit {
   } */
 
   selectUser(user: any) {
+
     this.selectedChannel = null;
     setTimeout(() => {
       this.selectedUser = user;
@@ -204,6 +207,8 @@ export class WorkspaceComponent implements OnInit {
         updateDoc(docRef, resetMessageCount);
       }
       this.global.statusCheck = false;
+      debugger;
+      this.channelService.setSelectedUser(user);
       this.openvollWidtChannelOrUserBox();
       this.hiddenVoolThreadBox();
       this.checkWidtSize();

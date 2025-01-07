@@ -41,6 +41,7 @@ import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { WorkspaceService } from '../services/workspace.service';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -118,14 +119,16 @@ export class ChatComponent implements OnInit, OnChanges {
   workspaceSubscription: Subscription | undefined;
   dataLoaded: boolean = false;
   cdr=inject(ChangeDetectorRef);
+  userChannelService=inject(UserChannelSelectService);
 
   constructor() {}
 
   async ngOnInit(): Promise<void> {
-    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+/*     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
+          console.log('user chat comp',user);
           await this.getSelectedMessages();
         }
       }
@@ -137,9 +140,10 @@ export class ChatComponent implements OnInit, OnChanges {
           this.selectedChannel = channel;
         }
       })
-    );
+    ); */
     await this.getAllUsersname();
   }
+
 
   async getSelectedMessages() {
     try {

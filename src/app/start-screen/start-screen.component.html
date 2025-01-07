@@ -4,11 +4,11 @@
     <mat-card-header class="header">
 
       <div *ngIf="!afterLoginSheet" class="drop-down-div">
-        <button *ngIf="selectedChannel || onHeaderChannel" class="drop-down-button" mat-button (click)="openDialog()">
+        <button *ngIf="selectedChannel " class="drop-down-button" mat-button (click)="openDialog()">
           <span class="btn-text-img"># {{ selectedChannel?.name}} </span>
           <!-- <img src="./assets/img/arrow_drop_down.svg"/></span> -->
         </button>
-        <div (click)="showMyUserProfile()" class="user-chat-info" *ngIf="selectedUser || onHeaderUser ">
+        <div (click)="showMyUserProfile()" class="user-chat-info" *ngIf="selectedUser">
           <img [src]="
               global.statusCheck 
                 ? global.currentUserData.picture
@@ -40,7 +40,7 @@
 
     <div *ngIf="!afterLoginSheet">
       <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
-        [onHeaderChannel]="onHeaderChannel" [selectedChannel]="selectedChannel" [onHeaderUser]="onHeaderUser"
+         [selectedChannel]="selectedChannel" [onHeaderUser]="onHeaderUser"
         (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
         <div class="members-container" *ngIf="global.channelSelected">
           <div class="member-avatars" (click)="openMemberDialog()">
