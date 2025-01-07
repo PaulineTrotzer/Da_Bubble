@@ -141,9 +141,8 @@ export class DirectThreadComponent implements OnInit {
 
   checkIfSelfThread() {
     if (this.global.currentUserData.id === this.selectedUser.id) {
-      // Kein spezielles Flag nötig, sondern direkt in der Logik der Nachrichtenanzeige
       this.isSelfThread = true;
-      this.showOneDisplay
+      this.showOneDisplay= true;
       console.log('self = true');
     } else if (this.global.currentUserData.id !== this.selectedUser.id) {
       this.isSelfThread = false;

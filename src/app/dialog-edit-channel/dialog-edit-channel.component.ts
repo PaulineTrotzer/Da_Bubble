@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, inject, OnInit, ViewChild } from '@angular/core';
 import {
   arrayRemove,
   deleteField,
@@ -9,10 +9,8 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
-import { checkActionCode } from '@angular/fire/auth';
 import { DialogChannelUserComponent } from '../dialog-channel-user/dialog-channel-user.component';
 import { WorkspaceService } from '../services/workspace.service';
 
@@ -32,20 +30,35 @@ export class DialogEditChannelComponent implements OnInit {
   isEditingName: boolean = false;
   isEditingDescription: boolean = false;
   workspaceService = inject(WorkspaceService);
+  @ViewChild('firstFocusable', { static: true }) firstFocusable: ElementRef | undefined;
 
-  constructor() {}
+  constructor(    @Inject(MAT_DIALOG_DATA) public data: any,
+  private dialogRef: MatDialogRef<DialogEditChannelComponent>) {}
 
   ngOnInit(): void {
+    if (this.firstFocusable) {
+      this.firstFocusable.nativeElement.focus();
+    }
     this.getCreaterData();
   }
 
   async getCreaterData() {
-    const docRef = doc(this.db, 'users', this.channel.createdBy);
-    const docSnap = await getDoc(docRef);
+    if (!this.channel || !this.channel.createdBy) {
+      console.error('Kanal oder "createdBy" fehlen!');
+      return;
+    }
+    try {
+      const docRef = doc(this.db, 'users', this.channel.createdBy);
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const user = docSnap.data();
-      this.createdBy = user['name'];
+      if (docSnap.exists()) {
+        const user = docSnap.data();
+        this.createdBy = user['name'];
+      } else {
+        console.warn('User-Dokument existiert nicht.');
+      }
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Benutzerdaten:', error);
     }
   }
 
@@ -83,13 +96,13 @@ export class DialogEditChannelComponent implements OnInit {
     const defaultChannel = {
       id: 'validChannelId',
       name: 'Willkommen',
-      userIds: []
+      userIds: [],
     };
     await updateDoc(channelRef, {
       userIds: arrayRemove(currentUserId),
     });
     this.workspaceService.setSelectedChannel(defaultChannel);
-    console.log('cahnnelser',defaultChannel);
+    console.log('cahnnelser', defaultChannel);
     this.closeDialog();
   }
 }

@@ -18,7 +18,6 @@ import { FormsModule } from '@angular/forms';
 import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
-import { User } from '../models/user.class';
 import { PeopleMentionComponent } from '../people-mention/people-mention.component';
 import { DialogHeaderProfilCardComponent } from '../dialog-header-profil-card/dialog-header-profil-card.component';
 import { OverlayStatusService } from '../services/overlay-status.service';
@@ -59,7 +58,6 @@ interface ChannelData {
 })
 export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   user: any;
-  constructor(public global: GlobalVariableService) {}
   afterLoginSheet: boolean = false;
   loginSuccessful = false;
   isGuestLogin = false;
@@ -110,8 +108,12 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   enterChatByUser: any;
   userChannelService = inject(UserChannelSelectService);
   memberDataService = inject(MemberDataService);
-  authService=inject(AuthService);
-  statusCheck= false;
+  authService = inject(AuthService);
+  statusCheck = false;
+
+  constructor(
+    public global: GlobalVariableService,
+  ) {}
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
@@ -121,8 +123,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.userservice.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
       this.cdr.detectChanges();
-      console.log(this.global.statusCheck);
-      console.log('Aktueller ausgewählter Benutzer:', this.selectedUser);
     });
     this.checkStatus();
     this.initializeGlobalState();
@@ -137,7 +137,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   checkStatus(): void {
-    if (this.global.statusCheck && this.global.currentUserData.name == this.selectedUser.name) {
+    if (
+      this.global.statusCheck &&
+      this.global.currentUserData.name == this.selectedUser.name
+    ) {
       console.log('Status ist TRUE');
       this.statusCheck = true;
     } else {
@@ -145,7 +148,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.statusCheck = false;
     }
   }
-
 
   initializeGlobalState(): void {
     this.global.channelSelected = false;
@@ -161,7 +163,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     debugger;
     this.userChannelService.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
-      console.log('Selected User:', this.selectedUser); // Debugging-Ausgabe
+      console.log('Selected User:', this.selectedUser); 
       if (this.selectedUser) {
         this.resetChannelSelection();
         this.checkProfileType();
@@ -184,7 +186,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   resetChannelSelection(): void {
     this.global.channelSelected = false;
     this.selectedChannel = null;
-/*     this.onHeaderChannel = null; */
+    /*     this.onHeaderChannel = null; */
     this.global.clearCurrentChannel();
     this.afterLoginSheet = false;
   }
@@ -262,9 +264,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.global.setCurrentChannel(this.onHeaderChannel);
     }
     if (changes['selectedUser'] && this.selectedUser) {
-
     }
-
   }
 
   resetChannelMessages() {
@@ -287,6 +287,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       panelClass: 'edit-dialog',
       maxWidth: '872px',
       maxHeight: '616px',
+      disableClose: true,
+      autoFocus: true,
     });
   }
 
@@ -366,7 +368,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-/*         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
+        /*         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
         }); */
       }
