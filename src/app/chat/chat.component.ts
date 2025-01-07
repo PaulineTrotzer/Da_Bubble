@@ -536,25 +536,35 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async updateMessagesWithNewPhoto() {
     try {
-      const newPhotoUrl = this.global.currentUserData?.picture; // Die URL des neuen Fotos aus den Benutzerdaten
+      const newPhotoUrl = this.global.currentUserData?.picture;
       if (newPhotoUrl) {
         for (let message of this.messagesData) {
+       
           if (message.senderId === this.global.currentUserData.id) {
             if (message.senderPicture !== newPhotoUrl) {
-              const messageRef = doc(this.firestore, 'messages', message.id);
-              await updateDoc(messageRef, {
-                photoUrl: newPhotoUrl,
-              });
               message.senderPicture = newPhotoUrl;
+              this.cdr.detectChanges(); 
             }
           }
         }
-        this.cdr.detectChanges();
+        const updatePromises = this.messagesData
+          .filter(
+            (message) =>
+              message.senderId === this.global.currentUserData.id &&
+              message.senderPicture !== newPhotoUrl
+          )
+          .map(async (message) => {
+            const messageRef = doc(this.firestore, 'messages', message.id);
+            return updateDoc(messageRef, { photoUrl: newPhotoUrl });
+          });
+
+        await Promise.all(updatePromises); 
       }
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
     }
   }
+  
 
   async openThread(messageId: any) {
     try {

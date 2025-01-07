@@ -121,7 +121,7 @@ export class DialogEditUserComponent implements OnInit {
   }
 
   async saveUser() {
-    this.loadingSpinner = true; // Ladeanzeige starten
+    this.loadingSpinner = true; 
     try {
       const userRef = doc(this.firestore, 'users', this.userID);
       const editingAvatar = this.editAvatar();
@@ -130,7 +130,7 @@ export class DialogEditUserComponent implements OnInit {
         email: this.currentUser.email,
       });
 
-      await Promise.all([editingAvatar, updatingUser]); // Beide Vorgänge abwarten
+      await Promise.all([editingAvatar, updatingUser]); 
       this.closeEditModus();
     } catch (error) {
       console.error('Fehler beim Speichern des Benutzers:', error);
@@ -145,7 +145,7 @@ export class DialogEditUserComponent implements OnInit {
         const filePath = `avatars/${this.userID}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
   
-        this.loadingSpinner = true; 
+        this.loadingSpinner = true; // Ladeanzeige starten
         await uploadBytes(storageRef, this.selectedFile);
         const downloadURL = await getDownloadURL(storageRef);
         await this.updateUserAvatar(downloadURL);
@@ -156,7 +156,7 @@ export class DialogEditUserComponent implements OnInit {
       console.error('Fehler beim Hochladen des Avatars:', error);
       alert('Beim Hochladen des Avatars ist ein Fehler aufgetreten.');
     } finally {
-      this.loadingSpinner = false; 
+      this.loadingSpinner = false; // Ladeanzeige stoppen
     }
   }
 
