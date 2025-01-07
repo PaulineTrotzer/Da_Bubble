@@ -138,26 +138,19 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   checkStatus(): void {
-    console.log('checkStatus CU', this.global.currentUserData);
-  
-    // Sicherstellen, dass `global.currentUserData` und `selectedUser` definiert sind
     if (!this.global.currentUserData || !this.selectedUser) {
       console.log('Daten noch nicht geladen oder unvollständig');
       this.statusCheck = false;
-      return; // Beende die Methode frühzeitig, um Fehler zu vermeiden
+      return; 
     }
-  
     if (this.global.currentUserData.name === 'Gast') {
-      console.log('Benutzer ist ein Gast');
-      this.statusCheck = false; // Gast hat keinen aktiven Status
+      this.statusCheck = false; 
     } else if (
       this.global.statusCheck &&
       this.global.currentUserData.name === this.selectedUser.name
     ) {
-      console.log('Status ist TRUE');
       this.statusCheck = true;
     } else {
-      console.log('Status ist FALSE');
       this.statusCheck = false;
     }
   }
