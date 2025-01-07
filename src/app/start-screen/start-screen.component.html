@@ -15,9 +15,15 @@
                 ? global.currentUserData.picture
                 : selectedUser?.picture
             " />
-      <h4>
-        {{ global.currentUserData.name === selectedUser?.name ? global.currentUserData.name + ' (Du)' : selectedUser?.name }}
-      </h4>
+             <h4>
+              {{
+                global.currentUserData.name === 'Gast' + 'Du'
+                  ? 'Gast'
+                  : global.currentUserData.name === selectedUser?.name
+                    ? global.currentUserData.name + ' (Du)'
+                    : selectedUser?.name
+              }}
+            </h4>
         </div>
 
       </div>

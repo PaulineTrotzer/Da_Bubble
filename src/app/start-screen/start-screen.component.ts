@@ -133,13 +133,26 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.subscribeToLoginStatus();
     this.subscribeToUserChanges();
     this.subscribeToChannelChanges();
+    this.subscribeToGuestLoginStatus();
     this.authService.initAuthListener();
   }
 
   checkStatus(): void {
-    if (
+    console.log('checkStatus CU', this.global.currentUserData);
+  
+    // Sicherstellen, dass `global.currentUserData` und `selectedUser` definiert sind
+    if (!this.global.currentUserData || !this.selectedUser) {
+      console.log('Daten noch nicht geladen oder unvollständig');
+      this.statusCheck = false;
+      return; // Beende die Methode frühzeitig, um Fehler zu vermeiden
+    }
+  
+    if (this.global.currentUserData.name === 'Gast') {
+      console.log('Benutzer ist ein Gast');
+      this.statusCheck = false; // Gast hat keinen aktiven Status
+    } else if (
       this.global.statusCheck &&
-      this.global.currentUserData.name == this.selectedUser.name
+      this.global.currentUserData.name === this.selectedUser.name
     ) {
       console.log('Status ist TRUE');
       this.statusCheck = true;
@@ -148,6 +161,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.statusCheck = false;
     }
   }
+  
+
 
   initializeGlobalState(): void {
     this.global.channelSelected = false;
@@ -160,10 +175,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   subscribeToUserChanges(): void {
-    debugger;
     this.userChannelService.selectedUser$.subscribe((user) => {
       this.selectedUser = user;
-      console.log('Selected User:', this.selectedUser); 
       if (this.selectedUser) {
         this.resetChannelSelection();
         this.checkProfileType();
@@ -241,6 +254,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.guestLoginStatusSub = this.loginAuthService.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
+        console.log('isGuest',this.isGuestLogin);
       }
     );
   }

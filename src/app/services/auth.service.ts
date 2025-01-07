@@ -193,7 +193,6 @@ export class AuthService {
       if (!docSnap.exists()) {
         await setDoc(userRef, guestUser.toJSON());
       }
-      debugger;
       this.globalVariable.setCurrentUserData(this.guestUser);
       this.LogInAuth.setIsGuestLogin(true);
       this.overlayStatusService.setOverlayStatus(true);
