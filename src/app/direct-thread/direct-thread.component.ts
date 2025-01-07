@@ -126,6 +126,8 @@ export class DirectThreadComponent implements OnInit {
   getAllUsersName: any[] = [];
   @Output() userSelectedFromDirectThread = new EventEmitter<any>();
   selectedThreadId: string | null = null;
+  isSelfThread = false;
+  showOneDisplay = false;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -134,8 +136,19 @@ export class DirectThreadComponent implements OnInit {
     await this.getAllUsersname();
     this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
+    this.checkIfSelfThread();
   }
 
+  checkIfSelfThread() {
+    if (this.global.currentUserData.id === this.selectedUser.id) {
+      // Kein spezielles Flag nötig, sondern direkt in der Logik der Nachrichtenanzeige
+      this.isSelfThread = true;
+      this.showOneDisplay
+      console.log('self = true');
+    } else if (this.global.currentUserData.id !== this.selectedUser.id) {
+      this.isSelfThread = false;
+    }
+  }
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
   }
@@ -448,7 +461,6 @@ export class DirectThreadComponent implements OnInit {
           )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
         );
       } */
-      debugger;
       const messageData = {
         senderId: threadMessageData.senderId,
         senderName: threadMessageData.senderName,

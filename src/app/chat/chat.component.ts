@@ -535,7 +535,6 @@ export class ChatComponent implements OnInit, OnChanges {
   
 
   async updateMessagesWithNewPhoto() {
-    debugger;
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (newPhotoUrl) {
