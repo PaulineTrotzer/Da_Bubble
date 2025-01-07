@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   inject,
@@ -103,6 +104,7 @@ export class ChannelThreadComponent implements OnInit {
   isClickedEdit = false;
   isClickedEditAnswers = false;
   threadMessageId: string | null = null;
+  cdr=inject(ChangeDetectorRef);
 
   constructor() {}
 
@@ -228,7 +230,7 @@ export class ChannelThreadComponent implements OnInit {
     );
   
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, (querySnapshot: any) => {
+    onSnapshot(q, async (querySnapshot: any) => {
       this.messages = querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         if (data.timestamp && data.timestamp.seconds) {
@@ -239,10 +241,52 @@ export class ChannelThreadComponent implements OnInit {
         }
         return { id: doc.id, ...data };
       });
+      await this.updateMessagesWithNewPhoto();
     });
   }
-  
 
+  async updateMessagesWithNewPhoto() {
+    try {
+      const newPhotoUrl = this.global.currentUserData?.picture;
+      if (!newPhotoUrl) {
+        console.warn('Keine neue Foto-URL verfügbar');
+        return;
+      }
+      await this.updateMessagePhoto(this.topicMessage, newPhotoUrl);
+      const messagesToUpdate = this.messages.filter(
+        (message) =>
+          message.senderId === this.global.currentUserData.id &&
+          message.senderPicture !== newPhotoUrl
+      );
+      if (messagesToUpdate.length > 0) {
+        messagesToUpdate.forEach((message) => message.senderPicture = newPhotoUrl);
+        this.messages = [...this.messages];
+        this.cdr.detectChanges();
+        await Promise.all(
+          messagesToUpdate.map((message) =>
+            this.updateMessagePhoto(message, newPhotoUrl)
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
+    }
+  }
+  
+  private async updateMessagePhoto(message: any, newPhotoUrl: string) {
+    if (message && message.senderId === this.global.currentUserData.id && message.senderPicture !== newPhotoUrl) {
+      message.senderPicture = newPhotoUrl;
+      const messageRef = doc(
+        this.firestore,
+        'channels',
+        this.selectedChannel.id,
+        'messages',
+        message.id
+      );
+      await updateDoc(messageRef, { photoUrl: newPhotoUrl });
+    }
+  }
+  
   closeThread() {
     this.global.channelThreadSubject.next(null);
     this.hiddenThreadFullBox();
