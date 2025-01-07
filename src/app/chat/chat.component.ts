@@ -124,7 +124,7 @@ export class ChatComponent implements OnInit, OnChanges {
   constructor() {}
 
   async ngOnInit(): Promise<void> {
-/*     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
@@ -140,7 +140,7 @@ export class ChatComponent implements OnInit, OnChanges {
           this.selectedChannel = channel;
         }
       })
-    ); */
+    );
     await this.getAllUsersname();
   }
 
@@ -178,6 +178,9 @@ export class ChatComponent implements OnInit, OnChanges {
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
+            await this.updateMessagesWithNewPhoto();
+            await this.subscribeToThreadAnswers();
+            this.checkForSelfChat();
           } catch (innerError) {
             console.error(
               'Fehler beim Verarbeiten der Nachrichten:',
@@ -320,14 +323,13 @@ export class ChatComponent implements OnInit, OnChanges {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
-
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-      await this.getMessages();
+      await this.getSelectedMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getMessages().then(() => this.checkForSelfChat());
+      await this.getSelectedMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
