@@ -23,7 +23,7 @@ import {
 } from '@angular/fire/firestore';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { Auth, authState, getAuth } from '@angular/fire/auth';
+import { Auth, getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverlayStatusService } from '../services/overlay-status.service';
@@ -281,7 +281,6 @@ export class ChannelChatComponent implements OnInit {
         );
         return updateDoc(messageRef, { photoUrl: newPhotoUrl });
       });
-  
       await Promise.all(updatePromises);
       console.log('Firestore-Updates abgeschlossen');
     } catch (error) {
@@ -292,7 +291,7 @@ export class ChannelChatComponent implements OnInit {
     }
   }
   
-  
+
 
   ngOnDestroy(): void {
     if (this.unsubscribe) {

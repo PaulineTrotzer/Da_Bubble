@@ -170,7 +170,7 @@
 
      
             <div *ngIf="checkUsersExsists && !isGuestLogin" class="all-user-contacts">
-              <div class="all-user" *ngFor="let user of filteredUsers"(click)="selectUser(user)">
+              <div class="all-user" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
                 <div class="active-user-div" [class.active]="selectedUser?.id === user.id">
                   <img [src]="user.picture">
                   <div class="status-border">

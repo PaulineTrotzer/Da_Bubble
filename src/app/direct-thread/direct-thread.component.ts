@@ -36,12 +36,7 @@ import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
-import {
-  animate,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 
 @Component({
@@ -53,7 +48,7 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
     InputFieldComponent,
     FormsModule,
     MatCardModule,
-    MentionMessageBoxComponent
+    MentionMessageBoxComponent,
   ],
   templateUrl: './direct-thread.component.html',
   styleUrls: ['./direct-thread.component.scss'],
@@ -130,6 +125,7 @@ export class DirectThreadComponent implements OnInit {
   wasClickedInDirectThread = false;
   getAllUsersName: any[] = [];
   @Output() userSelectedFromDirectThread = new EventEmitter<any>();
+  selectedThreadId: string | null = null;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -238,7 +234,6 @@ export class DirectThreadComponent implements OnInit {
     this.editWasClicked = false;
     this.isFirstClick = true;
   }
-
 
   onCancelMessageBox(): void {
     this.wasClickedInDirectThread = false;
@@ -417,7 +412,7 @@ export class DirectThreadComponent implements OnInit {
         if (docData?.['firstMessageCreated']) {
           this.currentThreadMessage = {
             id: docSnapshot.id,
-            ...docData, 
+            ...docData,
           };
           return;
         }
@@ -433,20 +428,16 @@ export class DirectThreadComponent implements OnInit {
       );
       await this.settingDataforFireBase(
         threadMessagesRef,
-        this.currentThreadMessage 
+        this.currentThreadMessage
       );
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }
   }
-  
 
-  async settingDataforFireBase(
-    threadMessagesRef: any,
-    threadMessageData: any 
-  ) {
+  async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
     try {
-/*       if (
+      /*       if (
         !this.selectedUser ||
         !this.selectedUser.uid ||
         !this.global.currentUserData
@@ -473,7 +464,7 @@ export class DirectThreadComponent implements OnInit {
         firstMessageCreated: true,
         reactions: '',
       };
-  
+
       const docRef = await addDoc(threadMessagesRef, messageData);
       console.log('Erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
@@ -481,7 +472,6 @@ export class DirectThreadComponent implements OnInit {
       console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
   }
-  
 
   async getThreadMessages(messageId: any) {
     try {
@@ -490,8 +480,7 @@ export class DirectThreadComponent implements OnInit {
         `messages/${messageId}/threadMessages`
       );
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
-      onSnapshot(q, (querySnapshot) => {
-        console.log(querySnapshot.docs.map((doc) => doc.data()));
+      onSnapshot(q, async (querySnapshot) => {
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
@@ -502,13 +491,60 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
+
+        await this.updateMessagesWithNewPhoto(messageId);
+
         this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
       });
     } catch (error) {
-      console.error('fehler getMessagws', error);
+      console.error('Fehler beim Abrufen der Thread-Nachrichten', error);
     }
   }
+
+  async updateMessagesWithNewPhoto(messageId: string) {
+    try {
+      const newPhotoUrl = this.global.currentUserData?.picture;
+      if (!newPhotoUrl) {
+        console.warn('Keine neue Foto-URL verfügbar');
+        return;
+      }
+      const messagesToUpdate = this.messagesData.filter(
+        (message) =>
+          message.senderId === this.global.currentUserData.id &&
+          message.senderPicture !== newPhotoUrl
+      );
+      if (messagesToUpdate.length === 0) {
+        console.log('Keine Änderungen an senderPicture erkannt');
+        return;
+      }
+      messagesToUpdate.forEach((message) => {
+        message.senderPicture = newPhotoUrl;
+      });
+      this.messagesData = [...this.messagesData];  
+      this.cdr.detectChanges(); 
+      const updatePromises = messagesToUpdate.map((message) => {
+        const messageRef = doc(
+          this.firestore,
+          'messages',
+          messageId, 
+          'threadMessages',
+          message.id
+        );
+        return updateDoc(messageRef, { senderPicture: newPhotoUrl });
+      });
+  
+      await Promise.all(updatePromises);
+      console.log('Firestore-Updates für Thread-Nachrichten abgeschlossen');
+  
+    } catch (error) {
+      console.error(
+        'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
+        error
+      );
+    }
+  }
+  
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
