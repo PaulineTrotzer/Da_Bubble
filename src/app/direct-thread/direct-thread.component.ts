@@ -139,6 +139,14 @@ export class DirectThreadComponent implements OnInit {
     this.checkIfSelfThread();
   }
 
+  isFirstDayInfoVisible(i: number): boolean {
+    return i === 0; 
+  }
+
+  isFirstMessage(i: number): boolean {
+    return i === 0; 
+  }
+
   checkIfSelfThread() {
     if (this.global.currentUserData.id === this.selectedUser.id) {
       this.isSelfThread = true;

@@ -27,6 +27,7 @@ import {
   getDoc,
   setDoc,
   getDocs,
+  or,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import { SendMessageInfo } from '../models/send-message-info.interface';
@@ -118,8 +119,8 @@ export class ChatComponent implements OnInit, OnChanges {
   workspaceService = inject(WorkspaceService);
   workspaceSubscription: Subscription | undefined;
   dataLoaded: boolean = false;
-  cdr=inject(ChangeDetectorRef);
-  userChannelService=inject(UserChannelSelectService);
+  cdr = inject(ChangeDetectorRef);
+  userChannelService = inject(UserChannelSelectService);
 
   constructor() {}
 
@@ -128,8 +129,8 @@ export class ChatComponent implements OnInit, OnChanges {
       async (user) => {
         if (user) {
           this.selectedUser = user;
-          console.log('user chat comp',user);
-          await this.getSelectedMessages();
+          console.log('user chat comp', user);
+          await this.getSelectedMessages(this.selectedUser);
         }
       }
     );
@@ -144,63 +145,69 @@ export class ChatComponent implements OnInit, OnChanges {
     await this.getAllUsersname();
   }
 
-
   isFirstDayInfoVisible(i: number): boolean {
     return i === 0; // Falls die erste Nachricht `messagesData[0]` ist, gib true zurück
   }
 
-  async getSelectedMessages() {
-    try {
-      if (!this.selectedUser?.uid || !this.global.currentUserData?.id) {
-        console.warn(
-          'Kein Benutzer ausgewählt oder keine gültigen Benutzer-Daten.'
-        );
-        return;
-      }
-      const docRef = collection(this.firestore, 'messages');
-      const q = query(
-        docRef,
-        where('recipientId', '==', this.selectedUser.uid),
-        where('senderId', '==', this.global.currentUserData.id)
-      );
-      onSnapshot(
-        q,
-        async (querySnapshot) => {
-          try {
-            this.messagesData = [];
-            querySnapshot.forEach((doc) => {
-              const messageData = doc.data();
-              if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-                messageData['timestamp'] = messageData['timestamp'].toDate();
-              }
-              this.messagesData.push({ id: doc.id, ...messageData });
-            });
-            this.messagesData.sort(
-              (a: any, b: any) => a.timestamp - b.timestamp
-            );
-            this.dataLoaded = true;
-            if (this.shouldScroll) {
-              this.scrollAutoDown();
-            }
-            await this.updateMessagesWithNewPhoto();
-            await this.subscribeToThreadAnswers();
-            this.checkForSelfChat();
-          } catch (innerError) {
-            console.error(
-              'Fehler beim Verarbeiten der Nachrichten:',
-              innerError
-            );
-          }
-        },
-        (error) => {
-          console.error('Fehler beim Abrufen der Nachrichten:', error);
-        }
-      );
-    } catch (error) {
-      console.error('Fehler bei getActualMessages:', error);
-    }
-  }
 
+ async getSelectedMessages(selectedUser: any) {
+  try {
+    if (!selectedUser?.uid || !this.global.currentUserData?.id) {
+      console.warn('Kein Benutzer ausgewählt oder keine gültigen Benutzer-Daten.');
+      return;
+    }
+    const docRef = collection(this.firestore, 'messages');
+    const q1 = query(
+      docRef,
+      where('recipientId', '==', selectedUser.uid),
+      where('senderId', '==', this.global.currentUserData.id)
+    );
+    const q2 = query(
+      docRef,
+      where('recipientId', '==', this.global.currentUserData.id),
+      where('senderId', '==', selectedUser.uid)
+    );
+    onSnapshot(q1, (querySnapshot1) => {
+      querySnapshot1.forEach((doc) => {
+        const messageData = doc.data();
+        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+          messageData['timestamp'] = messageData['timestamp'].toDate();
+        }
+        if (!this.messagesData.some((msg: any) => msg.id === doc.id)) {
+          this.messagesData.push({ id: doc.id, ...messageData });
+        }
+      });
+      this.updateMessages();
+    });
+    onSnapshot(q2, (querySnapshot2) => {
+      querySnapshot2.forEach((doc) => {
+        const messageData = doc.data();
+        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
+          messageData['timestamp'] = messageData['timestamp'].toDate();
+        }
+        if (!this.messagesData.some((msg: any) => msg.id === doc.id)) {
+          this.messagesData.push({ id: doc.id, ...messageData });
+        }
+      });
+      this.updateMessages();
+    });
+
+  } catch (error) {
+    console.error('Fehler bei getSelectedMessages:', error);
+  }
+}
+
+updateMessages() {
+  this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
+  this.dataLoaded = true;
+
+  if (this.shouldScroll) {
+    this.scrollAutoDown();
+  }
+  this.updateMessagesWithNewPhoto();
+  this.subscribeToThreadAnswers();
+  this.checkForSelfChat();
+}
   hasMessages(): boolean {
     return this.messagesData && this.messagesData.length > 0;
   }
@@ -323,11 +330,14 @@ export class ChatComponent implements OnInit, OnChanges {
   }
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-      await this.getSelectedMessages();
+      console.log('this Suser from onChanges', this.selectedUser);
+      await this.getSelectedMessages(this.selectedUser);
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getSelectedMessages().then(() => this.checkForSelfChat());
+      await this.getSelectedMessages(this.selectedUser).then(() =>
+        this.checkForSelfChat()
+      );
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
@@ -341,7 +351,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
-      await this.getMessages();
+      await this.getSelectedMessages(this.selectedUser);
       this.chatMessage = '';
     }
   }
@@ -477,8 +487,9 @@ export class ChatComponent implements OnInit, OnChanges {
     ids.sort();
     return ids.join('_');
   }
-
+  /* 
   async getMessages() {
+    debugger;
     try {
       if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
         return;
@@ -540,18 +551,17 @@ export class ChatComponent implements OnInit, OnChanges {
       console.error('Error initializing messages query:', error);
     }
   }
-  
+   */
 
   async updateMessagesWithNewPhoto() {
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (newPhotoUrl) {
         for (let message of this.messagesData) {
-       
           if (message.senderId === this.global.currentUserData.id) {
             if (message.senderPicture !== newPhotoUrl) {
               message.senderPicture = newPhotoUrl;
-              this.cdr.detectChanges(); 
+              this.cdr.detectChanges();
             }
           }
         }
@@ -566,13 +576,15 @@ export class ChatComponent implements OnInit, OnChanges {
             return updateDoc(messageRef, { photoUrl: newPhotoUrl });
           });
 
-        await Promise.all(updatePromises); 
+        await Promise.all(updatePromises);
       }
     } catch (error) {
-      console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
+      console.error(
+        'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
+        error
+      );
     }
   }
-  
 
   async openThread(messageId: any) {
     try {
@@ -708,14 +720,13 @@ export class ChatComponent implements OnInit, OnChanges {
 
   letPickerVisible(event: MouseEvent) {
     event.stopPropagation();
-    this.isEmojiPickerVisible = true; 
+    this.isEmojiPickerVisible = true;
   }
 
-  letEditPickerVisible(event: MouseEvent){
+  letEditPickerVisible(event: MouseEvent) {
     event.stopPropagation();
-    this.isEmojiPickerVisibleEdit = true; 
+    this.isEmojiPickerVisibleEdit = true;
   }
-  
 
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
@@ -796,9 +807,9 @@ export class ChatComponent implements OnInit, OnChanges {
       stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
       stickerBoxOpacity: message.stickerBoxOpacity,
     };
-    setTimeout(() => {
+    /*    setTimeout(() => {
       this.shouldScroll = true;
-    }, 100);
+    }, 1000); */
     await updateDoc(strickerRef, stikerObj);
     this.closePicker();
   }
@@ -988,7 +999,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.editableMessageText += emoji;
     this.isEmojiPickerVisibleEdit = false;
   }
-
 
   @HostListener('document:click', ['$event'])
   onEMojiEditClick(event: MouseEvent) {

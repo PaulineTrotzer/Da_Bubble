@@ -132,9 +132,6 @@ app-input-field {
       opacity: 1;
       cursor: pointer;
     }
-    .show-comment-stricker {
-      background-color: #ffffff;
-    }
     .show-stricker-svgbox {
       background-color: #ffffff;
       border-radius: 100%;
@@ -157,7 +154,6 @@ app-input-field {
   margin-top: 0;
   padding: 5px 0;
   top: -13px;
-  margin-top: 37px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -167,9 +163,6 @@ app-input-field {
       cursor: pointer;
     }
     .message-card-user {
-      background-color: #ffffff;
-    }
-    .show-comment-stricker {
       background-color: #ffffff;
     }
     .show-stricker-svgbox {
@@ -271,6 +264,7 @@ app-input-field {
 }
 
 .card-content-current {
+  position: relative;
   font-size: 18px;
   font-weight: 400;
   line-height: 24.55px;
@@ -278,6 +272,7 @@ app-input-field {
 }
 
 .card-content-user {
+  position: relative;
   font-size: 18px;
   font-weight: 400;
   line-height: 24.55px;
@@ -456,8 +451,11 @@ app-input-field {
 }
 
 .edit-input {
+  position: relative;
+  left: 28px;
+  bottom: 5px;
   width: 88%;
-  height: 148px;
+  height: 158px;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -483,7 +481,6 @@ app-input-field {
   gap: 11px;
   justify-content: flex-end;
   width: 86%;
-  background: #ffffff;
   border-radius: 63px;
   gap: 10px;
 }
@@ -581,7 +578,21 @@ app-input-field {
 
 .text-info-edit {
   position: relative;
-  font-size: 14px;
+  font-size: 13px;
+  position: absolute;
+  bottom: 35px;
+}
+
+.edited-recipient-view{
+  left: 265px;
+}
+
+.edited-both-view{
+  right: 265px;
+}
+
+.edited-sender-view{
+  right: 265px;
 }
 
 .mention-message {
@@ -657,8 +668,8 @@ app-mention-message-box {
 
 .edit-emoji-main {
   position: relative;
-  top: -52px;
-  left: 1%;
+  top: -55px;
+  left: 33px;
   z-index: 40;
   width: 40px;
   height: 40px;

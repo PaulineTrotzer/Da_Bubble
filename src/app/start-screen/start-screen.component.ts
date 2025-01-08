@@ -33,6 +33,8 @@ import { LoginAuthService } from '../services/login-auth.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { MemberDataService } from '../services/member-data.service';
 import { AuthService } from '../services/auth.service';
+import { User } from '../models/user.class';
+import { WorkspaceService } from '../services/workspace.service';
 
 interface ChannelData {
   userIds: string[];
@@ -110,20 +112,33 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   memberDataService = inject(MemberDataService);
   authService = inject(AuthService);
   statusCheck = false;
+  workspaceService=inject(WorkspaceService);
+  workspaceSubscription: Subscription | undefined;
 
-  constructor(
-    public global: GlobalVariableService,
-  ) {}
+  constructor(public global: GlobalVariableService) {}
 
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
 
   async ngOnInit(): Promise<void> {
-    this.userservice.selectedUser$.subscribe((user) => {
-      this.selectedUser = user;
-      this.cdr.detectChanges();
-    });
+    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+      async (user) => {
+        if (user) {
+          this.selectedUser = user;
+          console.log('user chat comp',user);
+      /*     await this.getSelectedMessages(this.selectedUser); */
+        }
+      }
+    );
+
+    this.workspaceSubscription.add(
+      this.workspaceService.selectedChannel$.subscribe((channel) => {
+        if (channel) {
+          this.selectedChannel = channel;
+        }
+      })
+    );
     this.checkStatus();
     this.initializeGlobalState();
     await this.loadUserData();
@@ -141,10 +156,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.global.currentUserData || !this.selectedUser) {
       console.log('Daten noch nicht geladen oder unvollständig');
       this.statusCheck = false;
-      return; 
+      return;
     }
     if (this.global.currentUserData.name === 'Gast') {
-      this.statusCheck = false; 
+      this.statusCheck = false;
     } else if (
       this.global.statusCheck &&
       this.global.currentUserData.name === this.selectedUser.name
@@ -154,8 +169,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.statusCheck = false;
     }
   }
-  
-
 
   initializeGlobalState(): void {
     this.global.channelSelected = false;
@@ -192,7 +205,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   resetChannelSelection(): void {
     this.global.channelSelected = false;
     this.selectedChannel = null;
-    /*     this.onHeaderChannel = null; */
+     this.onHeaderChannel = null; 
     this.global.clearCurrentChannel();
     this.afterLoginSheet = false;
   }
@@ -247,7 +260,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.guestLoginStatusSub = this.loginAuthService.isGuestLogin$.subscribe(
       (status) => {
         this.isGuestLogin = status;
-        console.log('isGuest',this.isGuestLogin);
       }
     );
   }
@@ -375,9 +387,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        /*         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
+        this.userservice.observingUserChanges(userId, (updatedUser: User) => {
           this.selectedUser = updatedUser;
-        }); */
+        });
       }
     } catch (error) {
       console.error('Fehler beim Abruf s Benutzers:', error);

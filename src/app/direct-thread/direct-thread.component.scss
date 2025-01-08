@@ -56,6 +56,11 @@
   }
 }
 
+.edit-messages-card {
+  position: abs($number: 0);
+  z-index: 2;
+}
+
 .edit-message {
   &:hover {
     .edit-messages-card {
@@ -116,7 +121,8 @@
 }
 
 .overflow-container {
-  overflow: scroll;
+  overflow: auto;
+  scroll-behavior: smooth;
   height: 730px;
 }
 
@@ -417,8 +423,13 @@ h3 {
   border: 1px solid #adb0d9;
 }
 
+.first-day-info {
+  margin-top: 33px;
+}
+
 .day-span {
   border-radius: 30px;
+  z-index: 2;
   border: 1px solid #adb0d9;
   padding: 5px 15px;
   background-color: #ffffff;
@@ -439,7 +450,6 @@ h3 {
 }
 
 .new-day-info {
-  margin-top: 40px;
   position: relative;
   top: -16px;
   padding: 0 35px;
@@ -494,7 +504,13 @@ h3 {
   margin: 16px 0;
 }
 
+.first-message-position{
+  position: relative;
+  bottom: 36px;
+}
+
 .color-separator {
+  padding-top: 16px;
   position: relative;
   cursor: pointer;
   &:hover {
@@ -520,14 +536,14 @@ h3 {
   }
 }
 
-.cancel-icon{
+.cancel-icon {
   object-fit: contain;
   width: 22px;
   padding: 3px;
   &:hover {
     background-color: #eceefe;
     border-radius: 50px;
-  } 
+  }
 }
 
 .message-holder {
@@ -581,7 +597,6 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 14px 0 43px 0;
 }
 
 .message-text {
@@ -699,16 +714,14 @@ svg {
   cursor: pointer;
 }
 
-
-@media(max-width:1349px){
-  .full-page-content.hidden-width{
+@media (max-width: 1349px) {
+  .full-page-content.hidden-width {
     width: unset;
   }
 }
 
-@media (max-width:720px){
-  .full-page-content.reset-width{
+@media (max-width: 720px) {
+  .full-page-content.reset-width {
     width: unset;
   }
-
 }

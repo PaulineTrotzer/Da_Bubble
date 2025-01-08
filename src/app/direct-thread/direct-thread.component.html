@@ -1,4 +1,5 @@
-<div [ngClass]="{'hidden-width':global.checkWideChannelOrUserThreadBox,'reset-width':global.openChannelOrUserThread}" class="full-page-content">
+<div [ngClass]="{'hidden-width':global.checkWideChannelOrUserThreadBox,'reset-width':global.openChannelOrUserThread}"
+  class="full-page-content">
   <header>
     <div class="headline-ct">
       <h3>Thread</h3>
@@ -22,14 +23,14 @@
   <div class="header-seperator"></div>
 
   <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInDirectThread"
-  (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
+    (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
 
   <div class="overflow-container">
     <div #messageContainer class="all-thread-message-container">
 
       <div *ngFor="let message of messagesData; let i=index" [id]="message.id" class="message-bubble">
-        <div *ngIf="displayDayInfo(i)" class="new-day-info">
+        <div *ngIf="displayDayInfo(i)" class="new-day-info" [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
           <div class="day-info">
             <div class="line"></div>
             <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
@@ -38,8 +39,9 @@
         </div>
         <div class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)" (mouseenter)="onMouseEnter(message)"
-          (mouseleave)="onMouseLeave(message)">
-          <div *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name && !isSelfThread && !showOneDisplay"
+          (mouseleave)="onMouseLeave(message)" [ngClass]="{'first-message-position': isFirstMessage(i)}">
+          <div
+            *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name && !isSelfThread && !showOneDisplay"
             class="chatpartner-message-container">
             <div class="partner-message-header">
               <div class="avatar-container">
@@ -49,7 +51,6 @@
               <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
             <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
-              <!--               <p>{{ message.text }}</p> -->
               <ng-container *ngFor="let mentionName of splitMessage(message.text)">
                 <span *ngIf="isMention(mentionName)" class="mention-message" (click)="handleMentionClick(mentionName)">
                   {{ mentionName }}
@@ -94,7 +95,8 @@
 
         <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
           class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
-          (mouseleave)="toggleOptionBar(message.id,false)" (mouseleave)="toggleEditOption(message.id, false)">
+          (mouseleave)="toggleOptionBar(message.id,false)" (mouseleave)="toggleEditOption(message.id, false)"
+          [ngClass]="{'first-message-position': isFirstMessage(i)}">
 
           <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
             <div class="show-set-reverse" @slideIn>

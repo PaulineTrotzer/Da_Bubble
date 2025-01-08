@@ -7,7 +7,8 @@
     <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox"
         #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
-            <div *ngIf="displayDayInfo(i)" class="new-day-info"  [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
+            <div *ngIf="displayDayInfo(i)" class="new-day-info"
+                [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
                 <div class="day-info">
                     <div class="line"></div>
                     <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
@@ -191,7 +192,13 @@
                         </div>
                     </ng-container>
 
-                    <div *ngIf="message.editedTextShow" class="text-info-edit">(Bearbeitet)</div>
+                    <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
+                       'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
+                       'edited-recipient-view': message.recipientName === global.currentUserData.name && message.senderName !== global.currentUserData.name,
+                       'edited-both-view': message.senderName === global.currentUserData.name && message.recipientName === global.currentUserData.name
+                     }">
+                        (Bearbeitet)
+                    </div>
 
                     <div class="avatar-box">
 

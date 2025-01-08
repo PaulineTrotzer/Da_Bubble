@@ -98,6 +98,7 @@
   margin: 24px 0;
   max-height: 140px;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .channel-row,
@@ -170,6 +171,7 @@
   max-height: 468px;
   overflow-y: auto;
   margin-left: 24px;
+  scroll-behavior: smooth;
 }
 
 .contact {
