@@ -30,6 +30,13 @@
   }
 }
 
+.message-scroll-container{
+  height: 880px;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  padding-top: 20px;
+}
+
 .message-from-user {
   display: flex;
   gap: 30px;
@@ -99,7 +106,8 @@
     .message-content {
       display: flex;
       gap: 16px;
-      height: 120px;
+      height: 136px;
+      padding-top: 16px;
     }
     .reaction-info {
       display: flex;
@@ -190,7 +198,8 @@
       display: flex;
       flex-direction: row-reverse;
       gap: 16px;
-      height: 110px;
+      height: 136px;
+      padding-top: 16px;
     }
     .reaction-info {
       display: flex;
@@ -334,7 +343,7 @@
   position: absolute;
   right: 45px;
   left: 45px;
-  top: -20px;
+  top: 0;
 }
 
 .line {

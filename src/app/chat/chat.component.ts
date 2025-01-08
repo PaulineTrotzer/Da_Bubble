@@ -263,14 +263,8 @@ export class ChatComponent implements OnInit, OnChanges {
   editMessages(message: any) {
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
+    this.shouldScroll = false;
     if (this.isFirstClick) {
-      setTimeout(() => {
-        if (this.editableTextarea) {
-          const textarea = this.editableTextarea.nativeElement;
-          textarea.scrollTop = textarea.scrollHeight;
-          textarea.focus();
-        }
-      }, 20);
       this.isFirstClick = false;
     }
   }
@@ -381,6 +375,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   saveOrDeleteMessage(message: any) {
+    this.shouldScroll = false;
     const messageRef = doc(this.firestore, 'messages', message.id);
     if (this.editableMessageText.trim() === '') {
       deleteDoc(messageRef).then(() => {
@@ -398,6 +393,9 @@ export class ChatComponent implements OnInit, OnChanges {
       });
       this.checkEditbox = false;
       this.isFirstClick = true;
+      setTimeout(() => {
+        this.shouldScroll = true;
+      }, 1000);
     }
   }
 

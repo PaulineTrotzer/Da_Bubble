@@ -95,6 +95,7 @@ app-input-field {
   padding: 5px 15px;
   background-color: #ffffff;
   position: absolute;
+  z-index: 2;
   right: 50%;
   font-size: 18px;
   font-weight: 400;
@@ -107,8 +108,9 @@ app-input-field {
   position: absolute;
   top: 140px;
   width: 100%;
-  max-height: 650px;
+  max-height: 750px;
   overflow-y: auto;
+  scroll-behavior: smooth;
   margin-top: -28px;
 }
 
@@ -118,7 +120,6 @@ app-input-field {
   margin-top: 0;
   padding: 5px 0;
   top: -13px;
-  margin-top: 37px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -196,20 +197,20 @@ app-input-field {
 }
 
 .message-content-current {
-  margin: 15px 145px;
+  margin: 16px 145px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  height: 130px;
+  height: 136px;
 }
 
 .message-content-user {
-  margin: 15px 145px;
+  margin: 16px 145px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 130px;
+  height: 136px;
 }
 
 .current-name-box {
@@ -300,11 +301,13 @@ app-input-field {
 .picture-box-current {
   position: absolute;
   right: 45px;
+  padding-top: 16px;
 }
 
 .picture-box-user {
   position: absolute;
   left: 45px;
+  padding-top: 16px;
 }
 
 .comment-box-current {
@@ -568,9 +571,8 @@ app-input-field {
 }
 
 .new-day-info {
-  margin-top: 40px;
   position: relative;
-  top: -16px;
+  top: -13px;
   padding: 0 35px;
 }
 

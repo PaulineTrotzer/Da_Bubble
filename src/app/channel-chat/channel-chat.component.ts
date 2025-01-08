@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewChecked,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -8,7 +10,10 @@ import {
   Input,
   OnInit,
   Output,
+  QueryList,
   SimpleChanges,
+  ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import {
   collection,
@@ -71,7 +76,7 @@ interface Message {
     ]),
   ],
 })
-export class ChannelChatComponent implements OnInit {
+export class ChannelChatComponent implements OnInit, AfterViewInit {
   isEdited = false;
   @Input() inputMessagesData: any[] = [];
   @Input() selectedChannel: any;
@@ -99,6 +104,8 @@ export class ChannelChatComponent implements OnInit {
   overlayStatusService = inject(OverlayStatusService);
   auth = inject(Auth);
   cdr = inject(ChangeDetectorRef);
+  @ViewChild('messageContainer') messageContainer!: ElementRef;
+  firstLoad: boolean = true; 
 
   constructor(private elRef: ElementRef) {}
 
@@ -113,6 +120,22 @@ export class ChannelChatComponent implements OnInit {
     );
   }
 
+  ngAfterViewInit() {
+    this.scrollToBottom();
+  }
+
+
+  scrollToBottom(): void {
+    if (this.messageContainer && this.messageContainer.nativeElement) {
+      const container = this.messageContainer.nativeElement;
+      const lastMessage = container.querySelector(
+        '.message-container:last-child'
+      );
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }
+  }
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
       console.log('Input Nachrichten geändert:', this.inputMessagesData);
@@ -246,15 +269,18 @@ export class ChannelChatComponent implements OnInit {
         return { id: doc.id, ...data };
       });
       await this.updateMessagesWithNewPhoto();
+      if (this.firstLoad) {
+        console.log('if erfüllt');
+        this.scrollToBottom();
+        this.firstLoad = false; // Verhindere weiteres Scrollen bei zukünftigen Änderungen
+      }
     });
-
   }
 
   async updateMessagesWithNewPhoto() {
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (!newPhotoUrl) {
-        console.warn('Keine neue Foto-URL verfügbar');
         return;
       }
       const messagesToUpdate = this.messagesData.filter(
@@ -263,7 +289,6 @@ export class ChannelChatComponent implements OnInit {
           message.senderPicture !== newPhotoUrl
       );
       if (messagesToUpdate.length === 0) {
-        console.log('Keine Änderungen an senderPicture erkannt');
         return;
       }
       messagesToUpdate.forEach((message) => {
@@ -290,8 +315,6 @@ export class ChannelChatComponent implements OnInit {
       );
     }
   }
-  
-
 
   ngOnDestroy(): void {
     if (this.unsubscribe) {
