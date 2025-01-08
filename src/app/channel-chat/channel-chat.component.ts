@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewChecked,
   AfterViewInit,
   ChangeDetectorRef,
   Component,
@@ -10,13 +9,12 @@ import {
   Input,
   OnInit,
   Output,
-  QueryList,
   SimpleChanges,
   ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentReference,
   Firestore,
@@ -105,7 +103,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   auth = inject(Auth);
   cdr = inject(ChangeDetectorRef);
   @ViewChild('messageContainer') messageContainer!: ElementRef;
-  firstLoad: boolean = true; 
+  shouldScroll = true; 
 
   constructor(private elRef: ElementRef) {}
 
@@ -139,10 +137,12 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
       console.log('Input Nachrichten geändert:', this.inputMessagesData);
-      this.messagesData = this.inputMessagesData; // Weisen Sie die Eingabedaten der lokalen Variable zu
-      this.loadUserNames(); // Lade Benutzernamen, wenn Nachrichten vorhanden sind
+      this.messagesData = this.inputMessagesData;
+      this.shouldScroll = true; 
+      this.loadUserNames(); 
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
+      this.shouldScroll = true;
       await this.loadChannelMessages();
     }
   }
@@ -269,10 +269,9 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
         return { id: doc.id, ...data };
       });
       await this.updateMessagesWithNewPhoto();
-      if (this.firstLoad) {
+      if (this.shouldScroll) {
         console.log('if erfüllt');
         this.scrollToBottom();
-        this.firstLoad = false; // Verhindere weiteres Scrollen bei zukünftigen Änderungen
       }
     });
   }
@@ -611,6 +610,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   }
 
   async saveEditedMessage(messageId: string) {
+    this.shouldScroll = false;
     try {
       const messageDocRef = doc(
         this.firestore,
@@ -619,17 +619,22 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
         'messages',
         messageId
       );
-      await updateDoc(messageDocRef, {
-        text: this.messageToEdit,
-        isEdited: true,
-      });
+  
+      if (this.messageToEdit.trim() === '') {
+        await deleteDoc(messageDocRef);
+      } else {
+        await updateDoc(messageDocRef, {
+          text: this.messageToEdit,
+          isEdited: true,
+        });
+      }
       this.showEditArea = null;
       this.messageToEdit = '';
-      console.log(`Message ${messageId} updated successfully.`);
     } catch (error) {
       console.error('Error saving edited message:', error);
     }
   }
+  
 
   cancelEdit() {
     this.showEditArea = null;

@@ -145,6 +145,10 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
 
+  isFirstDayInfoVisible(i: number): boolean {
+    return i === 0; // Falls die erste Nachricht `messagesData[0]` ist, gib true zurück
+  }
+
   async getSelectedMessages() {
     try {
       if (!this.selectedUser?.uid || !this.global.currentUserData?.id) {

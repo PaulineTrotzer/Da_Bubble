@@ -4,11 +4,10 @@
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
-
     <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox"
         #scrollContainer>
         <div *ngFor="let message of messagesData; let i=index">
-            <div *ngIf="displayDayInfo(i)" class="new-day-info">
+            <div *ngIf="displayDayInfo(i)" class="new-day-info"  [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
                 <div class="day-info">
                     <div class="line"></div>
                     <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
@@ -86,8 +85,8 @@
 
                         <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                             <div class="emoji-picker">
-                                <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event,message)"
-                                    size="18"></emoji-mart>
+                                <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
+                                    (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
                             </div>
                         </div>
 
@@ -395,12 +394,12 @@
                             </div>
                         </div>
                     </div>
-              
+
                 </div>
             </div>
         </div>
-        <app-channel-chat [inputMessagesData]="messagesData"  (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
-            [selectedChannel]="selectedChannel"></app-channel-chat>
+        <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
+            *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
     </div>
     <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
         <div class="self-name-and-img">
@@ -414,7 +413,7 @@
             gerne Dinge mit dir selbst besprechen.
         </span>
     </div>
-    <div class="two-chat-opener-ct"  *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
+    <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
         <div class="img-and-name">
             <img class="self-chat-img" src={{selectedUser?.picture}}>
             <p>{{selectedUser?.name}}</p>

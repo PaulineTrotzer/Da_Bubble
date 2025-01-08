@@ -111,8 +111,12 @@ app-input-field {
   max-height: 750px;
   overflow-y: auto;
   scroll-behavior: smooth;
-  margin-top: -28px;
 }
+
+.first-day-info{
+  margin-top: 33px;
+}
+
 
 .main-mesage-info-current {
   width: 100%;
@@ -180,7 +184,7 @@ app-input-field {
   cursor: pointer;
 }
 
-.last-used-emoji{
+.last-used-emoji {
   margin-left: 8px;
   display: flex;
   justify-content: center;
@@ -484,7 +488,6 @@ app-input-field {
   gap: 10px;
 }
 
-
 .show-comment-stricker {
   display: flex;
   border: 1px solid #adb0d9;
@@ -639,7 +642,6 @@ app-mention-message-box {
   z-index: 9999;
 }
 
-
 .comment-recipientSticker-box {
   display: flex;
   justify-content: center;
@@ -662,12 +664,12 @@ app-mention-message-box {
   height: 40px;
 }
 
-.thread-answer-display{
+.thread-answer-display {
   display: flex;
   gap: 5px;
   color: #444df2;
   font-weight: 500;
-  &:hover{
+  &:hover {
     transform: scale(1.05);
   }
 }
