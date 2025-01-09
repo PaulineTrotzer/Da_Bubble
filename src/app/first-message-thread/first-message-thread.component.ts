@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { ThreadControlService } from '../services/thread-control.service';
 
 @Component({
   selector: 'app-first-message-thread',
@@ -28,13 +27,6 @@ export class FirstMessageThreadComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  ngOnChanges(): void {
-    console.log('Aktualisierte Nachricht:', this.currentThreadMessage);
-  }
-
-  onMouseLeave(obj: any) {}
-
-  onMouseEnter(obj: any) {}
 
   getFormattedTimestamp(): Date | null {
     if (!this.currentThreadMessage?.timestamp) {

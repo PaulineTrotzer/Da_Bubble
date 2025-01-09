@@ -115,6 +115,7 @@ export class AuthService {
           email: email,
         });
         await this.saveUserAfterLogin(this.user);
+        this.globalVariable.setCurrentUserData(this.user);
         this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
         this.router.navigate(['/welcome', this.user.uid]);

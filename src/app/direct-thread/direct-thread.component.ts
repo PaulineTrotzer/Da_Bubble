@@ -151,7 +151,6 @@ export class DirectThreadComponent implements OnInit {
     if (this.global.currentUserData.id === this.selectedUser.id) {
       this.isSelfThread = true;
       this.showOneDisplay= true;
-      console.log('self = true');
     } else if (this.global.currentUserData.id !== this.selectedUser.id) {
       this.isSelfThread = false;
     }
@@ -493,6 +492,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
+    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,

@@ -74,7 +74,7 @@
   gap: 8px;
   position: relative;
   right: 35px;
-  bottom: 44px;
+  bottom: 8px;
   justify-content: end;
   align-items: center;
 }
@@ -123,7 +123,7 @@
 .overflow-container {
   overflow: auto;
   scroll-behavior: smooth;
-  height: 730px;
+  height: 750px;
 }
 
 .sticker-hover-ct {
@@ -175,8 +175,10 @@
 }
 
 .edit-input {
-  width: 88%;
-  height: 148px;
+  position: relative;
+  bottom: 39px;
+  width: 95%;
+  height: 133px;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -205,6 +207,10 @@
 
 .emoji-holder {
   position: relative;
+  bottom: 25px;
+  font-size: 14px;
+  height: 32px;
+  right: 80px;
   display: flex;
   width: 46px;
   align-items: baseline;
@@ -280,15 +286,39 @@ h3 {
 }
 
 .avatar-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: absolute;
+  right: 50px;
+  top: 35px;
   img {
     width: 50px;
     height: 50px;
     object-fit: cover;
     border-radius: 50px;
   }
+}
+
+.avatar-container-partner {
+  position: absolute;
+  left: 50px;
+  top: 46px;
+  img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50px;
+  }
+}
+
+.time-name-flex {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 23px;
+}
+
+.time-name-flex-partner {
+  display: flex;
+  flex-direction: row;
+  gap: 23px;
 }
 
 .hashtag {
@@ -298,7 +328,7 @@ h3 {
   font-weight: 600;
 }
 
-.all-thread-message-container {
+/* .all-thread-message-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -306,7 +336,7 @@ h3 {
   margin: 16px 0;
   max-height: 100%;
   overflow-y: auto;
-}
+} */
 
 .cu-msg-text {
   max-height: 105px;
@@ -325,7 +355,7 @@ h3 {
 
 .reaction-icon-container-editMode {
   position: absolute;
-  bottom: 21px;
+  bottom: 58px;
   left: 5px;
   svg {
     display: block;
@@ -383,7 +413,7 @@ h3 {
   border-bottom-right-radius: 30px;
   width: fit-content;
   height: fit-content;
-  padding: 8px 15px;
+  padding: 8px 11px;
   color: white;
 }
 
@@ -415,7 +445,8 @@ h3 {
 }
 
 .reaction-sender-currentUser-right {
-  bottom: 40px;
+  bottom: 47px;
+  right: -31px;
 }
 
 .line {
@@ -451,7 +482,6 @@ h3 {
 
 .new-day-info {
   position: relative;
-  top: -16px;
   padding: 0 35px;
 }
 
@@ -500,19 +530,19 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 10px 30px 55px 30px;
-  margin: 16px 0;
+  height: 136px;
+  padding-top: 16px;
 }
 
-.first-message-position{
+.first-message-position {
   position: relative;
-  bottom: 36px;
+  bottom: 16px;
 }
 
 .color-separator {
-  padding-top: 16px;
   position: relative;
   cursor: pointer;
+  padding-top: 16px;
   &:hover {
     background-color: #eceefe;
   }
@@ -522,7 +552,7 @@ h3 {
   display: flex;
   position: absolute;
   right: 46px;
-  bottom: 25px;
+  bottom: 61px;
   gap: 10px;
 }
 
@@ -555,31 +585,32 @@ h3 {
 .message-content-bubble {
   position: relative;
   background-color: white;
-  max-width: 278px;
   padding: 15px;
   margin-top: 15px;
+  width: fit-content;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
+  align-self: baseline;
 }
 
 .static-bubble {
   background-color: #eceefe;
-  max-width: 278px;
+  align-self: baseline;
   padding: 15px;
+  width: fit-content;
   margin-top: 15px;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
 
-.cu-message-header {
+.cu-message-column {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-direction: row-reverse;
+  flex-direction: column;
   position: relative;
-  right: 35px;
+  right: 95px;
+  align-items: end;
   h4 {
     font-family: Nunito;
     font-size: 18px;
@@ -597,6 +628,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  height: 136px;
 }
 
 .message-text {
@@ -617,10 +649,12 @@ h3 {
   left: 8px;
 }
 
-.partner-message-header {
+.partner-message-column {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: end;
+  flex-direction: column;
+  position: relative;
+  left: 125px;
   h4 {
     font-family: "Nunito";
     font-size: 18px;

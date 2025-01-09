@@ -119,7 +119,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.scrollToBottom();
+/*     this.scrollToBottom(); */
   }
 
 
@@ -271,7 +271,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       await this.updateMessagesWithNewPhoto();
       if (this.shouldScroll) {
         console.log('if erfüllt');
-        this.scrollToBottom();
+      //  this.scrollToBottom();
       }
     });
   }

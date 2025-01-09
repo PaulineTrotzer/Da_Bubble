@@ -6,6 +6,11 @@ app-input-field {
   position: relative;
 }
 
+.special-class-cu-sticker {
+  position: absolute;
+  bottom: -30px !important;
+}
+
 .self-chat-opener-ct {
   display: flex;
   flex-direction: column;
@@ -113,17 +118,14 @@ app-input-field {
   scroll-behavior: smooth;
 }
 
-.first-day-info{
+.first-day-info {
   margin-top: 33px;
 }
-
 
 .main-mesage-info-current {
   width: 100%;
   position: relative;
-  margin-top: 0;
-  padding: 5px 0;
-  top: -13px;
+  padding-top: 16px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -151,9 +153,8 @@ app-input-field {
 .main-message-info-user {
   width: 100%;
   position: relative;
-  margin-top: 0;
-  padding: 5px 0;
-  top: -13px;
+  padding-top: 16px;
+  height: 192px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -199,7 +200,7 @@ app-input-field {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  height: 136px;
+  height: 160px;
 }
 
 .message-content-user {
@@ -207,7 +208,7 @@ app-input-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 136px;
+  height: 160px;
 }
 
 .current-name-box {
@@ -486,12 +487,16 @@ app-input-field {
 }
 
 .show-comment-stricker {
+  position: absolute;
+  bottom: -31px;
   display: flex;
+  align-items: baseline;
   border: 1px solid #adb0d9;
   border-radius: 16px;
   padding: 5px;
-  gap: 6px;
-  align-items: center;
+  gap: 3px;
+  height: 35px;
+  font-size: 15px;
   &:hover {
     border-color: #444df2;
   }
@@ -580,19 +585,19 @@ app-input-field {
   position: relative;
   font-size: 13px;
   position: absolute;
-  bottom: 35px;
+  bottom: 55px;
 }
 
-.edited-recipient-view{
+.edited-recipient-view {
   left: 265px;
 }
 
-.edited-both-view{
+.edited-both-view {
   right: 265px;
 }
 
-.edited-sender-view{
-  right: 265px;
+.edited-sender-view {
+  right: 332px;
 }
 
 .mention-message {
@@ -679,7 +684,9 @@ app-mention-message-box {
   display: flex;
   gap: 5px;
   color: #444df2;
+  width: fit-content;
   font-weight: 500;
+  font-size: 14px;
   &:hover {
     transform: scale(1.05);
   }

@@ -27,7 +27,6 @@ import {
   getDoc,
   setDoc,
   getDocs,
-  or,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.class';
 import { SendMessageInfo } from '../models/send-message-info.interface';
@@ -130,7 +129,7 @@ export class ChatComponent implements OnInit, OnChanges {
         if (user) {
           this.selectedUser = user;
           console.log('user chat comp', user);
-          await this.getSelectedMessages(this.selectedUser);
+          await this.getMessages();
         }
       }
     );
@@ -146,56 +145,8 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   isFirstDayInfoVisible(i: number): boolean {
-    return i === 0; // Falls die erste Nachricht `messagesData[0]` ist, gib true zurück
+    return i === 0; 
   }
-
-
- async getSelectedMessages(selectedUser: any) {
-  try {
-    if (!selectedUser?.uid || !this.global.currentUserData?.id) {
-      console.warn('Kein Benutzer ausgewählt oder keine gültigen Benutzer-Daten.');
-      return;
-    }
-    const docRef = collection(this.firestore, 'messages');
-    const q1 = query(
-      docRef,
-      where('recipientId', '==', selectedUser.uid),
-      where('senderId', '==', this.global.currentUserData.id)
-    );
-    const q2 = query(
-      docRef,
-      where('recipientId', '==', this.global.currentUserData.id),
-      where('senderId', '==', selectedUser.uid)
-    );
-    onSnapshot(q1, (querySnapshot1) => {
-      querySnapshot1.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
-        }
-        if (!this.messagesData.some((msg: any) => msg.id === doc.id)) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
-      });
-      this.updateMessages();
-    });
-    onSnapshot(q2, (querySnapshot2) => {
-      querySnapshot2.forEach((doc) => {
-        const messageData = doc.data();
-        if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-          messageData['timestamp'] = messageData['timestamp'].toDate();
-        }
-        if (!this.messagesData.some((msg: any) => msg.id === doc.id)) {
-          this.messagesData.push({ id: doc.id, ...messageData });
-        }
-      });
-      this.updateMessages();
-    });
-
-  } catch (error) {
-    console.error('Fehler bei getSelectedMessages:', error);
-  }
-}
 
 updateMessages() {
   this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
@@ -238,7 +189,7 @@ updateMessages() {
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
-    this.overlayStatusService.setOverlayStatus(false);
+    this.overlayStatusService.setOverlayStatus(true);
   }
 
   openEmojiPickerEdit() {
@@ -331,11 +282,11 @@ updateMessages() {
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
       console.log('this Suser from onChanges', this.selectedUser);
-      await this.getSelectedMessages(this.selectedUser);
+      await this.getMessages();
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getSelectedMessages(this.selectedUser).then(() =>
+      await this.getMessages().then(() =>
         this.checkForSelfChat()
       );
     }
@@ -351,7 +302,7 @@ updateMessages() {
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
-      await this.getSelectedMessages(this.selectedUser);
+/*       await this.getMessages(); */
       this.chatMessage = '';
     }
   }
@@ -487,7 +438,7 @@ updateMessages() {
     ids.sort();
     return ids.join('_');
   }
-  /* 
+  
   async getMessages() {
     debugger;
     try {
@@ -551,7 +502,7 @@ updateMessages() {
       console.error('Error initializing messages query:', error);
     }
   }
-   */
+  
 
   async updateMessagesWithNewPhoto() {
     try {

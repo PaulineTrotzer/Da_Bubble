@@ -340,96 +340,106 @@
                             </mat-card-content>
                         </mat-card>
 
-                        <div *ngIf="message.senderSticker !== '' " class="show-comment-stricker"
-                            (click)="removeSenderSticker(message)" (mouseenter)="
-                messageIdHovered = message.id;
-                hoveredSenderName = message.senderName;
-                hoveredCurrentUser = 'Du'
-              " (mouseleave)="
-                messageIdHovered = null;
-                hoveredSenderName = null;
-                hoveredCurrentUser = null
-              ">
-                            <span>{{message.senderSticker}} </span>
-                            <span>{{ message.senderStickerCount || 1 }}</span>
+                        <div [ngClass]="{
+                          'show-comment-stricker': message.senderSticker !== '',
+                          'special-class-cu-sticker': message.senderName === selectedUser.name
+                        }" (click)="removeSenderSticker(message)" (mouseenter)="
+                          messageIdHovered = message.id;
+                          hoveredSenderName = message.senderName;
+                          hoveredCurrentUser = 'Du';
+                        " (mouseleave)="
+                          messageIdHovered = null;
+                          hoveredSenderName = null;
+                          hoveredCurrentUser = null;
+                        " *ngIf="message.senderSticker !== '' || message.senderName === selectedUser.name">
+                            <span *ngIf="message.senderSticker">{{ message.senderSticker }}</span>
+                            <span *ngIf="message.senderStickerCount && message.senderStickerCount > 0">
+                                {{ message.senderStickerCount }}
+                            </span>
+
+                            <div *ngIf="
+                            message.recipientSticker !== '' &&
+                            message.recipientSticker !== message.senderSticker
+                          " class="show-comment-stricker" (click)="removeRecipientSticker(message)" (mouseenter)="
+                            messageIdHovered = message.id;
+                            hoveredName = 'Du';
+                            hoveredRecipienUser = message.recipientName;
+                          " (mouseleave)="
+                            messageIdHovered = null;
+                            hoveredName = null;
+                            hoveredRecipienUser = null;
+                          ">
+                                <span>{{ message.recipientSticker }}</span>
+                                <span *ngIf="message.recipientStickerCount && message.recipientStickerCount > 0">
+                                    {{ message.recipientStickerCount }}
+                                </span>
+                            </div>
                         </div>
-                        <div *ngIf="
-                message.recipientSticker !== '' &&
-                message.recipientSticker !== message.senderSticker
-              " class="show-comment-stricker" (click)="removeRecipientSticker(message)" (mouseenter)="
-                messageIdHovered = message.id;
-                hoveredName = 'Du';
-                hoveredRecipienUser = message.recipientName
-              " (mouseleave)="
-                messageIdHovered = null;
-                hoveredName = null;
-                hoveredRecipienUser = null
-              ">
-                            <span>{{message.recipientSticker}}</span>
-                            <span>{{ message.recipientStickerCount || 1 }}</span>
-                        </div>
-                    </div>
 
 
-                    <div class="show-selected-files">
-                        <div *ngFor="let file of message.selectedFiles">
-                            <div class="mai-file" *ngIf="file.url">
 
-                                <div class="file-info" *ngIf="file.type.startsWith('image/')">
-                                    <a [href]="file.url" target="_blank">
-                                        <img [src]="file.data">
-                                    </a>
-                                </div>
+                        <div class="show-selected-files">
+                            <div *ngFor="let file of message.selectedFiles">
+                                <div class="mai-file" *ngIf="file.url">
 
-                                <div class="file-info" *ngIf="file.type==='application/pdf'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/pdf.png">
-                                    </a>
-                                </div>
-                                <div class="file-info" *ngIf="file.type==='text/plain'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/textfile.png">
-                                    </a>
-                                </div>
+                                    <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                                        <a [href]="file.url" target="_blank">
+                                            <img [src]="file.data">
+                                        </a>
+                                    </div>
 
-                                <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
+                                    <div class="file-info" *ngIf="file.type==='application/pdf'">
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/pdf.png">
+                                        </a>
+                                    </div>
+                                    <div class="file-info" *ngIf="file.type==='text/plain'">
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/textfile.png">
+                                        </a>
+                                    </div>
+
+                                    <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
                                 file.type !== 'application/pdf' && file.type!== 'text/plain'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/alldatei.png">
-                                    </a>
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/alldatei.png">
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
             </div>
+            <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
+                *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
         </div>
-        <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
-            *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
-    </div>
-    <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
-        <div class="self-name-and-img">
-            <img class="self-chat-img" src={{global.currentUserData.picture}}>
-            <p>{{global.currentUserData?.name }}</p>
-            <p class="you">(Du)</p>
+        <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
+            <div class="self-name-and-img">
+                <img class="self-chat-img" src={{global.currentUserData.picture}}>
+                <p>{{global.currentUserData?.name }}</p>
+                <p class="you">(Du)</p>
+            </div>
+            <span class="self-chat-txt">
+                <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
+                auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
+                gerne Dinge mit dir selbst besprechen.
+            </span>
         </div>
-        <span class="self-chat-txt">
-            <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
-            auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
-            gerne Dinge mit dir selbst besprechen.
-        </span>
-    </div>
-    <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
-        <div class="img-and-name">
-            <img class="self-chat-img" src={{selectedUser?.picture}}>
-            <p>{{selectedUser?.name}}</p>
-        </div>
-        <div class="two-chat-txt">
-            Diese Unterhaltung findet nur zwischen
-            <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und dir statt
+        <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
+            <div class="img-and-name">
+                <img class="self-chat-img" src={{selectedUser?.picture}}>
+                <p>{{selectedUser?.name}}</p>
+            </div>
+            <div class="two-chat-txt">
+                Diese Unterhaltung findet nur zwischen
+                <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und dir
+                statt
+            </div>
         </div>
     </div>
     <app-input-field (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
         [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
+
 </div>
