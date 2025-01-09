@@ -42,6 +42,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-chat-component',
@@ -57,6 +58,17 @@ import { UserChannelSelectService } from '../services/user-channel-select.servic
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('300ms ease', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease', style({ opacity: 0, transform: 'translateY(-10px)' }))
+      ])
+    ])
+  ]
 })
 export class ChatComponent implements OnInit, OnChanges {
   threadControlService = inject(ThreadControlService);
@@ -80,6 +92,7 @@ export class ChatComponent implements OnInit, OnChanges {
   messageIdHovered: any;
   hoveredName: any;
   hoveredSenderName: any;
+  wasRemoved = false;
   hoveredCurrentUser: any;
   hoveredRecipienUser: any;
   editMessageId: string | null = null;
@@ -120,8 +133,26 @@ export class ChatComponent implements OnInit, OnChanges {
   dataLoaded: boolean = false;
   cdr = inject(ChangeDetectorRef);
   userChannelService = inject(UserChannelSelectService);
+  isStickerVisible = false;
 
   constructor() {}
+
+
+  onMouseEnter(message: any): void {
+    // Zeige den Sticker bei Hover an
+    this.isStickerVisible = true;
+    this.messageIdHovered = message.id;
+    this.hoveredSenderName = message.senderName;
+    this.hoveredCurrentUser = 'Du';
+  }
+
+  onMouseLeave(): void {
+    // Verstecke den Sticker, wenn die Maus den Bereich verlässt
+    this.isStickerVisible = false;
+    this.messageIdHovered = null;
+    this.hoveredSenderName = null;
+    this.hoveredCurrentUser = null;
+  }
 
   async ngOnInit(): Promise<void> {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
@@ -302,7 +333,7 @@ updateMessages() {
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.global.clearCurrentChannel();
-/*       await this.getMessages(); */
+      await this.getMessages();
       this.chatMessage = '';
     }
   }
@@ -440,7 +471,6 @@ updateMessages() {
   }
   
   async getMessages() {
-    debugger;
     try {
       if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
         return;
@@ -766,6 +796,7 @@ updateMessages() {
   }
 
   removeSenderSticker(message: any) {
+    this.wasRemoved = true;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
       if (message.senderSticker && message.senderStickerCount === 1) {
@@ -845,6 +876,7 @@ updateMessages() {
   }
 
   removeRecipientSticker(message: any) {
+    this.wasRemoved = true;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id !== message.senderId) {
       this.hoveredName = null;
@@ -859,6 +891,7 @@ updateMessages() {
   }
 
   emojiSender(message: any) {
+    this.wasRemoved = false;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
       const docRef = doc(this.firestore, 'messages', message.id);
@@ -897,6 +930,7 @@ updateMessages() {
   }
 
   emojirecipient(message: any) {
+    this.wasRemoved = false;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
       if (

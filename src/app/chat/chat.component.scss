@@ -6,11 +6,6 @@ app-input-field {
   position: relative;
 }
 
-.special-class-cu-sticker {
-  position: absolute;
-  bottom: -30px !important;
-}
-
 .self-chat-opener-ct {
   display: flex;
   flex-direction: column;
@@ -103,15 +98,13 @@ app-input-field {
   z-index: 2;
   right: 50%;
   font-size: 18px;
-  font-weight: 400;
-  line-height: 24.55px;
   text-align: left;
   color: #000000;
 }
 
 .main-current-messagebox {
-  position: absolute;
-  top: 140px;
+  /*   position: absolute;
+  top: 140px; */
   width: 100%;
   max-height: 750px;
   overflow-y: auto;
@@ -120,6 +113,12 @@ app-input-field {
 
 .first-day-info {
   margin-top: 33px;
+}
+
+.show-reactions-transition {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .main-mesage-info-current {
@@ -262,6 +261,7 @@ app-input-field {
   width: fit-content;
   overflow-wrap: break-word;
   max-height: max-content;
+  margin-bottom: 23px;
 }
 
 .card-content-current {
@@ -486,9 +486,31 @@ app-input-field {
   gap: 10px;
 }
 
+.sticker-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Zentriert die Inhalte horizontal */
+  position: relative;
+}
+
+.sticker-container {
+  display: flex;
+  justify-content: center; /* Zentriert die Sticker horizontal */
+  gap: 10px; /* Abstand zwischen den Stickern */
+  position: relative;
+}
+
+.comment-sticker-holder {
+  position: relative;
+  bottom: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+
 .show-comment-stricker {
-  position: absolute;
-  bottom: -31px;
+  position: relative;
   display: flex;
   align-items: baseline;
   border: 1px solid #adb0d9;
@@ -509,38 +531,56 @@ app-input-field {
   border-top-right-radius: 30px;
   background-color: #444df2;
   color: #ffffff;
+  display: flex;
   position: absolute;
   width: fit-content;
   padding: 3px;
-  top: -94px;
+  top: -400px;
   left: 27px;
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out,
+    left 0.3s ease-in-out;
 }
 
 .sticker-senderName-current.hovered {
   opacity: 1;
   z-index: 200;
+  left: -80px;
+  top: -110px;
 }
 
+.sticker-info-wrapper .hoveredSelectedUserReaction {
+  top: -88px;
+  left: 5px;
+}
+
+.sticker-info-wrapper .hoveredCurrentUserReaction {
+  top: -88px;
+  left: 5px;
+}
+
+
 .sticker-senderName-current.hoveredRecipienUser {
-  left: 95px;
+  left: -80px;
+  top: -155px;
+  height: fit-content;
 }
 
 .sticker-senderName-user {
   border-top-left-radius: 30px;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 30;
   border-top-right-radius: 30px;
   background-color: #444df2;
   color: #ffffff;
   position: absolute;
   width: fit-content;
-  top: -94px;
-  left: -132px;
+  height: fit-content;
+  display: flex;
+  left: 0;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  padding: 3px;
+  padding: 1px;
 }
 
 .sticker-senderName-user.hovered {
@@ -550,7 +590,6 @@ app-input-field {
 
 .sticker-senderName-user.hoveredSenderName {
   position: absolute;
-  width: 167px;
   top: -94px;
 }
 
@@ -560,18 +599,39 @@ app-input-field {
   left: -58px;
 }
 
+.sticker-senderName-current-bothReaction {
+  top: -190px !important;
+  left: -30px !important;
+}
+
 .sticker-senderName-user.seperateName {
   position: absolute;
-  left: -130px;
+  left: 10px;
+  top: -28px;
 }
 
 .sticker-info {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out, left 0.3s ease-in-out;
+}
+
+.sticker-info.hidden {
+  opacity: 0;
+  top: -400px;
+  left: 27px;
+}
+
+.sticker-info.visible {
+  opacity: 1;
+  top: -110px;
+  left: -80px;
+  z-index: 200;
 }
 
 .sticker-sender-name {
+  transition: left 0.3s ease, opacity 0.3s ease;
   text-align: center;
 }
 
