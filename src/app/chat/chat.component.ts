@@ -795,8 +795,8 @@ updateMessages() {
     this.closePicker();
   }
 
-  removeSenderSticker(message: any) {
-    this.wasRemoved = true;
+  removeSenderSticker(message: any) { 
+    this.shouldScroll = false;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
       if (message.senderSticker && message.senderStickerCount === 1) {
@@ -876,7 +876,7 @@ updateMessages() {
   }
 
   removeRecipientSticker(message: any) {
-    this.wasRemoved = true;
+    this.shouldScroll = false;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id !== message.senderId) {
       this.hoveredName = null;

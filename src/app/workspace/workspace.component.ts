@@ -188,8 +188,6 @@ export class WorkspaceComponent implements OnInit {
   } */
 
   selectUser(user: any) {
-    debugger;
-    console.log('su is', user);
     this.userService.setSelectedUser(user);
     this.selectedChannel = null;
     setTimeout(() => {

@@ -186,7 +186,7 @@
                         </mat-card>
                     </div>
                     <ng-container *ngIf="getReplyCountValue(message.id) as replyCount">
-                        <div *ngIf="replyCount > 0" class="thread-answer-display" (click)="openThread(message.id)">
+                        <div [ngClass]="{'thread-answer-display': true, 'show': replyCount > 0}" (click)="openThread(message.id)">
                             <span class="answer-counter">{{ replyCount }}</span>
                             <span class="answers">{{ replyCount === 1 ? 'Antwort' : 'Antworten' }}</span>
                         </div>
@@ -209,6 +209,8 @@
                     <div class="sticker-info-wrapper">
                         <mat-card *ngIf="messageIdHovered === message.id" [class]="{
                                 'sticker-senderName-current': message.senderId === global.currentUserData.id,
+                                'hoveredOwnReaction':  message.senderId === global.currentUserData.id && hoveredCurrentUser,
+
                                 hoveredSenderName: hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
                                 hoveredName: hoveredName && message.recipientSticker !== message.senderSticker,
                                 hovered: messageIdHovered,
