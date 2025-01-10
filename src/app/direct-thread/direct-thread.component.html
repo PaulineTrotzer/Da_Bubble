@@ -69,7 +69,7 @@
                 (Bearbeitet)
               </div>
             </div>
- 
+
 
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set" @slideIn>
@@ -251,9 +251,11 @@
               </div>
 
 
-              <div class="reaction-name-info-ct-sender" *ngIf="showReactionPopUpSender[message.id]"
-                [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
-                [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid">
+              <div class="reaction-name-info-ct-sender"
+              [hidden]="!showReactionPopUpSender[message.id]"
+              [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
+              [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid"
+              [ngClass]="{ 'hovered': showReactionPopUpSender[message.id] }">
                 <span class="reaction-info-txt">
                   <ng-container *ngIf="message.senderId === currentUser.uid">
                     Du hast mit
@@ -284,7 +286,9 @@
               </div>
 
 
-              <div class="reaction-name-info-ct-recipient" *ngIf="showReactionPopUpRecipient[message.id]">
+              <div class="reaction-name-info-ct-recipient"
+                [ngStyle]="{ 'opacity': showReactionPopUpRecipient[message.id] ? 1 : 0 }"
+                [ngClass]="{ 'hovered': showReactionPopUpRecipient[message.id] }">
                 <span class="reaction-info-txt">
                   <ng-container *ngIf="message.recipientId === currentUser.uid">
                     Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji

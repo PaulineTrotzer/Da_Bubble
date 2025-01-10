@@ -218,10 +218,10 @@
 
 .emoji-holder {
   position: relative;
-  bottom: 25px;
+  /*   bottom: 25px; */
   font-size: 14px;
   height: 32px;
-  right: 80px;
+  /*   right: 80px; */
   display: flex;
   width: 46px;
   align-items: baseline;
@@ -426,6 +426,15 @@ h3 {
   height: fit-content;
   padding: 8px 11px;
   color: white;
+  opacity: 0; 
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; 
+  visibility: hidden; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+.reaction-name-info-ct-sender.hovered {
+  opacity: 1; 
+  visibility: visible; 
 }
 
 .both-reaction-info-ct.both-reaction-right {
@@ -513,9 +522,9 @@ h3 {
 }
 
 .mention-message {
-  color: #444df2 !important; 
+  color: #444df2 !important;
   cursor: pointer;
-  &:hover{
+  &:hover {
     color: red !important;
   }
 }
@@ -543,6 +552,13 @@ h3 {
   box-sizing: border-box;
   text-align: center;
   color: white;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+.reaction-name-info-ct-recipient.hovered {
+  opacity: 1;
 }
 
 .chatpartner-message-container {
