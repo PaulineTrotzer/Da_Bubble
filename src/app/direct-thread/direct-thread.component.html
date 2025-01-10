@@ -65,8 +65,11 @@
                   <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
                 </ng-container>
               </div>
+              <div *ngIf="message.editedTextShow" class="text-info-edit-chatpartner">
+                (Bearbeitet)
+              </div>
             </div>
-
+ 
 
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
               <div class="show-set" @slideIn>
