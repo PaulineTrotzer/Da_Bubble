@@ -186,7 +186,7 @@
                         </mat-card>
                     </div>
                     <div class="placeholder-thread-answer">
-                        <div [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
+                        <div (click)="openThread(message.id)" [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
                             <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
                             <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' : 'Antworten' }}</span>
                         </div>
