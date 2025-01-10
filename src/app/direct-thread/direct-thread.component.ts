@@ -339,13 +339,13 @@ export class DirectThreadComponent implements OnInit {
   }
 
   scrollToLastMessage(messageId: string): void {
-    const interval = setInterval(() => {
-      const element = document.getElementById(messageId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-        clearInterval(interval);
-      }
-    }, 100);
+    const element = document.getElementById(messageId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      // Optional: Wenn das Element nicht sofort vorhanden ist, erneut prüfen.
+      setTimeout(() => this.scrollToLastMessage(messageId), 50);
+    }
   }
 
   toggleOptionBar(messageId: string, show: boolean): void {
