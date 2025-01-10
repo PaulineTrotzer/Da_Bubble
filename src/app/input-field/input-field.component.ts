@@ -378,12 +378,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.chatMessage += `${mentionTag}  `;
       this.updateFormattedMessage();
     }
+    
+    // Sende das Ereignis mit dem Mention-Wert an das Parent
     this.mentionUserOut.emit(mention);
   }
 
   handleCardClosed() {
-    this.isMentionPeopleCardVisible = false;
+    this.isMentionPeopleCardVisible = false; // Schließt die Karte
   }
+
+
+  // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
     const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
@@ -397,6 +402,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     });
   }
 
+  
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
