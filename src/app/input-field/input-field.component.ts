@@ -379,14 +379,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.updateFormattedMessage();
     }
     
-    // Sende das Ereignis mit dem Mention-Wert an das Parent
     this.mentionUserOut.emit(mention);
   }
 
   handleCardClosed() {
-    this.isMentionPeopleCardVisible = false; // Schließt die Karte
+    this.isMentionPeopleCardVisible = false; 
   }
-
 
   // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 

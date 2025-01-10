@@ -515,6 +515,7 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
+        console.log(this.messagesData);
         this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
       });
