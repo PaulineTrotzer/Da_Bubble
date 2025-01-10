@@ -186,7 +186,8 @@
                         </mat-card>
                     </div>
                     <ng-container *ngIf="getReplyCountValue(message.id) as replyCount">
-                        <div [ngClass]="{'thread-answer-display': true, 'show': replyCount > 0}" (click)="openThread(message.id)">
+                        <div [ngClass]="{'thread-answer-display': true, 'show': replyCount > 0}"
+                            (click)="openThread(message.id)">
                             <span class="answer-counter">{{ replyCount }}</span>
                             <span class="answers">{{ replyCount === 1 ? 'Antwort' : 'Antworten' }}</span>
                         </div>
@@ -207,25 +208,27 @@
 
 
                     <div class="sticker-info-wrapper">
-                        <mat-card *ngIf="messageIdHovered === message.id" [class]="{
-                                'sticker-senderName-current': message.senderId === global.currentUserData.id,
-                                'hoveredOwnReaction':  message.senderId === global.currentUserData.id && hoveredCurrentUser,
-
-                                hoveredSenderName: hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
-                                hoveredName: hoveredName && message.recipientSticker !== message.senderSticker,
-                                hovered: messageIdHovered,
-                                seperateName: message.recipientSticker !== '' && message.senderSticker === '',
-                                hoveredRecipienUser: hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker,
-                                'sticker-senderName-current-bothReaction': message.senderId === global.currentUserData.id && message.recipientName == selectedUser.name  &&
-                        message.senderSticker !== '' &&
-                        message.recipientSticker !== '' && message.senderSticker == message.recipientSticker,
-                                'sticker-senderName-user': message.senderId !== global.currentUserData.id,
-                                'hoveredSelectedUserReaction': message.senderId === selectedUser.id && hoveredCurrentUser,
-                                'hoveredCurrentUserReaction': message.senderId === selectedUser.id && hoveredRecipienUser,
-                                'hoveredBothReaction': message.senderName === selectedUser.name &&
-                        message.senderSticker !== '' &&
-                        message.recipientSticker !== '' && message.senderSticker == message.recipientSticker
-                            }">
+                        <mat-card *ngIf="messageIdHovered === message.id"
+                        [ngClass]="{
+                          'sticker-senderName-current': message.senderId === global.currentUserData.id,
+                          'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
+                          'hovered': stickerHoverStates[message.id],
+                          'hoveredSenderName': hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
+                          'hoveredName': hoveredName && message.recipientSticker !== message.senderSticker,
+                          'seperateName': message.recipientSticker !== '' && message.senderSticker === '',
+                          'hoveredRecipienUser': hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker,
+                          'sticker-senderName-current-bothReaction': message.senderId === global.currentUserData.id &&
+                            message.recipientName == selectedUser.name &&
+                            message.senderSticker !== '' &&
+                            message.recipientSticker !== '' && message.senderSticker == message.recipientSticker,
+                          'sticker-senderName-user': message.senderId !== global.currentUserData.id,
+                          'hoveredSelectedUserReaction': message.senderId === selectedUser.id && hoveredCurrentUser,
+                          'hoveredCurrentUserReaction': message.senderId === selectedUser.id && hoveredRecipienUser,
+                          'hoveredBothReaction': message.senderName === selectedUser.name &&
+                            message.senderSticker !== '' &&
+                            message.recipientSticker !== '' && message.senderSticker == message.recipientSticker
+                        }">
+              
                             <mat-card-content *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">
                                 <!-- Nachricht vom aktuellen Benutzer -->
 
@@ -322,7 +325,8 @@
                         <!-- Erster Sticker -->
                         <div [ngClass]="{
                                     'show-comment-stricker': message.senderSticker !== '',
-                                  }" (click)="removeSenderSticker(message)" (mouseenter)="
+                                  }" (click)="removeSenderSticker(message)" (mouseenter)="onHoverSticker(message)"
+                            (mouseleave)="onLeaveSticker(message)" (mouseenter)="
                                     messageIdHovered = message.id;
                                     hoveredSenderName = message.senderName;
                                     hoveredCurrentUser = 'Du';
@@ -342,7 +346,7 @@
                                     message.recipientSticker !== '' &&
                                     message.recipientSticker !== message.senderSticker
                                   " class="show-comment-stricker" (click)="removeRecipientSticker(message)"
-                            (mouseenter)="
+                            (mouseenter)="onHoverSticker(message)" (mouseleave)="onLeaveSticker(message)" (mouseenter)="
                                     messageIdHovered = message.id;
                                     hoveredName = 'Du';
                                     hoveredRecipienUser = message.recipientName;

@@ -134,24 +134,22 @@ export class ChatComponent implements OnInit, OnChanges {
   cdr = inject(ChangeDetectorRef);
   userChannelService = inject(UserChannelSelectService);
   isStickerVisible = false;
+  stickerHoverStates: { [messageId: string]: boolean } = {};
 
   constructor() {}
 
 
-  onMouseEnter(message: any): void {
-    // Zeige den Sticker bei Hover an
-    this.isStickerVisible = true;
-    this.messageIdHovered = message.id;
-    this.hoveredSenderName = message.senderName;
-    this.hoveredCurrentUser = 'Du';
+  onHoverSticker(message: any): void {
+    setTimeout(() => {
+      this.stickerHoverStates[message.id] = true;
+    }, 10); // Verzögerung
   }
-
-  onMouseLeave(): void {
-    // Verstecke den Sticker, wenn die Maus den Bereich verlässt
-    this.isStickerVisible = false;
-    this.messageIdHovered = null;
-    this.hoveredSenderName = null;
-    this.hoveredCurrentUser = null;
+  
+  onLeaveSticker(message: any): void {
+    setTimeout(() => {
+      this.stickerHoverStates[message.id] = false;
+    }, 10); // Verzögerung von 10ms
+  
   }
 
   async ngOnInit(): Promise<void> {
