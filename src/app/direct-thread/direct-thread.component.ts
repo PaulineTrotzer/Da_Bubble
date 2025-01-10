@@ -140,17 +140,17 @@ export class DirectThreadComponent implements OnInit {
   }
 
   isFirstDayInfoVisible(i: number): boolean {
-    return i === 0; 
+    return i === 0;
   }
 
   isFirstMessage(i: number): boolean {
-    return i === 0; 
+    return i === 0;
   }
 
   checkIfSelfThread() {
     if (this.global.currentUserData.id === this.selectedUser.id) {
       this.isSelfThread = true;
-      this.showOneDisplay= true;
+      this.showOneDisplay = true;
     } else if (this.global.currentUserData.id !== this.selectedUser.id) {
       this.isSelfThread = false;
     }
@@ -456,7 +456,7 @@ export class DirectThreadComponent implements OnInit {
 
   async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
     try {
-      /*       if (
+      if (
         !this.selectedUser ||
         !this.selectedUser.uid ||
         !this.global.currentUserData
@@ -466,7 +466,7 @@ export class DirectThreadComponent implements OnInit {
             this.selectedUser
           )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
         );
-      } */
+      }
       const messageData = {
         senderId: threadMessageData.senderId,
         senderName: threadMessageData.senderName,
@@ -492,7 +492,6 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessages(messageId: any) {
-    debugger;
     try {
       const threadMessagesRef = collection(
         this.firestore,
@@ -540,22 +539,21 @@ export class DirectThreadComponent implements OnInit {
       messagesToUpdate.forEach((message) => {
         message.senderPicture = newPhotoUrl;
       });
-      this.messagesData = [...this.messagesData];  
-      this.cdr.detectChanges(); 
+      this.messagesData = [...this.messagesData];
+      this.cdr.detectChanges();
       const updatePromises = messagesToUpdate.map((message) => {
         const messageRef = doc(
           this.firestore,
           'messages',
-          messageId, 
+          messageId,
           'threadMessages',
           message.id
         );
         return updateDoc(messageRef, { senderPicture: newPhotoUrl });
       });
-  
+
       await Promise.all(updatePromises);
       console.log('Firestore-Updates für Thread-Nachrichten abgeschlossen');
-  
     } catch (error) {
       console.error(
         'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
@@ -563,7 +561,6 @@ export class DirectThreadComponent implements OnInit {
       );
     }
   }
-  
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;

@@ -741,6 +741,11 @@ app-mention-message-box {
   height: 40px;
 }
 
+.placeholder-thread-answer{
+  height: 40px;
+  width: 45px;
+}
+
 .thread-answer-display {
   display: flex;
   gap: 5px;
@@ -749,19 +754,21 @@ app-mention-message-box {
   font-weight: 500;
   font-size: 14px;
   height: auto;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.15s ease, visibility 0s 0.15s, transform 0.15s ease;
+  opacity: 0;  /* Anfangszustand unsichtbar */
+  visibility: visible;  /* Sichtbar, aber unsichtbar durch Opazität */
+  position: relative;  /* Im Layoutfluss bleiben */
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.hoveredOwnReaction{
+
+/* .hoveredOwnReaction{
   left: -20px;
-}
+} */
 
 .thread-answer-display.show {
-  visibility: visible;
-  opacity: 1;
+  opacity: 1;  /* Sichtbar machen */
 }
+
 
 .thread-answer-display:hover {
   transform: scale(1.05);

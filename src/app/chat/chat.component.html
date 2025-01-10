@@ -185,13 +185,12 @@
 
                         </mat-card>
                     </div>
-                    <ng-container *ngIf="getReplyCountValue(message.id) as replyCount">
-                        <div [ngClass]="{'thread-answer-display': true, 'show': replyCount > 0}"
-                            (click)="openThread(message.id)">
-                            <span class="answer-counter">{{ replyCount }}</span>
-                            <span class="answers">{{ replyCount === 1 ? 'Antwort' : 'Antworten' }}</span>
+                    <div class="placeholder-thread-answer">
+                        <div [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
+                            <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
+                            <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' : 'Antworten' }}</span>
                         </div>
-                    </ng-container>
+                    </div>
 
                     <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
                        'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
@@ -208,11 +207,10 @@
 
 
                     <div class="sticker-info-wrapper">
-                        <mat-card *ngIf="messageIdHovered === message.id"
-                        [ngClass]="{
+                        <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
                           'sticker-senderName-current': message.senderId === global.currentUserData.id,
                           'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
-                          'hovered': stickerHoverStates[message.id],
+                          'hovered': stickerHoverStates[message.id],  
                           'hoveredSenderName': hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
                           'hoveredName': hoveredName && message.recipientSticker !== message.senderSticker,
                           'seperateName': message.recipientSticker !== '' && message.senderSticker === '',
@@ -228,7 +226,7 @@
                             message.senderSticker !== '' &&
                             message.recipientSticker !== '' && message.senderSticker == message.recipientSticker
                         }">
-              
+
                             <mat-card-content *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">
                                 <!-- Nachricht vom aktuellen Benutzer -->
 

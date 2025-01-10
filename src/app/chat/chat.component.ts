@@ -142,13 +142,13 @@ export class ChatComponent implements OnInit, OnChanges {
   onHoverSticker(message: any): void {
     setTimeout(() => {
       this.stickerHoverStates[message.id] = true;
-    }, 10); // Verzögerung
+    }, 10); 
   }
   
   onLeaveSticker(message: any): void {
     setTimeout(() => {
       this.stickerHoverStates[message.id] = false;
-    }, 10); // Verzögerung von 10ms
+    }, 10); 
   
   }
 
@@ -576,6 +576,7 @@ updateMessages() {
         `messages/${messageId}/threadMessages`
       );
       const snapshot = await getDocs(threadMessagesRef);
+      this.shouldScroll = false;
       if (snapshot.empty) {
         const docRef = doc(this.firestore, 'messages', messageId);
         await setDoc(docRef, { firstMessageCreated: false }, { merge: true });
