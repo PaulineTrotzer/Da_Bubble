@@ -126,7 +126,7 @@
                   </svg>
                 </div>
 
-                <div class="add-reaction-cu-ct" (mouseenter)="toggleEditOption(message.id, false)"
+                <div class="add-reaction-ct" (mouseenter)="toggleEditOption(message.id, false)"
                   (click)="openEmojiPicker()">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8" width="24"
@@ -323,11 +323,13 @@
                 {{ getTotalCounterForSameEmoji(message.reactions) }}
               </span>
             </div>
-            <div class="both-reaction-info-ct" [ngClass]="{
-                  'both-reaction-right': message.senderName === currentUser.name,
-                  'both-reaction-left': message.recipientName === currentUser.name,
-                  'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
-                }" [style.visibility]="showReactionPopUpBoth[message.id] ? 'visible' : 'hidden'">
+            <div class="both-reaction-info-ct" 
+            [hidden]="!showReactionPopUpBoth[message.id]"
+            [ngClass]="{
+              'both-reaction-right': message.senderName === currentUser.name,
+              'both-reaction-left': message.recipientName === currentUser.name,
+              'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
+            }">
               <span class="reaction-info-txt-both"
                 *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
                 Du und {{

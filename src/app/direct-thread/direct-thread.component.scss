@@ -506,7 +506,6 @@ h3 {
 }
 
 .both-reaction-info-ct {
-  visibility: hidden;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -519,6 +518,19 @@ h3 {
   padding: 5px 15px;
   text-align: center;
   color: white;
+  opacity: 0; /* Initial unsichtbar */
+  visibility: hidden; /* Initial unsichtbar */
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Übergang für Sichtbarkeit und Opazität */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.both-reaction-info-ct[hidden] {
+  display: flex; /* Sicherstellen, dass das Layout korrekt bleibt */
+}
+
+.both-reaction-info-ct:not([hidden]) {
+  opacity: 1; /* Sichtbar */
+  visibility: visible; /* Sicherstellen, dass es angezeigt wird */
 }
 
 .mention-message {
