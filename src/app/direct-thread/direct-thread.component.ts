@@ -421,7 +421,6 @@ export class DirectThreadComponent implements OnInit {
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
   }
-
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
     try {
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
@@ -431,7 +430,7 @@ export class DirectThreadComponent implements OnInit {
         if (docData?.['firstMessageCreated']) {
           this.currentThreadMessage = {
             id: docSnapshot.id,
-            ...docData,
+            ...docData, 
           };
           return;
         }
@@ -447,16 +446,20 @@ export class DirectThreadComponent implements OnInit {
       );
       await this.settingDataforFireBase(
         threadMessagesRef,
-        this.currentThreadMessage
+        this.currentThreadMessage 
       );
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }
   }
+  
 
-  async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
+  async settingDataforFireBase(
+    threadMessagesRef: any,
+    threadMessageData: any 
+  ) {
     try {
-      if (
+/*       if (
         !this.selectedUser ||
         !this.selectedUser.uid ||
         !this.global.currentUserData
@@ -466,7 +469,8 @@ export class DirectThreadComponent implements OnInit {
             this.selectedUser
           )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
         );
-      }
+      } */
+      debugger;
       const messageData = {
         senderId: threadMessageData.senderId,
         senderName: threadMessageData.senderName,
@@ -482,7 +486,7 @@ export class DirectThreadComponent implements OnInit {
         firstMessageCreated: true,
         reactions: '',
       };
-
+  
       const docRef = await addDoc(threadMessagesRef, messageData);
       console.log('Erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
@@ -490,6 +494,7 @@ export class DirectThreadComponent implements OnInit {
       console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
   }
+  
 
   async getThreadMessages(messageId: any) {
     try {
@@ -498,7 +503,8 @@ export class DirectThreadComponent implements OnInit {
         `messages/${messageId}/threadMessages`
       );
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
-      onSnapshot(q, async (querySnapshot) => {
+      onSnapshot(q, (querySnapshot) => {
+        console.log(querySnapshot.docs.map((doc) => doc.data()));
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
@@ -509,14 +515,11 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
-
-        await this.updateMessagesWithNewPhoto(messageId);
-
         this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
       });
     } catch (error) {
-      console.error('Fehler beim Abrufen der Thread-Nachrichten', error);
+      console.error('fehler getMessagws', error);
     }
   }
 

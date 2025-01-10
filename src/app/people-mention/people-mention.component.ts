@@ -57,11 +57,13 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
   getFilteredUsers() {
     if (!this.searchUserName.trim()) {
       this.noUserFound = false;
-      return this.allUsers;
+      return this.allUsers.filter(user => user.name !== 'Gast');
     }
+  
     const filteredUsers = this.allUsers.filter((user) =>
-      user.name.toLowerCase().includes(this.searchUserName.toLowerCase())
+      user.name.toLowerCase().includes(this.searchUserName.toLowerCase()) && user.name !== 'Gast'
     );
+  
     this.noUserFound = filteredUsers.length === 0;
     return filteredUsers;
   }
