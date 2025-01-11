@@ -3,8 +3,11 @@
   box-shadow: 0px 2px 10px 0px #00000014;
   border-radius: 30px;
   position: relative;
-  height: 100vh;
+  height: 100vh; // Alternativ auf max-height setzen, falls nötig
   width: 510px;
+  display: flex;
+  flex-direction: column; // Damit Kinder in Spalten aufgeteilt werden
+  overflow: hidden; 
 }
 
 .text-info-edit {
@@ -85,15 +88,15 @@
   gap: 8px;
   position: relative;
   right: 35px;
-  bottom: 8px;
+  bottom: 2px;
   justify-content: end;
   align-items: center;
 }
 
 .two-both-selectedUser-reaction-left {
   position: relative;
-  bottom: 60px;
-  left: 32px;
+  bottom: 32px;
+  left: 125px;
 }
 
 .separated-both-selectedUser-reaction-left {
@@ -102,8 +105,8 @@
   gap: 8px;
   justify-content: start;
   position: relative;
-  bottom: 63px;
-  left: 35px;
+  bottom: 32px;
+  left: 120px;
 }
 
 .current-thread-header {
@@ -133,7 +136,6 @@
 
 .overflow-container {
   overflow: auto;
-  scroll-behavior: smooth !important;
   height: 750px;
 }
 
@@ -220,15 +222,15 @@
   position: relative;
   /*   bottom: 25px; */
   font-size: 14px;
-  height: 32px;
+  height: 30px;
   /*   right: 80px; */
   display: flex;
-  width: 46px;
   align-items: baseline;
   border: 1px solid #adb0d9;
   border-radius: 16px;
-  padding: 5px;
-  gap: 6px;
+  padding: 3px;
+  gap: 3px;
+  width: 40px;
   &:hover {
     border-color: #444df2;
     cursor: pointer;
@@ -339,15 +341,11 @@ h3 {
   font-weight: 600;
 }
 
-/* .all-thread-message-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px 0;
-  margin: 16px 0;
-  max-height: 100%;
+.all-thread-message-container {
   overflow-y: auto;
-} */
+  flex: 1; // Platz vollständig nutzen
+  max-height: calc(100vh - 210px); 
+}
 
 .cu-msg-text {
   max-height: 105px;
@@ -426,15 +424,15 @@ h3 {
   height: fit-content;
   padding: 8px 11px;
   color: white;
-  opacity: 0; 
-  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; 
-  visibility: hidden; 
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+  visibility: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .reaction-name-info-ct-sender.hovered {
-  opacity: 1; 
-  visibility: visible; 
+  opacity: 1;
+  visibility: visible;
 }
 
 .both-reaction-info-ct.both-reaction-right {
@@ -442,7 +440,7 @@ h3 {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 0px;
-  bottom: 40px;
+  bottom: 32px;
   right: -28px;
 }
 
@@ -518,19 +516,19 @@ h3 {
   padding: 5px 15px;
   text-align: center;
   color: white;
-  opacity: 0; /* Initial unsichtbar */
-  visibility: hidden; /* Initial unsichtbar */
-  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Übergang für Sichtbarkeit und Opazität */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .both-reaction-info-ct[hidden] {
-  display: flex; /* Sicherstellen, dass das Layout korrekt bleibt */
+  display: flex;
 }
 
 .both-reaction-info-ct:not([hidden]) {
-  opacity: 1; /* Sichtbar */
-  visibility: visible; /* Sicherstellen, dass es angezeigt wird */
+  opacity: 1;
+  visibility: visible;
 }
 
 .mention-message {
@@ -566,18 +564,18 @@ h3 {
   color: white;
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.reaction-name-info-ct-recipient.hovered {
+/* .reaction-name-info-ct-recipient.hovered {
   opacity: 1;
-}
+} */
 
 .chatpartner-message-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  height: 136px;
+  height: 149px;
   padding-top: 16px;
 }
 
@@ -714,14 +712,14 @@ h3 {
       cursor: pointer;
     }
   }
-  span {
+  /*   span {
     font-family: Nunito;
     font-size: 16px;
     font-weight: 400;
     line-height: 19.1px;
     text-align: left;
     color: black;
-  }
+  } */
 }
 
 .img-container {
@@ -784,6 +782,11 @@ h3 {
   left: 24px;
   top: -24px;
   display: flex;
+}
+
+.input-wrapper {
+  position: relative;
+  z-index: 10;
 }
 
 .input-holder {

@@ -194,7 +194,7 @@
 
 
                 <ng-template #editMode>
-                  <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
+                  <textarea #editableTextarea rows="3" class="edit-input"
                     [(ngModel)]="editableMessageText"></textarea>
                   <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -227,49 +227,50 @@
                   (Bearbeitet)
                 </div>
               </div>
+              <div [ngClass]="{
+                'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
+                'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name
+              }">
+                <div class="render-reaction-ct-sender" *ngIf="!areEmojisSame(message.reactions)">
+                  <ng-container>
+                    <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
+                      (mouseenter)="toggleReactionInfoSender(message.id, true)"
+                      (mouseleave)="toggleReactionInfoSender(message.id, false)">
+                      <span class="single-emoji">
+                        {{ message.reactions[message.senderId]?.emoji }}
+                      </span>
+                      <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                        {{ message.reactions[message.senderId]?.counter }}
+                      </span>
+                    </div>
+
+
+                    <div class="reaction-name-info-ct-sender" [hidden]="!showReactionPopUpSender[message.id]"
+                      [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
+                      [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid"
+                      [ngClass]="{ 'hovered': showReactionPopUpSender[message.id] }">
+                      <span class="reaction-info-txt">
+                        <ng-container *ngIf="message.senderId === currentUser.uid">
+                          Du hast mit
+                          <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
+                          </span> reagiert
+                        </ng-container>
+                        <ng-container *ngIf="message.senderId === selectedUser.uid">
+                          {{ message.senderName }} hat mit
+                          <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span>
+                          reagiert
+                        </ng-container>
+                      </span>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
 
 
-        <div [ngClass]="{
-          'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
-          'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name
-        }">
-          <div class="render-reaction-ct-sender" *ngIf="!areEmojisSame(message.reactions)">
-            <ng-container>
-              <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoSender(message.id, true)"
-                (mouseleave)="toggleReactionInfoSender(message.id, false)">
-                <span class="single-emoji">
-                  {{ message.reactions[message.senderId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
-                  {{ message.reactions[message.senderId]?.counter }}
-                </span>
-              </div>
 
-
-              <div class="reaction-name-info-ct-sender"
-              [hidden]="!showReactionPopUpSender[message.id]"
-              [class.reaction-sender-selectedUser-left]="message.senderId === selectedUser.uid"
-              [class.reaction-sender-currentUser-right]="message.senderId === currentUser.uid"
-              [ngClass]="{ 'hovered': showReactionPopUpSender[message.id] }">
-                <span class="reaction-info-txt">
-                  <ng-container *ngIf="message.senderId === currentUser.uid">
-                    Du hast mit
-                    <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
-                    </span> reagiert
-                  </ng-container>
-                  <ng-container *ngIf="message.senderId === selectedUser.uid">
-                    {{ message.senderName }} hat mit
-                    <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}</span> reagiert
-                  </ng-container>
-                </span>
-              </div>
-            </ng-container>
-          </div>
 
 
           <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)">
@@ -323,9 +324,7 @@
                 {{ getTotalCounterForSameEmoji(message.reactions) }}
               </span>
             </div>
-            <div class="both-reaction-info-ct" 
-            [hidden]="!showReactionPopUpBoth[message.id]"
-            [ngClass]="{
+            <div class="both-reaction-info-ct" [hidden]="!showReactionPopUpBoth[message.id]" [ngClass]="{
               'both-reaction-right': message.senderName === currentUser.name,
               'both-reaction-left': message.recipientName === currentUser.name,
               'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])
@@ -372,7 +371,11 @@
         </div>
 
       </div>
-      <div class="input-holder">
-        <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+      <div>
+        <div class="input-holder">
+          <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+        </div>
       </div>
     </div>
+  </div>
+</div>

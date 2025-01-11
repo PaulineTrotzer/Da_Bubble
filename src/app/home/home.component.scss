@@ -6,15 +6,17 @@ z-index: 110;
 .main-content{
   display: flex;
   justify-content: center;
+  overflow-y: auto; 
+  height: calc(100vh - 120px);
 }
 
 .page-content-plus-header {
   filter: blur(2px);
   transition: filter 0.3s ease;
+  height: calc(100vh); 
 }
 
 .full-page-content {
-  height: 100vh;
   display: flex;
   max-width: 2000px;
   gap: 32px;

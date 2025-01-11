@@ -4,210 +4,214 @@
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
-    <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox"
-        #scrollContainer>
-        <div *ngFor="let message of messagesData; let i=index">
-            <div *ngIf="displayDayInfo(i)" class="new-day-info"
-                [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
-                <div class="day-info">
-                    <div class="line"></div>
-                    <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+
+    <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox">
+        <div class="scroll-container" #scrollContainer>
+            <div *ngFor="let message of messagesData; let i=index">
+                <div *ngIf="displayDayInfo(i)" class="new-day-info"
+                    [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
+                    <div class="day-info">
+                        <div class="line"></div>
+                        <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+                    </div>
                 </div>
-            </div>
-            <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
+                <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
               'main-message-info-user':message.senderId !== global.currentUserData.id, 
               'backiColor':checkUpdateBackcolor===message.id,
               'backColorHover':checkUpdateBackcolor===message.id
                 }" (mouseleave)="resetIcon(message); isEmojiPickerVisible=false ">
-                <div *ngIf="editMessageId === message.id" class="edit-mesage-box">
+                    <div *ngIf="editMessageId === message.id" class="edit-mesage-box">
 
-                    <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
-                        [(ngModel)]="editableMessageText"></textarea>
-                    <div class="edit-emoji-main">
-                        <div class="add-reaction" (click)="openEmojiPickerEdit()">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
-                                    width="24" height="24">
-                                    <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
-                                </mask>
-                                <g mask="url(#mask0_489_4318)">
-                                    <path
-                                        d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
-                                        fill="black" />
-                                </g>
-                            </svg>
+                        <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
+                            [(ngModel)]="editableMessageText"></textarea>
+                        <div class="edit-emoji-main">
+                            <div class="add-reaction" (click)="openEmojiPickerEdit()">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                                        y="8" width="24" height="24">
+                                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_489_4318)">
+                                        <path
+                                            d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                                            fill="black" />
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="button-box">
+                            <div class="edit-button">
+                                <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
+                                <button class="btn-primary"
+                                    (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="button-box">
-                        <div class="edit-button">
-                            <button class="btn-secondary" (click)="cancelEdit()">Abbrechen</button>
-                            <button class="btn-primary"
-                                (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
-                        </div>
+                    <div (click)="closePickerEdit()" class="emoji-picker-container" *ngIf="isEmojiPickerVisibleEdit">
+                        <emoji-mart (click)="letEditPickerVisible($event)" (emojiClick)="editMessageAdd($event)"
+                            size="18" class="emoji-picker"></emoji-mart>
                     </div>
-                </div>
-                <div (click)="closePickerEdit()" class="emoji-picker-container" *ngIf="isEmojiPickerVisibleEdit">
-                    <emoji-mart (click)="letEditPickerVisible($event)" (emojiClick)="editMessageAdd($event)" size="18"
-                        class="emoji-picker"></emoji-mart>
-                </div>
-                <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
+                    <mat-card *ngIf="editMessageId !== message.id" [ngClass]="{'comment-box-current':message.senderId===global.currentUserData.id,
                       'comment-box-user':message.senderId !== global.currentUserData.id,
                       'position':message.stickerBoxCurrentStyle,
                       'position-user':message.stickerBoxCurrentStyle,
                        }">
-                    <mat-card-content style="padding: 5px 5px;" class="comment-content">
-                        <div *ngIf="message.senderSticker!==''    " class="comment-senderSticker-box"
-                            (click)="emojiSender(message)">
-                            <span class="last-used-emoji">{{message.senderSticker}}</span>
-                        </div>
-
-                        <div class="comment-recipientSticker-box"
-                            *ngIf="message.recipientSticker!=='' && message.recipientSticker!==message.senderSticker"
-                            (click)="emojirecipient(message)">
-                            <span>{{message.recipientSticker}}</span>
-                        </div>
-
-
-                        <div class="add-reaction" (click)="openEmojiPicker()">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
-                                    width="24" height="24">
-                                    <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
-                                </mask>
-                                <g mask="url(#mask0_489_4318)">
-                                    <path
-                                        d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
-                                        fill="black" />
-                                </g>
-                            </svg>
-                        </div>
-
-                        <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-                            <div class="emoji-picker">
-                                <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
-                                    (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
+                        <mat-card-content style="padding: 5px 5px;" class="comment-content">
+                            <div *ngIf="message.senderSticker!==''    " class="comment-senderSticker-box"
+                                (click)="emojiSender(message)">
+                                <span class="last-used-emoji">{{message.senderSticker}}</span>
                             </div>
-                        </div>
 
-                        <div (click)="openThread(message.id)" class="open-thread">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <mask id="mask0_489_4322" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
-                                    width="24" height="24">
-                                    <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
-                                </mask>
-                                <g mask="url(#mask0_489_4322)">
-                                    <path
-                                        d="M15 22H25C25.2833 22 25.5207 21.904 25.712 21.712C25.904 21.5207 26 21.2833 26 21C26 20.7167 25.904 20.479 25.712 20.287C25.5207 20.0957 25.2833 20 25 20H15C14.7167 20 14.479 20.0957 14.287 20.287C14.0957 20.479 14 20.7167 14 21C14 21.2833 14.0957 21.5207 14.287 21.712C14.479 21.904 14.7167 22 15 22ZM15 19H25C25.2833 19 25.5207 18.904 25.712 18.712C25.904 18.5207 26 18.2833 26 18C26 17.7167 25.904 17.479 25.712 17.287C25.5207 17.0957 25.2833 17 25 17H15C14.7167 17 14.479 17.0957 14.287 17.287C14.0957 17.479 14 17.7167 14 18C14 18.2833 14.0957 18.5207 14.287 18.712C14.479 18.904 14.7167 19 15 19ZM15 16H25C25.2833 16 25.5207 15.9043 25.712 15.713C25.904 15.521 26 15.2833 26 15C26 14.7167 25.904 14.479 25.712 14.287C25.5207 14.0957 25.2833 14 25 14H15C14.7167 14 14.479 14.0957 14.287 14.287C14.0957 14.479 14 14.7167 14 15C14 15.2833 14.0957 15.521 14.287 15.713C14.479 15.9043 14.7167 16 15 16ZM28.3 28.3L26 26H12C11.45 26 10.9793 25.8043 10.588 25.413C10.196 25.021 10 24.55 10 24V12C10 11.45 10.196 10.979 10.588 10.587C10.9793 10.1957 11.45 10 12 10H28C28.55 10 29.021 10.1957 29.413 10.587C29.8043 10.979 30 11.45 30 12V27.575C30 28.025 29.796 28.3373 29.388 28.512C28.9793 28.6873 28.6167 28.6167 28.3 28.3ZM12 12V24H26.825L28 25.175V12H12Z"
-                                        fill="black" />
-                                </g>
-                            </svg>
-                        </div>
-                        <div class="edit-message" *ngIf="message.senderId===global.currentUserData.id">
-                            <div (mouseenter)="checkEditbox=true" (mouseleave)="checkEditbox=false" class="edit-icon">
+                            <div class="comment-recipientSticker-box"
+                                *ngIf="message.recipientSticker!=='' && message.recipientSticker!==message.senderSticker"
+                                (click)="emojirecipient(message)">
+                                <span>{{message.recipientSticker}}</span>
+                            </div>
+
+
+                            <div class="add-reaction" (click)="openEmojiPicker()">
                                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
-                                    <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
                                         y="8" width="24" height="24">
                                         <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
                                     </mask>
-                                    <g mask="url(#mask0_1817_16003)">
+                                    <g mask="url(#mask0_489_4318)">
                                         <path
-                                            d="M20 28C19.45 28 18.9792 27.8042 18.5875 27.4125C18.1958 27.0208 18 26.55 18 26C18 25.45 18.1958 24.9792 18.5875 24.5875C18.9792 24.1958 19.45 24 20 24C20.55 24 21.0208 24.1958 21.4125 24.5875C21.8042 24.9792 22 25.45 22 26C22 26.55 21.8042 27.0208 21.4125 27.4125C21.0208 27.8042 20.55 28 20 28ZM20 22C19.45 22 18.9792 21.8042 18.5875 21.4125C18.1958 21.0208 18 20.55 18 20C18 19.45 18.1958 18.9792 18.5875 18.5875C18.9792 18.1958 19.45 18 20 18C20.55 18 21.0208 18.1958 21.4125 18.5875C21.8042 18.9792 22 19.45 22 20C22 20.55 21.8042 21.0208 21.4125 21.4125C21.0208 21.8042 20.55 22 20 22ZM20 16C19.45 16 18.9792 15.8042 18.5875 15.4125C18.1958 15.0208 18 14.55 18 14C18 13.45 18.1958 12.9792 18.5875 12.5875C18.9792 12.1958 19.45 12 20 12C20.55 12 21.0208 12.1958 21.4125 12.5875C21.8042 12.9792 22 13.45 22 14C22 14.55 21.8042 15.0208 21.4125 15.4125C21.0208 15.8042 20.55 16 20 16Z"
-                                            fill="#1C1B1F" />
+                                            d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                                            fill="black" />
                                     </g>
                                 </svg>
+                            </div>
+
+                            <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                                <div class="emoji-picker">
+                                    <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
+                                        (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
+                                </div>
+                            </div>
+
+                            <div (click)="openThread(message.id)" class="open-thread">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_489_4322" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                                        y="8" width="24" height="24">
+                                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_489_4322)">
+                                        <path
+                                            d="M15 22H25C25.2833 22 25.5207 21.904 25.712 21.712C25.904 21.5207 26 21.2833 26 21C26 20.7167 25.904 20.479 25.712 20.287C25.5207 20.0957 25.2833 20 25 20H15C14.7167 20 14.479 20.0957 14.287 20.287C14.0957 20.479 14 20.7167 14 21C14 21.2833 14.0957 21.5207 14.287 21.712C14.479 21.904 14.7167 22 15 22ZM15 19H25C25.2833 19 25.5207 18.904 25.712 18.712C25.904 18.5207 26 18.2833 26 18C26 17.7167 25.904 17.479 25.712 17.287C25.5207 17.0957 25.2833 17 25 17H15C14.7167 17 14.479 17.0957 14.287 17.287C14.0957 17.479 14 17.7167 14 18C14 18.2833 14.0957 18.5207 14.287 18.712C14.479 18.904 14.7167 19 15 19ZM15 16H25C25.2833 16 25.5207 15.9043 25.712 15.713C25.904 15.521 26 15.2833 26 15C26 14.7167 25.904 14.479 25.712 14.287C25.5207 14.0957 25.2833 14 25 14H15C14.7167 14 14.479 14.0957 14.287 14.287C14.0957 14.479 14 14.7167 14 15C14 15.2833 14.0957 15.521 14.287 15.713C14.479 15.9043 14.7167 16 15 16ZM28.3 28.3L26 26H12C11.45 26 10.9793 25.8043 10.588 25.413C10.196 25.021 10 24.55 10 24V12C10 11.45 10.196 10.979 10.588 10.587C10.9793 10.1957 11.45 10 12 10H28C28.55 10 29.021 10.1957 29.413 10.587C29.8043 10.979 30 11.45 30 12V27.575C30 28.025 29.796 28.3373 29.388 28.512C28.9793 28.6873 28.6167 28.6167 28.3 28.3ZM12 12V24H26.825L28 25.175V12H12Z"
+                                            fill="black" />
+                                    </g>
+                                </svg>
+                            </div>
+                            <div class="edit-message" *ngIf="message.senderId===global.currentUserData.id">
+                                <div (mouseenter)="checkEditbox=true" (mouseleave)="checkEditbox=false"
+                                    class="edit-icon">
+                                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse"
+                                            x="8" y="8" width="24" height="24">
+                                            <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                                        </mask>
+                                        <g mask="url(#mask0_1817_16003)">
+                                            <path
+                                                d="M20 28C19.45 28 18.9792 27.8042 18.5875 27.4125C18.1958 27.0208 18 26.55 18 26C18 25.45 18.1958 24.9792 18.5875 24.5875C18.9792 24.1958 19.45 24 20 24C20.55 24 21.0208 24.1958 21.4125 24.5875C21.8042 24.9792 22 25.45 22 26C22 26.55 21.8042 27.0208 21.4125 27.4125C21.0208 27.8042 20.55 28 20 28ZM20 22C19.45 22 18.9792 21.8042 18.5875 21.4125C18.1958 21.0208 18 20.55 18 20C18 19.45 18.1958 18.9792 18.5875 18.5875C18.9792 18.1958 19.45 18 20 18C20.55 18 21.0208 18.1958 21.4125 18.5875C21.8042 18.9792 22 19.45 22 20C22 20.55 21.8042 21.0208 21.4125 21.4125C21.0208 21.8042 20.55 22 20 22ZM20 16C19.45 16 18.9792 15.8042 18.5875 15.4125C18.1958 15.0208 18 14.55 18 14C18 13.45 18.1958 12.9792 18.5875 12.5875C18.9792 12.1958 19.45 12 20 12C20.55 12 21.0208 12.1958 21.4125 12.5875C21.8042 12.9792 22 13.45 22 14C22 14.55 21.8042 15.0208 21.4125 15.4125C21.0208 15.8042 20.55 16 20 16Z"
+                                                fill="#1C1B1F" />
+                                        </g>
+                                    </svg>
 
 
 
-                                <mat-card *ngIf="checkEditbox" [ngClass]="{'position-edit':isiconShow===message.id}"
-                                    class="edit-messages-card" appearance="outlined">
-                                    <mat-card-content class="edit-message-content">
-                                        <span (click)="editMessages(message)">Nachricht bearbeiten</span>
-                                    </mat-card-content>
-                                </mat-card>
+                                    <mat-card *ngIf="checkEditbox" [ngClass]="{'position-edit':isiconShow===message.id}"
+                                        class="edit-messages-card" appearance="outlined">
+                                        <mat-card-content class="edit-message-content">
+                                            <span (click)="editMessages(message)">Nachricht bearbeiten</span>
+                                        </mat-card-content>
+                                    </mat-card>
+
+                                </div>
 
                             </div>
 
-                        </div>
 
+                        </mat-card-content>
+                    </mat-card>
 
-                    </mat-card-content>
-                </mat-card>
-
-                <div [ngClass]="{
+                    <div [ngClass]="{
             'picture-box-current':
               message.senderId === global.currentUserData.id,
             'picture-box-user': message.senderId !== global.currentUserData.id
           }">
-                    <img class="sender-picture" [src]="message.senderPicture" />
-                </div>
-                <div [ngClass]="{
+                        <img class="sender-picture" [src]="message.senderPicture" />
+                    </div>
+                    <div [ngClass]="{
             'message-content-current':
               message.senderId === global.currentUserData.id,
             'message-content-user':
               message.senderId !== global.currentUserData.id
           }">
-                    <div [ngClass]="{
+                        <div [ngClass]="{
               'current-name-box':
                 message.senderId === global.currentUserData.id,
               'user-name-box': message.senderId !== global.currentUserData.id
             }">
-                        <span class="message-time">{{
-                            message.timestamp | date : "HH:mm"
-                            }} Uhr</span>
-                        <span class="sender-name">{{ message.senderName }}</span>
-                    </div>
-                    <div *ngIf="message.text.trim()!==''" class="message-area">
-                        <mat-card [ngClass]="{
+                            <span class="message-time">{{
+                                message.timestamp | date : "HH:mm"
+                                }} Uhr</span>
+                            <span class="sender-name">{{ message.senderName }}</span>
+                        </div>
+                        <div *ngIf="message.text.trim()!==''" class="message-area">
+                            <mat-card [ngClass]="{
                             'message-card-current':
                               message.senderId === global.currentUserData.id,
                             'message-card-user':
                               message.senderId !== global.currentUserData.id
                           }" appearance="outlined">
-                            <mat-card-content [ngClass]="{
+                                <mat-card-content [ngClass]="{
                               'card-content-current':
                                 message.senderId === global.currentUserData.id,
                                 
                               'card-content-user':
                                 message.senderId !== global.currentUserData.id
                             }">
-                                <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                                    <span *ngIf="isMention(mentionName)" class="mention-message"
-                                        (click)="handleMentionClick(mentionName)">
-                                        {{ mentionName }}
-                                    </span>
-                                    <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
-                                </ng-container>
-                            </mat-card-content>
+                                    <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                                        <span *ngIf="isMention(mentionName)" class="mention-message"
+                                            (click)="handleMentionClick(mentionName)">
+                                            {{ mentionName }}
+                                        </span>
+                                        <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                                    </ng-container>
+                                </mat-card-content>
 
-                        </mat-card>
-                    </div>
-                    <div class="placeholder-thread-answer">
-                        <div (click)="openThread(message.id)" [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
-                            <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
-                            <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' : 'Antworten' }}</span>
+                            </mat-card>
                         </div>
-                    </div>
+                        <div class="placeholder-thread-answer">
+                            <div (click)="openThread(message.id)"
+                                [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
+                                <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
+                                <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' : 'Antworten'
+                                    }}</span>
+                            </div>
+                        </div>
 
-                    <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
+                        <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
                        'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
                        'edited-recipient-view': message.recipientName === global.currentUserData.name && message.senderName !== global.currentUserData.name,
                        'edited-both-view': message.senderName === global.currentUserData.name && message.recipientName === global.currentUserData.name
                      }">
-                        (Bearbeitet)
-                    </div>
+                            (Bearbeitet)
+                        </div>
 
-                    <!--        <div class="avatar-box"> -->
-
-
+                        <!--        <div class="avatar-box"> -->
 
 
 
-                    <div class="sticker-info-wrapper">
-                        <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
+
+
+                        <div class="sticker-info-wrapper">
+                            <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
                           'sticker-senderName-current': message.senderId === global.currentUserData.id,
                           'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
                           'hovered': stickerHoverStates[message.id],  
@@ -227,104 +231,106 @@
                             message.recipientSticker !== '' && message.senderSticker == message.recipientSticker
                         }">
 
-                            <mat-card-content *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">
-                                <!-- Nachricht vom aktuellen Benutzer -->
+                                <mat-card-content
+                                    *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">
+                                    <!-- Nachricht vom aktuellen Benutzer -->
 
-                                <div
-                                    *ngIf="message.senderId === global.currentUserData.id && messageIdHovered === message.id">
-                                    <div class="sticker-info"
-                                        *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
-                                        <span class="sticker-sender-name">
-                                            {{ message.recipientName }} hat mit
-                                            <span>{{message.recipientSticker}}</span>
-                                            reagiert
-                                        </span>
+                                    <div
+                                        *ngIf="message.senderId === global.currentUserData.id && messageIdHovered === message.id">
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.recipientName }} hat mit
+                                                <span>{{message.recipientSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
+
+                                        <div class="sticker-info"
+                                            *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                Du hast mit <span>{{message.senderSticker}}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.recipientName }} und Du haben mit
+                                                <span>{{message.recipientSticker}}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredRecipienUser }} hat mit
+                                                <span>{{message.recipientSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
+
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredCurrentUser && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredCurrentUser }} hast mit <span>{{message.senderSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <div class="sticker-info"
-                                        *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
-                                        <span class="sticker-sender-name">
-                                            Du hast mit <span>{{message.senderSticker}}</span> reagiert
-                                        </span>
-                                    </div>
+                                    <!-- Nachricht von anderen Benutzern -->
+                                    <div
+                                        *ngIf="message.senderId !== global.currentUserData.id && messageIdHovered === message.id">
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                Du hast mit <span>{{message.recipientSticker}}</span> reagiert
+                                            </span>
+                                        </div>
 
-                                    <div class="sticker-info"
-                                        *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== ''">
-                                        <span class="sticker-sender-name">
-                                            {{ message.recipientName }} und Du haben mit
-                                            <span>{{message.recipientSticker}}</span> reagiert
-                                        </span>
-                                    </div>
+                                        <div class="sticker-info"
+                                            *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.senderName }} hat mit <span>{{message.senderSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
 
-                                    <div class="sticker-info"
-                                        *ngIf="hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker">
-                                        <span class="sticker-sender-name">
-                                            {{ hoveredRecipienUser }} hat mit <span>{{message.recipientSticker}}</span>
-                                            reagiert
-                                        </span>
-                                    </div>
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker === message.senderSticker">
+                                            <span class="sticker-sender-name">
+                                                {{ message.senderName }} und Du haben mit
+                                                <span>{{message.recipientSticker}}</span> reagiert
+                                            </span>
+                                        </div>
 
-                                    <div class="sticker-info"
-                                        *ngIf="hoveredCurrentUser && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
-                                        <span class="sticker-sender-name">
-                                            {{ hoveredCurrentUser }} hast mit <span>{{message.senderSticker}}</span>
-                                            reagiert
-                                        </span>
-                                    </div>
-                                </div>
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredName && message.recipientSticker !== message.senderSticker && message.senderSticker !== '' && message.recipientSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredName }} hast mit <span>{{message.recipientSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
 
-                                <!-- Nachricht von anderen Benutzern -->
-                                <div
-                                    *ngIf="message.senderId !== global.currentUserData.id && messageIdHovered === message.id">
-                                    <div class="sticker-info"
-                                        *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
-                                        <span class="sticker-sender-name">
-                                            Du hast mit <span>{{message.recipientSticker}}</span> reagiert
-                                        </span>
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredSenderName }} hat mit <span>{{message.senderSticker}}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
                                     </div>
-
-                                    <div class="sticker-info"
-                                        *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
-                                        <span class="sticker-sender-name">
-                                            {{ message.senderName }} hat mit <span>{{message.senderSticker}}</span>
-                                            reagiert
-                                        </span>
-                                    </div>
-
-                                    <div class="sticker-info"
-                                        *ngIf="message.recipientSticker === message.senderSticker">
-                                        <span class="sticker-sender-name">
-                                            {{ message.senderName }} und Du haben mit
-                                            <span>{{message.recipientSticker}}</span> reagiert
-                                        </span>
-                                    </div>
-
-                                    <div class="sticker-info"
-                                        *ngIf="hoveredName && message.recipientSticker !== message.senderSticker && message.senderSticker !== '' && message.recipientSticker !== ''">
-                                        <span class="sticker-sender-name">
-                                            {{ hoveredName }} hast mit <span>{{message.recipientSticker}}</span>
-                                            reagiert
-                                        </span>
-                                    </div>
-
-                                    <div class="sticker-info"
-                                        *ngIf="hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
-                                        <span class="sticker-sender-name">
-                                            {{ hoveredSenderName }} hat mit <span>{{message.senderSticker}}</span>
-                                            reagiert
-                                        </span>
-                                    </div>
-                                </div>
-                            </mat-card-content>
-                        </mat-card>
-                    </div>
-                    <div class="comment-sticker-holder"
-                        [ngClass]="{'comment-sticker-holder-partner': message.senderName === selectedUser.name}">
-                        <!-- Erster Sticker -->
-                        <div [ngClass]="{
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div class="comment-sticker-holder"
+                            [ngClass]="{'comment-sticker-holder-partner': message.senderName === selectedUser.name}">
+                            <!-- Erster Sticker -->
+                            <div [ngClass]="{
                                     'show-comment-stricker': message.senderSticker !== '',
                                   }" (click)="removeSenderSticker(message)" (mouseenter)="onHoverSticker(message)"
-                            (mouseleave)="onLeaveSticker(message)" (mouseenter)="
+                                (mouseleave)="onLeaveSticker(message)" (mouseenter)="
                                     messageIdHovered = message.id;
                                     hoveredSenderName = message.senderName;
                                     hoveredCurrentUser = 'Du';
@@ -333,18 +339,19 @@
                                     hoveredSenderName = null;
                                     hoveredCurrentUser = null;
                                   " *ngIf="message.senderSticker !== '' || message.senderName === selectedUser.name">
-                            <span *ngIf="message.senderSticker">{{ message.senderSticker }}</span>
-                            <span *ngIf="message.senderStickerCount && message.senderStickerCount > 0">
-                                {{ message.senderStickerCount }}
-                            </span>
-                        </div>
+                                <span *ngIf="message.senderSticker">{{ message.senderSticker }}</span>
+                                <span *ngIf="message.senderStickerCount && message.senderStickerCount > 0">
+                                    {{ message.senderStickerCount }}
+                                </span>
+                            </div>
 
-                        <!-- Zweiter Sticker -->
-                        <div *ngIf="
+                            <!-- Zweiter Sticker -->
+                            <div *ngIf="
                                     message.recipientSticker !== '' &&
                                     message.recipientSticker !== message.senderSticker
                                   " class="show-comment-stricker" (click)="removeRecipientSticker(message)"
-                            (mouseenter)="onHoverSticker(message)" (mouseleave)="onLeaveSticker(message)" (mouseenter)="
+                                (mouseenter)="onHoverSticker(message)" (mouseleave)="onLeaveSticker(message)"
+                                (mouseenter)="
                                     messageIdHovered = message.id;
                                     hoveredName = 'Du';
                                     hoveredRecipienUser = message.recipientName;
@@ -353,74 +360,76 @@
                                     hoveredName = null;
                                     hoveredRecipienUser = null;
                                   ">
-                            <span>{{ message.recipientSticker }}</span>
-                            <span *ngIf="message.recipientStickerCount && message.recipientStickerCount > 0">
-                                {{ message.recipientStickerCount }}
-                            </span>
+                                <span>{{ message.recipientSticker }}</span>
+                                <span *ngIf="message.recipientStickerCount && message.recipientStickerCount > 0">
+                                    {{ message.recipientStickerCount }}
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
 
 
-                    <div class="show-selected-files">
-                        <div *ngFor="let file of message.selectedFiles">
-                            <div class="mai-file" *ngIf="file.url">
+                        <div class="show-selected-files">
+                            <div *ngFor="let file of message.selectedFiles">
+                                <div class="mai-file" *ngIf="file.url">
 
-                                <div class="file-info" *ngIf="file.type.startsWith('image/')">
-                                    <a [href]="file.url" target="_blank">
-                                        <img [src]="file.data">
-                                    </a>
-                                </div>
+                                    <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                                        <a [href]="file.url" target="_blank">
+                                            <img [src]="file.data">
+                                        </a>
+                                    </div>
 
-                                <div class="file-info" *ngIf="file.type==='application/pdf'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/pdf.png">
-                                    </a>
-                                </div>
-                                <div class="file-info" *ngIf="file.type==='text/plain'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/textfile.png">
-                                    </a>
-                                </div>
+                                    <div class="file-info" *ngIf="file.type==='application/pdf'">
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/pdf.png">
+                                        </a>
+                                    </div>
+                                    <div class="file-info" *ngIf="file.type==='text/plain'">
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/textfile.png">
+                                        </a>
+                                    </div>
 
-                                <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
+                                    <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
                                 file.type !== 'application/pdf' && file.type!== 'text/plain'">
-                                    <a [href]="file.url" target="_blank">
-                                        <img src="../../assets/img/alldatei.png">
-                                    </a>
+                                        <a [href]="file.url" target="_blank">
+                                            <img src="../../assets/img/alldatei.png">
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
+                    <!--       </div> -->
                 </div>
-                <!--       </div> -->
+                <app-channel-chat [inputMessagesData]="messagesData"
+                    (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
+                    [selectedChannel]="selectedChannel"></app-channel-chat>
             </div>
-            <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
-                *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
-        </div>
-        <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
-            <div class="self-name-and-img">
-                <img class="self-chat-img" src={{global.currentUserData.picture}}>
-                <p>{{global.currentUserData?.name }}</p>
-                <p class="you">(Du)</p>
+            <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText ">
+                <div class="self-name-and-img">
+                    <img class="self-chat-img" src={{global.currentUserData.picture}}>
+                    <p>{{global.currentUserData?.name }}</p>
+                    <p class="you">(Du)</p>
+                </div>
+                <span class="self-chat-txt">
+                    <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
+                    auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
+                    gerne Dinge mit dir selbst besprechen.
+                </span>
             </div>
-            <span class="self-chat-txt">
-                <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
-                auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
-                gerne Dinge mit dir selbst besprechen.
-            </span>
-        </div>
-        <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
-            <div class="img-and-name">
-                <img class="self-chat-img" src={{selectedUser?.picture}}>
-                <p>{{selectedUser?.name}}</p>
-            </div>
-            <div class="two-chat-txt">
-                Diese Unterhaltung findet nur zwischen
-                <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und
-                dir
-                statt
+            <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessages() && dataLoaded">
+                <div class="img-and-name">
+                    <img class="self-chat-img" src={{selectedUser?.picture}}>
+                    <p>{{selectedUser?.name}}</p>
+                </div>
+                <div class="two-chat-txt">
+                    Diese Unterhaltung findet nur zwischen
+                    <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und
+                    dir
+                    statt
+                </div>
             </div>
         </div>
     </div>

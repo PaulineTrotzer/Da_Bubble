@@ -292,11 +292,11 @@ export class DirectThreadComponent implements OnInit {
     this.showOptionBar = {};
   }
 
-  onInput(event: Event): void {
+/*   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     const height = (textarea.scrollTop = textarea.scrollHeight);
     this.scrollHeightInput = height;
-  }
+  } */
 
   getDayInfoForMessage(index: number): string {
     const messageDate = new Date(this.messagesData[index].timestamp);
@@ -343,7 +343,6 @@ export class DirectThreadComponent implements OnInit {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } else {
-      // Optional: Wenn das Element nicht sofort vorhanden ist, erneut prüfen.
       setTimeout(() => this.scrollToLastMessage(messageId), 50);
     }
   }

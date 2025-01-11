@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild, inject } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 import { WorkspaceComponent } from '../workspace/workspace.component';
 import { StartScreenComponent } from '../start-screen/start-screen.component';
@@ -27,7 +27,7 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   selectedUser: any;
   selectedChannel: any;
   mentionUser: any;
@@ -51,6 +51,9 @@ export class HomeComponent implements OnInit {
   userChannelService=inject(UserChannelSelectService);
   firestore=inject(Firestore);
   authService=inject(AuthService);
+
+  constructor(private renderer: Renderer2, private el: ElementRef) {}
+ 
 
   ngOnInit(): void {
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
@@ -114,6 +117,17 @@ export class HomeComponent implements OnInit {
       this.selectedChannel = channel;
       this.userChannelService.setSelectedChannel(channel);
     });
+    const header = this.el.nativeElement.querySelector('app-header');
+    const fullPageContent = this.el.nativeElement.querySelector('.full-page-content');
+
+    if (header && fullPageContent) {
+      const headerHeight = header.offsetHeight;
+      this.renderer.setStyle(
+        fullPageContent,
+        'height',
+        `calc(100vh - ${headerHeight}px)`
+      );
+    }
   }
 
 

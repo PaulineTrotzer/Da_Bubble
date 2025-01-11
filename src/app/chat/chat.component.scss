@@ -2,6 +2,12 @@
   border-style: none;
 }
 
+.scroll-container {
+  overflow: auto;
+  height: 750px;
+  scroll-behavior: smooth !important;
+}
+
 app-input-field {
   position: relative;
 }
@@ -115,11 +121,11 @@ app-input-field {
   margin-top: 33px;
 }
 
-.show-reactions-transition {
+/* .show-reactions-transition {
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
-}
+} */
 
 .main-mesage-info-current {
   width: 100%;
@@ -520,6 +526,7 @@ app-input-field {
   font-size: 15px;
   &:hover {
     border-color: #444df2;
+    cursor: pointer;
   }
 }
 
