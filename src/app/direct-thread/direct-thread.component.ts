@@ -80,7 +80,6 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
 export class DirectThreadComponent implements OnInit {
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
-  @ViewChild('messageContainer') messageContainer!: ElementRef;
   chatMessage: string = '';
   showUserBubble: boolean = false;
   global = inject(GlobalVariableService);
@@ -128,13 +127,14 @@ export class DirectThreadComponent implements OnInit {
   selectedThreadId: string | null = null;
   isSelfThread = false;
   showOneDisplay = false;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     await this.initializeUser();
     await this.subscribeToThreadMessages();
     await this.getAllUsersname();
-    this.checkLastMessageForScroll();
+    // this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
     this.checkIfSelfThread();
   }
@@ -158,19 +158,21 @@ export class DirectThreadComponent implements OnInit {
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
   }
-
+  /* 
   checkLastMessageForScroll() {
     this.threadControlService.lastMessageId$.subscribe((id) => {
       if (id && id !== '0') {
-        this.scrollToLastMessage(id);
+       // this.scrollToLastMessage(id);
       } else {
+        console.warn('Keine gültige Nachricht zum Scrollen gefunden.');
       }
     });
+  
     if (this.lastMessageId === '0') {
-      this.initializeLastMessageId();
+      this.initializeLastMessageId(); // Stelle sicher, dass die ID initialisiert wird
     }
   }
-
+ */
   displayDayInfo(index: number): boolean {
     if (index === 0) return true;
     const currentMessage = this.messagesData[index];
@@ -185,7 +187,7 @@ export class DirectThreadComponent implements OnInit {
     this.editWasClicked = true;
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
-    if (this.isFirstClick) {
+    /*     if (this.isFirstClick) {
       setTimeout(() => {
         if (this.editableTextarea) {
           const textarea = this.editableTextarea.nativeElement;
@@ -194,7 +196,7 @@ export class DirectThreadComponent implements OnInit {
         }
       }, 20);
       this.isFirstClick = false;
-    }
+    } */
   }
 
   selectUserForChat(user: any) {
@@ -292,7 +294,7 @@ export class DirectThreadComponent implements OnInit {
     this.showOptionBar = {};
   }
 
-/*   onInput(event: Event): void {
+  /*   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     const height = (textarea.scrollTop = textarea.scrollHeight);
     this.scrollHeightInput = height;
@@ -327,7 +329,7 @@ export class DirectThreadComponent implements OnInit {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
-
+  /* 
   async initializeLastMessageId(): Promise<void> {
     try {
       await this.threadControlService.initializeLastMessageId(
@@ -336,14 +338,35 @@ export class DirectThreadComponent implements OnInit {
     } catch (error) {
       console.error('fehler beim Initialisieren der lastMessageId:', error);
     }
-  }
+  } */
 
-  scrollToLastMessage(messageId: string): void {
+  /*   scrollToLastMessage(messageId: string): void {
     const element = document.getElementById(messageId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } else {
       setTimeout(() => this.scrollToLastMessage(messageId), 50);
+    }
+  } */
+  scrollToBottom(): void {
+    if (this.scrollContainer) {
+      const container = this.scrollContainer.nativeElement;
+      console.log('scrollToBottom - Current scrollTop:', container.scrollTop);
+      console.log(
+        'scrollToBottom - Current scrollHeight:',
+        container.scrollHeight
+      );
+
+      // Warten, um sicherzustellen, dass das Rendering abgeschlossen ist
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+        console.log(
+          'scrollToBottom - New scrollTop set to:',
+          container.scrollTop
+        );
+      }, 50); // Verzögerung von 50ms hinzufügen
+    } else {
+      console.log('scrollToBottom - No scroll container found');
     }
   }
 
@@ -420,6 +443,7 @@ export class DirectThreadComponent implements OnInit {
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
   }
+
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
     try {
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
@@ -429,7 +453,7 @@ export class DirectThreadComponent implements OnInit {
         if (docData?.['firstMessageCreated']) {
           this.currentThreadMessage = {
             id: docSnapshot.id,
-            ...docData, 
+            ...docData,
           };
           return;
         }
@@ -445,20 +469,16 @@ export class DirectThreadComponent implements OnInit {
       );
       await this.settingDataforFireBase(
         threadMessagesRef,
-        this.currentThreadMessage 
+        this.currentThreadMessage
       );
     } catch (error) {
       console.error('Fehler der Thread-Nachricht:', error);
     }
   }
-  
 
-  async settingDataforFireBase(
-    threadMessagesRef: any,
-    threadMessageData: any 
-  ) {
+  async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
     try {
-/*       if (
+      /*       if (
         !this.selectedUser ||
         !this.selectedUser.uid ||
         !this.global.currentUserData
@@ -469,7 +489,6 @@ export class DirectThreadComponent implements OnInit {
           )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
         );
       } */
-      debugger;
       const messageData = {
         senderId: threadMessageData.senderId,
         senderName: threadMessageData.senderName,
@@ -485,7 +504,7 @@ export class DirectThreadComponent implements OnInit {
         firstMessageCreated: true,
         reactions: '',
       };
-  
+
       const docRef = await addDoc(threadMessagesRef, messageData);
       console.log('Erstellte Nachricht-ID:', docRef.id);
       this.threadControlService.setLastMessageId(docRef.id);
@@ -493,7 +512,6 @@ export class DirectThreadComponent implements OnInit {
       console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
   }
-  
 
   async getThreadMessages(messageId: any) {
     try {
@@ -514,13 +532,18 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
-        console.log(this.messagesData);
-        this.shouldScrollToBottom = true;
+        this.scrollAutoDown();
         this.cdr.detectChanges();
       });
     } catch (error) {
       console.error('fehler getMessagws', error);
     }
+  }
+
+  scrollAutoDown() {
+    setTimeout(() => {
+      this.scrollToBottom(); 
+    }, 100);
   }
 
   async updateMessagesWithNewPhoto(messageId: string) {
@@ -779,5 +802,9 @@ export class DirectThreadComponent implements OnInit {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
     this.global.currentThreadMessageSubject.next(null);
+  }
+
+  onMessageSent(): void {
+    this.scrollToBottom();
   }
 }

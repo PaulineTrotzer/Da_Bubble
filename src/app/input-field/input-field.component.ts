@@ -81,9 +81,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
   isMentionCardOpen: boolean = true;
   @Output() mentionUserOut = new EventEmitter<string>();
   authService=inject(AuthService);
+  isMessageBeingSent: boolean = false;
 
 
-  
+  onMessageChange(): void {
+    if (this.chatMessage.trim().length > 0) {
+      this.isMessageBeingSent = true;
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
     }
@@ -112,8 +118,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
   async sendMessage(event: KeyboardEvent): Promise<void> {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
+      this.isMessageBeingSent = true; // Nachricht wird jetzt gesendet
+  
       await this.processSendMessage();
-      this.formattedMessage = '';
+  
+      // Eingabefeld zurücksetzen
+      this.chatMessage = ''; 
+      this.isMessageBeingSent = false; // Nachricht wurde erfolgreich gesendet
     }
   }
 
@@ -247,6 +258,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   resetInputdata() {
     this.chatMessage = '';
+    this.formattedChatMessage = '';
     this.selectFiles = [];
   }
 

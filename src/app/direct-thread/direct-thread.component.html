@@ -26,7 +26,7 @@
     (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
 
-  <div class="overflow-container">
+  <div #scrollContainer class="overflow-container">
     <div #messageContainer class="all-thread-message-container">
 
       <div *ngFor="let message of messagesData; let i=index" [id]="message.id" class="message-bubble">
@@ -373,7 +373,7 @@
       </div>
       <div>
         <div class="input-holder">
-          <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+          <app-input-field (messageSent)="onMessageSent()" [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
         </div>
       </div>
     </div>

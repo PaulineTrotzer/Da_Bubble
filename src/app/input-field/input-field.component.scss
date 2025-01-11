@@ -15,8 +15,7 @@
   font-size: 18px !important;
   font-family: "Nunito";
   background: none;
-  color: transparent;
-  caret-color: black;
+  color: black;
   width: 100%;
   white-space: pre-wrap;
   overflow: visible;
@@ -30,6 +29,7 @@
   }
 
   &::placeholder {
+    font-style: italic;
     font-size: 18px;
     font-family: "Figtree";
     color: grey;
