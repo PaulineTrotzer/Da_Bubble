@@ -15,7 +15,8 @@
   font-size: 18px !important;
   font-family: "Nunito";
   background: none;
-  color: black;
+  color: transparent;
+  caret-color: black;
   width: 100%;
   white-space: pre-wrap;
   overflow: visible;
@@ -27,6 +28,7 @@
     border-color: #444df2;
     outline: none;
   }
+
 
   &::placeholder {
     font-style: italic;

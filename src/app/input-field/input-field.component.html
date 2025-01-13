@@ -3,8 +3,8 @@
   <div class="main-input-area">
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
-    <textarea id="msg-input" [placeholder]="isMessageBeingSent ? '' : 'Schreib etwas...'" class="chat-input"
-      [(ngModel)]="chatMessage" (keydown)="sendMessage($event)">
+    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" type="text" [(ngModel)]="chatMessage"
+      (input)=" onInput($event)" (keydown)="sendMessage($event)">
   </textarea>
   </div>
 
@@ -71,8 +71,8 @@
         </div>
         <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
       </div>
-      <app-people-mention (cardClosed)="handleCardClosed()" class="people-mention-card"
-        *ngIf="isMentionPeopleCardVisible" (mentionUser)="handleMentionUser($event)"></app-people-mention>
+      <app-people-mention (cardClosed)="handleCardClosed()"class="people-mention-card" *ngIf="isMentionPeopleCardVisible"
+        (mentionUser)="handleMentionUser($event)"></app-people-mention>
     </div>
 
     <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">

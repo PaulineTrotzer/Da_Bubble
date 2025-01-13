@@ -157,7 +157,6 @@ export class ChatComponent implements OnInit, OnChanges {
       async (user) => {
         if (user) {
           this.selectedUser = user;
-          console.log('user chat comp', user);
           await this.getMessages();
         }
       }

@@ -107,12 +107,14 @@ export class DirectThreadComponent implements OnInit {
   shouldScrollToBottom = false;
   firstInitialisedThreadMsg: string | null = null;
   currentThreadMessage!: currentThreadMessage;
-  showReactionPopUpSender: { [key: string]: boolean } = {};
-  showReactionPopUpRecipient: { [key: string]: boolean } = {};
+  showReactionPopUpSenderAtCu: { [key: string]: boolean } = {};
+  showReactionPopUpRecipientAtCu: { [key: string]: boolean } = {};
+  showReactionPopUpSenderAtSu: { [key: string]: boolean } = {};
+  showReactionPopUpRecipientAtSu: { [key: string]: boolean } = {};
   showReactionPopUpBoth: { [key: string]: boolean } = {};
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
-  lastMessageId: string | null = '0';
+/*   lastMessageId: string | null = '0'; */
   editMessageId: string | null = null;
   editableTextarea!: ElementRef<HTMLTextAreaElement>;
   isFirstClick: boolean = true;
@@ -134,7 +136,6 @@ export class DirectThreadComponent implements OnInit {
     await this.initializeUser();
     await this.subscribeToThreadMessages();
     await this.getAllUsersname();
-    // this.checkLastMessageForScroll();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
     this.checkIfSelfThread();
   }
@@ -158,21 +159,7 @@ export class DirectThreadComponent implements OnInit {
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
   }
-  /* 
-  checkLastMessageForScroll() {
-    this.threadControlService.lastMessageId$.subscribe((id) => {
-      if (id && id !== '0') {
-       // this.scrollToLastMessage(id);
-      } else {
-        console.warn('Keine gültige Nachricht zum Scrollen gefunden.');
-      }
-    });
-  
-    if (this.lastMessageId === '0') {
-      this.initializeLastMessageId(); // Stelle sicher, dass die ID initialisiert wird
-    }
-  }
- */
+
   displayDayInfo(index: number): boolean {
     if (index === 0) return true;
     const currentMessage = this.messagesData[index];
@@ -329,42 +316,13 @@ export class DirectThreadComponent implements OnInit {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
-  /* 
-  async initializeLastMessageId(): Promise<void> {
-    try {
-      await this.threadControlService.initializeLastMessageId(
-        this.global.currentThreadMessageSubject.value
-      );
-    } catch (error) {
-      console.error('fehler beim Initialisieren der lastMessageId:', error);
-    }
-  } */
 
-  /*   scrollToLastMessage(messageId: string): void {
-    const element = document.getElementById(messageId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else {
-      setTimeout(() => this.scrollToLastMessage(messageId), 50);
-    }
-  } */
   scrollToBottom(): void {
     if (this.scrollContainer) {
       const container = this.scrollContainer.nativeElement;
-      console.log('scrollToBottom - Current scrollTop:', container.scrollTop);
-      console.log(
-        'scrollToBottom - Current scrollHeight:',
-        container.scrollHeight
-      );
-
-      // Warten, um sicherzustellen, dass das Rendering abgeschlossen ist
       setTimeout(() => {
         container.scrollTop = container.scrollHeight;
-        console.log(
-          'scrollToBottom - New scrollTop set to:',
-          container.scrollTop
-        );
-      }, 50); // Verzögerung von 50ms hinzufügen
+      }, 50); 
     } else {
       console.log('scrollToBottom - No scroll container found');
     }
@@ -377,12 +335,24 @@ export class DirectThreadComponent implements OnInit {
     this.showOptionBar[messageId] = show;
   }
 
-  toggleReactionInfoSender(messageId: string, status: boolean): void {
-    this.showReactionPopUpSender[messageId] = status;
+  toggleReactionInfoSenderAtCurrentUser(messageId: string, status: boolean): void {
+    this.showReactionPopUpSenderAtCu[messageId] = status;
   }
-  toggleReactionInfoRecipient(messageId: string, status: boolean): void {
-    this.showReactionPopUpRecipient[messageId] = status;
+  toggleReactionInfoRecipientAtCurrentUser(messageId: string, status: boolean): void {
+    this.showReactionPopUpRecipientAtCu[messageId] = status;
   }
+  
+
+  toggleReactionInfoSenderAtSelectedUser(messageId: string, status: boolean): void {
+    this.showReactionPopUpSenderAtSu[messageId] = status;
+  }
+  toggleReactionInfoRecipientAtSelectedUser(messageId: string, status: boolean): void {
+    this.showReactionPopUpRecipientAtSu[messageId] = status;
+  }
+
+
+
+  
 
   toggleBothReactionInfo(messageId: string, show: boolean): void {
     this.showReactionPopUpBoth[messageId] = show;
@@ -650,27 +620,37 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async addEmoji(event: any, currentMessageId: string, userId: string) {
-    const emoji = event.emoji.native;
-    const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
-    const threadMessageData = await this.getThreadMessageDoc(threadMessageRef);
-    if (!threadMessageData) return;
-    if (!threadMessageData['reactions']) {
-      threadMessageData['reactions'] = {};
+    try {
+      const emoji = event.emoji.native;
+  
+      // Hole die Referenz und das Dokument gleichzeitig
+      const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+      const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
+  
+      if (!threadMessageDoc) {
+        console.error('Keine Daten für die Nachricht gefunden.');
+        return;
+      }
+  
+      // Initialisiere Reaktionen, falls nicht vorhanden
+      const reactions = threadMessageDoc['reactions'] || {};
+  
+      // Aktuelle Reaktion des Benutzers
+      const userReaction = reactions[userId];
+  
+      if (userReaction && userReaction.emoji === emoji) {
+        reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
+      } else {
+        reactions[userId] = { emoji, counter: 1 };
+      }
+  
+      // Update-Dokument schreiben
+      await updateDoc(threadMessageRef, { reactions });
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
-    const userReaction = threadMessageData['reactions'][userId];
-    if (userReaction && userReaction.emoji === emoji) {
-      threadMessageData['reactions'][userId].counter =
-        userReaction.counter === 0 ? 1 : 0;
-    } else {
-      threadMessageData['reactions'][userId] = {
-        emoji: emoji,
-        counter: 1,
-      };
-    }
-    await updateDoc(threadMessageRef, {
-      reactions: threadMessageData['reactions'],
-    });
   }
+  
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
