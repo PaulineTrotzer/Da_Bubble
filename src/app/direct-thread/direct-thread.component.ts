@@ -153,16 +153,19 @@ export class DirectThreadComponent implements OnInit {
     if (this.global.currentUserData.id === this.selectedUser.id) {
       this.isSelfThread = true;
       this.showOneDisplay = true;
-      console.log('true', this.isSelfThread);
     } else if (this.global.currentUserData.id !== this.selectedUser.id) {
       this.isSelfThread = false;
-      console.log('false', this.isSelfThread);
     }
   }
 
   letPickerVisible(event: MouseEvent) {
     event.stopPropagation();
     this.isEmojiPickerVisible = true;
+  }
+
+  letPickerEditVisible(event: MouseEvent) {
+    event.stopPropagation();
+    this.isEmojiPickerEditVisible = true;
   }
 
   toggleEditOption(messageId: string, show: boolean) {
@@ -601,6 +604,7 @@ export class DirectThreadComponent implements OnInit {
     if (event && event.emoji && event.emoji.native) {
       const emoji = event.emoji.native;
       this.editableMessageText = (this.editableMessageText || '') + emoji;
+      this.closePickerEdit();
     } else {
       console.error('kein Emoji ausgewählt');
     }

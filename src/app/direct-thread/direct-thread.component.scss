@@ -24,11 +24,13 @@
 
 .text-info-edit {
   position: absolute;
-  left: -55px;
+  left: -80px;
+  bottom: -10px;
   font-size: 12px;
   font-family: "Nunito";
   font-weight: 600;
   text-align: center;
+  color: black;
 }
 
 .text-info-edit-chatpartner {
@@ -492,9 +494,9 @@ h3 {
 }
 
 .has-reacted {
-  right: -100px;
+  right: -75px;
   bottom: 10px;
-  max-width: 140px;
+  max-width: 110px;
 }
 
 .reaction-name-info-ct-sender.hovered {

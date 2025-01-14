@@ -3,6 +3,9 @@
 }
 
 .scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   overflow: auto;
   height: 750px;
   scroll-behavior: smooth !important;
@@ -463,8 +466,8 @@ app-input-field {
   position: relative;
   left: 28px;
   bottom: 5px;
-  width: 88%;
-  height: 158px;
+  width: 90%;
+  height: 181px;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -483,7 +486,7 @@ app-input-field {
 
 .button-box {
   position: absolute;
-  top: 94px;
+  top: 117px;
   left: 5px;
   display: flex;
   align-items: center;
@@ -554,7 +557,7 @@ app-input-field {
 .sticker-senderName-current.hovered {
   opacity: 1;    
   z-index: 200;    
-  top: -120px;    
+  top: -120px;  
 }
 
 .sticker-info-wrapper .hoveredSelectedUserReaction {
@@ -570,8 +573,8 @@ app-input-field {
 
 
 .sticker-senderName-current.hoveredRecipienUser {
-  left: -80px;
-  top: -155px;
+  left: -38px;
+  top: -120px;
   height: fit-content;
 }
 

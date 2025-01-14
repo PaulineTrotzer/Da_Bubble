@@ -159,8 +159,8 @@
             </div>
           </div>
 
-          <mat-card *ngIf="showEditOption[message.id]" class="edit-messages-card" appearance="outlined"
-            (mouseleave)="toggleEditOption(message.id, false)">
+          <mat-card *ngIf="showEditOption[message.id] && !editWasClicked" class="edit-messages-card"
+            appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
             <mat-card-content class="edit-message-content" (mouseleave)="toggleEditOption(message.id, false)">
               <span *ngIf="!editWasClicked" (click)="editMessages(message)">Nachricht bearbeiten</span>
             </mat-card-content>
@@ -188,13 +188,15 @@
                         (click)="handleMentionClick(mentionName)">
                         {{ mentionName }}
                       </span>
+                      <div *ngIf="message.editedTextShow" class="text-info-edit">
+                        (Bearbeitet)
+                      </div>
                       <span *ngIf="!isMention(mentionName)">
                         {{ mentionName }}
                       </span>
                     </ng-container>
                   </div>
                 </ng-container>
-
 
 
 
@@ -217,7 +219,8 @@
 
                   <div (click)="closePickerEdit()" *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmojiToEdit($event)" class="emoji-picker" size="18">
+                      <emoji-mart (click)="letPickerEditVisible($event)" (emojiClick)="addEmojiToEdit($event)"
+                        class="emoji-picker" size="18">
                       </emoji-mart>
                     </div>
                   </div>
@@ -228,9 +231,7 @@
                     <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
                   </div>
                 </ng-template>
-                <div *ngIf="message.editedTextShow" class="text-info-edit">
-                  (Bearbeitet)
-                </div>
+
               </div>
             </div>
           </div>
@@ -247,9 +248,8 @@
             }">
 
 
-            <div
-              *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread"
-              class="emoji-holder" (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
+            <div *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread" class="emoji-holder"
+              (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
               (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
               <span class="single-emoji">
                 {{ message.reactions[message.senderId]?.emoji }}
@@ -259,17 +259,16 @@
               </span>
             </div>
 
-            <div
-            *ngIf="message.reactions[message.senderId]?.counter > 0 && isSelfThread"
-            class="emoji-holder" (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
-            (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
-            <span class="single-emoji">
-              {{ message.reactions[message.senderId]?.emoji }}
-            </span>
-            <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
-              {{ message.reactions[message.senderId]?.counter }}
-            </span>
-          </div>
+            <div *ngIf="message.reactions[message.senderId]?.counter > 0 && isSelfThread" class="emoji-holder"
+              (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
+              (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
+              <span class="single-emoji">
+                {{ message.reactions[message.senderId]?.emoji }}
+              </span>
+              <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                {{ message.reactions[message.senderId]?.counter }}
+              </span>
+            </div>
 
             <div *ngIf=" message.reactions[message.recipientId]?.counter> 0 && !isSelfThread" class="emoji-holder"
               (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
