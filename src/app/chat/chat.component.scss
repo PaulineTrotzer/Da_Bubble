@@ -6,6 +6,7 @@
   overflow: auto;
   height: 750px;
   scroll-behavior: smooth !important;
+  position: relative;
 }
 
 app-input-field {
@@ -17,7 +18,8 @@ app-input-field {
   flex-direction: column;
   align-items: flex-start;
   gap: 36px;
-  margin-bottom: 52px;
+  position: absolute;
+  bottom: 0;
 }
 
 .you {
@@ -55,6 +57,8 @@ app-input-field {
   flex-direction: column;
   gap: 24px;
   margin-bottom: 52px;
+  position: absolute;
+  bottom: 0;
 }
 
 .img-and-name {

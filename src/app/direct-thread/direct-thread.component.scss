@@ -15,9 +15,9 @@
   max-height: 170px;
 }
 
-.last-messagebubble {
+/* .last-messagebubble {
   margin-top: 20px;
-}
+} */
 .first-messagebubble {
   max-height: 218px;
 }
@@ -26,7 +26,6 @@
   position: absolute;
   left: -55px;
   font-size: 12px;
-  margin-top: 10px;
   font-family: "Nunito";
   font-weight: 600;
   text-align: center;
@@ -203,9 +202,11 @@
 
 .edit-input {
   position: relative;
+  left: 34px;
+  z-index:2;
   bottom: 39px;
-  width: 95%;
-  height: 133px;
+  width: 280px;
+  height: 152px;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -392,6 +393,9 @@ h3 {
 }
 
 .all-thread-message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .cu-msg-text {
@@ -412,7 +416,8 @@ h3 {
 .reaction-icon-container-editMode {
   position: absolute;
   bottom: 58px;
-  left: 5px;
+  left: 42px;
+  z-index: 3;
   svg {
     display: block;
     width: 36px;
@@ -683,9 +688,10 @@ h3 {
 .option-flex {
   display: flex;
   position: absolute;
-  right: 46px;
+  right: -14px;
   bottom: 61px;
   gap: 10px;
+  z-index: 3;
 }
 
 .save-icon {

@@ -78,6 +78,7 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
   ],
 })
 export class DirectThreadComponent implements OnInit {
+  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   chatMessage: string = '';
@@ -114,7 +115,7 @@ export class DirectThreadComponent implements OnInit {
   showReactionPopUpBoth: { [key: string]: boolean } = {};
   firstThreadValue: string | null = null;
   currentUserId: string | null = null;
-/*   lastMessageId: string | null = '0'; */
+  /*   lastMessageId: string | null = '0'; */
   editMessageId: string | null = null;
   editableTextarea!: ElementRef<HTMLTextAreaElement>;
   isFirstClick: boolean = true;
@@ -133,6 +134,7 @@ export class DirectThreadComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
+    this.shouldScrollToBottom = true;
     await this.initializeUser();
     await this.subscribeToThreadMessages();
     await this.getAllUsersname();
@@ -152,8 +154,10 @@ export class DirectThreadComponent implements OnInit {
     if (this.global.currentUserData.id === this.selectedUser.id) {
       this.isSelfThread = true;
       this.showOneDisplay = true;
+      console.log('true', this.isSelfThread);
     } else if (this.global.currentUserData.id !== this.selectedUser.id) {
       this.isSelfThread = false;
+      console.log('false', this.isSelfThread);
     }
   }
   toggleEditOption(messageId: string, show: boolean) {
@@ -322,7 +326,7 @@ export class DirectThreadComponent implements OnInit {
       const container = this.scrollContainer.nativeElement;
       setTimeout(() => {
         container.scrollTop = container.scrollHeight;
-      }, 50); 
+      }, 50);
     } else {
       console.log('scrollToBottom - No scroll container found');
     }
@@ -335,24 +339,31 @@ export class DirectThreadComponent implements OnInit {
     this.showOptionBar[messageId] = show;
   }
 
-  toggleReactionInfoSenderAtCurrentUser(messageId: string, status: boolean): void {
+  toggleReactionInfoSenderAtCurrentUser(
+    messageId: string,
+    status: boolean
+  ): void {
     this.showReactionPopUpSenderAtCu[messageId] = status;
   }
-  toggleReactionInfoRecipientAtCurrentUser(messageId: string, status: boolean): void {
+  toggleReactionInfoRecipientAtCurrentUser(
+    messageId: string,
+    status: boolean
+  ): void {
     this.showReactionPopUpRecipientAtCu[messageId] = status;
   }
-  
 
-  toggleReactionInfoSenderAtSelectedUser(messageId: string, status: boolean): void {
+  toggleReactionInfoSenderAtSelectedUser(
+    messageId: string,
+    status: boolean
+  ): void {
     this.showReactionPopUpSenderAtSu[messageId] = status;
   }
-  toggleReactionInfoRecipientAtSelectedUser(messageId: string, status: boolean): void {
+  toggleReactionInfoRecipientAtSelectedUser(
+    messageId: string,
+    status: boolean
+  ): void {
     this.showReactionPopUpRecipientAtSu[messageId] = status;
   }
-
-
-
-  
 
   toggleBothReactionInfo(messageId: string, show: boolean): void {
     this.showReactionPopUpBoth[messageId] = show;
@@ -491,7 +502,6 @@ export class DirectThreadComponent implements OnInit {
       );
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
       onSnapshot(q, (querySnapshot) => {
-        console.log(querySnapshot.docs.map((doc) => doc.data()));
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
@@ -502,7 +512,9 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
-        this.scrollAutoDown();
+        if (this.shouldScrollToBottom) {
+          this.scrollAutoDown();
+        }
         this.cdr.detectChanges();
       });
     } catch (error) {
@@ -512,8 +524,8 @@ export class DirectThreadComponent implements OnInit {
 
   scrollAutoDown() {
     setTimeout(() => {
-      this.scrollToBottom(); 
-    }, 100);
+      this.scrollToBottom();
+    }, 250);
   }
 
   async updateMessagesWithNewPhoto(messageId: string) {
@@ -579,6 +591,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   addEmojiToEdit(event: any) {
+    this.shouldScrollToBottom = false;
     if (event && event.emoji && event.emoji.native) {
       const emoji = event.emoji.native;
       this.editableMessageText = (this.editableMessageText || '') + emoji;
@@ -622,35 +635,34 @@ export class DirectThreadComponent implements OnInit {
   async addEmoji(event: any, currentMessageId: string, userId: string) {
     try {
       const emoji = event.emoji.native;
-  
+
       // Hole die Referenz und das Dokument gleichzeitig
       const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
       const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
-  
+
       if (!threadMessageDoc) {
         console.error('Keine Daten für die Nachricht gefunden.');
         return;
       }
-  
+
       // Initialisiere Reaktionen, falls nicht vorhanden
       const reactions = threadMessageDoc['reactions'] || {};
-  
+
       // Aktuelle Reaktion des Benutzers
       const userReaction = reactions[userId];
-  
+      this.shouldScrollToBottom = false;
       if (userReaction && userReaction.emoji === emoji) {
         reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
       } else {
         reactions[userId] = { emoji, counter: 1 };
       }
-  
+
       // Update-Dokument schreiben
       await updateDoc(threadMessageRef, { reactions });
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
   }
-  
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -785,6 +797,7 @@ export class DirectThreadComponent implements OnInit {
   }
 
   onMessageSent(): void {
+    this.shouldScrollToBottom = true;
     this.scrollToBottom();
   }
 }

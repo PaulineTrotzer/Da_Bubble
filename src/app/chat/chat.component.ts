@@ -62,13 +62,19 @@ import { animate, style, transition, trigger } from '@angular/animations';
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate('300ms ease', style({ opacity: 1, transform: 'translateY(0)' }))
+        animate(
+          '300ms ease',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
       ]),
       transition(':leave', [
-        animate('300ms ease', style({ opacity: 0, transform: 'translateY(-10px)' }))
-      ])
-    ])
-  ]
+        animate(
+          '300ms ease',
+          style({ opacity: 0, transform: 'translateY(-10px)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class ChatComponent implements OnInit, OnChanges {
   threadControlService = inject(ThreadControlService);
@@ -135,58 +141,61 @@ export class ChatComponent implements OnInit, OnChanges {
   userChannelService = inject(UserChannelSelectService);
   isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
+  hasMessagesValue = false;
 
   constructor() {}
-
 
   onHoverSticker(message: any): void {
     setTimeout(() => {
       this.stickerHoverStates[message.id] = true;
-    }, 10); 
+    }, 10);
   }
-  
+
   onLeaveSticker(message: any): void {
     setTimeout(() => {
       this.stickerHoverStates[message.id] = false;
-    }, 10); 
-  
+    }, 10);
   }
 
   async ngOnInit(): Promise<void> {
+    this.dataLoaded = false;
+
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
+
+          // Lade Nachrichten und setze den Status
           await this.getMessages();
+          this.hasMessagesValue = this.messagesData.length > 0;
+
+          // Überprüfe die Anzeige-Logik
+          this.checkTwoPersonConversation();
+
+          // Setze dataLoaded erst, nachdem alles fertig ist
+          this.dataLoaded = true;
+
+          // Erzwinge die Aktualisierung der View
+          this.cdr.detectChanges();
         }
       }
     );
-
-    this.workspaceSubscription.add(
-      this.workspaceService.selectedChannel$.subscribe((channel) => {
-        if (channel) {
-          this.selectedChannel = channel;
-        }
-      })
-    );
-    await this.getAllUsersname();
   }
 
   isFirstDayInfoVisible(i: number): boolean {
-    return i === 0; 
+    return i === 0;
   }
 
-updateMessages() {
-  this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-  this.dataLoaded = true;
-
-  if (this.shouldScroll) {
-    this.scrollAutoDown();
+  updateMessages() {
+    this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
+    this.dataLoaded = true;
+    if (this.shouldScroll) {
+      this.scrollAutoDown();
+    }
+    this.updateMessagesWithNewPhoto();
+    this.subscribeToThreadAnswers();
+    this.checkForSelfChat();
   }
-  this.updateMessagesWithNewPhoto();
-  this.subscribeToThreadAnswers();
-  this.checkForSelfChat();
-}
   hasMessages(): boolean {
     return this.messagesData && this.messagesData.length > 0;
   }
@@ -314,9 +323,7 @@ updateMessages() {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getMessages().then(() =>
-        this.checkForSelfChat()
-      );
+      await this.getMessages().then(() => this.checkForSelfChat());
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
@@ -466,7 +473,7 @@ updateMessages() {
     ids.sort();
     return ids.join('_');
   }
-  
+
   async getMessages() {
     try {
       if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
@@ -484,7 +491,7 @@ updateMessages() {
           this.global.currentUserData.id,
         ])
       );
-  
+
       onSnapshot(
         q,
         async (querySnapshot) => {
@@ -499,7 +506,8 @@ updateMessages() {
                 (messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.selectedUser.id) ||
                 (messageData['senderId'] === this.selectedUser.id &&
-                  messageData['recipientId'] === this.global.currentUserData.id) ||
+                  messageData['recipientId'] ===
+                    this.global.currentUserData.id) ||
                 (this.global.statusCheck &&
                   messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.global.currentUserData.id)
@@ -507,6 +515,7 @@ updateMessages() {
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
+            this.hasMessagesValue = this.messagesData.length > 0;
             await this.updateMessagesWithNewPhoto();
             await this.subscribeToThreadAnswers();
             this.messagesData.sort(
@@ -516,7 +525,6 @@ updateMessages() {
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
-            this.dataLoaded = true;
           } catch (innerError) {
             console.error('Error while querySnapshot:', innerError);
           }
@@ -529,7 +537,6 @@ updateMessages() {
       console.error('Error initializing messages query:', error);
     }
   }
-  
 
   async updateMessagesWithNewPhoto() {
     try {
@@ -793,7 +800,7 @@ updateMessages() {
     this.closePicker();
   }
 
-  removeSenderSticker(message: any) { 
+  removeSenderSticker(message: any) {
     this.shouldScroll = false;
     const docRef = doc(this.firestore, 'messages', message.id);
     if (this.global.currentUserData?.id === message.senderId) {
