@@ -142,7 +142,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
-   async processSendMessage(): Promise<void> {
+  async processSendMessage(): Promise<void> {
+    // Überprüfen, ob die Nachricht leer ist (nur Leerzeichen oder komplett leer)
+    if (!this.chatMessage || this.chatMessage.trim().length === 0) {
+      console.warn('Leere Nachricht kann nicht gesendet werden.');
+      return; // Methode beenden, wenn die Nachricht leer ist
+    }
+  
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
@@ -153,15 +159,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
-
+  
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
-
+  
         messageData.selectedFiles = fileData;
-
+  
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
@@ -176,6 +182,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       }
     }
   }
+  
 
 
   async sendChannelThreadMessage() {

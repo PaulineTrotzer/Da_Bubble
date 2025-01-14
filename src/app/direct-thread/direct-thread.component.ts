@@ -135,7 +135,10 @@ export class DirectThreadComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.shouldScrollToBottom = true;
     await this.initializeUser();
-    await this.subscribeToThreadMessages();
+    const firstInitialisedThreadMsg = this.threadControlService.getFirstThreadMessageId();
+    if (firstInitialisedThreadMsg) {
+      await this.processThreadMessages(firstInitialisedThreadMsg);
+    }
     await this.getAllUsersname();
     this.currentUserId = this.route.snapshot.paramMap.get('id');
     this.checkIfSelfThread();
@@ -377,7 +380,7 @@ export class DirectThreadComponent implements OnInit {
     this.showReactionPopUpBoth[messageId] = show;
   }
 
-  async subscribeToThreadMessages() {
+/*   async subscribeToThreadMessages() {
     this.threadControlService.firstThreadMessageId$.subscribe(
       async (firstInitialisedThreadMsg) => {
         if (firstInitialisedThreadMsg) {
@@ -385,7 +388,7 @@ export class DirectThreadComponent implements OnInit {
         }
       }
     );
-  }
+  } */
 
   getUserIds(reactions: {
     [key: string]: { emoji: string; counter: number };
