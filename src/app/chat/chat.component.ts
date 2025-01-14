@@ -158,28 +158,23 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async ngOnInit(): Promise<void> {
-    this.dataLoaded = false;
-
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
-
-          // Lade Nachrichten und setze den Status
           await this.getMessages();
-          this.hasMessagesValue = this.messagesData.length > 0;
-
-          // Überprüfe die Anzeige-Logik
-          this.checkTwoPersonConversation();
-
-          // Setze dataLoaded erst, nachdem alles fertig ist
-          this.dataLoaded = true;
-
-          // Erzwinge die Aktualisierung der View
-          this.cdr.detectChanges();
         }
       }
     );
+
+    this.workspaceSubscription.add(
+      this.workspaceService.selectedChannel$.subscribe((channel) => {
+        if (channel) {
+          this.selectedChannel = channel;
+        }
+      })
+    );
+    await this.getAllUsersname();
   }
 
   isFirstDayInfoVisible(i: number): boolean {
@@ -323,7 +318,7 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getMessages().then(() => this.checkForSelfChat());
+      await this.getMessages();/* .then(() => this.checkForSelfChat()) */;
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
@@ -491,7 +486,6 @@ export class ChatComponent implements OnInit, OnChanges {
           this.global.currentUserData.id,
         ])
       );
-
       onSnapshot(
         q,
         async (querySnapshot) => {
@@ -502,29 +496,28 @@ export class ChatComponent implements OnInit, OnChanges {
               if (messageData['timestamp'] && messageData['timestamp'].toDate) {
                 messageData['timestamp'] = messageData['timestamp'].toDate();
               }
+              // Filtere nur Nachrichten zwischen currentUser und selectedUser
               if (
                 (messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.selectedUser.id) ||
                 (messageData['senderId'] === this.selectedUser.id &&
-                  messageData['recipientId'] ===
-                    this.global.currentUserData.id) ||
-                (this.global.statusCheck &&
-                  messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.global.currentUserData.id)
               ) {
+                console.log('Messages Chat', this.messagesData);
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
-            this.hasMessagesValue = this.messagesData.length > 0;
             await this.updateMessagesWithNewPhoto();
             await this.subscribeToThreadAnswers();
             this.messagesData.sort(
               (a: any, b: any) => a.timestamp - b.timestamp
             );
+            this.hasMessagesValue = this.messagesData.length > 0;
             this.checkForSelfChat();
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
+            this.dataLoaded = true;
           } catch (innerError) {
             console.error('Error while querySnapshot:', innerError);
           }
