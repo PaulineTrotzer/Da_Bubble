@@ -94,7 +94,8 @@
 
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
-                      <emoji-mart (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
+                      <emoji-mart (click)="letPickerVisible($event)"
+                        (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
                         size="18"></emoji-mart>
                     </div>
                   </div>
@@ -108,7 +109,8 @@
 
         <!-- CURRENT USER I FOLLOWING-->
 
-        <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name || message.senderName == currentUser.name && message.recipientName == currentUser.name"
+        <div
+          *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name || message.senderName == currentUser.name && message.recipientName == currentUser.name"
           class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
           (mouseleave)="toggleOptionBar(message.id,false)" (mouseleave)="toggleEditOption(message.id, false)"
           [ngClass]="{'first-message-position': isFirstMessage(i)}">
@@ -237,7 +239,7 @@
 
         <!--- Reactions are following for 2 Reactions (2 Sides)-->
         <div class="separated-both-currentUser-reaction-right" [ngClass]="{ 
-          'separated-both-currentUser-reaction-right': message.senderName === currentUser.name && isSelfThread,
+          'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
           'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name && !isSelfThread
         }">
           <div class="render-reaction-ct-sender"
@@ -245,8 +247,9 @@
             }">
 
 
-            <div *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread || message.reactions[message.senderId]?.counter > 0 && isSelfThread" class="emoji-holder"
-              (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
+            <div
+              *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread"
+              class="emoji-holder" (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
               (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
               <span class="single-emoji">
                 {{ message.reactions[message.senderId]?.emoji }}
@@ -255,6 +258,18 @@
                 {{ message.reactions[message.senderId]?.counter }}
               </span>
             </div>
+
+            <div
+            *ngIf="message.reactions[message.senderId]?.counter > 0 && isSelfThread"
+            class="emoji-holder" (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
+            (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
+            <span class="single-emoji">
+              {{ message.reactions[message.senderId]?.emoji }}
+            </span>
+            <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+              {{ message.reactions[message.senderId]?.counter }}
+            </span>
+          </div>
 
             <div *ngIf=" message.reactions[message.recipientId]?.counter> 0 && !isSelfThread" class="emoji-holder"
               (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
@@ -283,8 +298,7 @@
             </span>
           </div>
 
-          <div *ngIf="!isSelfThread" class="reaction-name-info-ct-sender"
-            [hidden]="!showReactionPopUpRecipientAtCu[message.id]" [ngClass]="{ 'hovered': showReactionPopUpRecipientAtCu[message.id],
+          <div class="reaction-name-info-ct-sender" [hidden]="!showReactionPopUpRecipientAtCu[message.id]" [ngClass]="{ 'hovered': showReactionPopUpRecipientAtCu[message.id],
            'has-reacted':message.senderId === currentUser.uid && message.reactions[message.recipientId]?.counter> 0}">
             <span class="reaction-info-txt">
               <ng-container

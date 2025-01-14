@@ -78,7 +78,6 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
   ],
 })
 export class DirectThreadComponent implements OnInit {
-  [x: string]: any;
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   chatMessage: string = '';
@@ -160,6 +159,12 @@ export class DirectThreadComponent implements OnInit {
       console.log('false', this.isSelfThread);
     }
   }
+
+  letPickerVisible(event: MouseEvent) {
+    event.stopPropagation();
+    this.isEmojiPickerVisible = true;
+  }
+
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
   }
@@ -512,9 +517,8 @@ export class DirectThreadComponent implements OnInit {
             ...messageData,
           };
         });
-        if (this.shouldScrollToBottom) {
-          this.scrollAutoDown();
-        }
+
+        this.scrollAutoDown();
         this.cdr.detectChanges();
       });
     } catch (error) {
@@ -523,9 +527,11 @@ export class DirectThreadComponent implements OnInit {
   }
 
   scrollAutoDown() {
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 250);
+    if (this.shouldScrollToBottom) {
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 250);
+    }
   }
 
   async updateMessagesWithNewPhoto(messageId: string) {
@@ -635,8 +641,6 @@ export class DirectThreadComponent implements OnInit {
   async addEmoji(event: any, currentMessageId: string, userId: string) {
     try {
       const emoji = event.emoji.native;
-
-      // Hole die Referenz und das Dokument gleichzeitig
       const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
       const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
 
@@ -644,21 +648,16 @@ export class DirectThreadComponent implements OnInit {
         console.error('Keine Daten für die Nachricht gefunden.');
         return;
       }
-
-      // Initialisiere Reaktionen, falls nicht vorhanden
       const reactions = threadMessageDoc['reactions'] || {};
-
-      // Aktuelle Reaktion des Benutzers
       const userReaction = reactions[userId];
-      this.shouldScrollToBottom = false;
       if (userReaction && userReaction.emoji === emoji) {
         reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
       } else {
         reactions[userId] = { emoji, counter: 1 };
       }
-
-      // Update-Dokument schreiben
+      this.shouldScrollToBottom = false;
       await updateDoc(threadMessageRef, { reactions });
+      this.closePicker();
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
@@ -798,6 +797,6 @@ export class DirectThreadComponent implements OnInit {
 
   onMessageSent(): void {
     this.shouldScrollToBottom = true;
-    this.scrollToBottom();
+    this.scrollAutoDown();
   }
 }
