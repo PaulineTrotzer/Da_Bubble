@@ -206,10 +206,6 @@
 
                         <!--        <div class="avatar-box"> -->
 
-
-
-
-
                         <div class="sticker-info-wrapper">
                             <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
                           'sticker-senderName-current': message.senderId === global.currentUserData.id,
@@ -324,6 +320,8 @@
                                 </mat-card-content>
                             </mat-card>
                         </div>
+
+
                         <div class="comment-sticker-holder"
                             [ngClass]="{'comment-sticker-holder-partner': message.senderName === selectedUser.name}">
                             <!-- Erster Sticker -->
@@ -334,6 +332,7 @@
                                     messageIdHovered = message.id;
                                     hoveredSenderName = message.senderName;
                                     hoveredCurrentUser = 'Du';
+                                    
                                   " (mouseleave)="
                                     messageIdHovered = null;
                                     hoveredSenderName = null;

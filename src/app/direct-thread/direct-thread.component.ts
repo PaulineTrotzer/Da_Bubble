@@ -23,6 +23,7 @@ import {
   orderBy,
   setDoc,
   deleteDoc,
+  DocumentReference,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -91,6 +92,7 @@ export class DirectThreadComponent implements OnInit {
   showOptionBar: { [key: string]: boolean } = {};
   isHovered = false;
   isEmojiPickerVisible = false;
+  isEmojiPickerTwoVisible = false;
   isEmojiPickerEditVisible = false;
   currentSrc?: string;
   icons: { [key: string]: string } = {
@@ -165,6 +167,12 @@ export class DirectThreadComponent implements OnInit {
     event.stopPropagation();
     this.isEmojiPickerVisible = true;
   }
+
+  letPickerTwoVisible(event: MouseEvent) {
+    event.stopPropagation();
+    this.isEmojiPickerTwoVisible = true;
+  }
+
 
   letPickerEditVisible(event: MouseEvent) {
     event.stopPropagation();
@@ -585,13 +593,25 @@ export class DirectThreadComponent implements OnInit {
   }
 
   openEmojiPicker() {
+console.log('One');
     this.isEmojiPickerVisible = true;
+  /*   this.overlayStatusService.setOverlayStatus(true); */
+  }
+
+  openEmojiPickerTwo() {
+    console.log('Two');
+    this.isEmojiPickerTwoVisible = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
 
   closePicker() {
     this.overlayStatusService.setOverlayStatus(false);
     this.isEmojiPickerVisible = false;
+  }
+
+  closePickerTwo() {
+    this.overlayStatusService.setOverlayStatus(false);
+    this.isEmojiPickerTwoVisible = false;
   }
 
   closePickerEdit() {
@@ -639,45 +659,101 @@ export class DirectThreadComponent implements OnInit {
   }
 
   async getThreadMessageDoc(threadMessageRef: any): Promise<any> {
-    const threadMessageDoc = await getDoc(threadMessageRef);
-    if (!threadMessageDoc.exists()) {
+    const docSnap = await getDoc(threadMessageRef);
+    if (!docSnap.exists()) {
       console.error('thread message nicht gefunden.');
       return null;
     }
-    return threadMessageDoc.data();
+    
+    const data = docSnap.data() as Record<string, any>;
+    const id = docSnap.id;
+    
+    return { id, ...data };
   }
 
-async addEmoji(event: any, currentMessageId: string, userId: string) {
-  try {
-    const emoji = event.emoji.native;
-    const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
-    const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
+  async addEmoji(event: any, currentMessageId: string, userId: string) {
+    try {
+      const emoji = event?.emoji?.native;
+      if (!emoji) {
+        console.error('Kein gültiges Emoji gefunden.');
+        return;
+      }
+      const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+      const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef); 
+      if (!threadMessageDoc) {
+        console.error('Keine Daten für die Nachricht gefunden.');
+        return;
+      }
+      const updatedReactions = this.updateReactions(threadMessageDoc, emoji, userId);
+      if (currentMessageId === this.parentMessageId) {
+        // === PARENT-NACHRICHT ===
+        console.log('Parent Nachricht Emoji wird aktualisiert:', currentMessageId);
+  
+        const updatedParentMessage = {
+          ...threadMessageDoc,
+          parentThreadId: currentMessageId, 
+          reactions: updatedReactions
+        };
+  
+        await this.updateParentMessage(updatedParentMessage); 
+        
+      } else {
+        console.log('Child-Nachricht Emoji wird aktualisiert:', currentMessageId);
+        const updatedChildMessage = {
+          ...threadMessageDoc,
+          parentThreadId: threadMessageDoc.parentThreadId || this.parentMessageId,
+  
+          reactions: updatedReactions,
+          editedAt: new Date().toISOString()
+        };
+        await updateDoc(threadMessageRef, { reactions: updatedReactions });
+        this.threadControlService.updateThreadMessage(updatedChildMessage);
+      }
 
-    if (!threadMessageDoc) {
-      console.error('Keine Daten für die Nachricht gefunden.');
-      return;
+      this.closePicker();
+      this.shouldScrollToBottom = false;
+  
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
+  }
 
-    const reactions = threadMessageDoc['reactions'] || {};
+  updateReactions(threadMessageDoc: any, emoji: string, userId: string) {
+    const reactions = threadMessageDoc.reactions || {};
     const userReaction = reactions[userId];
     if (userReaction && userReaction.emoji === emoji) {
-      reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
+      delete reactions[userId];
     } else {
       reactions[userId] = { emoji, counter: 1 };
     }
-
-    this.shouldScrollToBottom = false;
-    await updateDoc(threadMessageRef, { reactions });
-
-    // Aktualisierte Nachricht an den Service senden
-    const updatedMessage = { ...threadMessageDoc, reactions };
-    this.threadControlService.updateThreadMessage(updatedMessage);
-
-    this.closePicker();
-  } catch (error) {
-    console.error('Fehler beim Hinzufügen des Emojis:', error);
+  
+    return reactions;
   }
-}
+  
+  async removeStickerOrUpdateReactions(threadMessageRef: DocumentReference, threadMessageDoc: any, userId: string, emoji: string) {
+    const reactions = threadMessageDoc.reactions || {};
+    if (reactions[userId] && reactions[userId].emoji === emoji) {
+
+      delete reactions[userId];
+    } else {
+      reactions[userId] = { emoji, counter: 1 };
+    }
+    const updatedChildMessage = {
+      ...threadMessageDoc,
+      reactions,
+      editedAt: new Date().toISOString(),
+    };
+    await updateDoc(threadMessageRef, { reactions });
+    this.threadControlService.updateThreadMessage(updatedChildMessage);
+  }
+  
+  
+  async updateParentMessage(parentMsg: any) {
+    const docRef = doc(this.firestore, 'messages', parentMsg.id);
+    await updateDoc(docRef, { reactions: parentMsg.reactions });
+    this.threadControlService.updateThreadMessage(parentMsg);
+  }
+  
 
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {

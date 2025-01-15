@@ -31,6 +31,10 @@ export class ThreadControlService {
     this.threadMessageSubject.next(updatedMessage);
   }
 
+  get currentFirstThreadMessageId(): string | null {
+    return this.firstThreadMessageIdSubject.value;
+  }
+
 
 /*   async initializeLastMessageId(threadId: any): Promise<void> {
     const threadMessagesRef = collection(
