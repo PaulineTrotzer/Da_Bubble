@@ -143,12 +143,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async processSendMessage(): Promise<void> {
-    // Überprüfen, ob die Nachricht leer ist (nur Leerzeichen oder komplett leer)
     if (!this.chatMessage || this.chatMessage.trim().length === 0) {
       console.warn('Leere Nachricht kann nicht gesendet werden.');
-      return; // Methode beenden, wenn die Nachricht leer ist
+      return;
     }
-  
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
@@ -165,9 +163,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
           this.senderStickerCount,
           this.recipientStickerCount
         );
-  
         messageData.selectedFiles = fileData;
-  
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
         const messageWithId = { ...messageData, id: docRef.id };
@@ -244,7 +240,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         reactions: '',
       };
       const docRef = await addDoc(threadMessagesRef, messageData);
-      this.threadControlService.setLastMessageId(docRef.id);
+/*       this.threadControlService.setLastMessageId(docRef.id); */
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {

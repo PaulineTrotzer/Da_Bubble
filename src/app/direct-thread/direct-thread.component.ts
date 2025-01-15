@@ -436,7 +436,9 @@ export class DirectThreadComponent implements OnInit {
     this.isDirectThreadOpen = status;
   }
 
+  parentMessageId: any;
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
+    this.parentMessageId = firstInitialisedThreadMsg;
     try {
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
       const docSnapshot = await getDoc(docRef);
@@ -499,7 +501,7 @@ export class DirectThreadComponent implements OnInit {
 
       const docRef = await addDoc(threadMessagesRef, messageData);
       console.log('Erstellte Nachricht-ID:', docRef.id);
-      this.threadControlService.setLastMessageId(docRef.id);
+/*       this.threadControlService.setLastMessageId(docRef.id); */
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
@@ -645,30 +647,38 @@ export class DirectThreadComponent implements OnInit {
     return threadMessageDoc.data();
   }
 
-  async addEmoji(event: any, currentMessageId: string, userId: string) {
-    try {
-      const emoji = event.emoji.native;
-      const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
-      const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
+async addEmoji(event: any, currentMessageId: string, userId: string) {
+  try {
+    const emoji = event.emoji.native;
+    const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+    const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
 
-      if (!threadMessageDoc) {
-        console.error('Keine Daten für die Nachricht gefunden.');
-        return;
-      }
-      const reactions = threadMessageDoc['reactions'] || {};
-      const userReaction = reactions[userId];
-      if (userReaction && userReaction.emoji === emoji) {
-        reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
-      } else {
-        reactions[userId] = { emoji, counter: 1 };
-      }
-      this.shouldScrollToBottom = false;
-      await updateDoc(threadMessageRef, { reactions });
-      this.closePicker();
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen des Emojis:', error);
+    if (!threadMessageDoc) {
+      console.error('Keine Daten für die Nachricht gefunden.');
+      return;
     }
+
+    const reactions = threadMessageDoc['reactions'] || {};
+    const userReaction = reactions[userId];
+    if (userReaction && userReaction.emoji === emoji) {
+      reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
+    } else {
+      reactions[userId] = { emoji, counter: 1 };
+    }
+
+    this.shouldScrollToBottom = false;
+    await updateDoc(threadMessageRef, { reactions });
+
+    // Aktualisierte Nachricht an den Service senden
+    const updatedMessage = { ...threadMessageDoc, reactions };
+    this.threadControlService.updateThreadMessage(updatedMessage);
+
+    this.closePicker();
+  } catch (error) {
+    console.error('Fehler beim Hinzufügen des Emojis:', error);
   }
+}
+
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {

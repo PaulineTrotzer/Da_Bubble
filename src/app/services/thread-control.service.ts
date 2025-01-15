@@ -18,12 +18,21 @@ export class ThreadControlService {
   currentThreadMessageIdSubject = new BehaviorSubject<string | null>(null);
   currentThreadMessageId$ = this.currentThreadMessageIdSubject.asObservable();
 
-  private lastMessageIdSubject = new BehaviorSubject<string | null>(null);
-  lastMessageId$ = this.lastMessageIdSubject.asObservable();
+/*   private lastMessageIdSubject = new BehaviorSubject<string | null>(null);
+  lastMessageId$ = this.lastMessageIdSubject.asObservable(); */
+
+  private threadMessageSubject = new BehaviorSubject<any>(null);
+  public threadMessage$ = this.threadMessageSubject.asObservable();
+
 
   constructor() {}
 
-  async initializeLastMessageId(threadId: any): Promise<void> {
+  updateThreadMessage(updatedMessage: any) {
+    this.threadMessageSubject.next(updatedMessage);
+  }
+
+
+/*   async initializeLastMessageId(threadId: any): Promise<void> {
     const threadMessagesRef = collection(
       this.firestore,
       `messages/${threadId}/threadMessages`
@@ -40,14 +49,14 @@ export class ThreadControlService {
         'Kein letzter Nachrichteneintrag gefunden, Standardwert bleibt 0.'
       );
     }
-  }
+  } */
 
-  setLastMessageId(id: string): void {
+/*   setLastMessageId(id: string): void {
     console.log('Setze lastMessageId:', id);
     this.lastMessageIdSubject.next(id);
-  }
+  } */
 
-  async updateLastMessageId(threadId: string): Promise<void> {
+/*   async updateLastMessageId(threadId: string): Promise<void> {
     const threadMessagesRef = collection(
       this.firestore,
       `messages/${threadId}/threadMessages`
@@ -61,12 +70,12 @@ export class ThreadControlService {
     } else {
       console.log('Kein letzter Nachrichteneintrag gefunden.');
     }
-  }
+  } */
 
-  getLastMessageId(): Observable<string | null> {
+ /*  getLastMessageId(): Observable<string | null> {
     return this.lastMessageId$;
   }
-
+ */
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);
   }

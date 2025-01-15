@@ -157,6 +157,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }, 10);
   }
 
+  currentThreadMessage: any;
   async ngOnInit(): Promise<void> {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
@@ -166,6 +167,14 @@ export class ChatComponent implements OnInit, OnChanges {
         }
       }
     );
+
+    this.threadControlService.threadMessage$.subscribe((message) => {
+      console.log('Received message:', message);
+      if (message) {
+        this.messagesData = Array.isArray(message) ? message : [message]; // Sicherstellen, dass messagesData ein Array ist
+        this.updateMessages();
+      }
+    });
 
     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
@@ -318,7 +327,7 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getMessages();/* .then(() => this.checkForSelfChat()) */;
+      await this.getMessages(); /* .then(() => this.checkForSelfChat()) */
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
