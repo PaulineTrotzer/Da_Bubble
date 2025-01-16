@@ -706,11 +706,13 @@ console.log('One');
           reactions: updatedReactions,
           editedAt: new Date().toISOString()
         };
+        this.closePicker();
+        this.closePickerTwo();
         await updateDoc(threadMessageRef, { reactions: updatedReactions });
         this.threadControlService.updateThreadMessage(updatedChildMessage);
       }
 
-      this.closePicker();
+
       this.shouldScrollToBottom = false;
   
     } catch (error) {
