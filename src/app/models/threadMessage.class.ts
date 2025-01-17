@@ -8,4 +8,5 @@ export class currentThreadMessage {
   timestamp?: Date;
   senderId?: string;
   isHovered?: boolean;
+  reactions?: any; 
 }

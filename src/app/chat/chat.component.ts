@@ -34,7 +34,7 @@ import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { InputFieldComponent } from '../input-field/input-field.component';
-import { Subscription, combineLatest } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { ThreadControlService } from '../services/thread-control.service';
@@ -157,6 +157,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }, 10);
   }
 
+  currentThreadMessage: any;
   async ngOnInit(): Promise<void> {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
@@ -166,7 +167,13 @@ export class ChatComponent implements OnInit, OnChanges {
         }
       }
     );
-    this.initThreadSubscriptions();
+
+    this.threadControlService.editedMessage$
+    .pipe(filter((message: any) => !!message)) // Nur wenn eine Nachricht vorhanden ist
+    .subscribe((updatedMessage) => {
+      console.log('Änderung erhalten im Chat:', updatedMessage);
+      this.updateMessage(updatedMessage);
+    });
     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
         if (channel) {
@@ -177,92 +184,34 @@ export class ChatComponent implements OnInit, OnChanges {
     await this.getAllUsersname();
   }
 
-  initThreadSubscriptions(): void {
-    combineLatest([
-      this.threadControlService.firstThreadMessageId$,
-      this.threadControlService.threadMessage$,
-    ]).subscribe(([parentId, updatedMessage]) => {
-      this.handleUpdatedMessage(parentId, updatedMessage);
-    });
-  }
-  async handleUpdatedMessage(
-    parentId: string | null,
-    updatedMessage: any
-  ): Promise<void> {
-    if (!parentId) {
-      console.error(
-        'parentId ist null oder undefined. Kann kein Firestore doc erstellen!'
-      );
-      return;
-    }
-  
-    if (!updatedMessage) {
-      console.log('Keine aktualisierte Nachricht vorhanden.');
-      return;
-    }
-  
-    if (updatedMessage.timestamp) {
-      updatedMessage.timestamp = this.toDateObject(updatedMessage.timestamp);
-    }
-  
-    if (updatedMessage.editedAt) {
-      updatedMessage.editedAt = this.toDateObject(updatedMessage.editedAt);
-    }
-  
-    const senderId = updatedMessage.senderId;
-    const recipientId = updatedMessage.recipientId;
-    const reactions = updatedMessage.reactions || {};
-  
-    // Reaktionen verarbeiten
-    updatedMessage.senderSticker = reactions[senderId]?.emoji || '';
-    updatedMessage.senderStickerCount = reactions[senderId]?.counter || 0;
-  
-    updatedMessage.recipientSticker = reactions[recipientId]?.emoji || '';
-    updatedMessage.recipientStickerCount = reactions[recipientId]?.counter || 0;
-  
-    // Prüfen, ob es sich um einen Self-Chat handelt
-    updatedMessage.isSelfChat = senderId === recipientId;
-  
-    // Firestore-Dokument aktualisieren
-    const docRef = doc(this.firestore, 'messages', parentId);
-  
-    if (updatedMessage.isSelfChat) {
-      // Nur den Sender aktualisieren, da Sender und Empfänger identisch sind
-      await updateDoc(docRef, {
-        senderSticker: updatedMessage.senderSticker,
-        senderStickerCount: updatedMessage.senderStickerCount,
-      });
-    } else {
-      // Normale Nachricht: Sender und Empfänger separat behandeln
-      await updateDoc(docRef, {
-        senderSticker: updatedMessage.senderSticker,
-        senderStickerCount: updatedMessage.senderStickerCount,
-        recipientSticker: updatedMessage.recipientSticker,
-        recipientStickerCount: updatedMessage.recipientStickerCount,
-      });
-    }
-  
-    // Nachricht in der lokalen Liste aktualisieren
-    this.messagesData = [...this.messagesData, updatedMessage];
-  }
-  
-
-  toDateObject(timestamp: any): Date {
-    if (timestamp && typeof timestamp.toDate === 'function') {
-      return timestamp.toDate();
-    }
-    if (timestamp?.seconds) {
-      return new Date(timestamp.seconds * 1000);
-    }
-    if (typeof timestamp === 'string' || timestamp instanceof Date) {
-      return new Date(timestamp);
-    }
-    return new Date();
-  }
-
-
   isFirstDayInfoVisible(i: number): boolean {
     return i === 0;
+  }
+  async updateMessage(updatedMessage: any): Promise<void> {
+    await this.ensureMessagesLoaded();
+
+    const index = this.messagesData.findIndex((msg: any) => msg.id === updatedMessage.id);
+    if (index !== -1) {
+      // Nachricht aktualisieren
+      this.messagesData[index] = { ...this.messagesData[index], ...updatedMessage };
+      console.log('Nachricht aktualisiert:', this.messagesData[index]);
+    } else {
+      console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
+      this.messagesData.push(updatedMessage);
+    }
+  
+  }
+
+  async ensureMessagesLoaded(): Promise<void> {
+    if (!this.messagesData || this.messagesData.length === 0) {
+      console.log('Lade Nachrichten...');
+      const snapshot = await getDocs(collection(this.firestore, 'messages'));
+      this.messagesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log('Nachrichten geladen:', this.messagesData);
+    }
   }
 
   updateMessages() {
@@ -456,27 +405,45 @@ export class ChatComponent implements OnInit, OnChanges {
   saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
     const messageRef = doc(this.firestore, 'messages', message.id);
+  
     if (this.editableMessageText.trim() === '') {
+      // Nachricht löschen
       deleteDoc(messageRef).then(() => {
+        console.log('Nachricht gelöscht:', message.id);
+  
+        // Änderungen über den Service weitergeben
+        this.threadControlService.setEditedMessage({ id: message.id, deleted: true });
+  
         this.editMessageId = null;
+        this.isFirstClick = true;
+        this.checkEditbox = false;
       });
-      this.isFirstClick = true;
-      this.checkEditbox = false;
     } else {
+      // Nachricht bearbeiten
       const editMessage = {
         text: this.editableMessageText,
         editedTextShow: true,
       };
+  
       updateDoc(messageRef, editMessage).then(() => {
+        console.log('Nachricht bearbeitet:', message.id);
+  
+        // Änderungen über den Service weitergeben
+        const updatedMessage = { id: message.id, ...editMessage };
+        this.threadControlService.setEditedMessage(updatedMessage);
+  
         this.editMessageId = null;
+        this.checkEditbox = false;
+        this.isFirstClick = true;
+  
+        // Optional: Scrollen nach Bearbeitung
+        setTimeout(() => {
+          this.shouldScroll = true;
+        }, 1000);
       });
-      this.checkEditbox = false;
-      this.isFirstClick = true;
-      setTimeout(() => {
-        this.shouldScroll = true;
-      }, 1000);
     }
   }
+  
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;
@@ -587,7 +554,6 @@ export class ChatComponent implements OnInit, OnChanges {
                 (messageData['senderId'] === this.selectedUser.id &&
                   messageData['recipientId'] === this.global.currentUserData.id)
               ) {
-                console.log('Messages Chat', this.messagesData);
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
@@ -649,18 +615,18 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async openThread(messageId: any) {
+    this.threadControlService.setFirstThreadMessageId(null);
+    this.chosenThreadMessage = null;
     try {
       this.threadOpened.emit();
-      this.global.setCurrentThreadMessage(messageId); // Speichert die aktuelle Thread-Nachricht
-      this.threadControlService.setFirstThreadMessageId(messageId); // Setzt die erste Thread-Nachricht im Service
-
-      // Holen der Nachrichten im Thread
+      this.global.setCurrentThreadMessage(messageId);
+      this.chosenThreadMessage = messageId;
+      this.threadControlService.setFirstThreadMessageId(messageId);
       const threadMessagesRef = collection(
         this.firestore,
         `messages/${messageId}/threadMessages`
       );
       const snapshot = await getDocs(threadMessagesRef);
-
       this.shouldScroll = false;
       if (snapshot.empty) {
         const docRef = doc(this.firestore, 'messages', messageId);
@@ -793,37 +759,12 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = true;
   }
 
-  async addEmoji(emojiOrEvent: any, message: any) {
-    // 1) Ermitteln, ob wir ein Event-Objekt oder bereits einen reinen Emoji-String haben
-    let emoji = '';
-
-    if (typeof emojiOrEvent === 'string') {
-      // Fall A: Aus addEmojiAfterThrow => bereits reiner String
-      emoji = emojiOrEvent;
-    } else if (emojiOrEvent?.emoji?.native) {
-      // Fall B: Aus dem Template => Objekt hat { emoji: { native: '😃' } }
-      emoji = emojiOrEvent.emoji.native;
-    } else if (emojiOrEvent?.emoji) {
-      // Fallback: Event-Objekt mit { emoji: '😃' } (oder andere Struktur)
-      emoji = emojiOrEvent.emoji;
-    } else {
-      console.error('Kein gültiger Emoji übergeben:', emojiOrEvent);
-      return;
-    }
-
-    // 2) Nochmals prüfen, ob wir jetzt einen gültigen String haben
-    if (!emoji || typeof emoji !== 'string') {
-      console.error('Kein gültiger Emoji-String übergeben:', emoji);
-      return;
-    }
-
-    // 3) Ab hier folgt deine bekannte Sticker-/Zähler-Logik
+  async addEmoji(event: any, message: any) {
+    const emoji = event.emoji.native;
     this.shouldScroll = false;
     if (this.global.currentUserData?.id === message.senderId) {
-      // Sender-Logik
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
-
       if (message.senderSticker === emoji) {
         message.senderSticker = '';
         if (message.senderStickerCount === 2) {
@@ -833,7 +774,6 @@ export class ChatComponent implements OnInit, OnChanges {
         message.senderSticker = emoji;
         message.senderStickerCount = 1;
       }
-
       if (message.recipientSticker === emoji) {
         message.recipientStickerCount =
           (message.recipientStickerCount || 1) + 1;
@@ -845,7 +785,6 @@ export class ChatComponent implements OnInit, OnChanges {
           message.recipientStickerCount = 1;
         }
       }
-
       if (message.senderSticker !== message.recipientSticker) {
         message.recipientStickerCount = 1;
       }
@@ -853,11 +792,11 @@ export class ChatComponent implements OnInit, OnChanges {
       if (message.senderSticker === message.recipientSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
-    } else {
-      // Empfänger-Logik
+      this.isEmojiPickerVisible = false;
+      this.messageIdHovered = null;
+    } else if (this.global.currentUserData?.id !== message.senderId) {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
-
       if (message.recipientSticker === emoji) {
         message.recipientSticker = '';
         if (message.recipientStickerCount === 2) {
@@ -867,51 +806,42 @@ export class ChatComponent implements OnInit, OnChanges {
         message.recipientSticker = emoji;
         message.recipientStickerCount = 1;
       }
-
       if (message.senderSticker === emoji) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
         if (message.senderStickerCount >= 3) {
           message.senderStickerCount = 1;
         }
       }
-
       if (message.recipientSticker !== '' && message.senderStickerCount === 2) {
         message.senderStickerCount = 1;
         message.recipientSticker = emoji;
       }
-
       if (message.recipientSticker === message.senderSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
+      this.isEmojiPickerVisible = false;
+      this.messageIdHovered = null;
     }
-
-    // Picker und Hover schließen
-    this.isEmojiPickerVisible = false;
-    this.messageIdHovered = null;
-
-    // 4) An Firestore nur einfache Strings/Numbers senden
+    const messageData = this.messageData(
+      message.senderStickerCount,
+      message.recipientStickerCount
+    );
+    const strickerRef = doc(this.firestore, 'messages', message.id);
     const stikerObj = {
-      senderSticker: message.senderSticker || '',
-      senderStickerCount: message.senderStickerCount || 0,
-      recipientSticker: message.recipientSticker || '',
-      recipientStickerCount: message.recipientStickerCount || 0,
-      senderchoosedStickereBackColor:
-        message.senderchoosedStickereBackColor || '',
+      senderSticker: message.senderSticker,
+      senderStickerCount: message.senderStickerCount,
+      recipientSticker: message.recipientSticker,
+      recipientStickerCount: message.recipientStickerCount,
+      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
       recipientChoosedStickerBackColor:
-        message.recipientChoosedStickerBackColor || '',
-      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle || false,
-      stickerBoxOpacity: message.stickerBoxOpacity ?? 1,
+        message.recipientChoosedStickerBackColor,
+      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
+      stickerBoxOpacity: message.stickerBoxOpacity,
     };
-
-    // message.id sollte vorhanden sein
-    if (!message.id) {
-      console.error('message.id fehlt oder ist undefined:', message);
-      return;
-    }
-
-    const docRef = doc(this.firestore, 'messages', message.id);
-    await updateDoc(docRef, stikerObj);
-
+    /*    setTimeout(() => {
+      this.shouldScroll = true;
+    }, 1000); */
+    await updateDoc(strickerRef, stikerObj);
     this.closePicker();
   }
 

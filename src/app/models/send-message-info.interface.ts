@@ -18,4 +18,6 @@ export interface SendMessageInfo {
   selectedFiles?: any[];
   editedTextShow?:boolean;
   reactions?: { [emoji: string]: any }; 
+  isParent?: boolean | false,
+  parentThreadId?: string | null;
 }

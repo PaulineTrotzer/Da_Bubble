@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+/* import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
@@ -48,3 +48,4 @@ export class FirstMessageThreadComponent implements OnInit {
     return null;
   }
 }
+ */

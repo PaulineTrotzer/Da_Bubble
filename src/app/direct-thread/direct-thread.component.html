@@ -133,7 +133,7 @@
                 </div>
 
                 <div class="add-reaction-ct" (mouseenter)="toggleEditOption(message.id, false)"
-                  (click)="openEmojiPickerTwo()">
+                  (click)="openEmojiPicker()">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8" width="24"
                       height="24">
@@ -148,9 +148,9 @@
                 </div>
 
 
-                <div (click)="closePickerTwo()" *ngIf="isEmojiPickerTwoVisible" class="emoji-picker-container">
+                <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                   <div class="emoji-picker">
-                    <emoji-mart (click)="letPickerTwoVisible($event)"(emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
+                    <emoji-mart (click)="letPickerVisible($event)"(emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
                       size="18">
                     </emoji-mart>
                   </div>
@@ -301,7 +301,7 @@
            'has-reacted':message.senderId === currentUser.uid && message.reactions[message.recipientId]?.counter> 0}">
             <span class="reaction-info-txt">
               <ng-container
-                *ngIf="message.recipientId === selectedUser.uid && message.reactions[message.recipientId]?.counter> 0 ">
+                *ngIf="message?.recipientId === selectedUser?.uid && message.reactions[message.recipientId]?.counter> 0 ">
                 {{ message.recipientName }} hat mit
                 <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji }}</span> reagiert
               </ng-container>
