@@ -31,6 +31,7 @@ import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 
 interface Message {
   id: string;
@@ -104,6 +105,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   cdr = inject(ChangeDetectorRef);
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   shouldScroll = true; 
+  userChannelSelectService =inject(UserChannelSelectService);
 
   constructor(private elRef: ElementRef) {}
 
@@ -116,6 +118,10 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       'click',
       this.closePickerIfClickedOutside.bind(this)
     );
+    this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
+      console.log('selectedChannel (channel):', channel);
+      this.selectedChannel = channel;
+    });
   }
 
   ngAfterViewInit() {
@@ -142,6 +148,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       this.loadUserNames(); 
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
+      debugger;
       this.shouldScroll = true;
       await this.loadChannelMessages();
     }

@@ -16,7 +16,6 @@ export class UserChannelSelectService {
   // Methode zum Setzen des ausgewählten Users
   setSelectedUser(user: any) {
     this.selectedUserSubject.next(user); // gibt den neuen Wert an alle Abonnenten weiter
-    console.log('selected user', this.selectedUserSubject.next(user));
   }
 
   // Methode zum Setzen des ausgewählten Channels

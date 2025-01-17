@@ -226,6 +226,10 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
 
+  getReplyCount(): number {
+    return this.messagesData.length > 1 ? this.messagesData.length - 1 : 0; // Antworten zählen
+  }
+
   isFirstDayInfoVisible(i: number): boolean {
     return i === 0;
   }
@@ -244,7 +248,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       console.warn('selectedUser oder dessen ID ist nicht definiert:', this.selectedUser);
       return;
     }
-  debugger;
     if (this.global.currentUserData.id == this.selectedUser.id) {
       this.isSelfThread = true;
       this.showOneDisplay = true;

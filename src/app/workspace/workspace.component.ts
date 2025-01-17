@@ -17,6 +17,7 @@ import {
   EventEmitter,
   Input,
   ChangeDetectorRef,
+  SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -169,8 +170,8 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
-  /* 
-  ngOnChanges(changes: SimpleChanges): void {
+  
+/*   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['selectedUserHome'] &&
       !changes['selectedUserHome'].firstChange
@@ -336,7 +337,6 @@ export class WorkspaceComponent implements OnInit {
         this.global.currentUserData = {};
       }
     });
-    console.log('name is', this.global.currentUserData.name);
   }
 
   getUserMessageCount(userId: string) {

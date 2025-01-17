@@ -115,6 +115,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
     this.workspaceComponent.channelSelected.subscribe((channel: any) => {
       this.selectedChannel = channel;
+      console.log('selectedChannel home)', channel)
       this.userChannelService.setSelectedChannel(channel);
     });
     const header = this.el.nativeElement.querySelector('app-header');

@@ -434,9 +434,10 @@ form {
 
 .reactions-container {
   display: flex;
-  justify-content: end;
+  justify-content: left;
   gap: 12px;
   position: relative;
+  bottom: 8px;
 }
 
 .reaction-on-user {
