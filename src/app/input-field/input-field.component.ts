@@ -373,6 +373,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   formattedMessage: string = '';
 
+
   handleMentionUser(mention: string) {
     this.isMentionPeopleCardVisible = false;
     this.mentionCardOpened.emit(false);
@@ -382,28 +383,37 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.updateFormattedMessage();
     }
     
+    // Sende das Ereignis mit dem Mention-Wert an das Parent
     this.mentionUserOut.emit(mention);
   }
 
   handleCardClosed() {
-    this.isMentionPeopleCardVisible = false; 
+    this.isMentionPeopleCardVisible = false; // Schließt die Karte
   }
+
 
   // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
     const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
-      const mentionName = match.substring(1);
-      if (this.mentionUserName.some((some) => some === mentionName)) {
-        return `<span class="mention">${match}</span>`;
+      const mentionName = match.substring(1).trim().toLowerCase(); // Normalisiere das Tag
+      const normalizedUserNames = this.mentionUserName.map((name) => name.trim().toLowerCase());
+      console.log('mentionName:', mentionName);
+      console.log('mentionUserName:', this.mentionUserName);
+      console.log('Normalized mentionUserName:', normalizedUserNames);
+  
+      if (normalizedUserNames.includes(mentionName)) {
+        console.log('true');
+        return `<span class="mention">${match.trim()}</span>`;
       } else {
-        return match;
+        console.log('false');
+        return match.trim();
       }
     });
   }
-
   
+
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
