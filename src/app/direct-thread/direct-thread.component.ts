@@ -136,11 +136,10 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   unsubscribe$ = new Subject<void>();
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
 
-
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     this.threadControlService.editedMessage$
-      .pipe(filter((message) => !!message)) 
+      .pipe(filter((message) => !!message))
       .subscribe((updatedMessage) => {
         console.log(
           'Bearbeitete Nachricht erhalten im Thread:',
@@ -161,8 +160,20 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleClickOnMention(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('mention-message')) {
+      const mentionName = target.textContent?.trim();
+      if (mentionName) {
+        if (this.getAllUsersName.length === 0) {
+          console.warn('Mentions-Daten sind noch nicht geladen.');
+          return;
+        }
+        this.handleMentionClick(mentionName);
+      }
+    }
+  }
 
- 
   async initializeComponent(): Promise<void> {
     await this.initializeUser();
     await this.getAllUsersname();
@@ -249,12 +260,18 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   checkIfSelfThread() {
     if (!this.global.currentUserData || !this.global.currentUserData.id) {
-      console.warn('currentUserData oder dessen ID ist nicht definiert:', this.global.currentUserData);
+      console.warn(
+        'currentUserData oder dessen ID ist nicht definiert:',
+        this.global.currentUserData
+      );
       return;
     }
-  
+
     if (!this.selectedUser || !this.selectedUser.id) {
-      console.warn('selectedUser oder dessen ID ist nicht definiert:', this.selectedUser);
+      console.warn(
+        'selectedUser oder dessen ID ist nicht definiert:',
+        this.selectedUser
+      );
       return;
     }
     if (this.global.currentUserData.id == this.selectedUser.id) {
@@ -264,7 +281,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       this.isSelfThread = false;
     }
   }
-  
 
   letPickerVisible(event: MouseEvent) {
     event.stopPropagation();
@@ -302,46 +318,64 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async handleMentionClick(mention: string) {
     this.wasClickedInDirectThread = true;
-    const cleanName = mention.substring(1);
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.global.getUserByName = {};
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const dataUserName = dataUser['name'];
-        if (dataUserName === cleanName) {
-          this.global.getUserByName = { id: doc.id, ...dataUser };
-        }
-        this.global.openMentionMessageBox = true;
-      });
-    });
+    const cleanName = mention.substring(1).trim().toLowerCase();
+    const user = await this.ensureUserDataLoaded(cleanName);
+
+    if (!user) {
+      return;
+    }
+    this.global.getUserByName = user;
+    this.global.openMentionMessageBox = true;
+  }
+
+  async ensureUserDataLoaded(name: string): Promise<any> {
+    while (this.getAllUsersName.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const foundUser = this.getAllUsersName.find(
+      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (!foundUser) {
+      console.warn('Benutzer nicht gefunden:', name);
+      return null;
+    }
+    return foundUser;
   }
 
   closeMentionBoxHandler() {
     this.wasClickedInDirectThread = false;
   }
 
-  splitMessage(text: string) {
-    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
-    return text.split(regex);
+  splitMessage(text: string): string[] {
+    const regex = /(@[\w\-_!$*]+)/g;
+    const parts = text.split(regex);
+    const cleanedParts = parts
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0);
+    return cleanedParts;
+  }
+  
+  isMention(text: string): boolean {
+    const regex = /^@[\w\-_!$*]+$/;
+    const isMention = regex.test(text.trim());
+    return isMention;
   }
 
-  isMention(part: string): boolean {
-    if (!part.startsWith('@')) {
-      return false;
-    }
-    const mentionName = part.substring(1);
-    return this.getAllUsersName.some((user) => user.userName === mentionName);
-  }
-
-  async getAllUsersname() {
+  async getAllUsersname(): Promise<void> {
     const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.getAllUsersName = [];
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const userName = dataUser['name'];
-        this.getAllUsersName.push({ userName });
+    return new Promise((resolve) => {
+      onSnapshot(userRef, (querySnapshot) => {
+        this.getAllUsersName = [];
+        querySnapshot.forEach((doc) => {
+          const dataUser = doc.data();
+          this.getAllUsersName.push({
+            name: dataUser['name'],
+            email: dataUser['email'],
+            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
+            id: doc.id,
+          });
+        });
+        resolve();
       });
     });
   }
@@ -560,7 +594,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
     debugger;
     try {
-
       const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
       const docSnapshot = await getDoc(docRef);
       if (docSnapshot.exists()) {

@@ -143,8 +143,10 @@
                 topicMessage?.senderId === global.currentUserData.id,
               'from-user': topicMessage?.senderId !== global.currentUserData.id
             }">
-            <ng-container *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
-              <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+
+            <ng-container (click)="handleClickOnMention($event)"
+              *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
+              <span *ngIf="isMention(mentionName)" class="mention-message"
                 (click)="handleMentionClick(mentionName)">
                 {{ mentionName }}
               </span>
@@ -152,6 +154,7 @@
                 {{ mentionName }}
               </span>
             </ng-container>
+
           </p>
           <div *ngIf="topicMessage?.isEdited" [ngClass]="getEditedClassTopicMessage(topicMessage)">
             <span>(Bearbeitet)</span>

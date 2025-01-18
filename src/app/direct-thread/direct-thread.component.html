@@ -60,7 +60,7 @@
                 <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
               </div>
 
-              <div [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
+              <div (click)="handleClickOnMention($event)" [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
                 <ng-container *ngFor="let mentionName of splitMessage(message.text)">
                   <span *ngIf="isMention(mentionName)" class="mention-message"
                     (click)="handleMentionClick(mentionName)">
@@ -186,7 +186,7 @@
 
               <div class="message-holder" [class.hovered]="message.isHovered">
                 <ng-container *ngIf="!(editWasClicked && editMessageId === message.id); else editMode">
-                  <div class="cu-msg-text">
+                  <div (click)="handleClickOnMention($event)" class="cu-msg-text">
                     <ng-container *ngFor="let mentionName of splitMessage(message.text)">
                       <span *ngIf="isMention(mentionName)" class="mention-message"
                         (click)="handleMentionClick(mentionName)">

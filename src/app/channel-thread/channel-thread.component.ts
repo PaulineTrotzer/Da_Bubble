@@ -29,6 +29,7 @@ import { FormsModule } from '@angular/forms';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface Message {
   id: string;
@@ -105,9 +106,9 @@ export class ChannelThreadComponent implements OnInit {
   isClickedEdit = false;
   isClickedEditAnswers = false;
   threadMessageId: string | null = null;
-  cdr=inject(ChangeDetectorRef);
+  cdr = inject(ChangeDetectorRef);
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
-
+  sanitizer=inject(DomSanitizer);
 
   constructor() {}
 
@@ -125,6 +126,34 @@ export class ChannelThreadComponent implements OnInit {
     });
   }
 
+  formatMentions(text: string): SafeHtml {
+    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name ? user.name.trim().toLowerCase() : ''
+    );
+    const formattedText = text.replace(regex, (match) => {
+      const mentionName = match.substring(1).trim().toLowerCase();
+      if (normalizedUserNames.includes(mentionName)) {
+        return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
+      }
+      return match;
+    });
+    return this.sanitizer.bypassSecurityTrustHtml(formattedText);
+  }
+
+  handleClickOnMention(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('mention-message')) {
+      const mentionName = target.textContent?.trim();
+      if (mentionName) {
+        if (this.getAllUsersName.length === 0) {
+          console.warn('Mentions-Daten sind noch nicht geladen.');
+          return;
+        }
+        this.handleMentionClick(mentionName);
+      }
+    }
+  }
 
   focusInputField(): void {
     if (this.inputFieldComponent) {
@@ -132,46 +161,64 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
 
-  async getAllUsersname() {
+  async getAllUsersname(): Promise<void> {
     const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.getAllUsersName = [];
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const userName = dataUser['name'];
-        this.getAllUsersName.push({ userName });
+    return new Promise((resolve) => {
+      onSnapshot(userRef, (querySnapshot) => {
+        this.getAllUsersName = [];
+        querySnapshot.forEach((doc) => {
+          const dataUser = doc.data();
+          this.getAllUsersName.push({
+            name: dataUser['name'],
+            email: dataUser['email'],
+            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
+            id: doc.id,
+          });
+        });
+        resolve();
       });
     });
   }
 
-  splitMessage(text: string) {
-    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
-    return text?.split(regex);
+  splitMessage(text: string): string[] {
+    const regex = /(@[\w\-_!$*]+)/g;
+    const parts = text.split(regex);
+    const cleanedParts = parts
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0);
+    return cleanedParts;
   }
 
-  isMention(part: string): boolean {
-    if (!part.startsWith('@')) {
-      return false;
-    }
-    const mentionName = part.substring(1);
-    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  isMention(text: string): boolean {
+    const regex = /^@[\w\-_!$*]+$/;
+    const isMention = regex.test(text.trim());
+    return isMention;
   }
 
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelThread = true;
-    const cleanName = mention.substring(1);
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.global.getUserByName = {};
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const dataUserName = dataUser['name'];
-        if (dataUserName === cleanName) {
-          this.global.getUserByName = { id: doc.id, ...dataUser };
-        }
-        this.global.openMentionMessageBox = true;
-      });
-    });
+    const cleanName = mention.substring(1).trim().toLowerCase();
+    const user = await this.ensureUserDataLoaded(cleanName);
+
+    if (!user) {
+      return;
+    }
+    this.global.getUserByName = user;
+    this.global.openMentionMessageBox = true;
+  }
+
+  async ensureUserDataLoaded(name: string): Promise<any> {
+    while (this.getAllUsersName.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const foundUser = this.getAllUsersName.find(
+      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (!foundUser) {
+      console.warn('Benutzer nicht gefunden:', name);
+      return null;
+    }
+    return foundUser;
   }
 
   closeMentionBoxHandler() {
@@ -229,7 +276,7 @@ export class ChannelThreadComponent implements OnInit {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-  
+
     const messagesRef = collection(
       this.db,
       'channels',
@@ -238,7 +285,7 @@ export class ChannelThreadComponent implements OnInit {
       this.channelMessageId,
       'thread'
     );
-  
+
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
     onSnapshot(q, async (querySnapshot: any) => {
       this.messages = querySnapshot.docs.map((doc: any) => {
@@ -246,8 +293,9 @@ export class ChannelThreadComponent implements OnInit {
         if (data.timestamp && data.timestamp.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
+        data.formattedText = this.formatMentions(data.text);
         if (data.isEdited === undefined) {
-          data.isEdited = false;  
+          data.isEdited = false;
         }
         return { id: doc.id, ...data };
       });
@@ -269,7 +317,9 @@ export class ChannelThreadComponent implements OnInit {
           message.senderPicture !== newPhotoUrl
       );
       if (messagesToUpdate.length > 0) {
-        messagesToUpdate.forEach((message) => message.senderPicture = newPhotoUrl);
+        messagesToUpdate.forEach(
+          (message) => (message.senderPicture = newPhotoUrl)
+        );
         this.messages = [...this.messages];
         this.cdr.detectChanges();
         await Promise.all(
@@ -279,12 +329,19 @@ export class ChannelThreadComponent implements OnInit {
         );
       }
     } catch (error) {
-      console.error('Fehler beim Aktualisieren der Nachrichten mit neuem Foto:', error);
+      console.error(
+        'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
+        error
+      );
     }
   }
-  
+
   private async updateMessagePhoto(message: any, newPhotoUrl: string) {
-    if (message && message.senderId === this.global.currentUserData.id && message.senderPicture !== newPhotoUrl) {
+    if (
+      message &&
+      message.senderId === this.global.currentUserData.id &&
+      message.senderPicture !== newPhotoUrl
+    ) {
       message.senderPicture = newPhotoUrl;
       const messageRef = doc(
         this.firestore,
@@ -296,7 +353,7 @@ export class ChannelThreadComponent implements OnInit {
       await updateDoc(messageRef, { photoUrl: newPhotoUrl });
     }
   }
-  
+
   closeThread() {
     this.global.channelThreadSubject.next(null);
     this.hiddenThreadFullBox();
@@ -651,19 +708,25 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   getEditedClass(message: any) {
-    if (message.isEdited && message.senderId !== this.global.currentUserData?.id) {
+    if (
+      message.isEdited &&
+      message.senderId !== this.global.currentUserData?.id
+    ) {
       return 'edited-indicator-user-display';
-    } else if (message.isEdited && message.senderId === this.global.currentUserData?.id) {
+    } else if (
+      message.isEdited &&
+      message.senderId === this.global.currentUserData?.id
+    ) {
       return 'edited-indicator';
     }
     return '';
   }
 
-  getEditedClassTopicMessage(topicMessage:any) {
+  getEditedClassTopicMessage(topicMessage: any) {
     if (!topicMessage?.isEdited) {
       return ''; // Keine Klasse, wenn die topicMessage nicht bearbeitet wurde
     }
-  
+
     // Wenn die topicMessage bearbeitet wurde
     if (topicMessage.senderId === this.global.currentUserData?.id) {
       return 'edited-indicator-topic'; // Bearbeitet vom aktuellen Benutzer
@@ -675,7 +738,7 @@ export class ChannelThreadComponent implements OnInit {
   async saveEditedMessage(messageId: string) {
     try {
       const isTopicMessage = messageId === this.topicMessage?.id;
-  
+
       const messageDocRef = isTopicMessage
         ? doc(
             this.db,
@@ -693,24 +756,23 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-  
+
       await updateDoc(messageDocRef, {
         text: this.messageToEdit,
         isEdited: true,
       });
-  
+
       // Aktualisiere den lokalen Status der topicMessage
       if (isTopicMessage) {
         this.topicMessage!.isEdited = true; // Markiere die topicMessage als bearbeitet
       }
-  
+
       this.showEditArea = null;
       this.messageToEdit = '';
     } catch (error) {
       console.error('Error saving edited message:', error);
     }
   }
-  
 
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {
