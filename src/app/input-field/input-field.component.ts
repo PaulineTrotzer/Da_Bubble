@@ -81,11 +81,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
   isMentionCardOpen: boolean = true;
   @Output() mentionUserOut = new EventEmitter<string>();
   authService=inject(AuthService);
+  @ViewChild('inputField', { static: true }) inputFieldRef!: ElementRef<HTMLTextAreaElement>;
 
 
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
+    }
+  }
+
+  focusInputField(): void {
+    if (this.inputFieldRef?.nativeElement) {
+      this.inputFieldRef.nativeElement.focus();
     }
   }
 
@@ -404,10 +411,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.log('Normalized mentionUserName:', normalizedUserNames);
   
       if (normalizedUserNames.includes(mentionName)) {
-        console.log('true');
         return `<span class="mention">${match.trim()}</span>`;
       } else {
-        console.log('false');
         return match.trim();
       }
     });

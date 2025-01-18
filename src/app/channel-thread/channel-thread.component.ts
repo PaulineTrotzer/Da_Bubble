@@ -6,6 +6,7 @@ import {
   Input,
   OnInit,
   Output,
+  ViewChild,
 } from '@angular/core';
 import {
   collection,
@@ -105,6 +106,8 @@ export class ChannelThreadComponent implements OnInit {
   isClickedEditAnswers = false;
   threadMessageId: string | null = null;
   cdr=inject(ChangeDetectorRef);
+  @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
+
 
   constructor() {}
 
@@ -120,6 +123,13 @@ export class ChannelThreadComponent implements OnInit {
         await this.getAllUsersname();
       }
     });
+  }
+
+
+  focusInputField(): void {
+    if (this.inputFieldComponent) {
+      this.inputFieldComponent.focusInputField();
+    }
   }
 
   async getAllUsersname() {

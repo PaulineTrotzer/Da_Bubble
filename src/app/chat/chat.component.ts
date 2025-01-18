@@ -142,6 +142,7 @@ export class ChatComponent implements OnInit, OnChanges {
   isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
   hasMessagesValue = false;
+  @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
 
   constructor() {}
 
@@ -352,11 +353,15 @@ export class ChatComponent implements OnInit, OnChanges {
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
       await this.getMessages(); /* .then(() => this.checkForSelfChat()) */
+      console.log('selectedUser changes');
+      this.focusInputField();
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
       this.clearInput();
+      console.log('selectedChannel changes');
+      this.focusInputField();
     }
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
       this.showWelcomeChatText = false;
@@ -367,6 +372,13 @@ export class ChatComponent implements OnInit, OnChanges {
       this.global.clearCurrentChannel();
       await this.getMessages();
       this.chatMessage = '';
+    }
+  }
+
+
+  focusInputField(): void {
+    if (this.inputFieldComponent) {
+      this.inputFieldComponent.focusInputField();
     }
   }
 

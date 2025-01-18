@@ -4,7 +4,7 @@
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
     <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" type="text" [(ngModel)]="chatMessage"
-      (input)=" onInput($event)" (keydown)="sendMessage($event)">
+      (input)=" onInput($event)" (keydown)="sendMessage($event)"  #inputField>
   </textarea>
   </div>
 

@@ -401,6 +401,7 @@ h3 {
 }
 
 .cu-msg-text {
+  max-width: 350px;
   max-height: 105px;
   background-color: #797ef3;
   border-top-right-radius: 0;
@@ -753,6 +754,7 @@ h3 {
 }
 
 .message-content-bubble {
+  max-width: 350px;
   position: relative;
   background-color: white;
   padding: 15px;

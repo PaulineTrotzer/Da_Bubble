@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   Input,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DirectThreadComponent } from '../direct-thread/direct-thread.component';
@@ -29,6 +30,30 @@ export class ThreadComponent {
   @Input() selectedChannel: any;
   @Output() userSelectedFromThread = new EventEmitter<any>();
   @Output() userSelectedFromChannelThread = new EventEmitter<any>();
+  @ViewChild(DirectThreadComponent) directThreadComp!: DirectThreadComponent;
+  @ViewChild(ChannelThreadComponent) channelThreadComp!: ChannelThreadComponent;
+
+
+  ngAfterViewInit(): void {
+    if (this.directThreadId) {
+      this.focusDirectThreadInput();
+    }
+    if (this.channelThreadId) {
+      this.focusChannelThreadInput();
+    }
+  }
+
+  focusDirectThreadInput(): void {
+    if (this.directThreadComp) {
+      this.directThreadComp.focusInputField();
+    }
+  }
+
+  focusChannelThreadInput(): void {
+    if (this.channelThreadComp) {
+      this.channelThreadComp.focusInputField();
+    }
+  }
 
 
   handleDirectThreadUserSelection(user: any) {

@@ -134,11 +134,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   lastProcessedThreadMessageId: string | null = null;
   unsubscribe$ = new Subject<void>();
+  @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
+
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     this.threadControlService.editedMessage$
-      .pipe(filter((message) => !!message)) // Nur wenn eine Nachricht vorhanden ist
+      .pipe(filter((message) => !!message)) 
       .subscribe((updatedMessage) => {
         console.log(
           'Bearbeitete Nachricht erhalten im Thread:',
@@ -152,6 +154,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.setCurrentUserId();
     this.checkIfSelfThread();
   }
+
+  focusInputField(): void {
+    if (this.inputFieldComponent) {
+      this.inputFieldComponent.focusInputField();
+    }
+  }
+
 
  
   async initializeComponent(): Promise<void> {
