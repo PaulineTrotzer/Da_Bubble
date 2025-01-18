@@ -80,10 +80,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
   isMentionPeopleCardVisible: boolean = false;
   isMentionCardOpen: boolean = true;
   @Output() mentionUserOut = new EventEmitter<string>();
-  authService=inject(AuthService);
-  @ViewChild('inputField', { static: true }) inputFieldRef!: ElementRef<HTMLTextAreaElement>;
-
-
+  authService = inject(AuthService);
+  @ViewChild('inputField', { static: true })
+  inputFieldRef!: ElementRef<HTMLTextAreaElement>;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -148,44 +147,50 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
     return false;
   }
-
   async processSendMessage(): Promise<void> {
     if (!this.chatMessage || this.chatMessage.trim().length === 0) {
-      console.warn('Leere Nachricht kann nicht gesendet werden.');
-      return;
+        console.warn('Leere Nachricht kann nicht gesendet werden.');
+        return;
     }
+
     if (this.selectedChannel && !this.isChannelThreadOpen) {
-      await this.sendChannelMessage();
+        await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
-      await this.sendDirectThreadMessage();
-      await this.setMessageCount();
-    } else if (this.isChannelThreadOpen) {
-      await this.sendChannelThreadMessage();
-    } else {
-      try {
-        const fileData = await this.uploadFilesToFirebaseStorage();
-  
-        const messageData = this.messageData(
-          this.chatMessage,
-          this.senderStickerCount,
-          this.recipientStickerCount
-        );
-        messageData.selectedFiles = fileData;
-        const messagesRef = collection(this.firestore, 'messages');
-        const docRef = await addDoc(messagesRef, messageData);
-        const messageWithId = { ...messageData, id: docRef.id };
-        this.messagesData.push(messageWithId);
+        await this.sendDirectThreadMessage();
         await this.setMessageCount();
-        this.messageSent.emit();
-        this.chatMessage = '';
-        this.formattedChatMessage = '';
-        this.selectFiles = [];
-      } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error);
-      }
+    } else if (this.isChannelThreadOpen) {
+        await this.sendChannelThreadMessage();
+    } else {
+        try {
+            const fileData = await this.uploadFilesToFirebaseStorage();
+
+            // Nachrichtendaten vorbereiten (kein formattedText hier)
+            const messageData = this.messageData(
+                this.chatMessage,
+                this.senderStickerCount,
+                this.recipientStickerCount
+            );
+            messageData.selectedFiles = fileData;
+
+            // Nachricht in Firestore speichern
+            const messagesRef = collection(this.firestore, 'messages');
+            const docRef = await addDoc(messagesRef, messageData);
+
+            // Nachricht in die lokale Liste einfügen
+            const messageWithId = { ...messageData, id: docRef.id };
+            this.messagesData.push(messageWithId);
+
+            // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
+            await this.setMessageCount();
+            this.messageSent.emit();
+            this.chatMessage = '';
+            this.formattedChatMessage = '';
+            this.selectFiles = [];
+        } catch (error) {
+            console.error('Fehler beim Senden der Nachricht:', error);
+        }
     }
-  }
-  
+}
 
 
   async sendChannelThreadMessage() {
@@ -247,7 +252,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         reactions: '',
       };
       const docRef = await addDoc(threadMessagesRef, messageData);
-/*       this.threadControlService.setLastMessageId(docRef.id); */
+      /*       this.threadControlService.setLastMessageId(docRef.id); */
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
@@ -308,12 +313,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.currentThreadMessageId = threadMessageId;
     this.threadControlService.setCurrentThreadMessageId(threadMessageId);
   }
-
   async sendChannelMessage() {
     if (!this.selectedChannel || this.chatMessage.trim() === '') {
       console.warn('Channel is not selected or message is empty');
       return;
     }
+  
     const channelMessagesRef = collection(
       this.firestore,
       'channels',
@@ -321,50 +326,50 @@ export class InputFieldComponent implements OnInit, OnChanges {
       'messages'
     );
     const fileData = await this.uploadFilesToFirebaseStorage();
+  
     const messageData = {
       text: this.chatMessage,
       senderId: this.global.currentUserData.id,
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
       timestamp: new Date(),
-      selectedFiles: this.selectFiles,
+      selectedFiles: fileData,
       editedTextShow: false,
     };
-    messageData.selectedFiles = fileData;
-    const docRef = await addDoc(channelMessagesRef, messageData);
+    await addDoc(channelMessagesRef, messageData);
     this.chatMessage = '';
     this.selectFiles = [];
     this.messageSent.emit();
-    console.log(this.chatMessage);
   }
-
   messageData(
     chatMessage: string,
     senderStickerCount: number = 0,
     recipientStickerCount: number = 0
-  ): SendMessageInfo {
+): SendMessageInfo {
     const recipientId = this.selectedUser?.id;
     const recipientName = this.selectedUser?.name;
     return {
-      text: chatMessage,
-      senderId: this.global.currentUserData.id,
-      senderName: this.global.currentUserData.name,
-      senderPicture: this.global.currentUserData.picture || '',
-      recipientId: recipientId,
-      recipientName: recipientName,
-      timestamp: new Date(),
-      senderSticker: '',
-      senderStickerCount,
-      recipientSticker: '',
-      recipientStickerCount,
-      senderchoosedStickereBackColor: '',
-      recipientChoosedStickerBackColor: '',
-      stickerBoxCurrentStyle: null,
-      stickerBoxOpacity: null,
-      selectedFiles: this.selectFiles,
-      editedTextShow: false,
+        text: chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        recipientId: recipientId,
+        recipientName: recipientName,
+        timestamp: new Date(),
+        senderSticker: '',
+        senderStickerCount,
+        recipientSticker: '',
+        recipientStickerCount,
+        senderchoosedStickereBackColor: '',
+        recipientChoosedStickerBackColor: '',
+        stickerBoxCurrentStyle: null,
+        stickerBoxOpacity: null,
+        selectedFiles: this.selectFiles,
+        editedTextShow: false
     };
-  }
+}
+
+  
 
   getByUserName() {
     const docRef = collection(this.firestore, 'users');
@@ -380,17 +385,23 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   formattedMessage: string = '';
 
-
   handleMentionUser(mention: string) {
     this.isMentionPeopleCardVisible = false;
     this.mentionCardOpened.emit(false);
     const mentionTag = `@${mention}`;
     if (!this.chatMessage.includes(mentionTag)) {
-      this.chatMessage += `${mentionTag}  `;
+      this.chatMessage += `${mentionTag} `;
       this.updateFormattedMessage();
+
+      const textarea = document.getElementById(
+        'msg-input'
+      ) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+        const position = this.chatMessage.length; 
+        textarea.setSelectionRange(position, position); 
+      }
     }
-    
-    // Sende das Ereignis mit dem Mention-Wert an das Parent
     this.mentionUserOut.emit(mention);
   }
 
@@ -398,24 +409,23 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.isMentionPeopleCardVisible = false; // Schließt die Karte
   }
 
-
   // const regex =/@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
 
   updateFormattedMessage() {
-    const regex = /@[\w\-\*_!$]+(?:\s[\w\-\*_!$]+)*/g;
+    const regex = /(@[\w\-\*_!$]+)(?=\s|$)/g;
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim().toLowerCase(); // Normalisiere das Tag
-      const normalizedUserNames = this.mentionUserName.map((name) => name.trim().toLowerCase());
-      console.log('mentionName:', mentionName);
-      console.log('mentionUserName:', this.mentionUserName);
-      console.log('Normalized mentionUserName:', normalizedUserNames);
+      const mentionName = match.substring(1).trim().toLowerCase(); 
+      const normalizedUserNames = this.mentionUserName.map((name) =>
+        name.trim().toLowerCase()
+      );
   
       if (normalizedUserNames.includes(mentionName)) {
         return `<span class="mention">${match.trim()}</span>`;
       } else {
-        return match.trim();
+        return match.trim(); 
       }
     });
+    this.formattedMessage = this.formattedMessage.replace(/\s\s+/g, ' ');
   }
   
 

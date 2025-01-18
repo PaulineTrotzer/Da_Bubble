@@ -43,6 +43,7 @@ import { OverlayStatusService } from '../services/overlay-status.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chat-component',
@@ -143,6 +144,7 @@ export class ChatComponent implements OnInit, OnChanges {
   stickerHoverStates: { [messageId: string]: boolean } = {};
   hasMessagesValue = false;
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
+  sanitizer = inject(DomSanitizer);
 
   constructor() {}
 
@@ -170,11 +172,11 @@ export class ChatComponent implements OnInit, OnChanges {
     );
 
     this.threadControlService.editedMessage$
-    .pipe(filter((message: any) => !!message)) // Nur wenn eine Nachricht vorhanden ist
-    .subscribe((updatedMessage) => {
-      console.log('Änderung erhalten im Chat:', updatedMessage);
-      this.updateMessage(updatedMessage);
-    });
+      .pipe(filter((message: any) => !!message)) // Nur wenn eine Nachricht vorhanden ist
+      .subscribe((updatedMessage) => {
+        console.log('Änderung erhalten im Chat:', updatedMessage);
+        this.updateMessage(updatedMessage);
+      });
     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
         if (channel) {
@@ -191,16 +193,20 @@ export class ChatComponent implements OnInit, OnChanges {
   async updateMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
 
-    const index = this.messagesData.findIndex((msg: any) => msg.id === updatedMessage.id);
+    const index = this.messagesData.findIndex(
+      (msg: any) => msg.id === updatedMessage.id
+    );
     if (index !== -1) {
       // Nachricht aktualisieren
-      this.messagesData[index] = { ...this.messagesData[index], ...updatedMessage };
+      this.messagesData[index] = {
+        ...this.messagesData[index],
+        ...updatedMessage,
+      };
       console.log('Nachricht aktualisiert:', this.messagesData[index]);
     } else {
       console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
       this.messagesData.push(updatedMessage);
     }
-  
   }
 
   async ensureMessagesLoaded(): Promise<void> {
@@ -376,6 +382,24 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
 
+  formatMentions(text: string): SafeHtml {
+    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name ? user.name.trim().toLowerCase() : ''
+    );
+    
+    const formattedText = text.replace(regex, (match) => {
+      const mentionName = match.substring(1).trim().toLowerCase();
+      if (normalizedUserNames.includes(mentionName)) {
+        return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
+      }
+      return match;
+    });
+    return this.sanitizer.bypassSecurityTrustHtml(formattedText);
+  }
+  
+  
+
   focusInputField(): void {
     if (this.inputFieldComponent) {
       this.inputFieldComponent.focusInputField();
@@ -417,15 +441,18 @@ export class ChatComponent implements OnInit, OnChanges {
   saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
     const messageRef = doc(this.firestore, 'messages', message.id);
-  
+
     if (this.editableMessageText.trim() === '') {
       // Nachricht löschen
       deleteDoc(messageRef).then(() => {
         console.log('Nachricht gelöscht:', message.id);
-  
+
         // Änderungen über den Service weitergeben
-        this.threadControlService.setEditedMessage({ id: message.id, deleted: true });
-  
+        this.threadControlService.setEditedMessage({
+          id: message.id,
+          deleted: true,
+        });
+
         this.editMessageId = null;
         this.isFirstClick = true;
         this.checkEditbox = false;
@@ -436,18 +463,18 @@ export class ChatComponent implements OnInit, OnChanges {
         text: this.editableMessageText,
         editedTextShow: true,
       };
-  
+
       updateDoc(messageRef, editMessage).then(() => {
         console.log('Nachricht bearbeitet:', message.id);
-  
+
         // Änderungen über den Service weitergeben
         const updatedMessage = { id: message.id, ...editMessage };
         this.threadControlService.setEditedMessage(updatedMessage);
-  
+
         this.editMessageId = null;
         this.checkEditbox = false;
         this.isFirstClick = true;
-  
+
         // Optional: Scrollen nach Bearbeitung
         setTimeout(() => {
           this.shouldScroll = true;
@@ -455,7 +482,6 @@ export class ChatComponent implements OnInit, OnChanges {
       });
     }
   }
-  
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;
@@ -501,28 +527,43 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   messageData(
-    senderStickerCount: number,
-    recipientStickerCount: number
+    chatMessage: string,
+    senderStickerCount: number = 0,
+    recipientStickerCount: number = 0
   ): SendMessageInfo {
-    let recipientId = this.selectedUser.id;
-    let recipientName = this.selectedUser.name;
+    const recipientId = this.selectedUser?.id;
+    const recipientName = this.selectedUser?.name;
+    const formattedText = chatMessage.replace(/@([\w\-_!$*]+)/g, (match) => {
+      const mentionName = match.substring(1).trim().toLowerCase();
+      const normalizedUserNames = this.getAllUsersName.map((name) =>
+        name.trim().toLowerCase()
+      );
+  
+      if (normalizedUserNames.includes(mentionName)) {
+        return `<span class="mention-message">${match}</span>`;
+      }
+      return match;
+    });
+  
     return {
-      text: this.chatMessage,
+      text: chatMessage,
       senderId: this.global.currentUserData.id,
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
-      recipientId,
-      recipientName,
+      recipientId: recipientId,
+      recipientName: recipientName,
       timestamp: new Date(),
       senderSticker: '',
-      senderStickerCount: senderStickerCount || 1,
+      senderStickerCount,
       recipientSticker: '',
-      recipientStickerCount: recipientStickerCount || 1,
+      recipientStickerCount,
       senderchoosedStickereBackColor: '',
       recipientChoosedStickerBackColor: '',
       stickerBoxCurrentStyle: null,
       stickerBoxOpacity: null,
-      selectedFiles: [],
+      selectedFiles: this.selectFiles,
+      editedTextShow: false,
+      formattedText: formattedText
     };
   }
 
@@ -556,9 +597,22 @@ export class ChatComponent implements OnInit, OnChanges {
             this.messagesData = [];
             querySnapshot.forEach((doc) => {
               const messageData = doc.data();
+      
+              // Sicherstellen, dass selectedUser und currentUserData verfügbar sind
+              if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
+                console.warn('Selected user or current user data is not available.');
+                return;
+              }
+      
               if (messageData['timestamp'] && messageData['timestamp'].toDate) {
                 messageData['timestamp'] = messageData['timestamp'].toDate();
               }
+      
+              // Mentions formatieren
+              messageData['formattedText'] = this.formatMentions(
+                messageData['text']
+              );
+      
               // Filtere nur Nachrichten zwischen currentUser und selectedUser
               if (
                 (messageData['senderId'] === this.global.currentUserData.id &&
@@ -569,6 +623,8 @@ export class ChatComponent implements OnInit, OnChanges {
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
+      
+            // Nachbearbeitung
             await this.updateMessagesWithNewPhoto();
             await this.subscribeToThreadAnswers();
             this.messagesData.sort(
@@ -587,7 +643,7 @@ export class ChatComponent implements OnInit, OnChanges {
         (error) => {
           console.error('Error in onSnapshot:', error);
         }
-      );
+      );      
     } catch (error) {
       console.error('Error initializing messages query:', error);
     }
@@ -686,19 +742,22 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  splitMessage(text: string) {
-    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
-    return text.split(regex);
+  splitMessage(text: string): string[] {
+    const regex = /(@[\w\-_!$*]+)/g;
+    const parts = text.split(regex);
+    const cleanedParts = parts.map(part => part.trim()).filter(part => part.length > 0);
+    return cleanedParts;
   }
+  
+  
 
-  isMention(part: string): boolean {
-    if (!part.startsWith('@')) {
-      return false;
-    }
-    const mentionName = part.substring(1);
-    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  isMention(text: string): boolean {
+    const regex = /^@[\w\-_!$*]+$/;
+    const isMention = regex.test(text.trim());
+    return isMention;
   }
-
+  
+  
   closeMentionBoxHandler() {
     this.wasClickedChatInput = false;
   }
@@ -707,34 +766,67 @@ export class ChatComponent implements OnInit, OnChanges {
     this.wasClickedChatInput = true;
   }
 
+  handleClickOnMention(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('mention-message')) {
+      const mentionName = target.textContent?.trim();
+      if (mentionName) {
+        if (this.getAllUsersName.length === 0) {
+          console.warn('Mentions-Daten sind noch nicht geladen.');
+          return;
+        }
+        this.handleMentionClick(mentionName);
+      }
+    }
+  }
+  
+  
   async handleMentionClick(mention: string) {
     this.wasClickedChatInput = true;
-    const cleanName = mention.substring(1);
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.global.getUserByName = {};
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const dataUserName = dataUser['name'];
-        if (dataUserName === cleanName) {
-          this.global.getUserByName = { id: doc.id, ...dataUser };
-        }
-        this.global.openMentionMessageBox = true;
-      });
-    });
-  }
+    const cleanName = mention.substring(1).trim().toLowerCase();
+    const user = await this.ensureUserDataLoaded(cleanName);
+  
+    if (!user) {
+      return;
+    }
+    this.global.getUserByName = user;
+    this.global.openMentionMessageBox = true;
+}
 
-  async getAllUsersname() {
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.getAllUsersName = [];
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const userName = dataUser['name'];
-        this.getAllUsersName.push({ userName });
-      });
-    });
+async ensureUserDataLoaded(name: string): Promise<any> {
+  while (this.getAllUsersName.length === 0) {
+    await new Promise((resolve) => setTimeout(resolve, 100)); 
   }
+  const foundUser = this.getAllUsersName.find(
+    (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
+  );
+  if (!foundUser) {
+    console.warn('Benutzer nicht gefunden:', name);
+    return null;
+  }
+  return foundUser;
+}
+
+
+async getAllUsersname(): Promise<void> {
+  const userRef = collection(this.firestore, 'users');
+  return new Promise((resolve) => {
+      onSnapshot(userRef, (querySnapshot) => {
+          this.getAllUsersName = [];
+          querySnapshot.forEach((doc) => {
+              const dataUser = doc.data();
+              this.getAllUsersName.push({
+                  name: dataUser['name'],
+                  email: dataUser['email'],
+                  picture: dataUser['picture'] || 'assets/img/default-avatar.png',
+                  id: doc.id,
+              });
+          });
+          resolve();
+      });
+  });
+}
+
 
   scrollHeightInput: any;
 

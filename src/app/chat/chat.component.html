@@ -176,13 +176,16 @@
                               'card-content-user':
                                 message.senderId !== global.currentUserData.id
                             }">
-                                    <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                                        <span *ngIf="isMention(mentionName)" class="mention-message"
-                                            (click)="handleMentionClick(mentionName)">
-                                            {{ mentionName }}
-                                        </span>
-                                        <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
-                                    </ng-container>
+                                    <div (click)="handleClickOnMention($event)" class="text-container">
+                                        <ng-container *ngFor="let mentionName of splitMessage(message.text)">
+                                            <span *ngIf="isMention(mentionName)" class="mention-message"
+                                                (click)="handleMentionClick(mentionName)">
+                                                {{ mentionName }}
+                                            </span>
+                                            <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                                        </ng-container>
+                                    </div>
+
                                 </mat-card-content>
 
                             </mat-card>
@@ -404,9 +407,8 @@
                 </div>
 
             </div>
-            <app-channel-chat [inputMessagesData]="messagesData"
-            (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
-            [selectedChannel]="selectedChannel"></app-channel-chat>
+            <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
+                *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
             <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText && !hasMessagesValue">
                 <div class="self-name-and-img">
                     <img class="self-chat-img" src={{global.currentUserData.picture}}>

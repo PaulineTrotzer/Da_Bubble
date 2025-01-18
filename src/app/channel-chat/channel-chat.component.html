@@ -83,9 +83,9 @@
             </div>
 
             <div class="text-content">
-              <div class="text">
+              <div class="text" (click)="handleClickOnMention($event)">
                 <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                  <span *ngIf="isMention(mentionName)" [ngClass]="'mention-message'"
+                  <span *ngIf="isMention(mentionName)" class="mention-message"
                     (click)="handleMentionClick(mentionName)">
                     {{ mentionName }}
                   </span>

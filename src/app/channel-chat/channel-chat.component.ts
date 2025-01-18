@@ -32,8 +32,10 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface Message {
+  formattedText: any;
   id: string;
   senderId: string;
   text: string;
@@ -104,8 +106,9 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   auth = inject(Auth);
   cdr = inject(ChangeDetectorRef);
   @ViewChild('messageContainer') messageContainer!: ElementRef;
-  shouldScroll = true; 
-  userChannelSelectService =inject(UserChannelSelectService);
+  shouldScroll = true;
+  userChannelSelectService = inject(UserChannelSelectService);
+  sanitizer = inject(DomSanitizer);
 
   constructor(private elRef: ElementRef) {}
 
@@ -125,9 +128,8 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-/*     this.scrollToBottom(); */
+    /*     this.scrollToBottom(); */
   }
-
 
   scrollToBottom(): void {
     if (this.messageContainer && this.messageContainer.nativeElement) {
@@ -144,8 +146,8 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
       console.log('Input Nachrichten geändert:', this.inputMessagesData);
       this.messagesData = this.inputMessagesData;
-      this.shouldScroll = true; 
-      this.loadUserNames(); 
+      this.shouldScroll = true;
+      this.loadUserNames();
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       debugger;
@@ -171,53 +173,81 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     this.enterChatFromChannel.emit(user);
   }
 
-  async getAllUsersname() {
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.getAllUsersName = [];
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        if (dataUser) {
-          const userName = dataUser['name'];
-          const userPicture = dataUser['profilePicture'];
-          this.getAllUsersName.push({ userName, userPicture });
+  handleClickOnMention(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('mention-message')) {
+      const mentionName = target.textContent?.trim();
+      if (mentionName) {
+        if (this.getAllUsersName.length === 0) {
+          console.warn('Mentions-Daten sind noch nicht geladen.');
+          return;
         }
+        this.handleMentionClick(mentionName);
+      }
+    }
+  }
+
+  async getAllUsersname(): Promise<void> {
+    const userRef = collection(this.firestore, 'users');
+    return new Promise((resolve) => {
+      onSnapshot(userRef, (querySnapshot) => {
+        this.getAllUsersName = [];
+        querySnapshot.forEach((doc) => {
+          const dataUser = doc.data();
+          this.getAllUsersName.push({
+            name: dataUser['name'],
+            email: dataUser['email'],
+            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
+            id: doc.id,
+          });
+        });
+        resolve();
       });
     });
   }
 
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelInput = true;
-    const cleanName = mention.substring(1);
-    const userRef = collection(this.firestore, 'users');
-    onSnapshot(userRef, (querySnapshot) => {
-      this.global.getUserByName = {};
-      querySnapshot.forEach((doc) => {
-        const dataUser = doc.data();
-        const dataUserName = dataUser['name'];
-        if (dataUserName === cleanName) {
-          this.global.getUserByName = { id: doc.id, ...dataUser };
-        }
-        this.global.openMentionMessageBox = true;
-      });
-    });
+    const cleanName = mention.substring(1).trim().toLowerCase();
+    const user = await this.ensureUserDataLoaded(cleanName);
+
+    if (!user) {
+      return;
+    }
+    this.global.getUserByName = user;
+    this.global.openMentionMessageBox = true;
+  }
+
+  async ensureUserDataLoaded(name: string): Promise<any> {
+    while (this.getAllUsersName.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const foundUser = this.getAllUsersName.find(
+      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (!foundUser) {
+      console.warn('Benutzer nicht gefunden:', name);
+      return null;
+    }
+    return foundUser;
   }
 
   closeMentionBoxHandler() {
     this.wasClickedInChannelInput = false;
   }
 
-  splitMessage(text: string) {
-    const regex = /(@[\w\-_!$*]+(?:\s[\w\-_!$*]+)?)/g;
-    return text.split(regex);
+  splitMessage(text: string): string[] {
+    const regex = /(@[\w\-_!$*]+)/g;
+    const parts = text.split(regex);
+    const cleanedParts = parts
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0);
+    return cleanedParts;
   }
-
-  isMention(part: string): boolean {
-    if (!part.startsWith('@')) {
-      return false;
-    }
-    const mentionName = part.substring(1);
-    return this.getAllUsersName.some((user) => user.userName === mentionName);
+  isMention(text: string): boolean {
+    const regex = /^@[\w\-_!$*]+$/;
+    const isMention = regex.test(text.trim());
+    return isMention;
   }
 
   async loadUserNames() {
@@ -256,10 +286,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       console.warn('No channel selected');
       return;
     }
-
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
+  
     const messagesRef = collection(
       this.firestore,
       'channels',
@@ -267,20 +294,33 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       'messages'
     );
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, async (querySnapshot: any) => {
+    onSnapshot(q, (querySnapshot: any) => {
       this.messagesData = querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         if (data.timestamp && data.timestamp.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
+        data.formattedText = this.formatMentions(data.text);
+  
         return { id: doc.id, ...data };
       });
-      await this.updateMessagesWithNewPhoto();
-      if (this.shouldScroll) {
-        console.log('if erfüllt');
-      //  this.scrollToBottom();
-      }
     });
+  }
+  
+
+  formatMentions(text: string): SafeHtml {
+    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name ? user.name.trim().toLowerCase() : ''
+    );
+    const formattedText = text.replace(regex, (match) => {
+      const mentionName = match.substring(1).trim().toLowerCase();
+      if (normalizedUserNames.includes(mentionName)) {
+        return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
+      }
+      return match;
+    });
+    return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
   async updateMessagesWithNewPhoto() {
@@ -626,7 +666,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
         'messages',
         messageId
       );
-  
+
       if (this.messageToEdit.trim() === '') {
         await deleteDoc(messageDocRef);
       } else {
@@ -641,7 +681,6 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       console.error('Error saving edited message:', error);
     }
   }
-  
 
   cancelEdit() {
     this.showEditArea = null;

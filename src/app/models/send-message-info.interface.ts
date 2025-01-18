@@ -1,4 +1,5 @@
 export interface SendMessageInfo {
+  formattedText?: any;
   id?: string;
   text: string;
   senderId: string;
@@ -20,4 +21,5 @@ export interface SendMessageInfo {
   reactions?: { [emoji: string]: any }; 
   isParent?: boolean | false,
   parentThreadId?: string | null;
+
 }
