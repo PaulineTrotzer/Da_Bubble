@@ -147,51 +147,56 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
     return false;
   }
+
   async processSendMessage(): Promise<void> {
     if ((!this.chatMessage || this.chatMessage.trim().length === 0) && this.selectFiles.length === 0) {
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
     }
-  
-
     if (this.selectedChannel && !this.isChannelThreadOpen) {
-        await this.sendChannelMessage();
+      await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
-        await this.sendDirectThreadMessage();
-        await this.setMessageCount();
+      await this.sendDirectThreadMessage();
+      await this.setMessageCount();
     } else if (this.isChannelThreadOpen) {
-        await this.sendChannelThreadMessage();
+      await this.sendChannelThreadMessage();
     } else {
-        try {
-            const fileData = await this.uploadFilesToFirebaseStorage();
-
-            // Nachrichtendaten vorbereiten (kein formattedText hier)
-            const messageData = this.messageData(
-                this.chatMessage,
-                this.senderStickerCount,
-                this.recipientStickerCount
-            );
-            messageData.selectedFiles = fileData;
-
-            // Nachricht in Firestore speichern
-            const messagesRef = collection(this.firestore, 'messages');
-            const docRef = await addDoc(messagesRef, messageData);
-
-            // Nachricht in die lokale Liste einfügen
-            const messageWithId = { ...messageData, id: docRef.id };
-            this.messagesData.push(messageWithId);
-
-            // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
-            await this.setMessageCount();
-            this.messageSent.emit();
-            this.chatMessage = '';
-            this.formattedChatMessage = '';
-            this.selectFiles = [];
-        } catch (error) {
-            console.error('Fehler beim Senden der Nachricht:', error);
-        }
+      try {
+        const fileData = await this.uploadFilesToFirebaseStorage();
+  
+        // Nachrichtendaten vorbereiten (ohne unnötige Felder)
+        const messageData = this.messageData(
+          this.chatMessage,
+          this.senderStickerCount,
+          this.recipientStickerCount
+        );
+  
+        // Nur URL und Typ in `selectedFiles` speichern
+        messageData.selectedFiles = fileData.map(file => ({
+          url: file.url,
+          type: file.type,
+        }));
+  
+        // Nachricht in Firestore speichern
+        const messagesRef = collection(this.firestore, 'messages');
+        const docRef = await addDoc(messagesRef, messageData);
+  
+        // Nachricht in die lokale Liste einfügen
+        const messageWithId = { ...messageData, id: docRef.id };
+        this.messagesData.push(messageWithId);
+  
+        // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
+        await this.setMessageCount();
+        this.messageSent.emit();
+        this.chatMessage = '';
+        this.formattedChatMessage = '';
+        this.selectFiles = [];
+      } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error);
+      }
     }
-}
+  }
+  
 
 
   async sendChannelThreadMessage() {

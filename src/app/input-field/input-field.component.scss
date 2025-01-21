@@ -174,19 +174,20 @@
   font-size: 18px !important;
 }
 
-.show-selected-files {
+/* .show-selected-files {
   display: flex;
   gap: 10px;
   margin-bottom: 5px;
-}
+  position: absolute;
+} */
 
 .file-info {
   display: flex;
-  width: 103px;
+  width: 105px;
   justify-content: center;
-  height: 59px;
+  height: 75px;
   align-items: center;
-  border-radius: 20px;
+  border-radius: 5%;
   cursor: pointer;
   &:hover {
     background-color: #eceefe;
