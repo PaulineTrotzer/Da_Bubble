@@ -9,6 +9,7 @@ import {
 import { MatCardModule } from '@angular/material/card';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { CommonModule } from '@angular/common';
+import { UserChannelSelectService } from '../services/user-channel-select.service';
 @Component({
   selector: 'app-mention-message-box',
   standalone: true,
@@ -22,6 +23,7 @@ export class MentionMessageBoxComponent implements OnInit {
   @Output() closeMentionBox = new EventEmitter<void>();
   @Input() mention: string = '';
   @Output() cancelMessageBoxCard = new EventEmitter<any>();
+  userChannelSelectService =inject(UserChannelSelectService);
 
   ngOnInit(): void {}
 
@@ -38,6 +40,7 @@ export class MentionMessageBoxComponent implements OnInit {
   }
   enterChat(user: any) {
     this.enterChatUser.emit(user);
+    this.userChannelSelectService.setSelectedUser(user);
     this.closeMentionBox.emit(); 
   }
 }

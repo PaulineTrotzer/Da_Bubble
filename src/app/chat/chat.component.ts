@@ -172,9 +172,8 @@ export class ChatComponent implements OnInit, OnChanges {
     );
 
     this.threadControlService.editedMessage$
-      .pipe(filter((message: any) => !!message)) // Nur wenn eine Nachricht vorhanden ist
+      .pipe(filter((message: any) => !!message)) 
       .subscribe((updatedMessage) => {
-        console.log('Änderung erhalten im Chat:', updatedMessage);
         this.updateMessage(updatedMessage);
       });
     this.workspaceSubscription.add(

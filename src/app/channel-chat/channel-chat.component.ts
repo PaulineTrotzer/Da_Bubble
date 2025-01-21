@@ -253,6 +253,8 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
     return normalizedUserNames.includes(mentionName);
   }
+
+  
   async loadUserNames() {
     try {
       const auth = getAuth();

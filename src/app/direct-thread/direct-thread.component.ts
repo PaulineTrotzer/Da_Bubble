@@ -394,7 +394,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
   
   async saveOrDeleteMessage(message: SendMessageInfo) {
-    debugger;
     try {
       if (!message || !message.id) {
         console.error('Invalid message object passed to saveOrDeleteMessage');
