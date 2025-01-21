@@ -148,10 +148,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
   async processSendMessage(): Promise<void> {
-    if (!this.chatMessage || this.chatMessage.trim().length === 0) {
-        console.warn('Leere Nachricht kann nicht gesendet werden.');
-        return;
+    if ((!this.chatMessage || this.chatMessage.trim().length === 0) && this.selectFiles.length === 0) {
+      console.warn('Leere Nachricht kann nicht gesendet werden.');
+      return;
     }
+  
 
     if (this.selectedChannel && !this.isChannelThreadOpen) {
         await this.sendChannelMessage();
