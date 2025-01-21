@@ -66,7 +66,7 @@
                     (click)="handleMentionClick(mentionName)">
                     {{ mentionName }}
                   </span>
-                  <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                  <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
                 </ng-container>
               </div>
               <div *ngIf="message.editedTextShow" class="text-info-edit-chatpartner">
@@ -195,7 +195,7 @@
                       <div *ngIf="message.editedTextShow" class="text-info-edit">
                         (Bearbeitet)
                       </div>
-                      <span *ngIf="!isMention(mentionName)">
+                      <span class="only-name" *ngIf="!isMention(mentionName)">
                         {{ mentionName }}
                       </span>
                     </ng-container>

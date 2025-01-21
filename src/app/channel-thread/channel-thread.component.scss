@@ -5,6 +5,10 @@
   justify-content: space-between;
 }
 
+.only-name{
+  margin: 0 2px;
+}
+
 .thread {
   max-height: 730px;
   overflow: auto;
@@ -408,7 +412,6 @@ header {
 
 .topic-area {
   position: relative;
-  bottom: 20px;
 }
 
 .textarea-wrapper {

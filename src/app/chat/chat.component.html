@@ -162,7 +162,7 @@
                                 }} Uhr</span>
                             <span class="sender-name">{{ message.senderName }}</span>
                         </div>
-                        <div *ngIf="message.text.trim()!==''" class="message-area">
+                        <div *ngIf="message.text && message.text.trim() !== ''" class="message-area">
                             <mat-card [ngClass]="{
                             'message-card-current':
                               message.senderId === global.currentUserData.id,
@@ -182,7 +182,7 @@
                                                 (click)="handleMentionClick(mentionName)">
                                                 {{ mentionName }}
                                             </span>
-                                            <span *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                                            <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
                                         </ng-container>
                                     </div>
 

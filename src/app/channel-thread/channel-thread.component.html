@@ -150,7 +150,7 @@
                 (click)="handleMentionClick(mentionName)">
                 {{ mentionName }}
               </span>
-              <span *ngIf="!isMention(mentionName)">
+              <span class="only-name" *ngIf="!isMention(mentionName)">
                 {{ mentionName }}
               </span>
             </ng-container>
@@ -300,7 +300,7 @@
                 (click)="handleMentionClick(mentionName)">
                 {{ mentionName }}
               </span>
-              <span *ngIf="!isMention(mentionName)">
+              <span class="only-name" *ngIf="!isMention(mentionName)">
                 {{ mentionName }}
               </span>
             </ng-container>

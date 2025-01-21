@@ -189,12 +189,13 @@ export class ChannelThreadComponent implements OnInit {
     return cleanedParts;
   }
 
-  isMention(text: string): boolean {
-    const regex = /^@[\w\-_!$*]+$/;
-    const isMention = regex.test(text.trim());
-    return isMention;
+  isMention(textPart: string): boolean {
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name.trim().toLowerCase()
+    );
+    const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
+    return normalizedUserNames.includes(mentionName);
   }
-
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelThread = true;
     const cleanName = mention.substring(1).trim().toLowerCase();

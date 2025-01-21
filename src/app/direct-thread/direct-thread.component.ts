@@ -354,11 +354,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       .filter((part) => part.length > 0);
     return cleanedParts;
   }
-  
-  isMention(text: string): boolean {
-    const regex = /^@[\w\-_!$*]+$/;
-    const isMention = regex.test(text.trim());
-    return isMention;
+
+  isMention(textPart: string): boolean {
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name.trim().toLowerCase()
+    );
+    const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
+    return normalizedUserNames.includes(mentionName);
   }
 
   async getAllUsersname(): Promise<void> {
@@ -390,6 +392,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   onCancelMessageBox(): void {
     this.wasClickedInDirectThread = false;
   }
+  
   async saveOrDeleteMessage(message: SendMessageInfo) {
     debugger;
     try {

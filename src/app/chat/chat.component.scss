@@ -2,6 +2,10 @@
   border-style: none;
 }
 
+.only-name{
+  margin: 0 2px;
+}
+
 .scroll-container {
   display: flex;
   flex-direction: column;
@@ -11,6 +15,13 @@
   scroll-behavior: smooth !important;
   position: relative;
 }
+
+.message-preview {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 
 
 .click-overlay {
@@ -691,6 +702,7 @@ app-input-field {
   cursor: pointer;
   &:hover {
     color: red;
+    cursor: pointer;
   }
 }
 
