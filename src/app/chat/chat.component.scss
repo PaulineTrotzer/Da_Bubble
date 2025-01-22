@@ -299,6 +299,9 @@ app-input-field {
 }
 
 .card-content-current {
+  display: flex;
+  width: fit-content;
+  height: fit-content;
   position: relative;
   font-size: 18px;
   font-weight: 400;
@@ -717,19 +720,16 @@ app-mention-message-box {
 }
 
 .show-selected-files {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  position: absolute;
-  left: 15%;
+  max-height: 86px;
+  max-width: 88px;
 }
 
 .file-info {
   img {
-    width: 100px;
-    height: 100px;
+    width: 92px;
+    height: 87px;
     border-radius: 100%;
+    object-fit: cover;
   }
   &:hover {
     img {

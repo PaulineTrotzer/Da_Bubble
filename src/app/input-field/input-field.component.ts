@@ -93,15 +93,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
-  console: any;
+  isPreviewActive: boolean = false;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
     }
-    console.log(
-      'InputField changes detected. currentComponentId:',
-      this.currentComponentId
-    );
   }
 
   focusInputField(): void {
@@ -131,15 +127,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
-      console.log('Updated activeComponentId from service:', id);
       this.cdr.detectChanges();
     });
-
-    // Beobachte die Dateien
-    /*    this.inputFieldService.selectFiles$.subscribe((files) => {
-      this.selectFiles = files;
-      console.log('Updated files from service:', files);
-    }); */
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -176,9 +165,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async processSendMessage(): Promise<void> {
+    const selectedFiles = this.inputFieldService.getFiles(
+      this.currentComponentId
+    );
+
     if (
       (!this.chatMessage || this.chatMessage.trim().length === 0) &&
-      this.selectFiles.length === 0
+      selectedFiles.length === 0
     ) {
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
@@ -192,16 +185,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
       await this.sendChannelThreadMessage();
     } else {
       try {
-        const fileData = await this.uploadFilesToFirebaseStorage();
+        // Dateien zu Firebase hochladen
+        const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
 
-        // Nachrichtendaten vorbereiten (ohne unnötige Felder)
+        // Nachrichtendaten vorbereiten
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
 
-        // Nur URL und Typ in `selectedFiles` speichern
+        // URLs und Typen der hochgeladenen Dateien hinzufügen
         messageData.selectedFiles = fileData.map((file) => ({
           url: file.url,
           type: file.type,
@@ -220,7 +214,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.messageSent.emit();
         this.chatMessage = '';
         this.formattedChatMessage = '';
-        this.selectFiles = [];
+
+        // Dateien im Service zurücksetzen
+        this.inputFieldService.updateFiles(this.currentComponentId, []);
       } catch (error) {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
@@ -259,16 +255,28 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
-    if (!this.isDirectThreadOpen || this.chatMessage.trim() === '') {
-      console.warn('Thread is not open or message is empty');
+    if (
+      !this.isDirectThreadOpen ||
+      (this.chatMessage.trim() === '' &&
+        this.inputFieldService.getFiles(this.currentComponentId).length === 0)
+    ) {
+      console.warn(
+        'Thread is not open or message is empty and no files are selected'
+      );
       return;
     }
     if (!this.currentThreadMessageId) {
       console.error('No current message selected.');
       return;
     }
-
     try {
+      const selectedFiles = this.inputFieldService.getFiles(
+        this.currentComponentId
+      );
+      let uploadedFiles: any[] = [];
+      if (selectedFiles.length > 0) {
+        uploadedFiles = await this.uploadFilesToFirebaseStorage(selectedFiles);
+      }
       const threadMessagesRef = collection(
         this.firestore,
         `messages/${this.currentThreadMessageId}/threadMessages`
@@ -279,16 +287,19 @@ export class InputFieldComponent implements OnInit, OnChanges {
         senderName: this.global.currentUserData.name,
         senderPicture: this.global.currentUserData.picture || '',
         timestamp: new Date(),
-        selectedFiles: this.selectFiles,
+        selectedFiles: uploadedFiles.map((file) => ({
+          url: file.url,
+          type: file.type,
+        })),
         editedTextShow: false,
         recipientId: this.selectedUser.uid,
         recipientName: this.selectedUser.name,
         reactions: '',
       };
       const docRef = await addDoc(threadMessagesRef, messageData);
-      /*       this.threadControlService.setLastMessageId(docRef.id); */
       this.resetInputdata();
       this.messageSent.emit();
+      this.inputFieldService.updateFiles(this.currentComponentId, []);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -327,19 +338,26 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  async uploadFilesToFirebaseStorage(): Promise<
-    { url: string; type: string }[]
-  > {
+  async uploadFilesToFirebaseStorage(
+    files: { data: string; type: string }[]
+  ): Promise<{ url: string; type: string }[]> {
     const storage = this.storage;
-    const uploadPromises = this.selectFiles.map(async (file, index) => {
+
+    const uploadPromises = files.map(async (file, index) => {
       const filePath = `uploads/${new Date().getTime()}_${index}_${
         file.type.split('/')[1]
       }`;
       const fileRef = ref(storage, filePath);
+
+      // Datei als Base64 (data_url) hochladen
       await uploadString(fileRef, file.data, 'data_url');
+
+      // URL der hochgeladenen Datei abrufen
       const url = await getDownloadURL(fileRef);
-      return { url, type: file.type, data: file.data };
+
+      return { url, type: file.type };
     });
+
     return await Promise.all(uploadPromises);
   }
 
@@ -359,7 +377,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.selectedChannel.id,
       'messages'
     );
-    const fileData = await this.uploadFilesToFirebaseStorage();
+    /*     const fileData = await this.uploadFilesToFirebaseStorage(); */
 
     const messageData = {
       text: this.chatMessage,
@@ -367,7 +385,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       senderName: this.global.currentUserData.name,
       senderPicture: this.global.currentUserData.picture || '',
       timestamp: new Date(),
-      selectedFiles: fileData,
+      /*       selectedFiles: fileData, */
       editedTextShow: false,
     };
     await addDoc(channelMessagesRef, messageData);
@@ -538,7 +556,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     );
   }
 
-
   onFileSelected(event: Event, componentId: string) {
     if (componentId !== 'chat') {
       console.error(
@@ -547,31 +564,27 @@ export class InputFieldComponent implements OnInit, OnChanges {
       );
       return;
     }
-
     this.inputFieldService.setActiveComponent(componentId);
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
+      this.isPreviewActive = true;
       const newFiles: any[] = [];
       Array.from(input.files).forEach((file) => {
         const reader = new FileReader();
         reader.onload = () => {
           const fileData = {
+            name: file.name,
             type: file.type,
             data: reader.result as string,
           };
           newFiles.push(fileData);
 
-          // Dateien für die übergebene Komponente aktualisieren
           const updatedFiles = [
             ...this.inputFieldService.getFiles(componentId),
             ...newFiles,
           ];
           this.inputFieldService.updateFiles(componentId, updatedFiles);
-          console.log(
-            'Files updated for component:',
-            componentId,
-            updatedFiles
-          );
+          console.log('Updated files for component:', updatedFiles);
         };
         reader.readAsDataURL(file);
       });
@@ -587,10 +600,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       );
       return;
     }
-    console.log('onFileSelected - Current ID:', componentId);
     this.inputFieldService.setActiveComponent('direct-thread');
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
+      this.isPreviewActive = true;
       const newFiles: any[] = [];
       Array.from(input.files).forEach((file) => {
         const reader = new FileReader();
@@ -607,11 +620,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
             ...newFiles,
           ];
           this.inputFieldService.updateFiles(componentId, updatedFiles);
-          console.log(
-            'Files updated for component:',
-            componentId,
-            updatedFiles
-          );
         };
         reader.readAsDataURL(file);
       });
@@ -631,7 +639,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.inputFieldService.setActiveComponent(this.currentComponentId);
   } */
 
-  deleteFile(index: number) {
+/*   deleteFile(index: number) {
     this.selectFiles.splice(index, 1);
-  }
+    this.isPreviewActive = this.selectFiles.length > 0;
+    this.cdr.detectChanges();
+    console.log('isPreviewActive:', this.isPreviewActive, 'selectFiles:', this.selectFiles);
+  } */
 }

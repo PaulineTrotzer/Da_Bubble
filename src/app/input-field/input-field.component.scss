@@ -23,12 +23,11 @@
   scrollbar-width: none;
   max-height: 250px;
   word-wrap: break-word;
-
+  z-index: 4;
   &:focus {
     border-color: #444df2;
     outline: none;
   }
-
 
   &::placeholder {
     font-style: italic;
@@ -55,6 +54,7 @@
   border-bottom-left-radius: 22px;
   background-color: #ffffff;
   height: 39px;
+  z-index: 10;
 }
 
 .only-interactions-bottom-ct {
@@ -89,8 +89,8 @@
   transition: all 0.2s ease-in-out;
   &:hover {
     transform: scale(1.05);
-    filter: brightness(0) saturate(100%) invert(14%) sepia(70%)
-      saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
+    filter: brightness(0) saturate(100%) invert(14%) sepia(70%) saturate(4200%)
+      hue-rotate(210deg) brightness(93%) contrast(105%);
   }
 }
 
@@ -136,9 +136,8 @@
   top: -421px;
 }
 
-
 .mention {
-  color: #444df2; 
+  color: #444df2;
 }
 
 .msg-send {
@@ -176,13 +175,16 @@
   font-size: 18px !important;
 }
 
-/* .show-selected-files {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 5px;
-  position: absolute;
-} */
+.chat-input-expanded {
+  height: 250px; /* Erweiterte Höhe */
+}
 
+.flex-preview {
+  width: 100%;
+  position: absolute;
+  justify-content: center;
+  display: flex;
+}
 
 .file-info {
   display: flex;

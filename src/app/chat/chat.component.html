@@ -162,13 +162,13 @@
                                 }} Uhr</span>
                             <span class="sender-name">{{ message.senderName }}</span>
                         </div>
-                        <div *ngIf="message.text && message.text.trim() !== ''" class="message-area">
-                            <mat-card [ngClass]="{
-                            'message-card-current':
-                              message.senderId === global.currentUserData.id,
-                            'message-card-user':
-                              message.senderId !== global.currentUserData.id
-                          }" appearance="outlined">
+                        <div>
+                            <mat-card
+                                *ngIf="(message.text && message.text.trim() !== '') || (message.selectedFiles && message.selectedFiles.length > 0)"
+                                [ngClass]="{
+                              'message-card-current': message.senderId === global.currentUserData.id,
+                              'message-card-user': message.senderId !== global.currentUserData.id
+                            }" appearance="outlined">
                                 <mat-card-content [ngClass]="{
                               'card-content-current':
                                 message.senderId === global.currentUserData.id,
@@ -185,8 +185,49 @@
                                             <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName
                                                 }}</span>
                                         </ng-container>
-                                    </div>
 
+                                    </div>
+                                </mat-card-content>
+
+                                <mat-card-content *ngIf="message.selectedFiles && message.selectedFiles.length > 0"
+                                    [ngClass]="{
+      'card-content-current': message.senderId === global.currentUserData.id,
+      'card-content-user': message.senderId !== global.currentUserData.id
+    }">
+                                    <div class="show-selected-files">
+                                        <div *ngFor="let file of message.selectedFiles">
+                                            <div class="mai-file" *ngIf="file.url">
+                                                <!-- Für Bilder -->
+                                                <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                                                    <a [href]="file.url" target="_blank">
+                                                        <img [src]="file.url" alt="Image File" />
+                                                    </a>
+                                                </div>
+
+                                                <!-- Für PDFs -->
+                                                <div class="file-info" *ngIf="file.type === 'application/pdf'">
+                                                    <a [href]="file.url" target="_blank">
+                                                        <img src="../../assets/img/pdf.png" alt="PDF File" />
+                                                    </a>
+                                                </div>
+
+                                                <!-- Für Textdateien -->
+                                                <div class="file-info" *ngIf="file.type === 'text/plain'">
+                                                    <a [href]="file.url" target="_blank">
+                                                        <img src="../../assets/img/textfile.png" alt="Text File" />
+                                                    </a>
+                                                </div>
+
+                                                <!-- Für andere Dateitypen -->
+                                                <div class="file-info"
+                                                    *ngIf="!file.type.startsWith('image/') && file.type !== 'application/pdf' && file.type !== 'text/plain'">
+                                                    <a [href]="file.url" target="_blank">
+                                                        <img src="../../assets/img/alldatei.png" alt="Other File" />
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </mat-card-content>
 
                             </mat-card>
@@ -372,36 +413,6 @@
 
 
 
-                        <div class="show-selected-files">
-                            <div *ngFor="let file of message.selectedFiles">
-                                <div class="mai-file" *ngIf="file.url">
-
-                                    <div class="file-info" *ngIf="file.type.startsWith('image/')">
-                                        <a [href]="file.url" target="_blank">
-                                            <img [src]="file.data">
-                                        </a>
-                                    </div>
-
-                                    <div class="file-info" *ngIf="file.type==='application/pdf'">
-                                        <a [href]="file.url" target="_blank">
-                                            <img src="../../assets/img/pdf.png">
-                                        </a>
-                                    </div>
-                                    <div class="file-info" *ngIf="file.type==='text/plain'">
-                                        <a [href]="file.url" target="_blank">
-                                            <img src="../../assets/img/textfile.png">
-                                        </a>
-                                    </div>
-
-                                    <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
-                                file.type !== 'application/pdf' && file.type!== 'text/plain'">
-                                        <a [href]="file.url" target="_blank">
-                                            <img src="../../assets/img/alldatei.png">
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
                     <!--       </div> -->
@@ -436,8 +447,8 @@
             </div>
         </div>
     </div>
-    <app-input-field [currentComponentId]="'chat'"
-        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
-        [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
+    <app-input-field [currentComponentId]="'chat'" (mentionCardOpened)="handleMentionCardOpened($event)"
+        [selectedChannel]="selectedChannel" [selectedUser]="selectedUser"
+        (messageSent)="onMessageSent()"></app-input-field>
 
 </div>

@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class InputfieldService {
-  private activeComponentId = new BehaviorSubject<string>(''); // Keine Standard-ID
+  private activeComponentId = new BehaviorSubject<string>('');
   activeComponentId$ = this.activeComponentId.asObservable();
 
   private selectFiles = new BehaviorSubject<any[]>([]);
@@ -27,7 +27,7 @@ export class InputfieldService {
 
   updateFiles(componentId: string, files: any[]): void {
     this.filesByComponent[componentId] = files;
-    this.filesSubject.next(this.filesByComponent); // Aktualisiere den globalen Zustand
+    this.filesSubject.next(this.filesByComponent); 
   }
 
   getFiles(componentId: string): any[] {

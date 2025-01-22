@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputfieldService } from '../services/inputfield.service';
 
@@ -15,21 +15,16 @@ export class FilesPreviewComponent implements OnInit, OnDestroy {
   @Input() currentComponentId!: string;
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
+  @Output() previewUpdated = new EventEmitter<boolean>(); 
 
   ngOnInit(): void {
     console.log('cuurentCoompId', this.currentComponentId);
     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
-      console.log('Updated activeComponentId from service:', id);
     });
 
-    // Beobachte die Dateien
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectedFiles = filesByComponent[this.currentComponentId] || [];
-      console.log(
-        `Updated files for ${this.currentComponentId}:`,
-        this.selectedFiles
-      );
     });
   
   }
@@ -39,5 +34,6 @@ export class FilesPreviewComponent implements OnInit, OnDestroy {
   deleteFile(index: number) {
     this.selectedFiles.splice(index, 1); // Entferne die Datei lokal
     this.inputFieldService.updateFiles(this.currentComponentId, this.selectedFiles); // Aktualisiere die Dateien im Service
+    this.previewUpdated.emit(this.selectedFiles.length > 0); // Emitte den neuen Status
   }
 }

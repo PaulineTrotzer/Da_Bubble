@@ -3,18 +3,22 @@
   <div class="main-input-area">
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
-    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" type="text" [(ngModel)]="chatMessage"
-      (input)=" onInput($event)" (keydown)="sendMessage($event)" #inputField>
-  </textarea>
+    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input"
+      [ngClass]="{ 'chat-input-expanded': isPreviewActive }" [(ngModel)]="chatMessage" (input)="onInput($event)"
+      (keydown)="sendMessage($event)" #inputField></textarea>
+    <div class="flex-preview"
+      *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
+      <app-files-preview (previewUpdated)="isPreviewActive = $event"
+        [currentComponentId]="currentComponentId"></app-files-preview>
+    </div>
+    <div class="flex-preview" *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
+      <app-files-preview (previewUpdated)="isPreviewActive = $event"
+        [currentComponentId]="currentComponentId"></app-files-preview>
+    </div>
   </div>
 
 
-  <div *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
-    <app-files-preview [currentComponentId]="currentComponentId"></app-files-preview>
-  </div>
-  <div *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
-    <app-files-preview [currentComponentId]="currentComponentId"></app-files-preview>
-  </div>
+
 
 
   <div class="interactions-send-msg-ct">
@@ -23,29 +27,24 @@
 
         <div>
           <div *ngIf="currentComponentId === 'direct-thread'">
-            <!-- Verstecktes Input -->
+
             <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, currentComponentId)" hidden />
 
-            <!-- Label mit eingebettetem Image -->
+
             <label for="upload-thread">
               <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Direct Thread" />
             </label>
           </div>
 
           <div *ngIf="currentComponentId === 'chat'">
-            <!-- Verstecktes Input -->
+
             <input type="file" id="upload-chat" (change)="onFileSelected($event, currentComponentId)" hidden />
 
-            <!-- Label mit eingebettetem Image -->
             <label for="upload-chat">
               <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
             </label>
           </div>
         </div>
-
-
-
-
 
         <img src="./assets/img/vector_4.svg">
       </div>

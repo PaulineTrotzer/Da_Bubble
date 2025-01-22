@@ -927,7 +927,9 @@ async getAllUsersname(): Promise<void> {
       this.isEmojiPickerVisible = false;
       this.messageIdHovered = null;
     }
+    const chatMessage = message.chatMessage || '';
     const messageData = this.messageData(
+      chatMessage,
       message.senderStickerCount,
       message.recipientStickerCount
     );
