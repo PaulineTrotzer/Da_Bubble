@@ -4,64 +4,51 @@
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
     <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" type="text" [(ngModel)]="chatMessage"
-      (input)=" onInput($event)" (keydown)="sendMessage($event)"  #inputField>
+      (input)=" onInput($event)" (keydown)="sendMessage($event)" #inputField>
   </textarea>
   </div>
 
 
-  <div class="show-selected-files">
-    <div *ngFor="let file of selectFiles; let i=index">
-
-      <div class="file-info" *ngIf="file.type.startsWith('image/')">
-        <div class="file-box">
-          <img [src]="file.data">
-          <div class="delet-box" (click)="deleteFile(i)">
-            <span class="delete-span">x</span>
-          </div>
-        </div>
-      </div>
-      <div class="file-info" *ngIf="file.type==='application/pdf' ">
-        <div class="file-box">
-          <img src="../../assets/img/pdf.png">
-          <div class="delet-box" (click)="deleteFile(i)">
-            <span class="delete-span">x</span>
-          </div>
-        </div>
-      </div>
-      <div class="file-info" *ngIf="file.type==='text/plain'">
-        <div class="file-box">
-          <img src="../../assets/img/textfile.png">
-          <div class="delet-box" (click)="deleteFile(i)">
-            <span class="delete-span">x</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="file-info-mix" *ngIf="!file.type.startsWith('image/')
-           &&  file.type !== 'application/pdf' && file.type!=='text/plain'">
-        <div class="file-box">
-          <img src="../../assets/img/alldatei.png">
-          <div class="mix-file">
-            <span class="delete-span" (click)="deleteFile(i)">x</span>
-            <span>{{file.type}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
+    <app-files-preview [currentComponentId]="currentComponentId"></app-files-preview>
   </div>
+  <div *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
+    <app-files-preview [currentComponentId]="currentComponentId"></app-files-preview>
+  </div>
+
 
   <div class="interactions-send-msg-ct">
     <div class="only-interactions-bottom-ct">
       <div class="plus-separator-flex">
+
         <div>
-          <div>
-            <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
-            <label for="upload"> <img class="plus" src="./assets/img/add.svg"></label>
+          <div *ngIf="currentComponentId === 'direct-thread'">
+            <!-- Verstecktes Input -->
+            <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, currentComponentId)" hidden />
+
+            <!-- Label mit eingebettetem Image -->
+            <label for="upload-thread">
+              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Direct Thread" />
+            </label>
+          </div>
+
+          <div *ngIf="currentComponentId === 'chat'">
+            <!-- Verstecktes Input -->
+            <input type="file" id="upload-chat" (change)="onFileSelected($event, currentComponentId)" hidden />
+
+            <!-- Label mit eingebettetem Image -->
+            <label for="upload-chat">
+              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
+            </label>
           </div>
         </div>
 
+
+
+
+
+        <img src="./assets/img/vector_4.svg">
       </div>
-      <img src="./assets/img/vector_4.svg">
 
       <div class="emoji-at-ct">
         <div class="emoji-picker-container">
@@ -71,11 +58,12 @@
         </div>
         <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
       </div>
-      <app-people-mention (cardClosed)="handleCardClosed()"class="people-mention-card" *ngIf="isMentionPeopleCardVisible"
-        (mentionUser)="handleMentionUser($event)"></app-people-mention>
-    </div>
+      <app-people-mention (cardClosed)="handleCardClosed()" class="people-mention-card"
+        *ngIf="isMentionPeopleCardVisible" (mentionUser)="handleMentionUser($event)"></app-people-mention>
 
-    <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
+
+      <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
+    </div>
 
   </div>
 

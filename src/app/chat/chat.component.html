@@ -182,7 +182,8 @@
                                                 (click)="handleMentionClick(mentionName)">
                                                 {{ mentionName }}
                                             </span>
-                                            <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                                            <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName
+                                                }}</span>
                                         </ng-container>
                                     </div>
 
@@ -435,7 +436,8 @@
             </div>
         </div>
     </div>
-    <app-input-field (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
+    <app-input-field [currentComponentId]="'chat'"
+        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
         [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 
 </div>

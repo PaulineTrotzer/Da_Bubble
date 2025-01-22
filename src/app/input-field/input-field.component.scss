@@ -80,18 +80,20 @@
       background-color: #eceefe;
     }
   }
-  .plus {
-    width: 27px;
-    object-fit: cover;
-    height: auto;
-    transition: all 0.2s ease-in-out;
-    &:hover {
-      transform: scale(1.05);
-      filter: brightness(0) saturate(100%) invert(14%) sepia(70%)
-        saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
-    }
+}
+
+.plus {
+  width: 27px;
+  object-fit: cover;
+  height: auto;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.05);
+    filter: brightness(0) saturate(100%) invert(14%) sepia(70%)
+      saturate(4200%) hue-rotate(210deg) brightness(93%) contrast(105%);
   }
 }
+
 .emoji-at-ct {
   display: flex;
   align-items: center;
@@ -180,6 +182,7 @@
   margin-bottom: 5px;
   position: absolute;
 } */
+
 
 .file-info {
   display: flex;

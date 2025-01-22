@@ -40,11 +40,19 @@ import {
 } from '@angular/fire/storage';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { InputfieldService } from '../services/inputfield.service';
+import { FilesPreviewComponent } from '../files-preview/files-preview.component';
 
 @Component({
   selector: 'app-input-field',
   standalone: true,
-  imports: [CommonModule, PickerComponent, PeopleMentionComponent, FormsModule],
+  imports: [
+    CommonModule,
+    PickerComponent,
+    PeopleMentionComponent,
+    FormsModule,
+    FilesPreviewComponent,
+  ],
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
 })
@@ -83,10 +91,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   authService = inject(AuthService);
   @ViewChild('inputField', { static: true })
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
+  inputFieldService = inject(InputfieldService);
+  activeComponentId!: string;
+  console: any;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
     }
+    console.log(
+      'InputField changes detected. currentComponentId:',
+      this.currentComponentId
+    );
   }
 
   focusInputField(): void {
@@ -113,6 +128,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.currentChannelThreadId = messageId;
     });
     this.selectedChannel = this.global.currentChannel;
+
+    this.inputFieldService.activeComponentId$.subscribe((id) => {
+      this.activeComponentId = id;
+      console.log('Updated activeComponentId from service:', id);
+      this.cdr.detectChanges();
+    });
+
+    // Beobachte die Dateien
+    /*    this.inputFieldService.selectFiles$.subscribe((files) => {
+      this.selectFiles = files;
+      console.log('Updated files from service:', files);
+    }); */
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -149,7 +176,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async processSendMessage(): Promise<void> {
-    if ((!this.chatMessage || this.chatMessage.trim().length === 0) && this.selectFiles.length === 0) {
+    if (
+      (!this.chatMessage || this.chatMessage.trim().length === 0) &&
+      this.selectFiles.length === 0
+    ) {
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
     }
@@ -163,28 +193,28 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } else {
       try {
         const fileData = await this.uploadFilesToFirebaseStorage();
-  
+
         // Nachrichtendaten vorbereiten (ohne unnötige Felder)
         const messageData = this.messageData(
           this.chatMessage,
           this.senderStickerCount,
           this.recipientStickerCount
         );
-  
+
         // Nur URL und Typ in `selectedFiles` speichern
-        messageData.selectedFiles = fileData.map(file => ({
+        messageData.selectedFiles = fileData.map((file) => ({
           url: file.url,
           type: file.type,
         }));
-  
+
         // Nachricht in Firestore speichern
         const messagesRef = collection(this.firestore, 'messages');
         const docRef = await addDoc(messagesRef, messageData);
-  
+
         // Nachricht in die lokale Liste einfügen
         const messageWithId = { ...messageData, id: docRef.id };
         this.messagesData.push(messageWithId);
-  
+
         // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
         await this.setMessageCount();
         this.messageSent.emit();
@@ -196,8 +226,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       }
     }
   }
-  
-
 
   async sendChannelThreadMessage() {
     if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {
@@ -324,7 +352,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Channel is not selected or message is empty');
       return;
     }
-  
+
     const channelMessagesRef = collection(
       this.firestore,
       'channels',
@@ -332,7 +360,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       'messages'
     );
     const fileData = await this.uploadFilesToFirebaseStorage();
-  
+
     const messageData = {
       text: this.chatMessage,
       senderId: this.global.currentUserData.id,
@@ -351,31 +379,29 @@ export class InputFieldComponent implements OnInit, OnChanges {
     chatMessage: string,
     senderStickerCount: number = 0,
     recipientStickerCount: number = 0
-): SendMessageInfo {
+  ): SendMessageInfo {
     const recipientId = this.selectedUser?.id;
     const recipientName = this.selectedUser?.name;
     return {
-        text: chatMessage,
-        senderId: this.global.currentUserData.id,
-        senderName: this.global.currentUserData.name,
-        senderPicture: this.global.currentUserData.picture || '',
-        recipientId: recipientId,
-        recipientName: recipientName,
-        timestamp: new Date(),
-        senderSticker: '',
-        senderStickerCount,
-        recipientSticker: '',
-        recipientStickerCount,
-        senderchoosedStickereBackColor: '',
-        recipientChoosedStickerBackColor: '',
-        stickerBoxCurrentStyle: null,
-        stickerBoxOpacity: null,
-        selectedFiles: this.selectFiles,
-        editedTextShow: false
+      text: chatMessage,
+      senderId: this.global.currentUserData.id,
+      senderName: this.global.currentUserData.name,
+      senderPicture: this.global.currentUserData.picture || '',
+      recipientId: recipientId,
+      recipientName: recipientName,
+      timestamp: new Date(),
+      senderSticker: '',
+      senderStickerCount,
+      recipientSticker: '',
+      recipientStickerCount,
+      senderchoosedStickereBackColor: '',
+      recipientChoosedStickerBackColor: '',
+      stickerBoxCurrentStyle: null,
+      stickerBoxOpacity: null,
+      selectedFiles: this.selectFiles,
+      editedTextShow: false,
     };
-}
-
-  
+  }
 
   getByUserName() {
     const docRef = collection(this.firestore, 'users');
@@ -404,8 +430,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       ) as HTMLTextAreaElement;
       if (textarea) {
         textarea.focus();
-        const position = this.chatMessage.length; 
-        textarea.setSelectionRange(position, position); 
+        const position = this.chatMessage.length;
+        textarea.setSelectionRange(position, position);
       }
     }
     this.mentionUserOut.emit(mention);
@@ -420,20 +446,19 @@ export class InputFieldComponent implements OnInit, OnChanges {
   updateFormattedMessage() {
     const regex = /(@[\w\-\*_!$]+)(?=\s|$)/g;
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim().toLowerCase(); 
+      const mentionName = match.substring(1).trim().toLowerCase();
       const normalizedUserNames = this.mentionUserName.map((name) =>
         name.trim().toLowerCase()
       );
-  
+
       if (normalizedUserNames.includes(mentionName)) {
         return `<span class="mention">${match.trim()}</span>`;
       } else {
-        return match.trim(); 
+        return match.trim();
       }
     });
     this.formattedMessage = this.formattedMessage.replace(/\s\s+/g, ' ');
   }
-  
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
@@ -513,24 +538,98 @@ export class InputFieldComponent implements OnInit, OnChanges {
     );
   }
 
-  onFileSelected(event: Event) {
+
+  onFileSelected(event: Event, componentId: string) {
+    if (componentId !== 'chat') {
+      console.error(
+        'onFileSelected called with wrong componentId in Chat:',
+        componentId
+      );
+      return;
+    }
+
+    this.inputFieldService.setActiveComponent(componentId);
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
+      const newFiles: any[] = [];
       Array.from(input.files).forEach((file) => {
         const reader = new FileReader();
         reader.onload = () => {
-          this.selectFiles.push({
+          const fileData = {
             type: file.type,
             data: reader.result as string,
-            preview: reader.result as string,
-          });
-          console.log(this.selectFiles);
+          };
+          newFiles.push(fileData);
+
+          // Dateien für die übergebene Komponente aktualisieren
+          const updatedFiles = [
+            ...this.inputFieldService.getFiles(componentId),
+            ...newFiles,
+          ];
+          this.inputFieldService.updateFiles(componentId, updatedFiles);
+          console.log(
+            'Files updated for component:',
+            componentId,
+            updatedFiles
+          );
         };
         reader.readAsDataURL(file);
       });
       input.value = '';
     }
   }
+
+  onFileSelectedThread(event: Event, componentId: string) {
+    if (componentId !== 'direct-thread') {
+      console.error(
+        'onFileSelectedThread called with wrong componentId: i  Thread',
+        componentId
+      );
+      return;
+    }
+    console.log('onFileSelected - Current ID:', componentId);
+    this.inputFieldService.setActiveComponent('direct-thread');
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const newFiles: any[] = [];
+      Array.from(input.files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const fileData = {
+            type: file.type,
+            data: reader.result as string,
+          };
+          newFiles.push(fileData);
+
+          // Dateien für die übergebene Komponente aktualisieren
+          const updatedFiles = [
+            ...this.inputFieldService.getFiles(componentId),
+            ...newFiles,
+          ];
+          this.inputFieldService.updateFiles(componentId, updatedFiles);
+          console.log(
+            'Files updated for component:',
+            componentId,
+            updatedFiles
+          );
+        };
+        reader.readAsDataURL(file);
+      });
+      input.value = '';
+    }
+  }
+
+  @Input() currentComponentId!: string;
+  @Output() inputFieldFocused = new EventEmitter<string>();
+
+  /*   onFocus() {
+    console.log('Focusing component with ID:', this.currentComponentId);
+    if (!this.currentComponentId) {
+      console.error('currentComponentId is undefined or empty!');
+      return;
+    }
+    this.inputFieldService.setActiveComponent(this.currentComponentId);
+  } */
 
   deleteFile(index: number) {
     this.selectFiles.splice(index, 1);

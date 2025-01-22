@@ -455,6 +455,6 @@
 
       </div>
       <div class="input-holder">
-        <app-input-field [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+        <app-input-field  [currentComponentId]="'direct-thread'"   (inputFieldFocused)="handleInputFieldFocused($event)" [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
       </div>
     </div>

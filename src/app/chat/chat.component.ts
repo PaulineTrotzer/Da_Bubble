@@ -234,6 +234,7 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.messagesData && this.messagesData.length > 0;
   }
 
+
   ngOnDestroy() {
     this.workspaceSubscription?.unsubscribe();
   }

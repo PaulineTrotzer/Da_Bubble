@@ -160,6 +160,14 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  activeComponentId: string = 'direct-thread';
+  handleInputFieldFocused(componentId: string): void {
+    console.log('InputField focused in component:', componentId);
+    this.activeComponentId = componentId; // Setze die aktive Komponente
+  }
+  
+
   handleClickOnMention(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target && target.classList.contains('mention-message')) {
