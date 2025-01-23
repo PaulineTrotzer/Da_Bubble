@@ -2,7 +2,7 @@
   border-style: none;
 }
 
-.only-name{
+.only-name {
   margin: 0 2px;
 }
 
@@ -21,8 +21,6 @@
   font-size: 14px;
   line-height: 1.5;
 }
-
-
 
 .click-overlay {
   position: absolute;
@@ -138,7 +136,7 @@ app-input-field {
 }
 
 .main-current-messagebox {
-    position: absolute;
+  position: absolute;
   top: 140px;
   width: 100%;
   max-height: 750px;
@@ -181,14 +179,14 @@ app-input-field {
 }
 
 .main-message-info-current.update-box {
-  opacity: 1;
+  opacity: 1; 
 }
 
 .main-message-info-user {
   width: 100%;
   position: relative;
   padding-top: 16px;
-  height: 192px;
+/*   height: 192px; */
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -229,20 +227,26 @@ app-input-field {
 }
 
 .message-content-current {
-  margin: 16px 145px;
+  margin: 16px auto 16px auto;
+
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  height: 160px;
+  max-width: 80%; /* Begrenze die maximale Breite */
+  word-wrap: break-word;
+  /*   height: 160px; */
 }
 
 .message-content-user {
-  margin: 16px 145px;
+  margin: 16px auto 16px auto;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 160px;
+  max-width: 80%; /* Begrenze die maximale Breite */
+  word-wrap: break-word;
+  /*   height: 160px; */
 }
 
 .current-name-box {
@@ -300,6 +304,7 @@ app-input-field {
 
 .card-content-current {
   display: flex;
+  justify-content: center;
   width: fit-content;
   height: fit-content;
   position: relative;
@@ -333,17 +338,18 @@ app-input-field {
   height: 70px;
   border-radius: 50px;
   object-fit: cover;
+  margin-right: 20px;
 }
 
 .picture-box-current {
   position: absolute;
-  right: 45px;
+  right: 60px;
   padding-top: 16px;
 }
 
 .picture-box-user {
   position: absolute;
-  left: 45px;
+  left: 60px;
   padding-top: 16px;
 }
 
@@ -539,12 +545,10 @@ app-input-field {
 
 .comment-sticker-holder {
   position: relative;
-  bottom: 13px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 
 .show-comment-stricker {
   position: relative;
@@ -562,7 +566,6 @@ app-input-field {
   }
 }
 
-
 .sticker-senderName-current {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 0;
@@ -574,29 +577,27 @@ app-input-field {
   position: absolute;
   width: fit-content;
   padding: 3px;
-  top: -400px;  
+  top: -400px;
   left: -40px;
-  opacity: 0;   
-  transition: opacity 0.4s ease-in-out;  
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
 }
 
 .sticker-senderName-current.hovered {
-  opacity: 1;    
-  z-index: 200;    
-  top: -120px;  
+  opacity: 1;
+  z-index: 200;
+  top: -120px;
 }
 
 .sticker-info-wrapper .hoveredSelectedUserReaction {
-  top: -110px;
-  left: -28px;
-  
+
+  left: 10px;
 }
 
 .sticker-info-wrapper .hoveredCurrentUserReaction {
-  top: -88px;
-  left: 5px;
+  bottom: -10px;
+/*   right: 5px; */
 }
-
 
 .sticker-senderName-current.hoveredRecipienUser {
   left: -38px;
@@ -615,22 +616,23 @@ app-input-field {
   width: fit-content;
   height: fit-content;
   display: flex;
-  left: 0;
+/*   left: 0; */
   opacity: 0;
   padding: 1px;
-  top: -400px; 
-  transition: opacity 0.4s ease-in-out;  
+/*   top: -400px; */
+  transition: opacity 0.4s ease-in-out;
 }
 
 .sticker-senderName-user.hovered {
   opacity: 1;
   z-index: 200;
-  top: -94px;
+  top: -50px;
+/*   left: 8px; */
 }
 
 .sticker-senderName-user.hoveredSenderName {
-  position: absolute;
-  top: -94px;
+/*   position: absolute;
+  bottom: -200px; */
 }
 
 .sticker-senderName-user.hoveredName {
@@ -654,7 +656,8 @@ app-input-field {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out, left 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out,
+    left 0.3s ease-in-out;
 }
 
 .sticker-info.hidden {
@@ -719,15 +722,25 @@ app-mention-message-box {
   right: 33%;
 }
 
+.file-name {
+  display: flex;
+  min-width: 150px;
+}
+
 .show-selected-files {
-  max-height: 86px;
-  max-width: 88px;
+  margin-top: 5px;
 }
 
 .file-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  gap: 8px;
   img {
-    width: 92px;
-    height: 87px;
+    display: flex;
+    width: 50px;
+    height: 40px;
     border-radius: 100%;
     object-fit: cover;
   }
@@ -780,34 +793,29 @@ app-mention-message-box {
   height: 40px;
 }
 
-.placeholder-thread-answer{
-  height: 40px;
+.placeholder-thread-answer {
+  height: 15px; /* Mindestens Platz für den Platzhalter */
   width: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .thread-answer-display {
   display: flex;
   gap: 5px;
   color: #444df2;
-  width: fit-content;
   font-weight: 500;
   font-size: 14px;
   height: auto;
-  opacity: 0;  /* Anfangszustand unsichtbar */
-  visibility: visible;  /* Sichtbar, aber unsichtbar durch Opazität */
-  position: relative;  /* Im Layoutfluss bleiben */
+  opacity: 0; /* Unsichtbar im Startzustand */
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-
-/* .hoveredOwnReaction{
-  left: -20px;
-} */
-
 .thread-answer-display.show {
-  opacity: 1;  /* Sichtbar machen */
+  opacity: 1; /* Sichtbar, wenn `.show` aktiv ist */
+  transform: translateY(0);
 }
-
 
 .thread-answer-display:hover {
   transform: scale(1.05);

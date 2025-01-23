@@ -150,7 +150,8 @@
             'message-content-current':
               message.senderId === global.currentUserData.id,
             'message-content-user':
-              message.senderId !== global.currentUserData.id
+              message.senderId !== global.currentUserData.id,
+              'message-content-with-files': message.selectedFiles?.length > 0
           }">
                         <div [ngClass]="{
               'current-name-box':
@@ -202,6 +203,7 @@
                                                     <a [href]="file.url" target="_blank">
                                                         <img [src]="file.url" alt="Image File" />
                                                     </a>
+                                                    <div class="file-name">{{ file.name }}</div>
                                                 </div>
 
                                                 <!-- Für PDFs -->
@@ -209,6 +211,7 @@
                                                     <a [href]="file.url" target="_blank">
                                                         <img src="../../assets/img/pdf.png" alt="PDF File" />
                                                     </a>
+                                                    <div class="file-name">{{ file.name }}</div>
                                                 </div>
 
                                                 <!-- Für Textdateien -->
@@ -216,6 +219,7 @@
                                                     <a [href]="file.url" target="_blank">
                                                         <img src="../../assets/img/textfile.png" alt="Text File" />
                                                     </a>
+                                                    <div class="file-name">{{ file.name }}</div>
                                                 </div>
 
                                                 <!-- Für andere Dateitypen -->
@@ -224,6 +228,7 @@
                                                     <a [href]="file.url" target="_blank">
                                                         <img src="../../assets/img/alldatei.png" alt="Other File" />
                                                     </a>
+                                                    <div class="file-name">{{ file.name }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -253,24 +258,27 @@
 
                         <div class="sticker-info-wrapper">
                             <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
-                          'sticker-senderName-current': message.senderId === global.currentUserData.id,
-                          'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
-                          'hovered': stickerHoverStates[message.id],  
-                          'hoveredSenderName': hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
-                          'hoveredName': hoveredName && message.recipientSticker !== message.senderSticker,
-                          'seperateName': message.recipientSticker !== '' && message.senderSticker === '',
-                          'hoveredRecipienUser': hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker,
-                          'sticker-senderName-current-bothReaction': message.senderId === global.currentUserData.id &&
-                            message.recipientName == selectedUser.name &&
-                            message.senderSticker !== '' &&
-                            message.recipientSticker !== '' && message.senderSticker == message.recipientSticker,
-                          'sticker-senderName-user': message.senderId !== global.currentUserData.id,
-                          'hoveredSelectedUserReaction': message.senderId === selectedUser.id && hoveredCurrentUser,
-                          'hoveredCurrentUserReaction': message.senderId === selectedUser.id && hoveredRecipienUser,
-                          'hoveredBothReaction': message.senderName === selectedUser.name &&
-                            message.senderSticker !== '' &&
-                            message.recipientSticker !== '' && message.senderSticker == message.recipientSticker
-                        }">
+    'sticker-senderName-current': message.senderId === global.currentUserData.id,
+    'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
+    'hovered': stickerHoverStates[message.id],  
+    'hoveredSenderName': hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
+    'hoveredName': hoveredName && message.recipientSticker !== message.senderSticker,
+    'seperateName': message.recipientSticker !== '' && message.senderSticker === '',
+    'hoveredRecipienUser': hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker,
+    'sticker-senderName-current-bothReaction': message.senderId === global.currentUserData.id &&
+      message.recipientName === selectedUser.name &&
+      message.senderSticker !== '' &&
+      message.recipientSticker !== '' &&
+      message.senderSticker === message.recipientSticker,
+    'sticker-senderName-user': message.senderId !== global.currentUserData.id &&
+      !(message.senderId === global.currentUserData.id), 
+    'hoveredSelectedUserReaction': message.senderId === selectedUser.id && hoveredCurrentUser,
+    'hoveredCurrentUserReaction': message.senderId === selectedUser.id && hoveredRecipienUser,
+    'hoveredBothReaction': message.senderName === selectedUser.name &&
+      message.senderSticker !== '' &&
+      message.recipientSticker !== '' &&
+      message.senderSticker === message.recipientSticker
+  }">
 
                                 <mat-card-content
                                     *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">

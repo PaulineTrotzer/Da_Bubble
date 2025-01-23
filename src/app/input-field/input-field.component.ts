@@ -140,6 +140,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   sendMessageClick(): void {
+    this.isPreviewActive = false;
     if (this.chatMessage.trim() === '' && this.selectFiles.length === 0) {
       console.warn('Keine Nachricht und keine Dateien zum Senden.');
       return;
@@ -199,6 +200,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         messageData.selectedFiles = fileData.map((file) => ({
           url: file.url,
           type: file.type,
+          name: file.name,
         }));
 
         // Nachricht in Firestore speichern
@@ -214,6 +216,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.messageSent.emit();
         this.chatMessage = '';
         this.formattedChatMessage = '';
+        this.isPreviewActive = false;
 
         // Dateien im Service zurücksetzen
         this.inputFieldService.updateFiles(this.currentComponentId, []);
@@ -339,8 +342,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async uploadFilesToFirebaseStorage(
-    files: { data: string; type: string }[]
-  ): Promise<{ url: string; type: string }[]> {
+    files: { data: string; type: string; name: string }[]
+  ): Promise<{
+    name: any; url: string; type: string 
+}[]> {
     const storage = this.storage;
 
     const uploadPromises = files.map(async (file, index) => {
@@ -354,8 +359,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
       // URL der hochgeladenen Datei abrufen
       const url = await getDownloadURL(fileRef);
-
-      return { url, type: file.type };
+      return {
+        url,
+        type: file.type,
+        name: file.name, // Hier den Namen hinzufügen
+      };
     });
 
     return await Promise.all(uploadPromises);
@@ -480,17 +488,27 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+
+    // Dynamische Größenanpassung nur ausführen, wenn keine Vorschau aktiv ist
+    if (!this.isPreviewActive) {
+      textarea.style.height = 'auto'; // Höhe zurücksetzen
+      textarea.style.height = `${textarea.scrollHeight}px`; // Dynamische Anpassung
+    } else {
+      textarea.style.height = '250px'; // Fixierte Höhe bei aktiver Vorschau
+    }
+
+    // Scrollen der Container synchronisieren
     const container = document.querySelector('.main-input-area') as HTMLElement;
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
+
     const containerh = document.querySelector('.highlight') as HTMLElement;
     if (containerh) {
       containerh.scrollTop = containerh.scrollHeight;
     }
-    this.updateFormattedMessage();
+
+    this.updateFormattedMessage(); // Aktualisiere das Highlighting
   }
 
   updateSelectedUser(newUser: any) {
@@ -639,7 +657,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.inputFieldService.setActiveComponent(this.currentComponentId);
   } */
 
-/*   deleteFile(index: number) {
+  /*   deleteFile(index: number) {
     this.selectFiles.splice(index, 1);
     this.isPreviewActive = this.selectFiles.length > 0;
     this.cdr.detectChanges();
