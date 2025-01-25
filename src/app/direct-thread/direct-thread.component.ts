@@ -363,12 +363,17 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.wasClickedInDirectThread = false;
   }
 
-  splitMessage(text: string): string[] {
+  splitMessage(text: string | undefined): string[] {
+    if (!text) {
+      return []; // Gib einen leeren Array zurück, wenn der Text nicht definiert ist
+    }
+  
     const regex = /(@[\w\-_!$*]+)/g;
     const parts = text.split(regex);
     const cleanedParts = parts
       .map((part) => part.trim())
       .filter((part) => part.length > 0);
+  
     return cleanedParts;
   }
 
