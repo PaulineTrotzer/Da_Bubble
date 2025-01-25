@@ -144,7 +144,8 @@
   width: 34px;
   align-self: center;
   margin-bottom: 4px;
-
+  position: absolute;
+  right: 0;
   &:hover {
     filter: brightness(1.8);
   }

@@ -160,13 +160,11 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     }
   }
 
-
   activeComponentId: string = 'direct-thread';
   handleInputFieldFocused(componentId: string): void {
     console.log('InputField focused in component:', componentId);
     this.activeComponentId = componentId; // Setze die aktive Komponente
   }
-  
 
   handleClickOnMention(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -211,7 +209,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         },
       });
   }
-  
 
   async updateThreadMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
@@ -237,7 +234,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         );
       }
     } else {
-      console.error('messagesData ist leer, keine Aktualisierung möglich.');
+      return;
     }
     this.messagesData = [...this.messagesData];
   }
@@ -263,10 +260,16 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.currentUserId = this.route.snapshot.paramMap.get('id');
   }
 
-  getReplyCount(): number {
-    return this.messagesData.length > 1 ? this.messagesData.length - 1 : 0; // Antworten zählen
+  getReplyCountText(): string {
+    const replyCount = this.messagesData.length > 1 ? this.messagesData.length - 1 : 0; // Antworten zählen
+    if (replyCount === 1) {
+      return '1 Antwort';
+    } else if (replyCount > 1) {
+      return `${replyCount} Antworten`;
+    } else {
+      return 'Keine Antworten';
+    }
   }
-
   isFirstDayInfoVisible(i: number): boolean {
     return i === 0;
   }
@@ -365,15 +368,14 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   splitMessage(text: string | undefined): string[] {
     if (!text) {
-      return []; // Gib einen leeren Array zurück, wenn der Text nicht definiert ist
+      return [];
     }
-  
     const regex = /(@[\w\-_!$*]+)/g;
     const parts = text.split(regex);
     const cleanedParts = parts
       .map((part) => part.trim())
       .filter((part) => part.length > 0);
-  
+
     return cleanedParts;
   }
 
@@ -381,7 +383,9 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
       user.name.trim().toLowerCase()
     );
-    const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
+    const mentionName = textPart.startsWith('@')
+      ? textPart.substring(1).toLowerCase()
+      : '';
     return normalizedUserNames.includes(mentionName);
   }
 
@@ -414,7 +418,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   onCancelMessageBox(): void {
     this.wasClickedInDirectThread = false;
   }
-  
+
   async saveOrDeleteMessage(message: SendMessageInfo) {
     try {
       if (!message || !message.id) {

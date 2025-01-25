@@ -116,7 +116,7 @@
 
 
               <div class="seperator p-top27" *ngIf="isFirstMessage(i)">
-                <h3>{{ getReplyCount() }} Antworten</h3>
+                <h3>{{ getReplyCountText() }}</h3>
                 <div class="line-separator"></div>
               </div>
 
@@ -319,7 +319,7 @@
               </div>
             </div>
             <div class="seperator" *ngIf="isFirstMessage(i)">
-              <h3>{{ getReplyCount() }} Antworten</h3>
+              <h3>{{ getReplyCountText() }}</h3>
               <div class="line-separator"></div>
             </div>
           </div>
