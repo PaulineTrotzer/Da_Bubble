@@ -179,10 +179,14 @@ export class ChatComponent implements OnInit, OnChanges {
     });
 
     this.threadControlService.editedMessage$
-      .pipe(filter((message: any) => !!message))
+      .pipe(
+        filter((message: any) => !!message), // Nachricht darf nicht null oder undefined sein
+        filter((message: any) => message.text && message.text.trim() !== '') // Nachricht darf keinen leeren Text haben
+      )
       .subscribe((updatedMessage) => {
         this.updateMessage(updatedMessage);
       });
+
     /*     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
         if (channel) {
@@ -196,46 +200,105 @@ export class ChatComponent implements OnInit, OnChanges {
   isFirstDayInfoVisible(i: number): boolean {
     return i === 0;
   }
+
   async updateMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
 
-    // Ausschluss von Nachrichten, die als gelöscht markiert sind
     if (updatedMessage.deleted) {
-      console.log('Gelöschte Nachricht ignoriert:', updatedMessage.id);
+      await this.handleDeletedMessage(updatedMessage);
       return;
     }
+
     const index = this.messagesData.findIndex(
       (msg: any) => msg.id === updatedMessage.id
     );
+
     if (index !== -1) {
-      // Nachricht aktualisieren
-      this.messagesData[index] = {
-        ...this.messagesData[index],
-        ...updatedMessage,
-      };
-      console.log('Nachricht aktualisiert:', this.messagesData[index]);
+      await this.updateExistingMessage(index, updatedMessage);
     } else {
-      // Neue Nachricht hinzufügen
-      console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
-      this.messagesData.push(updatedMessage);
+      await this.addNewMessage(updatedMessage);
+    }
+    this.updateSubscriptionText();
+    this.messagesData = [...this.messagesData];
+  }
+
+  async updateExistingMessage(
+    index: number,
+    updatedMessage: any
+  ): Promise<void> {
+    const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
+
+    this.messagesData[index] = {
+      ...this.messagesData[index],
+      ...updatedMessage,
+    };
+    console.log('Nachricht lokal aktualisiert:', this.messagesData[index]);
+
+    try {
+      await updateDoc(messageRef, updatedMessage);
+      console.log('Nachricht in Firebase aktualisiert:', updatedMessage.id);
+    } catch (error) {
+      console.error(
+        'Fehler beim Aktualisieren der Nachricht in Firebase:',
+        error
+      );
     }
 
-    // Trigger Angular Change Detection
-    this.messagesData = [...this.messagesData];
+    return; // Füge ein explizites return hinzu
+  }
+
+  async addNewMessage(updatedMessage: any): Promise<void> {
+    const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
+
+    console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
+    this.messagesData.push(updatedMessage);
+
+    try {
+      await setDoc(messageRef, updatedMessage);
+      console.log('Neue Nachricht in Firebase hinzugefügt:', updatedMessage.id);
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Nachricht in Firebase:', error);
+    }
+  }
+
+  async handleDeletedMessage(updatedMessage: any): Promise<void> {
+    const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
+    console.log('Gelöschte Nachricht ignoriert:', updatedMessage.id);
+
+    try {
+      await deleteDoc(messageRef);
+      console.log('Nachricht aus Firebase gelöscht:', updatedMessage.id);
+    } catch (error) {
+      console.error('Fehler beim Löschen der Nachricht in Firebase:', error);
+    }
+
+    this.messagesData = this.messagesData.filter(
+      (msg: any) => msg.id !== updatedMessage.id
+    );
   }
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
       console.log('Lade Nachrichten...');
       const snapshot = await getDocs(collection(this.firestore, 'messages'));
-      this.messagesData = snapshot.docs.map((doc) => ({
+      const loadedMessages = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+      this.messagesData = loadedMessages.map((loadedMessage) => {
+        const localMessage = this.messagesData.find(
+          (msg) => msg.id === loadedMessage.id
+        );
+        return localMessage
+          ? { ...loadedMessage, ...localMessage }
+          : loadedMessage;
+      });
+
       console.log('Nachrichten geladen:', this.messagesData);
     }
   }
 
+  /* 
   updateMessages() {
     // Gelöschte Nachrichten ausschließen
     this.messagesData = this.messagesData.filter(
@@ -257,7 +320,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.updateMessagesWithNewPhoto();
     this.subscribeToThreadAnswers();
     this.checkForSelfChat();
-  }
+  } */
 
   hasMessages(): boolean {
     return this.messagesData && this.messagesData.length > 0;
@@ -446,7 +509,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  checkForSelfChat() {
+/*   checkForSelfChat() {
     if (
       this.selectedUser?.uid === this.global.currentUserData?.id &&
       this.messagesData.length === 0
@@ -468,7 +531,7 @@ export class ChatComponent implements OnInit, OnChanges {
     } else {
       this.showTwoPersonConversationTxt = false;
     }
-  }
+  } */
 
   showBeginningText() {
     this.showWelcomeChatText = true;
@@ -731,7 +794,7 @@ export class ChatComponent implements OnInit, OnChanges {
               (a: any, b: any) => a.timestamp - b.timestamp
             );
             this.hasMessagesValue = this.messagesData.length > 0;
-            this.checkForSelfChat();
+            this.updateSubscriptionText();
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
@@ -748,6 +811,15 @@ export class ChatComponent implements OnInit, OnChanges {
       console.error('Error initializing messages query:', error);
     }
   }
+
+  updateSubscriptionText() {
+    const isSelfChat = this.selectedUser?.uid === this.global.currentUserData?.id;
+    const hasNoMessages = this.messagesData.length === 0;
+  
+    this.showWelcomeChatText = isSelfChat && hasNoMessages;
+    this.showTwoPersonConversationTxt = !isSelfChat && hasNoMessages;
+  }
+  
 
   async updateMessagesWithNewPhoto() {
     try {
