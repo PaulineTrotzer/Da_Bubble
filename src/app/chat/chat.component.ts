@@ -146,7 +146,7 @@ export class ChatComponent implements OnInit, OnChanges {
   hasMessagesValue = false;
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
   sanitizer = inject(DomSanitizer);
-  inputFieldService=inject(InputfieldService);
+  inputFieldService = inject(InputfieldService);
 
   constructor() {}
 
@@ -183,13 +183,13 @@ export class ChatComponent implements OnInit, OnChanges {
       .subscribe((updatedMessage) => {
         this.updateMessage(updatedMessage);
       });
-    this.workspaceSubscription.add(
+    /*     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
         if (channel) {
           this.selectedChannel = channel;
         }
       })
-    );
+    ); */
     await this.getAllUsersname();
   }
 
@@ -199,6 +199,11 @@ export class ChatComponent implements OnInit, OnChanges {
   async updateMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
 
+    // Ausschluss von Nachrichten, die als gelöscht markiert sind
+    if (updatedMessage.deleted) {
+      console.log('Gelöschte Nachricht ignoriert:', updatedMessage.id);
+      return;
+    }
     const index = this.messagesData.findIndex(
       (msg: any) => msg.id === updatedMessage.id
     );
@@ -210,9 +215,13 @@ export class ChatComponent implements OnInit, OnChanges {
       };
       console.log('Nachricht aktualisiert:', this.messagesData[index]);
     } else {
+      // Neue Nachricht hinzufügen
       console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
       this.messagesData.push(updatedMessage);
     }
+
+    // Trigger Angular Change Detection
+    this.messagesData = [...this.messagesData];
   }
 
   async ensureMessagesLoaded(): Promise<void> {
@@ -228,15 +237,28 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   updateMessages() {
+    // Gelöschte Nachrichten ausschließen
+    this.messagesData = this.messagesData.filter(
+      (message: any) => !message.deleted
+    );
+
+    // Nachrichten sortieren
     this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+    // Datenstatus setzen
     this.dataLoaded = true;
+
+    // Automatisch scrollen, falls aktiviert
     if (this.shouldScroll) {
       this.scrollAutoDown();
     }
+
+    // Zusätzliche Updates
     this.updateMessagesWithNewPhoto();
     this.subscribeToThreadAnswers();
     this.checkForSelfChat();
   }
+
   hasMessages(): boolean {
     return this.messagesData && this.messagesData.length > 0;
   }
@@ -310,9 +332,23 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   displayDayInfo(index: number): boolean {
-    if (index === 0) return true;
+    if (index === 0) {
+      const firstMessage = this.messagesData[index];
+      // Überprüfen, ob die erste Nachricht gelöscht ist
+      if (firstMessage.deleted) {
+        return false;
+      }
+      return true;
+    }
+
     const currentMessage = this.messagesData[index];
     const previousMessage = this.messagesData[index - 1];
+
+    // Gelöschte Nachrichten ausschließen
+    if (currentMessage.deleted || previousMessage.deleted) {
+      return false;
+    }
+
     return !this.isSameDay(
       new Date(currentMessage.timestamp),
       new Date(previousMessage.timestamp)
@@ -441,49 +477,109 @@ export class ChatComponent implements OnInit, OnChanges {
   clearInput() {
     this.messagesData = [];
   }
-
   saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
+
+    // ID-Prüfung
+    if (!message.id) {
+      console.error('Ungültige Nachricht-ID:', message);
+      return;
+    }
+
     const messageRef = doc(this.firestore, 'messages', message.id);
 
     if (this.editableMessageText.trim() === '') {
       // Nachricht löschen
-      deleteDoc(messageRef).then(() => {
-        console.log('Nachricht gelöscht:', message.id);
+      getDoc(messageRef)
+        .then((docSnapshot) => {
+          if (docSnapshot.exists()) {
+            deleteDoc(messageRef).then(() => {
+              console.log('Nachricht gelöscht:', message.id);
 
-        // Änderungen über den Service weitergeben
-        this.threadControlService.setEditedMessage({
-          id: message.id,
-          deleted: true,
+              // Nachricht aus messagesData entfernen
+              this.messagesData = this.messagesData.filter(
+                (msg: any) => msg.id !== message.id
+              );
+
+              // Dummy-Objekt hinzufügen
+              const deletedMessage = { id: message.id, deleted: true };
+              this.messagesData.push(deletedMessage);
+
+              // Änderungen weitergeben
+              this.threadControlService.setEditedMessage(deletedMessage);
+
+              this.editMessageId = null;
+              this.isFirstClick = true;
+              this.checkEditbox = false;
+            });
+          } else {
+            console.warn(
+              `Nachricht konnte nicht gelöscht werden, da sie nicht existiert: ${message.id}`
+            );
+          }
+        })
+        .catch((error) => {
+          console.error(
+            `Fehler beim Überprüfen oder Löschen der Nachricht: ${message.id}`,
+            error
+          );
         });
-
-        this.editMessageId = null;
-        this.isFirstClick = true;
-        this.checkEditbox = false;
-      });
     } else {
       // Nachricht bearbeiten
-      const editMessage = {
-        text: this.editableMessageText,
-        editedTextShow: true,
-      };
+      getDoc(messageRef)
+        .then((docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const editMessage = {
+              text: this.editableMessageText,
+              editedTextShow: true,
+            };
 
-      updateDoc(messageRef, editMessage).then(() => {
-        console.log('Nachricht bearbeitet:', message.id);
+            updateDoc(messageRef, editMessage).then(() => {
+              console.log('Nachricht bearbeitet:', message.id);
 
-        // Änderungen über den Service weitergeben
-        const updatedMessage = { id: message.id, ...editMessage };
-        this.threadControlService.setEditedMessage(updatedMessage);
+              // Nachricht in messagesData aktualisieren
+              const index = this.messagesData.findIndex(
+                (msg: any) => msg.id === message.id
+              );
+              if (index !== -1) {
+                this.messagesData[index] = {
+                  ...this.messagesData[index],
+                  ...editMessage,
+                };
+              } else {
+                console.warn(
+                  'Nachricht nicht gefunden, füge sie hinzu:',
+                  message.id
+                );
+                this.messagesData.push({ id: message.id, ...editMessage });
+              }
 
-        this.editMessageId = null;
-        this.checkEditbox = false;
-        this.isFirstClick = true;
+              // Änderungen weitergeben
+              this.threadControlService.setEditedMessage({
+                id: message.id,
+                ...editMessage,
+              });
 
-        // Optional: Scrollen nach Bearbeitung
-        setTimeout(() => {
-          this.shouldScroll = true;
-        }, 1000);
-      });
+              this.editMessageId = null;
+              this.checkEditbox = false;
+              this.isFirstClick = true;
+
+              setTimeout(() => {
+                this.shouldScroll = true;
+              }, 1000);
+            });
+          } else {
+            console.warn(
+              `Nachricht konnte nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
+            );
+          }
+        })
+        .catch((error) => {
+          console.error(
+            `Fehler beim Überprüfen oder Bearbeiten der Nachricht: ${message.id}`,
+            error
+          );
+        });
     }
   }
 
@@ -629,8 +725,6 @@ export class ChatComponent implements OnInit, OnChanges {
                 this.messagesData.push({ id: doc.id, ...messageData });
               }
             });
-
-            // Nachbearbeitung
             await this.updateMessagesWithNewPhoto();
             await this.subscribeToThreadAnswers();
             this.messagesData.sort(

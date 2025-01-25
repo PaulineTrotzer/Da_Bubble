@@ -194,15 +194,24 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         filter((id) => id !== this.lastProcessedThreadMessageId),
         takeUntil(this.unsubscribe$)
       )
-      .subscribe(async (firstThreadMessageId) => {
-        try {
-          this.lastProcessedThreadMessageId = firstThreadMessageId;
-          await this.processThreadMessages(firstThreadMessageId!);
-        } catch (error) {
-          console.error('Fehler bei der Verarbeitung des Threads:', error);
-        }
+      .subscribe({
+        next: async (firstThreadMessageId) => {
+          try {
+            this.lastProcessedThreadMessageId = firstThreadMessageId;
+            await this.processThreadMessages(firstThreadMessageId!);
+          } catch (error) {
+            console.error('Fehler bei der Verarbeitung des Threads:', error);
+          }
+        },
+        error: (err) => {
+          console.error('Fehler im Thread-Listener:', err);
+        },
+        complete: () => {
+          console.log('Thread-Listener beendet.');
+        },
       });
   }
+  
 
   async updateThreadMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
