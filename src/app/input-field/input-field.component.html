@@ -15,7 +15,7 @@
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview (resetErrors)="resetErrorMessages()"
+      <app-files-preview (resetErrors)="handleResetErrors()"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
     <div class="flex-preview" *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
@@ -27,7 +27,7 @@
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview (resetErrors)="resetErrorMessages()"
+      <app-files-preview (resetErrors)="handleResetErrors()"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
   </div>

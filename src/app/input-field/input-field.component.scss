@@ -44,10 +44,10 @@
   scrollbar-width: none;
   word-wrap: break-word;
   z-index: 4;
-  &:focus {
+/*   &:focus {
     border-color: #444df2;
     outline: none;
-  }
+  } */
 
   &::placeholder {
     font-style: italic;
@@ -58,11 +58,11 @@
   }
 }
 
-.chat-input::selection {
+/* .chat-input::selection {
   color: #ffffff;
   background: #444df2;
 }
-
+ */
 .interactions-send-msg-ct {
   display: flex;
   align-items: center;

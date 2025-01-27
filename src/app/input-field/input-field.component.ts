@@ -91,6 +91,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   authService = inject(AuthService);
   @ViewChild('inputField', { static: true })
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
+  
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
 
@@ -98,13 +99,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (changes['selectedUser'] && this.selectedUser?.id) {
     }
   }
-
   focusInputField(): void {
-    if (this.inputFieldRef?.nativeElement) {
-      this.inputFieldRef.nativeElement.focus();
-    }
+  /*   const mainInputArea = document.querySelector('.main-input-area') as HTMLDivElement;
+    if (mainInputArea) {
+      mainInputArea.focus();
+    } */
   }
-
+  
   ngOnInit(): void {
     this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -537,7 +538,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    this.resetErrorMessages();
     // Scrollen der Container synchronisieren
     const container = document.querySelector('.main-input-area') as HTMLElement;
     if (container) {
@@ -552,9 +552,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.updateFormattedMessage(); // Aktualisiere das Highlighting
   }
 
-  resetErrorMessages(): void {
-    this.fileTooLargeMessage = null;
-    this.multipleFilesErrorMessage = null;
+  handleResetErrors(): void {
+    const textarea = this.inputFieldRef?.nativeElement;
+    if (textarea) {
+      textarea.style.height = '130px'; // Höhe auf Standardgröße setzen
+    }
   }
 
   updateSelectedUser(newUser: any) {
