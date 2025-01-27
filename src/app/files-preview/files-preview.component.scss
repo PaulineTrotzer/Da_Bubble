@@ -14,9 +14,10 @@
   background-color: #f4f5ff; /* Helleres Blau für weniger Kontrast */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
   cursor: pointer;
-  position: relative;
+  position: absolute;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  top: 100px;
+  left: 50%;
+  margin-top: 42px;
   &:hover {
     border: 1px solid #444df2;
     background-color: #e2e6ff; /* Etwas dunkler beim Hover */

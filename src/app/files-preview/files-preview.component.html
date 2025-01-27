@@ -1,43 +1,26 @@
 <div class="show-selected-files">
-    <div *ngFor="let file of selectedFiles; let i=index">
-
-        <div class="file-info" *ngIf="file.type.startsWith('image/')">
-            <div class="file-box">
-                <img [src]="file.data">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="delet-box" (click)="deleteFile(i)">
-                    <span class="delete-span">x</span>
-                </div>
-            </div>
+    <div *ngFor="let file of selectedFiles; let i = index">
+      <!-- Anzeige für Bilder -->
+      <div class="file-info" *ngIf="file.type.startsWith('image/')">
+        <div class="file-box">
+          <img [src]="file.data" alt="Image preview">
+          <div class="file-name">{{ file.name }}</div>
+          <div class="delete-box" (click)="deleteFile(i)">
+            <span class="delete-span">x</span>
+          </div>
         </div>
-        <div class="file-info" *ngIf="file.type==='application/pdf' ">
-            <div class="file-box">
-                <img src="../../assets/img/pdf.png">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="delet-box" (click)="deleteFile(i)">
-                    <span class="delete-span">x</span>
-                </div>
-            </div>
+      </div>
+  
+      <!-- Anzeige für PDFs -->
+      <div class="file-info" *ngIf="file.type === 'application/pdf'">
+        <div class="file-box">
+          <img src="../../assets/img/pdf.png" alt="PDF preview">
+          <div class="file-name">{{ file.name }}</div>
+          <div class="delete-box" (click)="deleteFile(i)">
+            <span class="delete-span">x</span>
+          </div>
         </div>
-        <div class="file-info" *ngIf="file.type==='text/plain'">
-            <div class="file-box">
-                <img src="../../assets/img/textfile.png">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="delet-box" (click)="deleteFile(i)">
-                    <span class="delete-span">x</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="file-info" *ngIf="!file.type.startsWith('image/')
-           &&  file.type !== 'application/pdf' && file.type!=='text/plain'">
-            <div class="file-box">
-                <img src="../../assets/img/alldatei.png">
-                <div class="file-name">{{ file.name }}</div>
-                <div class="delet-box" (click)="deleteFile(i)">
-                    <span class="delete-span">x</span>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</div>
+  </div>
+  

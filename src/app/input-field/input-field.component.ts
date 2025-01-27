@@ -165,11 +165,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return false;
   }
 
+  fileTooLargeMessage: string | null = null;
+  multipleFilesErrorMessage: string | null = null;
+
   async processSendMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
       this.currentComponentId
     );
 
+    // Prüfen, ob keine Nachricht oder Datei ausgewählt ist
     if (
       (!this.chatMessage || this.chatMessage.trim().length === 0) &&
       selectedFiles.length === 0
@@ -177,6 +181,23 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
     }
+
+    // Maximal zulässige Dateigröße in Bytes (500 KB)
+    const MAX_FILE_SIZE = 500 * 1024; // 500 KB
+
+    // Prüfen, ob die hochgeladene Datei zu groß ist
+    if (selectedFiles.length === 1) {
+      const file = selectedFiles[0];
+      const fileBlob = this.dataURLToBlob(file.data);
+
+      if (fileBlob.size > MAX_FILE_SIZE) {
+        this.fileTooLargeMessage = `Bitte konvertiere deine Datei (max. 500 KB):`;
+        this.multipleFilesErrorMessage = null; // Sicherstellen, dass keine vorherige Fehlermeldung angezeigt wird
+        return;
+      }
+    }
+
+    // Restliche Logik bleibt unverändert
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen) {
@@ -224,6 +245,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
+  }
+
+  dataURLToBlob(dataURL: string): Blob {
+    const byteString = atob(dataURL.split(',')[1]);
+    const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
   }
 
   async sendChannelThreadMessage() {
@@ -343,9 +375,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   async uploadFilesToFirebaseStorage(
     files: { data: string; type: string; name: string }[]
-  ): Promise<{
-    name: any; url: string; type: string 
-}[]> {
+  ): Promise<
+    {
+      name: any;
+      url: string;
+      type: string;
+    }[]
+  > {
     const storage = this.storage;
 
     const uploadPromises = files.map(async (file, index) => {
@@ -488,7 +524,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-
+    this.resetErrorMessages();
     // Dynamische Größenanpassung nur ausführen, wenn keine Vorschau aktiv ist
     if (!this.isPreviewActive) {
       textarea.style.height = 'auto'; // Höhe zurücksetzen
@@ -509,6 +545,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
 
     this.updateFormattedMessage(); // Aktualisiere das Highlighting
+  }
+
+  resetErrorMessages(): void {
+    this.fileTooLargeMessage = null;
+    this.multipleFilesErrorMessage = null;
   }
 
   updateSelectedUser(newUser: any) {
@@ -574,7 +615,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     );
   }
 
-  onFileSelected(event: Event, componentId: string) {
+  onFileSelected(event: Event, componentId: string): void {
     if (componentId !== 'chat') {
       console.error(
         'onFileSelected called with wrong componentId in Chat:',
@@ -583,67 +624,108 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     this.inputFieldService.setActiveComponent(componentId);
+  
     const input = event.target as HTMLInputElement;
+  
+    // Überprüfen, ob bereits eine Datei existiert
+    const existingFiles = this.inputFieldService.getFiles(componentId);
+    if (existingFiles.length > 0) {
+      console.error('Es kann nur eine Datei hochgeladen werden.');
+      this.multipleFilesErrorMessage =
+        'Es kann nur eine Datei hochgeladen werden.';
+      this.fileTooLargeMessage = null; // Andere Fehlermeldung zurücksetzen
+      return;
+    }
+  
     if (input.files && input.files.length > 0) {
-      this.isPreviewActive = true;
-      const newFiles: any[] = [];
-      Array.from(input.files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const fileData = {
-            name: file.name,
-            type: file.type,
-            data: reader.result as string,
-          };
-          newFiles.push(fileData);
-
-          const updatedFiles = [
-            ...this.inputFieldService.getFiles(componentId),
-            ...newFiles,
-          ];
-          this.inputFieldService.updateFiles(componentId, updatedFiles);
-          console.log('Updated files for component:', updatedFiles);
+      const selectedFile = input.files[0]; // Nur die erste Datei auswählen
+      const allowedTypes = ['image/', 'application/pdf'];
+  
+      // Prüfung: Unterstützte Dateitypen
+      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
+        console.error('Unsupported file type:', selectedFile.type);
+        this.fileTooLargeMessage = 'Nur Bilder und PDFs können hochgeladen werden.';
+        this.multipleFilesErrorMessage = null; // Andere Fehlermeldung zurücksetzen
+        return;
+      }
+  
+      // Datei laden
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: reader.result as string,
         };
-        reader.readAsDataURL(file);
-      });
-      input.value = '';
+  
+        // Datei speichern
+        this.inputFieldService.updateFiles(componentId, [fileData]);
+        console.log('File added:', fileData);
+      };
+      reader.readAsDataURL(selectedFile);
+  
+      input.value = ''; // Input-Feld zurücksetzen
+      this.isPreviewActive = true; // Vorschau aktivieren
     }
   }
+  
 
-  onFileSelectedThread(event: Event, componentId: string) {
+
+  onFileSelectedThread(event: Event, componentId: string): void {
     if (componentId !== 'direct-thread') {
       console.error(
-        'onFileSelectedThread called with wrong componentId: i  Thread',
+        'onFileSelectedThread called with wrong componentId: in Thread',
         componentId
       );
       return;
     }
+  
     this.inputFieldService.setActiveComponent('direct-thread');
     const input = event.target as HTMLInputElement;
+  
+    // Überprüfen, ob bereits eine Datei existiert
+    const existingFiles = this.inputFieldService.getFiles(componentId);
+    if (existingFiles.length > 0) {
+      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
+      this.multipleFilesErrorMessage =
+        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
+      this.fileTooLargeMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
+      return;
+    }
+  
+    // Überprüfen, ob eine Datei ausgewählt wurde
     if (input.files && input.files.length > 0) {
-      this.isPreviewActive = true;
-      const newFiles: any[] = [];
-      Array.from(input.files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const fileData = {
-            type: file.type,
-            data: reader.result as string,
-          };
-          newFiles.push(fileData);
-
-          // Dateien für die übergebene Komponente aktualisieren
-          const updatedFiles = [
-            ...this.inputFieldService.getFiles(componentId),
-            ...newFiles,
-          ];
-          this.inputFieldService.updateFiles(componentId, updatedFiles);
+      const selectedFile = input.files[0];
+      const allowedTypes = ['image/', 'application/pdf'];
+  
+      // Prüfung: Unterstützte Dateitypen
+      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
+        console.error('Unsupported file type:', selectedFile.type);
+        this.fileTooLargeMessage = 'Nur Bilder und PDFs können hochgeladen werden.';
+        this.multipleFilesErrorMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
+        return;
+      }
+  
+      // Datei laden
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: reader.result as string,
         };
-        reader.readAsDataURL(file);
-      });
-      input.value = '';
+  
+        // Datei speichern
+        this.inputFieldService.updateFiles(componentId, [fileData]);
+        console.log('File added in thread:', fileData);
+      };
+  
+      reader.readAsDataURL(selectedFile);
+      input.value = ''; // Input-Feld zurücksetzen
+      this.isPreviewActive = true; // Vorschau aktivieren
     }
   }
+  
 
   @Input() currentComponentId!: string;
   @Output() inputFieldFocused = new EventEmitter<string>();

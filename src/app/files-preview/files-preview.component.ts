@@ -16,6 +16,8 @@ export class FilesPreviewComponent implements OnInit, OnDestroy {
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
   @Output() previewUpdated = new EventEmitter<boolean>(); 
+  @Output() resetErrors = new EventEmitter<void>();
+
 
   ngOnInit(): void {
     console.log('cuurentCoompId', this.currentComponentId);
@@ -35,5 +37,6 @@ export class FilesPreviewComponent implements OnInit, OnDestroy {
     this.selectedFiles.splice(index, 1); // Entferne die Datei lokal
     this.inputFieldService.updateFiles(this.currentComponentId, this.selectedFiles); // Aktualisiere die Dateien im Service
     this.previewUpdated.emit(this.selectedFiles.length > 0); // Emitte den neuen Status
+    this.resetErrors.emit();
   }
 }

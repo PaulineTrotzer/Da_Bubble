@@ -8,11 +8,27 @@
       (keydown)="sendMessage($event)" #inputField></textarea>
     <div class="flex-preview"
       *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
-      <app-files-preview (previewUpdated)="isPreviewActive = $event"
+      <div class="error-message" *ngIf="multipleFilesErrorMessage">
+        {{ multipleFilesErrorMessage }}
+      </div>
+
+      <!-- Feedback für zu große Datei -->
+      <div class="error-message" *ngIf="fileTooLargeMessage">
+        {{ fileTooLargeMessage }}
+      </div>
+      <app-files-preview   (resetErrors)="resetErrorMessages()" (previewUpdated)="isPreviewActive = $event"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
     <div class="flex-preview" *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
-      <app-files-preview (previewUpdated)="isPreviewActive = $event"
+      <div class="error-message" *ngIf="multipleFilesErrorMessage">
+        {{ multipleFilesErrorMessage }}
+      </div>
+
+      <!-- Feedback für zu große Datei -->
+      <div class="error-message" *ngIf="fileTooLargeMessage">
+        {{ fileTooLargeMessage }}
+      </div>
+      <app-files-preview   (resetErrors)="resetErrorMessages()" (previewUpdated)="isPreviewActive = $event"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
   </div>
