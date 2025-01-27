@@ -27,6 +27,7 @@
 
 
 .chat-input {
+  height: 130px;
   flex: 1;
   border: 1px solid #adb0d9;
   border-radius: 20px;
@@ -42,7 +43,6 @@
   white-space: pre-wrap;
   overflow: visible;
   scrollbar-width: none;
-  max-height: 250px;
   word-wrap: break-word;
   z-index: 4;
   &:focus {
@@ -176,7 +176,6 @@
   position: relative;
   width: 100%;
   display: flex;
-  max-height: 250px;
   overflow-y: auto;
   background-color: #ffffff;
   scrollbar-width: thin;

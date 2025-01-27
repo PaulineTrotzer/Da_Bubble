@@ -149,7 +149,9 @@ app-start-screen{
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.7); /* Halbtransparentes Schwarz für den Hintergrund */
+  backdrop-filter: blur(8px); /* Hintergrund wird weichgezeichnet */
+  -webkit-backdrop-filter: blur(8px); /* Unterstützung für Safari */
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -159,6 +161,7 @@ app-start-screen{
   text-align: center;
   font-family: "Nunito";
 }
+
 
 .overlay-contacts p {
   font-size: 1.5rem;

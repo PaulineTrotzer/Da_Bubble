@@ -3,9 +3,8 @@
   <div class="main-input-area">
     <label for="msg-input"></label>
     <div class="highlight" [innerHTML]="formattedMessage"></div>
-    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input"
-      [ngClass]="{ 'chat-input-expanded': isPreviewActive }" [(ngModel)]="chatMessage" (input)="onInput($event)"
-      (keydown)="sendMessage($event)" #inputField></textarea>
+    <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" [(ngModel)]="chatMessage"
+      (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea>
     <div class="flex-preview"
       *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
       <div class="error-message" *ngIf="multipleFilesErrorMessage">
@@ -16,7 +15,7 @@
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview   (resetErrors)="resetErrorMessages()" (previewUpdated)="isPreviewActive = $event"
+      <app-files-preview (resetErrors)="resetErrorMessages()"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
     <div class="flex-preview" *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
@@ -28,7 +27,7 @@
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview   (resetErrors)="resetErrorMessages()" (previewUpdated)="isPreviewActive = $event"
+      <app-files-preview (resetErrors)="resetErrorMessages()"
         [currentComponentId]="currentComponentId"></app-files-preview>
     </div>
   </div>

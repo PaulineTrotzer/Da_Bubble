@@ -93,7 +93,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
-  isPreviewActive: boolean = false;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -138,10 +137,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.formattedMessage = '';
     }
   }
-
   sendMessageClick(): void {
-    this.isPreviewActive = false;
-    if (this.chatMessage.trim() === '' && this.selectFiles.length === 0) {
+    const selectedFiles = this.inputFieldService.getFiles('chat');
+    if (
+      this.chatMessage.trim() === '' &&
+      (!selectedFiles || selectedFiles.length === 0)
+    ) {
       console.warn('Keine Nachricht und keine Dateien zum Senden.');
       return;
     }
@@ -149,8 +150,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
+
     this.formattedMessage = '';
-    this.processSendMessage();
+    /*     this.processSendMessage().then(() => {
+      this.isPreviewActive = false;
+    }); */
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -237,15 +241,23 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.messageSent.emit();
         this.chatMessage = '';
         this.formattedChatMessage = '';
-        this.isPreviewActive = false;
-
-        // Dateien im Service zurücksetzen
         this.inputFieldService.updateFiles(this.currentComponentId, []);
+        const textarea = document.getElementById(
+          'msg-input'
+        ) as HTMLTextAreaElement;
+        if (textarea) {
+          textarea.style.height = '130px'; // Höhe auf Standardgröße setzen
+        }
       } catch (error) {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
   }
+
+  /*   onPreviewUpdated(isActive: boolean): void {
+    this.isPreviewActive = isActive;
+    console.log('Preview status:', isActive);
+  } */
 
   dataURLToBlob(dataURL: string): Blob {
     const byteString = atob(dataURL.split(',')[1]);
@@ -335,6 +347,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.resetInputdata();
       this.messageSent.emit();
       this.inputFieldService.updateFiles(this.currentComponentId, []);
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -525,14 +538,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     this.resetErrorMessages();
-    // Dynamische Größenanpassung nur ausführen, wenn keine Vorschau aktiv ist
-    if (!this.isPreviewActive) {
-      textarea.style.height = 'auto'; // Höhe zurücksetzen
-      textarea.style.height = `${textarea.scrollHeight}px`; // Dynamische Anpassung
-    } else {
-      textarea.style.height = '250px'; // Fixierte Höhe bei aktiver Vorschau
-    }
-
     // Scrollen der Container synchronisieren
     const container = document.querySelector('.main-input-area') as HTMLElement;
     if (container) {
@@ -623,10 +628,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
       );
       return;
     }
+    /*     this.isPreviewActive = true;  */
     this.inputFieldService.setActiveComponent(componentId);
-  
+
     const input = event.target as HTMLInputElement;
-  
+
     // Überprüfen, ob bereits eine Datei existiert
     const existingFiles = this.inputFieldService.getFiles(componentId);
     if (existingFiles.length > 0) {
@@ -636,19 +642,20 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.fileTooLargeMessage = null; // Andere Fehlermeldung zurücksetzen
       return;
     }
-  
+
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0]; // Nur die erste Datei auswählen
       const allowedTypes = ['image/', 'application/pdf'];
-  
+
       // Prüfung: Unterstützte Dateitypen
       if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
         console.error('Unsupported file type:', selectedFile.type);
-        this.fileTooLargeMessage = 'Nur Bilder und PDFs können hochgeladen werden.';
+        this.fileTooLargeMessage =
+          'Nur Bilder und PDFs können hochgeladen werden.';
         this.multipleFilesErrorMessage = null; // Andere Fehlermeldung zurücksetzen
         return;
       }
-  
+
       // Datei laden
       const reader = new FileReader();
       reader.onload = () => {
@@ -657,19 +664,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
           type: selectedFile.type,
           data: reader.result as string,
         };
-  
+
         // Datei speichern
         this.inputFieldService.updateFiles(componentId, [fileData]);
-        console.log('File added:', fileData);
+        const textarea = document.getElementById(
+          'msg-input'
+        ) as HTMLTextAreaElement;
+        if (textarea) {
+          textarea.style.height = '250px'; // Höhe auf Vorschau-Größe setzen
+        }
       };
       reader.readAsDataURL(selectedFile);
-  
+
       input.value = ''; // Input-Feld zurücksetzen
-      this.isPreviewActive = true; // Vorschau aktivieren
     }
   }
-  
-
 
   onFileSelectedThread(event: Event, componentId: string): void {
     if (componentId !== 'direct-thread') {
@@ -679,10 +688,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       );
       return;
     }
-  
+
     this.inputFieldService.setActiveComponent('direct-thread');
     const input = event.target as HTMLInputElement;
-  
+
     // Überprüfen, ob bereits eine Datei existiert
     const existingFiles = this.inputFieldService.getFiles(componentId);
     if (existingFiles.length > 0) {
@@ -692,20 +701,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.fileTooLargeMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
       return;
     }
-  
+
     // Überprüfen, ob eine Datei ausgewählt wurde
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0];
       const allowedTypes = ['image/', 'application/pdf'];
-  
+
       // Prüfung: Unterstützte Dateitypen
       if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
         console.error('Unsupported file type:', selectedFile.type);
-        this.fileTooLargeMessage = 'Nur Bilder und PDFs können hochgeladen werden.';
+        this.fileTooLargeMessage =
+          'Nur Bilder und PDFs können hochgeladen werden.';
         this.multipleFilesErrorMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
         return;
       }
-  
+
       // Datei laden
       const reader = new FileReader();
       reader.onload = () => {
@@ -714,18 +724,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
           type: selectedFile.type,
           data: reader.result as string,
         };
-  
+
         // Datei speichern
         this.inputFieldService.updateFiles(componentId, [fileData]);
+        this.cdr.detectChanges();
         console.log('File added in thread:', fileData);
       };
-  
+
       reader.readAsDataURL(selectedFile);
       input.value = ''; // Input-Feld zurücksetzen
-      this.isPreviewActive = true; // Vorschau aktivieren
+      /*       this.isPreviewActive = true; // Vorschau aktivieren */
     }
   }
-  
 
   @Input() currentComponentId!: string;
   @Output() inputFieldFocused = new EventEmitter<string>();

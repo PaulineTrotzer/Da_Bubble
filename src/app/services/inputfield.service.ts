@@ -16,21 +16,29 @@ export class InputfieldService {
   files$ = this.filesSubject.asObservable();
 
   setActiveComponent(id: string): void {
-    console.log('Attempting to set active component to:', id);
     if (this.activeComponentId.getValue() !== id) {
       this.activeComponentId.next(id);
-      console.log('Active component updated to:', id);
     } else {
-      console.log('Active component remains unchanged:', id);
+     return
     }
   }
 
   updateFiles(componentId: string, files: any[]): void {
     this.filesByComponent[componentId] = files;
-    this.filesSubject.next(this.filesByComponent); 
+    this.filesSubject.next({ ...this.filesByComponent }); // Dateien für alle Komponenten aktualisieren
+  
+    // Falls nötig, auch `selectFiles` aktualisieren, falls an anderer Stelle abonniert:
+    if (componentId === this.activeComponentId.getValue()) {
+      this.selectFiles.next(files); // Nur aktive Komponente aktualisieren
+    }
+  
+    console.log(`Updated files for component [${componentId}]:`, files);
   }
+  
 
   getFiles(componentId: string): any[] {
-    return this.filesByComponent[componentId] || [];
+    const files = this.filesByComponent[componentId] || [];
+    console.log(`getFiles for component [${componentId}]:`, files);
+    return files;
   }
 }
