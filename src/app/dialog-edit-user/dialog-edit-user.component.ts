@@ -58,6 +58,7 @@ export class DialogEditUserComponent implements OnInit {
   storage = inject(Storage);
   userData: any = {};
   loadingSpinner = false;
+  fileTooLargeMessage: string | null = null;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -105,20 +106,47 @@ export class DialogEditUserComponent implements OnInit {
     this.selectedFile = null;
   }
 
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
+  
+    // Überprüfen, ob eine Datei ausgewählt wurde
     if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
+      const selectedFile = input.files[0];
+      const MAX_FILE_SIZE = 500 * 1024; // 500 KB
+  
+      // Prüfung: Dateigröße
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        console.error(`Datei ist zu groß: ${selectedFile.size / 1024} KB`);
+        this.fileTooLargeMessage = 'Die Datei darf nicht größer als 500 KB sein.';
+        return;
+      }
+  
+      // Prüfung: Dateityp (nur Bilder)
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        console.error('Ungültiger Dateityp:', selectedFile.type);
+        this.fileTooLargeMessage = 'Nur PNG- oder JPEG-Bilder sind erlaubt.';
+        return;
+      }
+  
+      // Reset der Fehlermeldung (falls vorher ein Fehler vorlag)
+      this.fileTooLargeMessage = null;
+  
+      // Datei verarbeiten und Vorschau anzeigen
+      this.selectedFile = selectedFile;
       this.chossePicture = '';
       this.user.picture = '';
+  
       const reader = new FileReader();
       reader.onload = () => {
         this.previewUrl = reader.result as string;
       };
-      reader.readAsDataURL(this.selectedFile);
-      input.value = '';
+      reader.readAsDataURL(selectedFile);
+  
+      input.value = ''; // Input-Feld zurücksetzen
     }
   }
+  
 
   async saveUser() {
     this.loadingSpinner = true; 

@@ -20,6 +20,9 @@
             <img [src]="avatar" (click)="selectAvatar(avatar)">
         </div>
     </div>
+    <div *ngIf="fileTooLargeMessage" class="error-message">
+        <span>{{ fileTooLargeMessage }}</span>
+    </div>
 
     <div *ngIf="!guestAccount" class="added-avatar">
         <div class="picture-info-text">oder Bild</div>
@@ -27,6 +30,7 @@
             <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
             <label for="upload">Datei hochladen</label>
         </div>
+
     </div>
 
     <div class="name-edit-flex">

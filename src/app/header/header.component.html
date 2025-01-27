@@ -122,6 +122,9 @@
         <div class="user-info">
             <h2>{{user.name}}</h2>
             <img class="user-img" src={{user.picture}}>
+            <div class="status-border">
+                <span [ngClass]="{'online': user.status === 'online', 'offline': user.status === 'offline'}"></span>
+              </div>
             <button class="arrow-down-btn" (click)="toggleDropDown()">
                 <svg class="svg-down" width="15" height="10" viewBox="0 0 15 10" fill="none"
                     xmlns="http://www.w3.org/2000/svg">

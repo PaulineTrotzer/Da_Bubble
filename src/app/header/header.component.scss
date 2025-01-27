@@ -203,6 +203,15 @@ input.radius {
   left: 26px;
 }
 
+.status-border {
+  position: absolute;
+  background-color: white;
+  padding: 2px;
+  border-radius: 100%;
+  right: 54px;
+  bottom: -4px;
+}
+
 .user-name {
   color: #686868;
   font-size: 18px;

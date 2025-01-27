@@ -17,9 +17,31 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  span{
+  span {
     color: black;
     font-weight: 600;
+  }
+}
+
+.error-message {
+  display: flex;
+  justify-content: center;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  margin: 15px 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -40,7 +62,6 @@
     transform: rotate(360deg);
   }
 }
-
 
 .name-escape-flex {
   display: flex;
@@ -93,9 +114,9 @@
 }
 
 input[readonly] {
-  background-color: #f5f5f5; 
-  color: #333; 
-  cursor: not-allowed; 
+  background-color: #f5f5f5;
+  color: #333;
+  cursor: not-allowed;
 }
 
 .error-msg {
@@ -200,7 +221,7 @@ h3 {
   transform: scale(1.05);
 }
 
-.avatar-box{
+.avatar-box {
   display: flex;
   gap: 8px;
   padding: 48px 0 0 36px;
@@ -217,9 +238,9 @@ h3 {
       cursor: pointer;
     }
   }
- } 
+}
 
- .added-avatar {
+.added-avatar {
   display: flex;
   padding: 42px 0 0 36px;
   gap: 24px;
@@ -233,8 +254,7 @@ h3 {
   cursor: default;
 }
 
-
- label {
+label {
   font-family: "Nunito";
   font-size: 18px;
   font-weight: 700;
@@ -255,60 +275,59 @@ h3 {
   }
 }
 
- @media (max-width:750px){
-  .profile-card-ct{
+@media (max-width: 750px) {
+  .profile-card-ct {
     width: 350px;
     padding: 15px 15px;
     gap: 12px;
-  } 
-  
-  .img-frame{
-    img{
-      width: 150px;
-      height: 150px;    
-    }
-}
-
-.avatar-box{
-  gap: 4px;
-  padding: 10px 0 0 0px;
-  img{
-    width: 50px;
-    height: 50px;
   }
-} 
 
-.name-escape-flex{
-      justify-content: space-between;
-      align-items: center;
-      padding: 0;
-      margin-top: 0;
-}
+  .img-frame {
+    img {
+      width: 150px;
+      height: 150px;
+    }
+  }
 
-.added-avatar{
+  .avatar-box {
+    gap: 4px;
+    padding: 10px 0 0 0px;
+    img {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  .name-escape-flex {
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .added-avatar {
     gap: 24px;
     padding: 19px 0px;
-} 
-
-.name-edit-flex{
-  padding: 0;
-  
-  input{
-    width:98%;
-  } 
-}
-
- .mail-flex-column{
-  padding: 0;
-  input{
-    width: 98%;
   }
-}
 
-.button-flex{
-  width: unset;
-  gap: 10px;
-  margin-bottom: 0;
-}
+  .name-edit-flex {
+    padding: 0;
 
+    input {
+      width: 98%;
+    }
+  }
+
+  .mail-flex-column {
+    padding: 0;
+    input {
+      width: 98%;
+    }
+  }
+
+  .button-flex {
+    width: unset;
+    gap: 10px;
+    margin-bottom: 0;
+  }
 }
