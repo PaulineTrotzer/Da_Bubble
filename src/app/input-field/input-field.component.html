@@ -2,9 +2,9 @@
 
   <div class="main-input-area">
     <label for="msg-input"></label>
-    <div class="highlight" [innerHTML]="formattedMessage"></div>
+    <div class="highlight" #highlightDiv  [innerHTML]="formattedMessage"></div>
     <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" [(ngModel)]="chatMessage"
-      (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea>
+      (scroll)="onScroll($event)" (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea>
     <div class="flex-preview"
       *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
       <div class="error-message" *ngIf="multipleFilesErrorMessage">

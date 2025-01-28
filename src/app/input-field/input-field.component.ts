@@ -97,6 +97,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
+      console.log('user changed', this.selectedUser);
+      this.resetInputdata();
+    
     }
   }
   focusInputField(): void {
@@ -104,6 +107,20 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (mainInputArea) {
       mainInputArea.focus();
     } */
+  }
+
+  @ViewChild('highlightDiv') highlightRef!: ElementRef<HTMLDivElement>;
+
+  onScroll(event: any) {
+    const textarea = event.target as HTMLTextAreaElement;
+    if (this.highlightRef?.nativeElement) {
+      this.highlightRef.nativeElement.scrollTop = textarea.scrollTop;
+    }
+  }
+  
+
+  ngAfterViewInit() {
+    this.inputFieldRef.nativeElement.focus();
   }
   
   ngOnInit(): void {
@@ -355,8 +372,19 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   resetInputdata() {
-    this.chatMessage = '';
+    // Variablen zurücksetzen
+    this.chatMessage = '';       // oder wie auch immer du deinen Text speicherst
     this.selectFiles = [];
+    this.formattedChatMessage = '';
+  
+    // Inneren Inhalt des contenteditable-DIV leeren
+    if (this.inputFieldRef?.nativeElement) {
+      this.inputFieldRef.nativeElement.innerHTML = '';
+    }
+    if (this.highlightRef) {
+      this.highlightRef.nativeElement.innerHTML = '';
+    }
+    
   }
 
   async setMessageCount() {
