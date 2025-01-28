@@ -7,12 +7,16 @@
 }
 
 .text-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  /* font-size: 14px; */
-  line-height: 1.5;
+  display: flex; /* Flexbox für flexible Ausrichtung */
+  flex-wrap: wrap; /* Automatisches Umbrechen bei Platzmangel */
+  justify-content: flex-start; /* Text von links beginnen lassen */
+  align-items: center; /* Vertikale Zentrierung */
+  line-height: 1.5; /* Angenehmer Zeilenabstand */
+  padding: 5px 30px; /* Platz um den Text */
+  gap: 8px; /* Abstand zwischen Textteilen */
+  max-width: 100%; /* Verhindert, dass der Container die Bubble sprengt */
+  word-wrap: break-word; /* Längere Wörter umbrechen */
+  overflow-wrap: break-word;
 }
 
 .mat-mdc-card-content:first-child {
@@ -722,7 +726,7 @@ app-input-field {
 }
 
 .edited-recipient-view {
-  left: 0;
+  right: 0;
 }
 
 .edited-both-view {
@@ -730,7 +734,7 @@ app-input-field {
 }
 
 .edited-sender-view {
-  right: 0;
+  left: 0;
 }
 
 .mention-message {
