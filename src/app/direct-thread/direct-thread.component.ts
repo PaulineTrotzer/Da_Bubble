@@ -156,7 +156,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   focusInputField(): void {
     if (this.inputFieldComponent) {
-      this.inputFieldComponent.focusInputField();
+/*       this.inputFieldComponent.focusInputField(); */
     }
   }
 
@@ -261,7 +261,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   getReplyCountText(): string {
-    const replyCount = this.messagesData.length > 1 ? this.messagesData.length - 1 : 0; // Antworten zählen
+    const replyCount = this.messagesData.length > 1 ? this.messagesData.length - 1 : 0;
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {

@@ -1,8 +1,8 @@
 .msg-input-ct {
-  display: flex !important;
+  /*   display: flex !important; */
   padding: 32px;
-  position: relative;
-  flex-direction: column-reverse;
+  /*   position: relative;
+  flex-direction: column-reverse; */
 }
 
 .error-message {
@@ -25,22 +25,16 @@
   }
 }
 
-.chat-input,
-.highlight {
-  backface-visibility: hidden;
-  will-change: transform;
-}
-
-.chat-input {
+/* .chat-input {
   position: relative;
   -webkit-text-fill-color: transparent;
   min-height: 130px; // Grundhöhe
   max-height: 200px;
   flex: 1;
-  /*   border: 1px solid #adb0d9; */
+
   border: none;
   outline: none;
-  /*   border-radius: 20px; */
+
   padding: 20px 20px 40px 18px;
   position: relative;
   resize: none;
@@ -52,28 +46,24 @@
   width: 100%;
   white-space: pre-wrap;
   overflow-y: auto;
-/*   max-height: 200px; */
-  /*   scrollbar-width: none; */
+
   word-wrap: break-word;
   z-index: 4;
-  /*   &:focus {
-    border-color: #444df2;
-    outline: none;
-  } */
+
   &::placeholder {
     color: grey;
     opacity: 0.9;
     font-style: italic;
-    /* zusätzlich falls nötig: */
+
     -webkit-text-fill-color: grey;
   }
 
-  /* Für Chrome/Safari: */
+
   &::-webkit-input-placeholder {
     color: grey;
     -webkit-text-fill-color: grey;
   }
-}
+} */
 
 .chat-input:focus {
   outline: none; // wichtig für manche Browser
@@ -89,10 +79,10 @@
   align-items: center;
   position: absolute;
   bottom: 33px;
-  left: 35px;
+  left: 33px;
   justify-content: space-between;
-  width: calc(97% - 59px);
-  border-bottom-left-radius: 22px;
+  width: calc(99% - 57px);
+  border-radius: 20px;
   background-color: #ffffff;
   height: 39px;
   z-index: 10;
@@ -179,10 +169,10 @@
   left: 128px;
   top: -421px;
 }
-
+/* 
 .mention {
   color: #444df2;
-}
+} */
 
 .msg-send {
   width: 34px;
@@ -195,28 +185,64 @@
   }
 }
 
+.sending-status-box {
+  color: #444;
+  background: #eeeeff;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.chat-editable {
+  min-height: 130px;
+  max-height: 200px;
+  overflow-y: auto;
+  outline: none;
+  border: none;
+  caret-color: black; 
+  cursor: text;
+  resize: none;
+  color: black;
+  padding: 20px 20px 40px 18px;
+  font-size: 18px;
+  font-family: "Nunito";
+  white-space: pre-wrap;
+  word-wrap: break-word;
+z-index: 2;
+position: relative;
+  &:empty:before {
+    content: attr(data-placeholder);
+    color: grey;
+    opacity: 0.9;
+    font-style: italic;
+    pointer-events: none;
+  }
+}
+
 .main-input-area {
   position: relative;
   width: 100%;
   background-color: #ffffff;
   scrollbar-width: thin;
-  margin-bottom: -5px;
   border: 1px solid #adb0d9;
   border-radius: 20px;
+  overflow: hidden;
   &:focus-within {
     border-color: blue;
   }
 }
 
-.main-input-area:focus-within {
+/* .main-input-area:focus-within {
   // Border-Farbe bei Fokus
   border-color: blue;
   // oder wenn du magst outline:
   // outline: 2px solid blue;
   // outline-offset: 0;
-}
+} */
 
-.highlight {
+/* .highlight {
   position: absolute;
   top: 0;
   left: 0;
@@ -227,10 +253,10 @@
   font-family: "Nunito";
   background: none;
   color: transparent;
-  /*   height: 100%; */
+
   min-height: 130px; // Grundhöhe
   max-height: 200px;
-  pointer-events: none;
+
   white-space: pre-wrap;
   word-wrap: break-word;
   color: black;
@@ -239,7 +265,7 @@
   font-size: 18px !important;
   z-index: 1;
 }
-
+ */
 .vector {
   height: 33px;
   width: 7px;
@@ -248,6 +274,7 @@
 .flex-preview {
   width: 100%;
   position: absolute;
+  top: 0;
   justify-content: center;
   display: flex;
   flex-direction: column;

@@ -12,9 +12,8 @@
   justify-content: flex-start; /* Text von links beginnen lassen */
   align-items: center; /* Vertikale Zentrierung */
   line-height: 1.5; /* Angenehmer Zeilenabstand */
-  padding: 5px 30px; /* Platz um den Text */
+  padding: 5px 12px; /* Platz um den Text */
   gap: 8px; /* Abstand zwischen Textteilen */
-  max-width: 100%; /* Verhindert, dass der Container die Bubble sprengt */
   word-wrap: break-word; /* Längere Wörter umbrechen */
   overflow-wrap: break-word;
 }
@@ -68,7 +67,7 @@ app-input-field {
   align-items: flex-start;
   gap: 36px;
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
 }
 
 .you {
@@ -106,7 +105,7 @@ app-input-field {
   flex-direction: column;
   gap: 24px;
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
 }
 
 .img-and-name {
@@ -310,7 +309,7 @@ app-input-field {
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   padding: 10px 15px;
-  max-width: 80%; /* Maximal 80% der Breite */
+  width: 80%; /* Maximal 80% der Breite */
   width: fit-content; /* Passt sich dynamisch an den Inhalt an */
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -329,7 +328,7 @@ app-input-field {
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   padding: 10px 15px;
-  max-width: 80%; /* Maximal 80% der Breite */
+  width: 80%; /* Maximal 80% der Breite */
   width: fit-content; /* Passt sich dynamisch an den Inhalt an */
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -720,7 +719,7 @@ app-input-field {
 
 .text-info-edit {
   position: relative;
-  font-size: 13px;
+  font-size: 12px;
   position: absolute;
   bottom: -25px;
 }

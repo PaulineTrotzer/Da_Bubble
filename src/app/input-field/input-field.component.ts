@@ -42,6 +42,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { InputfieldService } from '../services/inputfield.service';
 import { FilesPreviewComponent } from '../files-preview/files-preview.component';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-input-field',
@@ -55,6 +56,19 @@ import { FilesPreviewComponent } from '../files-preview/files-preview.component'
   ],
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),       // Startzustand
+        animate('300ms ease-out',    // Dauer + Timing
+          style({ opacity: 1 }))     // Endzustand
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in',
+          style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
@@ -91,7 +105,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   authService = inject(AuthService);
   @ViewChild('inputField', { static: true })
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
-  
+
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
 
@@ -99,30 +113,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (changes['selectedUser'] && this.selectedUser?.id) {
       console.log('user changed', this.selectedUser);
       this.resetInputdata();
-    
     }
   }
-  focusInputField(): void {
-  /*   const mainInputArea = document.querySelector('.main-input-area') as HTMLDivElement;
-    if (mainInputArea) {
-      mainInputArea.focus();
-    } */
-  }
 
-  @ViewChild('highlightDiv') highlightRef!: ElementRef<HTMLDivElement>;
-
-  onScroll(event: any) {
-    const textarea = event.target as HTMLTextAreaElement;
-    if (this.highlightRef?.nativeElement) {
-      this.highlightRef.nativeElement.scrollTop = textarea.scrollTop;
-    }
-  }
-  
+  @ViewChild('editableDiv') editableDivRef!: ElementRef<HTMLDivElement>;
 
   ngAfterViewInit() {
-    this.inputFieldRef.nativeElement.focus();
+    this.editableDivRef.nativeElement.focus();
   }
-  
+
   ngOnInit(): void {
     this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -152,7 +151,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       await this.processSendMessage();
-      this.formattedMessage = '';
     }
   }
   sendMessageClick(): void {
@@ -168,7 +166,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
-
     this.formattedMessage = '';
     /*     this.processSendMessage().then(() => {
       this.isPreviewActive = false;
@@ -189,32 +186,32 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   fileTooLargeMessage: string | null = null;
   multipleFilesErrorMessage: string | null = null;
+  sendingStatus: string | null = null;
 
   async processSendMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
       this.currentComponentId
     );
-
-    // Prüfen, ob keine Nachricht oder Datei ausgewählt ist
     if (
       (!this.chatMessage || this.chatMessage.trim().length === 0) &&
       selectedFiles.length === 0
     ) {
+      this.sendingStatus = null; 
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
     }
-
-    // Maximal zulässige Dateigröße in Bytes (500 KB)
     const MAX_FILE_SIZE = 500 * 1024; // 500 KB
 
     // Prüfen, ob die hochgeladene Datei zu groß ist
     if (selectedFiles.length === 1) {
+      this.sendingStatus = 'Message is reaching chat partner...';
       const file = selectedFiles[0];
       const fileBlob = this.dataURLToBlob(file.data);
 
       if (fileBlob.size > MAX_FILE_SIZE) {
         this.fileTooLargeMessage = `Bitte konvertiere deine Datei (max. 500 KB):`;
-        this.multipleFilesErrorMessage = null; // Sicherstellen, dass keine vorherige Fehlermeldung angezeigt wird
+        this.multipleFilesErrorMessage = null;
+        this.sendingStatus = null;
         return;
       }
     }
@@ -257,15 +254,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
         // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
         await this.setMessageCount();
         this.messageSent.emit();
-        this.chatMessage = '';
-        this.formattedChatMessage = '';
+        this.resetInputdata();
         this.inputFieldService.updateFiles(this.currentComponentId, []);
-        const textarea = document.getElementById(
-          'msg-input'
-        ) as HTMLTextAreaElement;
-        if (textarea) {
-          textarea.style.height = '130px'; // Höhe auf Standardgröße setzen
+        const chatDiv = this.editableDivRef.nativeElement;
+        if (chatDiv) {
+          chatDiv.style.height = '130px';
         }
+        this.sendingStatus = null;
       } catch (error) {
         console.error('Fehler beim Senden der Nachricht:', error);
       }
@@ -372,21 +367,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   resetInputdata() {
-    // Variablen zurücksetzen
-    this.chatMessage = '';       // oder wie auch immer du deinen Text speicherst
+    // 1) State-Variablen zurücksetzen
+    this.chatMessage = '';
     this.selectFiles = [];
     this.formattedChatMessage = '';
   
-    // Inneren Inhalt des contenteditable-DIV leeren
-    if (this.inputFieldRef?.nativeElement) {
-      this.inputFieldRef.nativeElement.innerHTML = '';
+    // 2) Contenteditable-DIV leeren
+    if (this.editableDivRef?.nativeElement) {
+      this.editableDivRef.nativeElement.innerHTML = '';
+      // Fokus setzen
+      this.editableDivRef.nativeElement.focus();
     }
-    if (this.highlightRef) {
-      this.highlightRef.nativeElement.innerHTML = '';
-    }
-    
   }
-
   async setMessageCount() {
     try {
       if (!this.userId || !this.selectedUser?.uid) {
@@ -565,25 +557,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   onInput(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    // Scrollen der Container synchronisieren
-    const container = document.querySelector('.main-input-area') as HTMLElement;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-    }
-
-    const containerh = document.querySelector('.highlight') as HTMLElement;
+    const editableDiv = event.target as HTMLDivElement;
+    this.chatMessage = editableDiv.innerText;
+  
+    /*     const containerh = document.querySelector('.highlight') as HTMLElement;
     if (containerh) {
       containerh.scrollTop = containerh.scrollHeight;
-    }
-
-    this.updateFormattedMessage(); // Aktualisiere das Highlighting
+    } */
+/* 
+    this.updateFormattedMessage(); // Aktualisiere das Highlighting */
   }
 
   handleResetErrors(): void {
-    const textarea = this.inputFieldRef?.nativeElement;
-    if (textarea) {
-      textarea.style.height = '130px'; // Höhe auf Standardgröße setzen
+    const chatDiv = this.editableDivRef.nativeElement;
+
+    if (chatDiv) {
+      chatDiv.style.height = '130px';
     }
   }
 
@@ -697,11 +686,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
         // Datei speichern
         this.inputFieldService.updateFiles(componentId, [fileData]);
-        const textarea = document.getElementById(
-          'msg-input'
-        ) as HTMLTextAreaElement;
-        if (textarea) {
-          textarea.style.height = '250px'; // Höhe auf Vorschau-Größe setzen
+        const chatDiv = this.editableDivRef.nativeElement;
+        if (chatDiv) {
+          chatDiv.style.height = '250px';
         }
       };
       reader.readAsDataURL(selectedFile);

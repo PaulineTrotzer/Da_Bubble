@@ -1,15 +1,26 @@
 <div class="msg-input-ct">
 
+
+  <div *ngIf="sendingStatus" [@fadeInOut] class="sending-status-box">
+    {{ sendingStatus }}
+  </div>
+
   <div class="main-input-area">
     <label for="msg-input"></label>
-    <div class="highlight" #highlightDiv  [innerHTML]="formattedMessage"></div>
+
+    <div class="chat-editable" contenteditable="true" (input)="onInput($event)" (keydown)="sendMessage($event)"
+      #editableDiv [attr.data-placeholder]="'Schreib etwas...'" [innerHTML]="formattedMessage">
+    </div>
+    <!--    <div class="highlight" #highlightDiv  [innerHTML]="formattedMessage"></div>
     <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" [(ngModel)]="chatMessage"
-      (scroll)="onScroll($event)" (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea>
+      (scroll)="onScroll($event)" (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea> -->
     <div class="flex-preview"
       *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
       <div class="error-message" *ngIf="multipleFilesErrorMessage">
         {{ multipleFilesErrorMessage }}
       </div>
+
+
 
       <!-- Feedback für zu große Datei -->
       <div class="error-message" *ngIf="fileTooLargeMessage">

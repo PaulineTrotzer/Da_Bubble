@@ -157,7 +157,7 @@ export class ChannelThreadComponent implements OnInit {
 
   focusInputField(): void {
     if (this.inputFieldComponent) {
-      this.inputFieldComponent.focusInputField();
+/*       this.inputFieldComponent.focusInputField(); */
     }
   }
 

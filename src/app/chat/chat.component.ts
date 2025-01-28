@@ -505,7 +505,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   focusInputField(): void {
     if (this.inputFieldComponent) {
-      this.inputFieldComponent.focusInputField();
+/*       this.inputFieldComponent.focusInputField(); */
     }
   }
 
