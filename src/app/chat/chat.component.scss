@@ -7,14 +7,13 @@
 }
 
 .text-container {
-  display: flex; /* Flexbox für flexible Ausrichtung */
-  flex-wrap: wrap; /* Automatisches Umbrechen bei Platzmangel */
-  justify-content: flex-start; /* Text von links beginnen lassen */
-  align-items: center; /* Vertikale Zentrierung */
-  line-height: 1.5; /* Angenehmer Zeilenabstand */
-  padding: 5px 12px; /* Platz um den Text */
-  gap: 8px; /* Abstand zwischen Textteilen */
-  word-wrap: break-word; /* Längere Wörter umbrechen */
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: flex-start; 
+  align-items: center;
+  padding: 5px 12px; 
+  gap: 8px; 
+  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 

@@ -25,11 +25,9 @@ export class InputfieldService {
 
   updateFiles(componentId: string, files: any[]): void {
     this.filesByComponent[componentId] = files;
-    this.filesSubject.next({ ...this.filesByComponent }); // Dateien für alle Komponenten aktualisieren
-  
-    // Falls nötig, auch `selectFiles` aktualisieren, falls an anderer Stelle abonniert:
+    this.filesSubject.next({ ...this.filesByComponent }); 
     if (componentId === this.activeComponentId.getValue()) {
-      this.selectFiles.next(files); // Nur aktive Komponente aktualisieren
+      this.selectFiles.next(files); 
     }
   
     console.log(`Updated files for component [${componentId}]:`, files);

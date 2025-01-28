@@ -464,7 +464,7 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       this.showTwoPersonConversationTxt = false;
-      await this.getMessages(); /* .then(() => this.checkForSelfChat()) */
+      await this.getMessages();
       console.log('selectedUser changes');
       this.focusInputField();
     }
@@ -509,29 +509,6 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-/*   checkForSelfChat() {
-    if (
-      this.selectedUser?.uid === this.global.currentUserData?.id &&
-      this.messagesData.length === 0
-    ) {
-      this.showWelcomeChatText = true;
-      this.showTwoPersonConversationTxt = false;
-    } else {
-      this.showWelcomeChatText = false;
-      this.checkTwoPersonConversation();
-    }
-  }
-
-  checkTwoPersonConversation() {
-    if (
-      this.selectedUser?.uid !== this.global.currentUserData?.id &&
-      this.messagesData.length === 0
-    ) {
-      this.showTwoPersonConversationTxt = true;
-    } else {
-      this.showTwoPersonConversationTxt = false;
-    }
-  } */
 
   showBeginningText() {
     this.showWelcomeChatText = true;
@@ -552,7 +529,6 @@ export class ChatComponent implements OnInit, OnChanges {
     const messageRef = doc(this.firestore, 'messages', message.id);
 
     if (this.editableMessageText.trim() === '') {
-      // Nachricht löschen
       getDoc(messageRef)
         .then((docSnapshot) => {
           if (docSnapshot.exists()) {
@@ -734,6 +710,17 @@ export class ChatComponent implements OnInit, OnChanges {
     const ids = [this.global.currentUserData?.id, this.selectedUser?.id];
     ids.sort();
     return ids.join('_');
+  }
+
+  onMessageCreated(newLocalMsg: any) {
+    // 1) Sofort in dein Array pushen
+    this.messagesData.push(newLocalMsg);
+    
+    // 2) Ggf. sortieren?
+    // this.messagesData.sort((a, b) => a.timestamp - b.timestamp);
+
+    // 3) Optional: Autoscroll?
+    this.scrollAutoDown();
   }
 
   async getMessages() {

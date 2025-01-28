@@ -59,16 +59,15 @@ import { animate, style, transition, trigger } from '@angular/animations';
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [
-        style({ opacity: 0 }),       // Startzustand
-        animate('300ms ease-out',    // Dauer + Timing
-          style({ opacity: 1 }))     // Endzustand
+        style({ opacity: 0 }), // Startzustand
+        animate(
+          '300ms ease-out', // Dauer + Timing
+          style({ opacity: 1 })
+        ), // Endzustand
       ]),
-      transition(':leave', [
-        animate('300ms ease-in',
-          style({ opacity: 0 }))
-      ])
-    ])
-  ]
+      transition(':leave', [animate('300ms ease-in', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
@@ -85,7 +84,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   firestore = inject(Firestore);
   selectFiles: any[] = [];
   elementRef = inject(ElementRef);
-  @ViewChild('scrollContainer') private scrollContainer: any = ElementRef;
   cdr = inject(ChangeDetectorRef);
   userService = inject(UserService);
   senderStickerCount: number = 0;
@@ -108,6 +106,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   inputFieldService = inject(InputfieldService);
   activeComponentId!: string;
+  @Output() messageCreated = new EventEmitter<any>();
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -167,9 +166,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
     this.formattedMessage = '';
-    /*     this.processSendMessage().then(() => {
-      this.isPreviewActive = false;
-    }); */
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -189,6 +185,110 @@ export class InputFieldComponent implements OnInit, OnChanges {
   sendingStatus: string | null = null;
 
   async processSendMessage(): Promise<void> {
+    // 1) Eingabe & Dateien prüfen
+    if (!this.canSendMessage()) {
+      return;
+    }
+  
+    // 2) Senden je nach Channel/Thread/Direct
+    if (this.selectedChannel && !this.isChannelThreadOpen) {
+      await this.sendChannelMessage();
+    } else if (this.isDirectThreadOpen) {
+      await this.sendDirectThreadMessage();
+      await this.setMessageCount();
+    } else if (this.isChannelThreadOpen) {
+      await this.sendChannelThreadMessage();
+    } else {
+      // 3) Normaler Upload + Firestore
+      await this.sendStandardMessage();
+    }
+  }
+
+  canSendMessage(): boolean {
+    const selectedFiles = this.inputFieldService.getFiles(this.currentComponentId);
+    const noText = !this.chatMessage || this.chatMessage.trim().length === 0;
+    const noFiles = !selectedFiles || selectedFiles.length === 0;
+  
+    if (noText && noFiles) {
+      this.sendingStatus = null;
+      console.warn('Leere Nachricht kann nicht gesendet werden.');
+      return false;
+    }
+  
+    if (selectedFiles.length === 1) {
+      this.sendingStatus = 'Message is reaching chat partner...';
+      const file = selectedFiles[0];
+      const fileBlob = this.dataURLToBlob(file.data);
+  
+      const MAX_FILE_SIZE = 500 * 1024; // 500KB
+      if (fileBlob.size > MAX_FILE_SIZE) {
+        this.fileTooLargeMessage = 'Bitte konvertiere deine Datei (max. 500 KB):';
+        this.multipleFilesErrorMessage = null;
+        this.sendingStatus = null;
+        return false;
+      }
+    }
+  
+    return true;
+  }
+
+  private async sendStandardMessage(): Promise<void> {
+    const selectedFiles = this.inputFieldService.getFiles(this.currentComponentId);
+  
+    try {
+      const localTempId = `temp_${Date.now()}_${Math.random()}`;
+      const localMessage = {
+        id: localTempId,
+        text: this.chatMessage,
+        sending: true,
+        timestamp: new Date(),
+        // Dateivorschau: data-URLs
+        selectedFiles: selectedFiles.map(file => ({
+          url: file.data,
+          type: file.type,
+          name: file.name,
+        })),
+      };
+      this.messageCreated.emit(localMessage);
+      const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
+  
+      const messageData = this.messageData(
+        this.chatMessage,
+        this.senderStickerCount,
+        this.recipientStickerCount
+      );
+  
+      messageData.selectedFiles = fileData.map(file => ({
+        url: file.url,
+        type: file.type,
+        name: file.name,
+      }));
+  
+      const messagesRef = collection(this.firestore, 'messages');
+      const docRef = await addDoc(messagesRef, messageData);
+  
+      const messageWithId = { ...messageData, id: docRef.id };
+      this.messagesData.push(messageWithId);
+  
+      await this.setMessageCount();
+      this.messageSent.emit();
+      this.resetInputdata();
+  
+    } catch (error) {
+      console.error('Fehler beim Senden der Nachricht:', error);
+    } finally {
+      // Aufräumen
+      if (this.editableDivRef?.nativeElement) {
+        this.editableDivRef.nativeElement.style.height = '130px';
+      }
+      this.inputFieldService.updateFiles(this.currentComponentId, []);
+      this.sendingStatus = null;
+    }
+  }
+  
+/* 
+
+  async processSendMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
       this.currentComponentId
     );
@@ -196,10 +296,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
       (!this.chatMessage || this.chatMessage.trim().length === 0) &&
       selectedFiles.length === 0
     ) {
-      this.sendingStatus = null; 
+      this.sendingStatus = null;
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return;
     }
+
     const MAX_FILE_SIZE = 500 * 1024; // 500 KB
 
     // Prüfen, ob die hochgeladene Datei zu groß ist
@@ -226,7 +327,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
       await this.sendChannelThreadMessage();
     } else {
       try {
-        // Dateien zu Firebase hochladen
+        const localTempId = `temp_${Date.now()}_${Math.random()}`;
+        const localMessage = {
+          id: localTempId,
+          text: this.chatMessage,
+          sending: true, // oder ein Status-Feld
+          timestamp: new Date(),
+          selectedFiles: selectedFiles.map(file => ({
+            url: file.data,         // oder eine dataURL
+            type: file.type,
+            name: file.name,
+          })),
+        };
+
+        this.messageCreated.emit(localMessage);
+
         const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
 
         // Nachrichtendaten vorbereiten
@@ -251,25 +366,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
         const messageWithId = { ...messageData, id: docRef.id };
         this.messagesData.push(messageWithId);
 
-        // Nach dem Senden Input-Feld und andere Zustände zurücksetzen
         await this.setMessageCount();
         this.messageSent.emit();
         this.resetInputdata();
-        this.inputFieldService.updateFiles(this.currentComponentId, []);
+      } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error);
+      }
+      finally {
         const chatDiv = this.editableDivRef.nativeElement;
         if (chatDiv) {
           chatDiv.style.height = '130px';
         }
+        this.inputFieldService.updateFiles(this.currentComponentId, []);
         this.sendingStatus = null;
-      } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error);
       }
     }
-  }
-
-  /*   onPreviewUpdated(isActive: boolean): void {
-    this.isPreviewActive = isActive;
-    console.log('Preview status:', isActive);
   } */
 
   dataURLToBlob(dataURL: string): Blob {
@@ -371,7 +482,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.chatMessage = '';
     this.selectFiles = [];
     this.formattedChatMessage = '';
-  
+
     // 2) Contenteditable-DIV leeren
     if (this.editableDivRef?.nativeElement) {
       this.editableDivRef.nativeElement.innerHTML = '';
@@ -559,12 +670,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
   onInput(event: Event): void {
     const editableDiv = event.target as HTMLDivElement;
     this.chatMessage = editableDiv.innerText;
-  
+
     /*     const containerh = document.querySelector('.highlight') as HTMLElement;
     if (containerh) {
       containerh.scrollTop = containerh.scrollHeight;
     } */
-/* 
+    /* 
     this.updateFormattedMessage(); // Aktualisiere das Highlighting */
   }
 
@@ -592,17 +703,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.isEmojiPickerVisible = true;
       }, 0);
     }
-  }
-
-  scrollToBottom(): void {
-    this.scrollContainer.nativeElement.scrollTop =
-      this.scrollContainer.nativeElement.scrollHeight;
-  }
-
-  scrollAutoDown(): void {
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 1000);
   }
 
   addEmoji(event: any) {

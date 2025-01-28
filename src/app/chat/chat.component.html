@@ -464,7 +464,7 @@
             </div>
         </div>
     </div>
-    <app-input-field [currentComponentId]="'chat'" (mentionCardOpened)="handleMentionCardOpened($event)"
+    <app-input-field  (messageCreated)="onMessageCreated($event)" [currentComponentId]="'chat'" (mentionCardOpened)="handleMentionCardOpened($event)"
         [selectedChannel]="selectedChannel" [selectedUser]="selectedUser"
         (messageSent)="onMessageSent()"></app-input-field>
 
