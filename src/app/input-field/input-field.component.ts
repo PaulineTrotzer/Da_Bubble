@@ -110,8 +110,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
-      console.log('user changed', this.selectedUser);
       this.resetInputdata();
+      this.handleResetErrors();
     }
   }
 
@@ -477,8 +477,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
+
   resetInputdata() {
-    // 1) State-Variablen zurücksetzen
     this.chatMessage = '';
     this.selectFiles = [];
     this.formattedChatMessage = '';
@@ -679,12 +679,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.updateFormattedMessage(); // Aktualisiere das Highlighting */
   }
 
-  handleResetErrors(): void {
-    const chatDiv = this.editableDivRef.nativeElement;
 
-    if (chatDiv) {
-      chatDiv.style.height = '130px';
-    }
+  handleResetErrors() {
+    this.fileTooLargeMessage = null;
+    this.multipleFilesErrorMessage = null;
   }
 
   updateSelectedUser(newUser: any) {
