@@ -238,9 +238,16 @@
                                             </div>
                                         </div>
                                     </mat-card-content>
-
+                                    <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
+                                        'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
+                                        'edited-recipient-view': message.recipientName === global.currentUserData.name && message.senderName !== global.currentUserData.name,
+                                        'edited-both-view': message.senderName === global.currentUserData.name && message.recipientName === global.currentUserData.name
+                                      }">
+                                        (Bearbeitet)
+                                    </div>
                                 </mat-card>
                             </div>
+       
                             <div class="placeholder-thread-answer">
                                 <div (click)="openThread(message.id)"
                                     [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
@@ -251,13 +258,7 @@
                                 </div>
                             </div>
 
-                            <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
-                       'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
-                       'edited-recipient-view': message.recipientName === global.currentUserData.name && message.senderName !== global.currentUserData.name,
-                       'edited-both-view': message.senderName === global.currentUserData.name && message.recipientName === global.currentUserData.name
-                     }">
-                                (Bearbeitet)
-                            </div>
+
 
                             <!--        <div class="avatar-box"> -->
 
