@@ -203,7 +203,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async updateMessage(updatedMessage: any): Promise<void> {
     await this.ensureMessagesLoaded();
-
+    this.shouldScroll = false;
     if (updatedMessage.deleted) {
       await this.handleDeletedMessage(updatedMessage);
       return;
@@ -356,6 +356,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   openEmojiPickerEdit() {
+    this.isEmojiPickerVisible = false;
     this.isEmojiPickerVisibleEdit = true;
     this.overlayStatusService.setOverlayStatus(true);
   }
@@ -505,10 +506,9 @@ export class ChatComponent implements OnInit, OnChanges {
 
   focusInputField(): void {
     if (this.inputFieldComponent) {
-/*       this.inputFieldComponent.focusInputField(); */
+      /*       this.inputFieldComponent.focusInputField(); */
     }
   }
-
 
   showBeginningText() {
     this.showWelcomeChatText = true;
@@ -713,13 +713,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   onMessageCreated(newLocalMsg: any) {
-    // 1) Sofort in dein Array pushen
     this.messagesData.push(newLocalMsg);
-    
-    // 2) Ggf. sortieren?
-    // this.messagesData.sort((a, b) => a.timestamp - b.timestamp);
-
-    // 3) Optional: Autoscroll?
     this.scrollAutoDown();
   }
 
@@ -800,13 +794,13 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   updateSubscriptionText() {
-    const isSelfChat = this.selectedUser?.uid === this.global.currentUserData?.id;
+    const isSelfChat =
+      this.selectedUser?.uid === this.global.currentUserData?.id;
     const hasNoMessages = this.messagesData.length === 0;
-  
+
     this.showWelcomeChatText = isSelfChat && hasNoMessages;
     this.showTwoPersonConversationTxt = !isSelfChat && hasNoMessages;
   }
-  
 
   async updateMessagesWithNewPhoto() {
     try {
@@ -1297,7 +1291,7 @@ export class ChatComponent implements OnInit, OnChanges {
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;
     this.editableMessageText += emoji;
-    this.isEmojiPickerVisibleEdit = false;
+    this.closePickerEdit();
   }
 
   @HostListener('document:click', ['$event'])

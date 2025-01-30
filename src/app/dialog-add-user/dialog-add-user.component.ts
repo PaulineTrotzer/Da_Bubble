@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Inject,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   MatDialogModule,
   MatDialog,
@@ -49,8 +56,8 @@ export class DialogAddUserComponent implements OnInit {
   currentUser: any;
   currentUserId: any;
   global = inject(GlobalVariableService);
-  firestore=inject(Firestore);
-  memberDataService=inject(MemberDataService);
+  firestore = inject(Firestore);
+  memberDataService = inject(MemberDataService);
 
   async ngOnInit(): Promise<void> {
     this.getCreatedChannel(this.data.channelId);
@@ -58,26 +65,34 @@ export class DialogAddUserComponent implements OnInit {
   }
 
   async onSubmit(form: any) {
-    if (this.addAllUsers && form.valid) {
+    if (!this.isFormValid()) {
+      return;
+    }
+
+    if (this.addAllUsers) {
       await this.addAllUsersToChannel();
-    } else if (this.selectUsers && this.selectedUsers.length > 0) {
+    } else if (this.selectUsers) {
       await this.addSelectedUsersToChannel();
     }
+
     this.dialogRef.close(true);
   }
 
-   async addAllUsersToChannel() {
+  async addAllUsersToChannel() {
     const userIds = this.allUsers.map((user) => user.uid);
     await this.updateChannelUserIds(userIds);
   }
 
-   async addSelectedUsersToChannel() {
-    const selectedUsersWithCurrentUser = [...this.selectedUsers, this.global.currentUserData];
+  async addSelectedUsersToChannel() {
+    const selectedUsersWithCurrentUser = [
+      ...this.selectedUsers,
+      this.global.currentUserData,
+    ];
     const userIds = selectedUsersWithCurrentUser.map((user) => user.uid);
     await this.updateChannelUserIds(userIds);
   }
 
-   async updateChannelUserIds(userIds: string[]) {
+  async updateChannelUserIds(userIds: string[]) {
     const channelRef = doc(this.db, 'channels', this.data.channelId);
     try {
       await updateDoc(channelRef, {
@@ -89,9 +104,12 @@ export class DialogAddUserComponent implements OnInit {
         const channelData = updatedChannelDoc.data();
         const userIdsInChannel = channelData?.['userIds'] || [];
         const usersRef = collection(this.db, 'users');
-        const usersQuery = query(usersRef, where('uid', 'in', userIdsInChannel));
+        const usersQuery = query(
+          usersRef,
+          where('uid', 'in', userIdsInChannel)
+        );
         const querySnapshot = await getDocs(usersQuery);
-  
+
         const members = querySnapshot.docs.map((doc) => doc.data());
         this.memberDataService.setMembers(members);
       }
@@ -99,7 +117,26 @@ export class DialogAddUserComponent implements OnInit {
       console.error('Error adding users to the channel:', error);
     }
   }
-  
+
+  isFormValid(): boolean {
+    console.log(
+      '🔍 Status - addAllUsers:',
+      this.addAllUsers,
+      ' | selectUsers:',
+      this.selectUsers,
+      ' | selectedUsers:',
+      this.selectedUsers.length
+    );
+
+    if (this.addAllUsers) {
+      return true; // Button bleibt aktiv, wenn alle Nutzer hinzugefügt werden sollen
+    }
+    if (this.selectUsers && this.selectedUsers.length > 0) {
+      return true; // Button bleibt aktiv, wenn mindestens ein Nutzer ausgewählt ist
+    }
+    return false; // Falls nichts ausgewählt ist oder kein User hinzugefügt wurde -> Button bleibt deaktiviert
+  }
+
   closeDialog() {
     this.dialog.closeAll();
   }
@@ -108,7 +145,6 @@ export class DialogAddUserComponent implements OnInit {
     const colRef = collection(this.db, 'users');
     onSnapshot(colRef, (snapshot) => {
       this.allUsers = snapshot.docs.map((doc) => doc.data());
-
     });
   }
 
@@ -133,6 +169,12 @@ export class DialogAddUserComponent implements OnInit {
     const selectedUser = this.filteredUsers[index];
     if (!this.selectedUsers.includes(selectedUser)) {
       this.selectedUsers.push(selectedUser);
+      console.log(
+        '✅ Nutzer hinzugefügt:',
+        selectedUser.name,
+        ' | Anzahl:',
+        this.selectedUsers.length
+      );
     }
     this.allUsers = this.allUsers.filter(
       (user) => user.uid !== selectedUser.uid
@@ -140,12 +182,16 @@ export class DialogAddUserComponent implements OnInit {
     this.filteredUsers = this.filteredUsers.filter(
       (user) => user.uid !== selectedUser.uid
     );
+
     this.searchInput = '';
   }
 
   deleteUser(index: number) {
     const removedUser = this.selectedUsers[index];
     this.selectedUsers.splice(index, 1);
+    if (this.selectedUsers.length === 0) {
+      return;
+    }
     if (!this.allUsers.some((user) => user.uid === removedUser.uid)) {
       this.allUsers.push(removedUser);
     }
@@ -161,6 +207,7 @@ export class DialogAddUserComponent implements OnInit {
   toggleAllUsers() {
     this.addAllUsers = true;
     this.selectUsers = false;
+    this.selectedUsers = []; // Falls vorher Nutzer ausgewählt wurden, löschen
     this.updateDialogHeight();
   }
 

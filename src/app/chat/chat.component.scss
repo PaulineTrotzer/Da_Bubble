@@ -7,12 +7,12 @@
 }
 
 .text-container {
-  display: flex; 
-  flex-wrap: wrap; 
-  justify-content: flex-start; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
-  padding: 5px 12px; 
-  gap: 8px; 
+  padding: 5px 12px;
+  gap: 8px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -563,10 +563,11 @@ app-input-field {
 }
 
 .sticker-info-wrapper {
+  position: absolute;
+  /*   top: 186px; */
   display: flex;
   flex-direction: column;
   align-items: center; /* Zentriert die Inhalte horizontal */
-  position: relative;
 }
 
 .sticker-container {
@@ -576,27 +577,97 @@ app-input-field {
   position: relative;
 }
 
-.comment-sticker-holder {
+/* .comment-sticker-holder {
   position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
+} */
 
 .show-comment-stricker {
   position: relative;
   display: flex;
-  align-items: baseline;
+  justify-content: center;
+  align-items: center;
   border: 1px solid #adb0d9;
-  border-radius: 16px;
+  border-radius: 13px;
   padding: 5px;
-  gap: 3px;
+  gap: 1px;
   height: 35px;
-  font-size: 15px;
+  width: 38px;
+  font-size: 14px;
   &:hover {
     border-color: #444df2;
     cursor: pointer;
   }
+}
+
+.sticker-item {
+  position: relative; // Wichtig
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #adb0d9;
+  border-radius: 13px;
+  padding: 5px;
+  gap: 1px;
+  height: 35px;
+  width: 38px;
+  font-size: 14px;
+  &:hover {
+    border-color: #444df2;
+    cursor: pointer;
+  }
+  .sticker-content {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.sticker-info-tooltip {
+  position: absolute;
+  bottom: 35px;
+  left: 55px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 30px;
+  border-top-right-radius: 30px;
+  background-color: #444df2;
+  color: #ffffff;
+  max-width: 200px;
+  padding: 8px;
+  width: fit-content;
+  opacity: 0;
+  visibility: hidden; /* Damit es nicht klickbar ist */
+  pointer-events: none; /* Kein Maus-Fokus */
+  transition: opacity 0.3s ease-in-out;
+  z-index: 999;
+
+  &.is-current {
+    background-color: #444df2;
+    // if you want a different style for the current user
+  }
+  &.is-other {
+    background-color: #444df2;
+    // if you want a different style for the other user
+  }
+}
+
+.sticker-info-tooltip.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; /* Wieder anklickbar */
+}
+
+/* Tooltip verstecken ohne "blauen Tropfen" */
+.sticker-info-tooltip:not(.show) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .sticker-senderName-current {
@@ -607,11 +678,11 @@ app-input-field {
   background-color: #444df2;
   color: #ffffff;
   display: flex;
+  padding: 8px !important;
   position: absolute;
   width: fit-content;
-  padding: 3px;
-  top: -400px;
-  left: -40px;
+  /*   top: -400px;
+  left: -40px; */
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
 }
@@ -619,15 +690,16 @@ app-input-field {
 .sticker-senderName-current.hovered {
   opacity: 1;
   z-index: 200;
-  top: -120px;
 }
 
 .sticker-info-wrapper .hoveredSelectedUserReaction {
+  bottom: -230px;
   left: 10px;
 }
 
 .sticker-info-wrapper .hoveredCurrentUserReaction {
-  bottom: -10px;
+  bottom: -230px;
+  left: 60px;
   /*   right: 5px; */
 }
 
@@ -635,6 +707,10 @@ app-input-field {
   left: -38px;
   top: -120px;
   height: fit-content;
+}
+
+.sticker-senderName-current .hoveredOwnReaction .hovered {
+  bottom: -190px !important;
 }
 
 .sticker-senderName-user {
@@ -650,7 +726,7 @@ app-input-field {
   display: flex;
   /*   left: 0; */
   opacity: 0;
-  padding: 1px;
+  padding: 8px !important;
   /*   top: -400px; */
   transition: opacity 0.4s ease-in-out;
 }
@@ -658,7 +734,7 @@ app-input-field {
 .sticker-senderName-user.hovered {
   opacity: 1;
   z-index: 200;
-  top: -50px;
+  /*   top: -50px; */
   /*   left: 8px; */
 }
 
@@ -669,19 +745,20 @@ app-input-field {
 
 .sticker-senderName-user.hoveredName {
   position: absolute;
-  top: -94px;
-  left: -58px;
+  /*  top: -94px;
+  left: -58px; */
 }
 
 .sticker-senderName-current-bothReaction {
-  top: -190px !important;
-  left: -30px !important;
+  bottom: -220px;
+  /*   left: -30px !important; */
 }
 
-.sticker-senderName-user.seperateName {
-  position: absolute;
+.sticker-senderName-current.seperateName {
+  /*   position: absolute;
   left: 10px;
-  top: -28px;
+  top: -28px; */
+  bottom: -220px !important;
 }
 
 .sticker-info {
@@ -721,6 +798,11 @@ app-input-field {
   font-size: 12px;
   position: absolute;
   bottom: -25px;
+  color: black;
+}
+
+.sticker-info-wrapper .hoveredBothReaction {
+  bottom: -230px;
 }
 
 .edited-recipient-view {

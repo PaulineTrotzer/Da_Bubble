@@ -128,8 +128,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
     this.getByUserName();
     this.subscription.add(
-      this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
-        this.currentThreadMessageId = messageId;
+      this.threadControlService.firstThreadMessageId$.subscribe({
+        next: (messageId) => {
+          console.log('Empfangenes Message ID:', messageId);
+          this.currentThreadMessageId = messageId;
+        },
+        error: (err) => console.error('Fehler im Subscription-Stream:', err),
+        complete: () => console.log('Observable wurde beendet.'),
       })
     );
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -142,7 +147,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
-      this.cdr.detectChanges();
     });
   }
 
@@ -189,7 +193,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (!this.canSendMessage()) {
       return;
     }
-  
+
     // 2) Senden je nach Channel/Thread/Direct
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
@@ -205,36 +209,41 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   canSendMessage(): boolean {
-    const selectedFiles = this.inputFieldService.getFiles(this.currentComponentId);
+    const selectedFiles = this.inputFieldService.getFiles(
+      this.currentComponentId
+    );
     const noText = !this.chatMessage || this.chatMessage.trim().length === 0;
     const noFiles = !selectedFiles || selectedFiles.length === 0;
-  
+
     if (noText && noFiles) {
       this.sendingStatus = null;
       console.warn('Leere Nachricht kann nicht gesendet werden.');
       return false;
     }
-  
+
     if (selectedFiles.length === 1) {
       this.sendingStatus = 'Message is reaching chat partner...';
       const file = selectedFiles[0];
       const fileBlob = this.dataURLToBlob(file.data);
-  
+
       const MAX_FILE_SIZE = 500 * 1024; // 500KB
       if (fileBlob.size > MAX_FILE_SIZE) {
-        this.fileTooLargeMessage = 'Bitte konvertiere deine Datei (max. 500 KB):';
+        this.fileTooLargeMessage =
+          'Bitte konvertiere deine Datei (max. 500 KB):';
         this.multipleFilesErrorMessage = null;
         this.sendingStatus = null;
         return false;
       }
     }
-  
+
     return true;
   }
 
   private async sendStandardMessage(): Promise<void> {
-    const selectedFiles = this.inputFieldService.getFiles(this.currentComponentId);
-  
+    const selectedFiles = this.inputFieldService.getFiles(
+      this.currentComponentId
+    );
+
     try {
       const localTempId = `temp_${Date.now()}_${Math.random()}`;
       const localMessage = {
@@ -243,7 +252,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         sending: true,
         timestamp: new Date(),
         // Dateivorschau: data-URLs
-        selectedFiles: selectedFiles.map(file => ({
+        selectedFiles: selectedFiles.map((file) => ({
           url: file.data,
           type: file.type,
           name: file.name,
@@ -251,29 +260,28 @@ export class InputFieldComponent implements OnInit, OnChanges {
       };
       this.messageCreated.emit(localMessage);
       const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
-  
+
       const messageData = this.messageData(
         this.chatMessage,
         this.senderStickerCount,
         this.recipientStickerCount
       );
-  
-      messageData.selectedFiles = fileData.map(file => ({
+
+      messageData.selectedFiles = fileData.map((file) => ({
         url: file.url,
         type: file.type,
         name: file.name,
       }));
-  
+
       const messagesRef = collection(this.firestore, 'messages');
       const docRef = await addDoc(messagesRef, messageData);
-  
+
       const messageWithId = { ...messageData, id: docRef.id };
       this.messagesData.push(messageWithId);
-  
+
       await this.setMessageCount();
       this.messageSent.emit();
       this.resetInputdata();
-  
     } catch (error) {
       console.error('Fehler beim Senden der Nachricht:', error);
     } finally {
@@ -285,8 +293,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.sendingStatus = null;
     }
   }
-  
-/* 
+
+  /* 
 
   async processSendMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
@@ -476,7 +484,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Error sending message:', error);
     }
   }
-
 
   resetInputdata() {
     this.chatMessage = '';
@@ -678,7 +685,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     /* 
     this.updateFormattedMessage(); // Aktualisiere das Highlighting */
   }
-
 
   handleResetErrors() {
     this.fileTooLargeMessage = null;

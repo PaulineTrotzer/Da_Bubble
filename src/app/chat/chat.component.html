@@ -4,7 +4,6 @@
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
-
     <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
             <div *ngFor="let message of messagesData; let i=index">
@@ -143,6 +142,11 @@
                             </mat-card-content>
                         </mat-card>
 
+
+
+
+
+
                         <div [ngClass]="{
             'picture-box-current':
               message.senderId === global.currentUserData.id,
@@ -247,7 +251,7 @@
                                     </div>
                                 </mat-card>
                             </div>
-       
+
                             <div class="placeholder-thread-answer">
                                 <div (click)="openThread(message.id)"
                                     [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
@@ -262,210 +266,186 @@
 
                             <!--        <div class="avatar-box"> -->
 
-                            <div class="sticker-info-wrapper">
-                                <mat-card *ngIf="messageIdHovered === message.id" [ngClass]="{
-    'sticker-senderName-current': message.senderId === global.currentUserData.id,
-    'hoveredOwnReaction': message.senderId === global.currentUserData.id && hoveredCurrentUser,
-    'hovered': stickerHoverStates[message.id],  
-    'hoveredSenderName': hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '',
-    'hoveredName': hoveredName && message.recipientSticker !== message.senderSticker,
-    'seperateName': message.recipientSticker !== '' && message.senderSticker === '',
-    'hoveredRecipienUser': hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker,
-    'sticker-senderName-current-bothReaction': message.senderId === global.currentUserData.id &&
-      message.recipientName === selectedUser.name &&
-      message.senderSticker !== '' &&
-      message.recipientSticker !== '' &&
-      message.senderSticker === message.recipientSticker,
-    'sticker-senderName-user': message.senderId !== global.currentUserData.id &&
-      !(message.senderId === global.currentUserData.id), 
-    'hoveredSelectedUserReaction': message.senderId === selectedUser.id && hoveredCurrentUser,
-    'hoveredCurrentUserReaction': message.senderId === selectedUser.id && hoveredRecipienUser,
-    'hoveredBothReaction': message.senderName === selectedUser.name &&
-      message.senderSticker !== '' &&
-      message.recipientSticker !== '' &&
-      message.senderSticker === message.recipientSticker
-  }">
-
-                                    <mat-card-content
-                                        *ngIf="message.senderSticker !== '' || message.recipientSticker !== ''">
-                                        <!-- Nachricht vom aktuellen Benutzer -->
-
-                                        <div
-                                            *ngIf="message.senderId === global.currentUserData.id && messageIdHovered === message.id">
-                                            <div class="sticker-info"
-                                                *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ message.recipientName }} hat mit
-                                                    <span>{{message.recipientSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
-                                                <span class="sticker-sender-name">
-                                                    Du hast mit <span>{{message.senderSticker}}</span> reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ message.recipientName }} und Du haben mit
-                                                    <span>{{message.recipientSticker}}</span> reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="hoveredRecipienUser && message.senderSticker !== '' && message.senderSticker !== message.recipientSticker">
-                                                <span class="sticker-sender-name">
-                                                    {{ hoveredRecipienUser }} hat mit
-                                                    <span>{{message.recipientSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="hoveredCurrentUser && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ hoveredCurrentUser }} hast mit
-                                                    <span>{{message.senderSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <!-- Nachricht von anderen Benutzern -->
-                                        <div
-                                            *ngIf="message.senderId !== global.currentUserData.id && messageIdHovered === message.id">
-                                            <div class="sticker-info"
-                                                *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
-                                                <span class="sticker-sender-name">
-                                                    Du hast mit <span>{{message.recipientSticker}}</span> reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="message.senderSticker !== '' && message.recipientSticker === ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ message.senderName }} hat mit
-                                                    <span>{{message.senderSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="message.recipientSticker === message.senderSticker">
-                                                <span class="sticker-sender-name">
-                                                    {{ message.senderName }} und Du haben mit
-                                                    <span>{{message.recipientSticker}}</span> reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="hoveredName && message.recipientSticker !== message.senderSticker && message.senderSticker !== '' && message.recipientSticker !== ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ hoveredName }} hast mit <span>{{message.recipientSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-
-                                            <div class="sticker-info"
-                                                *ngIf="hoveredSenderName && message.recipientSticker !== message.senderSticker && message.recipientSticker !== '' && message.senderSticker !== ''">
-                                                <span class="sticker-sender-name">
-                                                    {{ hoveredSenderName }} hat mit
-                                                    <span>{{message.senderSticker}}</span>
-                                                    reagiert
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </mat-card-content>
-                                </mat-card>
-                            </div>
 
 
                             <div class="comment-sticker-holder"
                                 [ngClass]="{'comment-sticker-holder-partner': message.senderName === selectedUser.name}">
                                 <!-- Erster Sticker -->
-                                <div [ngClass]="{
-                                    'show-comment-stricker': message.senderSticker !== '',
-                                  }" (click)="removeSenderSticker(message)" (mouseenter)="onHoverSticker(message)"
-                                    (mouseleave)="onLeaveSticker(message)" (mouseenter)="
-                                    messageIdHovered = message.id;
-                                    hoveredSenderName = message.senderName;
-                                    hoveredCurrentUser = 'Du';
-                                    
-                                  " (mouseleave)="
-                                    messageIdHovered = null;
-                                    hoveredSenderName = null;
-                                    hoveredCurrentUser = null;
-                                  " *ngIf="message.senderSticker !== '' || message.senderName === selectedUser.name">
-                                    <span *ngIf="message.senderSticker">{{ message.senderSticker }}</span>
-                                    <span *ngIf="message.senderStickerCount && message.senderStickerCount > 0">
-                                        {{ message.senderStickerCount }}
-                                    </span>
+
+                                <div class="sticker-item"
+                                    *ngIf="message.senderSticker !== '' || message.recipientSticker !==''" [ngClass]="{
+                                  'comment-sticker-holder-partner': message.senderName === selectedUser.name
+                                }" (mouseenter)="
+                                   messageIdHovered = message.id;
+                                   hoveredSenderName = message.senderName;
+                                   hoveredCurrentUser = 'Du';
+                                   onHoverSticker(message)
+                                " (mouseleave)="
+                                   messageIdHovered = null;
+                                   hoveredSenderName = null;
+                                   hoveredCurrentUser = null;
+                                   onLeaveSticker(message)
+                                ">
+
+                                    <div class="sticker-content" (click)="removeSenderSticker(message)">
+                                        <span *ngIf="message.senderSticker">{{ message.senderSticker }}</span>
+                                        <span *ngIf="message.senderStickerCount && message.senderStickerCount > 1">
+                                            {{ message.senderStickerCount }}
+                                        </span>
+                                    </div>
+
+
+                                    <!-- Zweiter Sticker -->
+                                    <div *ngIf="message.recipientSticker !== message.senderSticker"
+                                        class="sticker-content" (click)="removeRecipientSticker(message)">
+                                        <span>{{ message.recipientSticker }}</span>
+                                        <span
+                                            *ngIf="message.recipientStickerCount && message.recipientStickerCount > 1">
+                                            {{ message.recipientStickerCount }}
+                                        </span>
+                                    </div>
+
                                 </div>
 
-                                <!-- Zweiter Sticker -->
-                                <div *ngIf="
-                                    message.recipientSticker !== '' &&
-                                    message.recipientSticker !== message.senderSticker
-                                  " class="show-comment-stricker" (click)="removeRecipientSticker(message)"
-                                    (mouseenter)="onHoverSticker(message)" (mouseleave)="onLeaveSticker(message)"
-                                    (mouseenter)="
-                                    messageIdHovered = message.id;
-                                    hoveredName = 'Du';
-                                    hoveredRecipienUser = message.recipientName;
-                                  " (mouseleave)="
-                                    messageIdHovered = null;
-                                    hoveredName = null;
-                                    hoveredRecipienUser = null;
-                                  ">
-                                    <span>{{ message.recipientSticker }}</span>
-                                    <span *ngIf="message.recipientStickerCount && message.recipientStickerCount > 0">
-                                        {{ message.recipientStickerCount }}
-                                    </span>
-                                </div>
                             </div>
+                            <mat-card class="sticker-info-tooltip" [ngClass]="{
+                                'is-current': message.senderId === global.currentUserData.id,
+                                'is-other': message.senderId !== global.currentUserData.id,
+                                'show': messageIdHovered === message.id
+                              }">
+                                <mat-card-content *ngIf="messageIdHovered === message.id">
 
+                                    <!-- 🔹 Sender ist der aktuelle User -->
+                                    <div *ngIf="message.senderId === global.currentUserData.uid">
+                                        <!-- 1️⃣ Anderer hat reagiert, du nicht -->
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker !== '' && message.senderSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.recipientName }} hat mit <span>{{ message.recipientSticker
+                                                    }}</span> reagiert
+                                            </span>
+                                        </div>
 
+                                        <!-- 2️⃣ Du hast reagiert, anderer nicht -->
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredCurrentUser && message.recipientSticker !== message.senderSticker && message.senderId !== global.currentUserData.uid">
 
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredCurrentUser }} hast mit <span>{{ message.senderSticker
+                                                    }}</span> reagiert
+                                            </span>
+                                        </div>
 
+                                        <!-- 3️⃣ Beide haben denselben Sticker -->
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.recipientName }} und Du haben mit <span>{{
+                                                    message.recipientSticker }}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <!-- 4️⃣ Unterschiedliche Sticker -->
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredRecipienUser && message.senderSticker !== message.recipientSticker">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredRecipienUser }} hat mit <span>{{ message.recipientSticker
+                                                    }}</span> reagiert
+                                            </span>
+                                        </div>
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredCurrentUser && message.recipientSticker !== message.senderSticker && message.recipientSticker !== message.senderSticker">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredCurrentUser }} hast mit <span>{{ message.senderSticker
+                                                    }}</span> reagiert
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 🔹 Sender ist nicht der aktuelle User -->
+                                    <div *ngIf="message.senderId !== global.currentUserData.uid">
+                                        <!-- 1️⃣ Du hast reagiert, anderer nicht -->
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker && message.recipientSticker !== '' && message.senderId !== global.currentUserData.uid && message.recipientSticker !== message.senderSticker">
+                                            <span class="sticker-sender-name">
+                                                Du hast mit <span>{{ message.recipientSticker }}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <!-- 2️⃣ Anderer hat reagiert, du nicht -->
+                                        <div class="sticker-info"
+                                            *ngIf="!hoveredRecipienUser && message.senderSticker && message.senderSticker !== '' && message.recipientSticker === ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.senderName }} hat mit <span>{{ message.senderSticker
+                                                    }}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <!-- 3️⃣ Beide haben denselben Sticker -->
+                                        <div class="sticker-info"
+                                            *ngIf="message.recipientSticker === message.senderSticker && message.recipientSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ message.senderName }} und Du haben mit <span>{{
+                                                    message.recipientSticker }}</span> reagiert
+                                            </span>
+                                        </div>
+
+                                        <!-- 4️⃣ Unterschiedliche Sticker -->
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredName && message.recipientSticker !== message.senderSticker && !hoveredSenderName">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredName }} hast mit <span>{{ message.recipientSticker }}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
+                                        <div class="sticker-info"
+                                            *ngIf="hoveredSenderName && message.senderSticker && message.recipientSticker !== message.senderSticker && !hoveredRecipienUser && message.recipientSticker !== ''">
+                                            <span class="sticker-sender-name">
+                                                {{ hoveredSenderName }} hat mit <span>{{ message.senderSticker }}</span>
+                                                reagiert
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </mat-card-content>
+                            </mat-card>
+
+                            <!--       </div> -->
                         </div>
-                        <!--       </div> -->
                     </div>
                 </div>
-            </div>
-            <app-channel-chat [inputMessagesData]="messagesData" (enterChatFromChannel)="enterChatByUserName($event)"
-                *ngIf="global.channelSelected" [selectedChannel]="selectedChannel"></app-channel-chat>
-            <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText && !hasMessagesValue">
-                <div class="self-name-and-img">
-                    <img class="self-chat-img" src={{global.currentUserData.picture}}>
-                    <p>{{global.currentUserData?.name }}</p>
-                    <p class="you">(Du)</p>
+                <app-channel-chat [inputMessagesData]="messagesData"
+                    (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
+                    [selectedChannel]="selectedChannel"></app-channel-chat>
+                <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText && !hasMessagesValue">
+                    <div class="self-name-and-img">
+                        <img class="self-chat-img" src={{global.currentUserData.picture}}>
+                        <p>{{global.currentUserData?.name }}</p>
+                        <p class="you">(Du)</p>
+                    </div>
+                    <span class="self-chat-txt">
+                        <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
+                        auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
+                        gerne Dinge mit dir selbst besprechen.
+                    </span>
                 </div>
-                <span class="self-chat-txt">
-                    <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
-                    auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
-                    gerne Dinge mit dir selbst besprechen.
-                </span>
-            </div>
-            <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessagesValue">
-                <div class="img-and-name">
-                    <img class="self-chat-img" src={{selectedUser?.picture}}>
-                    <p>{{selectedUser?.name}}</p>
-                </div>
-                <div class="two-chat-txt">
-                    Diese Unterhaltung findet nur zwischen
-                    <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span> und
-                    dir
-                    statt
+                <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessagesValue">
+                    <div class="img-and-name">
+                        <img class="self-chat-img" src={{selectedUser?.picture}}>
+                        <p>{{selectedUser?.name}}</p>
+                    </div>
+                    <div class="two-chat-txt">
+                        Diese Unterhaltung findet nur zwischen
+                        <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span>
+                        und
+                        dir
+                        statt
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <app-input-field  (messageCreated)="onMessageCreated($event)" [currentComponentId]="'chat'" (mentionCardOpened)="handleMentionCardOpened($event)"
-        [selectedChannel]="selectedChannel" [selectedUser]="selectedUser"
-        (messageSent)="onMessageSent()"></app-input-field>
-
+    <app-input-field (messageCreated)="onMessageCreated($event)" [currentComponentId]="'chat'"
+        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
+        [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 </div>

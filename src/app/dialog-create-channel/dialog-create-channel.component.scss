@@ -5,6 +5,12 @@
   gap: 25px;
 }
 
+.warning-max-length {
+  color: rgb(234 7 7);
+  font-size: 15px;
+  text-align: center;
+}
+
 .top-bar {
   display: flex;
   align-items: center;
@@ -24,10 +30,10 @@
   border-radius: 100%;
   cursor: pointer;
   &:hover {
-    background-color: #ECEEFE;
+    background-color: #eceefe;
   }
   &:hover .icon path {
-    fill: #535AF1;
+    fill: #535af1;
   }
 }
 
@@ -66,7 +72,7 @@ form {
   }
   input {
     border-radius: 40px;
-    border: 1px solid #ADB0D9;
+    border: 1px solid #adb0d9;
     padding: 18px 20px;
     outline: none;
   }
@@ -78,17 +84,17 @@ form {
   }
 }
 
-
 .button-row {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .warn-message {
-  color: red;
+  color: rgb(234 7 7);
+  font-size: 15px;
 }
 
-@media (min-width: 768px){
+@media (min-width: 768px) {
   .card {
     padding: 40px;
   }
