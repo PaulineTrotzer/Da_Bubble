@@ -371,6 +371,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
+    this.workspaceService.updateChannel(channel);
     this.selectedUser = null;
     this.selectedChannel = null;
     setTimeout(() => {

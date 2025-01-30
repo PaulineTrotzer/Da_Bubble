@@ -78,7 +78,7 @@ header {
 }
 
 .padding-border {
-  padding: 20px;
+  padding: 12px;
   border: 1px solid #adb0d9;
   transition: all 175ms ease-in-out;
 }
@@ -120,12 +120,11 @@ header {
 .created-by-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   p {
     font-family: Nunito;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 400;
-    line-height: 32.74px;
     text-align: left;
     color: #535af1;
   }
@@ -148,13 +147,16 @@ header {
 .edit-button {
   color: #535af1;
   font-family: Nunito;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 24.55px;
   text-align: left;
   border: none;
   background: none;
   cursor: pointer;
+  &:hover{
+    color: blue;
+  }
 }
 
 hr {

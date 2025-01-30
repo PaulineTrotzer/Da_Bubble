@@ -301,8 +301,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   openDialog() {
+    console.log("📌 Übergebene Channel-Daten:", this.selectedChannel);
     this.dialog.open(DialogEditChannelComponent, {
-      data: this.selectedChannel,
+      data: this.selectedChannel,  // Prüfen, ob `createdBy` existiert
       panelClass: 'edit-dialog',
       maxWidth: '872px',
       maxHeight: '616px',

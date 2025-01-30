@@ -125,8 +125,7 @@ export class DialogCreateChannelComponent implements OnInit {
     newChannel.name = channelName;
     newChannel.description = this.channelForm.value.description || '';
     newChannel.userIds = [];
-    newChannel.createdBy = this.data.userId || '';
-
+    newChannel.createdBy = this.global.currentUserData.uid || '';
     try {
       // 🚀 Speichere den Channel mit toJSON()
       const docRef = await addDoc(channelsRef, newChannel.toJSON());
@@ -148,8 +147,9 @@ export class DialogCreateChannelComponent implements OnInit {
       const channelDocRef = doc(this.db, 'channels', docRef.id);
       await updateDoc(channelDocRef, { id: docRef.id });
 
-      // 🎯 Aktualisiere den Channel in der `workspaceService`
+
       this.workspaceService.updateChannel(newChannel);
+      console.log('for workspace',newChannel);
 
       // 🎯 Setze `this.channel` korrekt
       this.channel = newChannel;

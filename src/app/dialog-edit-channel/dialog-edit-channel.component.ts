@@ -35,12 +35,23 @@ export class DialogEditChannelComponent implements OnInit {
   constructor(    @Inject(MAT_DIALOG_DATA) public data: any,
   private dialogRef: MatDialogRef<DialogEditChannelComponent>) {}
 
+
   ngOnInit(): void {
     if (this.firstFocusable) {
       this.firstFocusable.nativeElement.focus();
     }
-    this.getCreaterData();
+
+    this.workspaceService.selectedChannel$.subscribe(channel => {
+      if (channel) {
+        this.channel = channel;
+        console.log("🔄 Channel im Edit-Dialog geladen:", this.channel);
+        this.getCreaterData();
+      } else {
+        console.error("⚠️ Kein Channel im WorkspaceService verfügbar!");
+      }
+    });
   }
+
 
   async getCreaterData() {
     if (!this.channel || !this.channel.createdBy) {
