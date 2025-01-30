@@ -119,22 +119,13 @@ export class DialogAddUserComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    console.log(
-      '🔍 Status - addAllUsers:',
-      this.addAllUsers,
-      ' | selectUsers:',
-      this.selectUsers,
-      ' | selectedUsers:',
-      this.selectedUsers.length
-    );
-
     if (this.addAllUsers) {
-      return true; // Button bleibt aktiv, wenn alle Nutzer hinzugefügt werden sollen
+      return true; 
     }
     if (this.selectUsers && this.selectedUsers.length > 0) {
-      return true; // Button bleibt aktiv, wenn mindestens ein Nutzer ausgewählt ist
+      return true; 
     }
-    return false; // Falls nichts ausgewählt ist oder kein User hinzugefügt wurde -> Button bleibt deaktiviert
+    return false; 
   }
 
   closeDialog() {
@@ -160,7 +151,7 @@ export class DialogAddUserComponent implements OnInit {
       this.filteredUsers = [];
       const searchTerm = this.searchInput.toLowerCase();
       this.filteredUsers = this.allUsers.filter((user) => {
-        return user.name && user.name.toLowerCase().includes(searchTerm);
+        return user.name && user.name.toLowerCase().includes(searchTerm) && user.name !== 'Gast';
       });
     }
   }
