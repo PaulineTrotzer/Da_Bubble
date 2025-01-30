@@ -120,12 +120,12 @@ export class DialogAddUserComponent implements OnInit {
 
   isFormValid(): boolean {
     if (this.addAllUsers) {
-      return true; 
+      return true;
     }
     if (this.selectUsers && this.selectedUsers.length > 0) {
-      return true; 
+      return true;
     }
-    return false; 
+    return false;
   }
 
   closeDialog() {
@@ -151,7 +151,11 @@ export class DialogAddUserComponent implements OnInit {
       this.filteredUsers = [];
       const searchTerm = this.searchInput.toLowerCase();
       this.filteredUsers = this.allUsers.filter((user) => {
-        return user.name && user.name.toLowerCase().includes(searchTerm) && user.name !== 'Gast';
+        return (
+          user.name &&
+          user.name.toLowerCase().includes(searchTerm) &&
+          user.name !== 'Gast'
+        );
       });
     }
   }
@@ -180,15 +184,25 @@ export class DialogAddUserComponent implements OnInit {
   deleteUser(index: number) {
     const removedUser = this.selectedUsers[index];
     this.selectedUsers.splice(index, 1);
-    if (this.selectedUsers.length === 0) {
-      return;
-    }
+
+    // 🔄 Füge den entfernten User zurück zur Auswahl hinzu
     if (!this.allUsers.some((user) => user.uid === removedUser.uid)) {
       this.allUsers.push(removedUser);
     }
+
+    // 🔄 Falls Suchbegriff existiert, Liste neu filtern
     if (this.searchInput) {
       this.searchUser();
     }
+
+    // 🔄 Setze den Formular-Status neu
+    this.updateFormState();
+  }
+
+  updateFormState() {
+    setTimeout(() => {
+      this.isFormValid();
+    });
   }
 
   toggleHover() {

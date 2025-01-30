@@ -74,6 +74,11 @@ header {
     font-weight: 400;
     line-height: 24.55px;
     text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    display: block;
+    max-width: 100%;
   }
 }
 

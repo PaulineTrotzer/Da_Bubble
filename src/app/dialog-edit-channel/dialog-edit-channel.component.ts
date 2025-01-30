@@ -1,15 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Inject,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   arrayRemove,
-  deleteField,
   doc,
   Firestore,
   getDoc,
   updateDoc,
 } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { AuthService } from '../services/auth.service';
 import { DialogChannelUserComponent } from '../dialog-channel-user/dialog-channel-user.component';
 import { WorkspaceService } from '../services/workspace.service';
@@ -30,28 +40,52 @@ export class DialogEditChannelComponent implements OnInit {
   isEditingName: boolean = false;
   isEditingDescription: boolean = false;
   workspaceService = inject(WorkspaceService);
-  @ViewChild('firstFocusable', { static: true }) firstFocusable: ElementRef | undefined;
+  @ViewChild('firstFocusable', { static: true }) firstFocusable:
+    | ElementRef
+    | undefined;
 
-  constructor(    @Inject(MAT_DIALOG_DATA) public data: any,
-  private dialogRef: MatDialogRef<DialogEditChannelComponent>) {}
-
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private dialogRef: MatDialogRef<DialogEditChannelComponent>
+  ) {}
 
   ngOnInit(): void {
     if (this.firstFocusable) {
       this.firstFocusable.nativeElement.focus();
     }
-
-    this.workspaceService.selectedChannel$.subscribe(channel => {
-      if (channel) {
-        this.channel = channel;
-        console.log("🔄 Channel im Edit-Dialog geladen:", this.channel);
-        this.getCreaterData();
+    if (this.data && this.data.id) {
+      this.channel = this.data;
+      if (!this.channel.createdBy) {
+        this.loadChannelFromFirestore(this.channel.id);
       } else {
-        console.error("⚠️ Kein Channel im WorkspaceService verfügbar!");
+        this.getCreaterData();
       }
-    });
+    } else {
+      this.workspaceService.selectedChannel$.subscribe((channel) => {
+        if (channel) {
+          this.channel = channel;
+          this.getCreaterData();
+        } else {
+          console.warn(
+            ' Kein Channel gefunden'
+          );
+        }
+      });
+    }
   }
 
+  async loadChannelFromFirestore(channelId: string) {
+    try {
+      const channelRef = doc(this.db, 'channels', channelId);
+      const channelSnap = await getDoc(channelRef);
+      if (channelSnap.exists()) {
+        this.channel = { id: channelId, ...channelSnap.data() };
+        this.getCreaterData();
+      }
+    } catch (error) {
+      console.error('Fehler beim Nachladen des Channels:', error);
+    }
+  }
 
   async getCreaterData() {
     if (!this.channel || !this.channel.createdBy) {

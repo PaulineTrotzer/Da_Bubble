@@ -35,6 +35,7 @@ import { MemberDataService } from '../services/member-data.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.class';
 import { WorkspaceService } from '../services/workspace.service';
+import { Channel } from '../models/channel.class';
 
 interface ChannelData {
   userIds: string[];
@@ -300,10 +301,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  openDialog() {
-    console.log("📌 Übergebene Channel-Daten:", this.selectedChannel);
+  openDialog(channel: Channel) {
     this.dialog.open(DialogEditChannelComponent, {
-      data: this.selectedChannel,  // Prüfen, ob `createdBy` existiert
+      data: channel,  // 🔥 Hier den gesamten Channel übergeben
       panelClass: 'edit-dialog',
       maxWidth: '872px',
       maxHeight: '616px',
