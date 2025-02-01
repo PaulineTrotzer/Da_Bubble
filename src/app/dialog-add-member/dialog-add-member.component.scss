@@ -28,9 +28,16 @@
   align-items: center;
   gap: 16px;
   color: #797ef3;
+
   .hashtag path {
     fill: #797ef3;
   }
+}
+
+.error-box {
+  font-size: 13px;
+  text-align: center;
+  color: #c81a20;
 }
 
 .add-input {
@@ -75,30 +82,56 @@ form {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px 25px;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 20px;
+  padding: 8px;
   border: 1px solid #adb0d9;
-  box-shadow: 0px 2px 10px 0px #00000014;
   background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 10px 0px #00000014;
+
   position: absolute;
+  top: 64px; /* etwas weiter unter dem Input, je nach Layout */
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
   z-index: 10;
-  top: 16px;
-  left: 21px;
+
+  /* Kleiner Pfeil oberhalb (optional) */
+  &::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #fff;
+  }
 }
 
 .contact {
+  position: relative; 
   display: flex;
   align-items: center;
   gap: 16px;
   cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
   img {
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     object-fit: cover;
-    border-radius: 100%;
+    border-radius: 20px;
   }
+
+  &:hover {
+    background-color: #f2f3ff;
+  }
+}
+
+.contact:not(:last-child) {
+  border-bottom: 1px solid #eee;
 }
 
 .status-border {
@@ -106,8 +139,9 @@ form {
   background-color: white;
   padding: 2px;
   border-radius: 100%;
-  top: 54px;
-  left: 59px;
+  top: 34px;
+  left: 30px;
+
 
   span {
     display: block;
@@ -119,31 +153,34 @@ form {
 }
 
 .selected-users {
-  position: absolute;
-  left: 16px;
-  top: 8px;
   display: flex;
-  align-items: center;
+  flex-wrap: wrap; /* mehrzeiliger Umbruch bei vielen Users */
   gap: 8px;
+  margin-top: 8px; /* Abstand zum Input */
 }
 
 .selected-contact {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  border-radius: 35px;
   gap: 8px;
-  padding: 3px 20px;
-  background: #eceefe;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background-color: #eceefe; /* oder #f0f0f0, je nach Geschmack */
+
   img {
     height: 34px;
-    min-width: 34px;
-    border-radius: 100%;
+    width: 34px;
+    border-radius: 17px;
+    object-fit: cover;
   }
+
   p {
-    font-family: Nunito;
-    font-size: 18px;
+    margin: 0;
+    font-size: 16px;
     font-weight: 400;
-    line-height: 24.55px;
-    text-align: left;
+    white-space: nowrap; /* ggf. Zeilenumbruch verhindern */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 120px; /* wenn du das per „…“ abkürzen möchtest */
   }
 }
