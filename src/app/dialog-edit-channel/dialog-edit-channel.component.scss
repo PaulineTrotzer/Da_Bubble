@@ -159,10 +159,17 @@ header {
   border: none;
   background: none;
   cursor: pointer;
-  &:hover{
-    color: blue;
+  transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+
+  &:hover {
+    color: #3949ab; 
+    transform: scale(1.05); 
+  }
+  &:active {
+    transform: scale(1); 
   }
 }
+
 
 hr {
   border: 1px solid #adb0d9;

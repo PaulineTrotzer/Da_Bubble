@@ -16,21 +16,28 @@
         </svg>
       </div>
     </div>
+
     <form #addUserForm="ngForm" (submit)="onSubmit(addUserForm)">
       <div class="form-row">
         <input (click)="toggleAllUsers()" value="allUsers" name="option" type="radio" id="all-user"
-        [checked]="addAllUsers" />
-        <label for="all-user">Alle Mitglieder zu <span> {{ channel.name }} </span> hinzufügen
+          [checked]="addAllUsers" />
+        <label for="all-user">
+          Alle Mitglieder zu <span> {{ channel.name }} </span> hinzufügen
         </label>
       </div>
+
       <div class="form-row">
         <input (click)="toggleSelectUsers()" value="selectedUsers" name="option" type="radio" id="selected-user"
-        [checked]="selectUsers" />
+          [checked]="selectUsers" />
         <label for="selected-user">Bestimmte Leute hinzufügen</label>
       </div>
-      <div class="form-row search-row">
+
+
+      <div class="form-row search-row" style="flex-direction: column; align-items: flex-start;">
         <input (input)="searchUser()" class="search-field" #searchField type="text" name="search-input"
           #search="ngModel" [(ngModel)]="searchInput" placeholder="Name eingeben..." *ngIf="selectUsers" />
+
+        <!-- Dropdown-Liste mit gefilterten Usern -->
         <div class="user-list" *ngIf="searchInput && filteredUsers.length > 0">
           <div class="status-border">
             <span class="status"></span>
@@ -40,6 +47,8 @@
             <p>{{ user.name }}</p>
           </div>
         </div>
+
+
         <div class="selected-users" *ngIf="selectedUsers.length > 0">
           <div class="selected-contact" *ngFor="let selectedUser of selectedUsers; let i = index">
             <img src="{{ selectedUser.picture }}" alt="" />
@@ -62,7 +71,6 @@
         </div>
       </div>
 
-      
       <div class="button-row">
         <button type="submit" [disabled]="!isFormValid()" (mouseenter)="toggleHover()" (mouseleave)="toggleHover()"
           [ngClass]="{

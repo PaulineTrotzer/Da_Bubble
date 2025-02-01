@@ -54,11 +54,44 @@ form {
   width: 100%;
 }
 
+
+.selected-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; 
+  margin-top: 8px;
+}
+
+
+.selected-contact {
+  display: inline-flex; 
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  max-width: 100%;
+}
+
+
+.selected-contact img {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+
+.selected-contact p {
+  margin: 0;
+  word-wrap: break-word; 
+}
+
 .user-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px 25px;
+  padding: 8px;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -67,14 +100,32 @@ form {
   background-color: white;
   position: absolute;
   z-index: 10;
-  top: 16px;
-  left: 21px;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
 }
+
+.user-list::before {
+  content: '';
+  position: absolute;
+  top: -8px; 
+  left: 20px; 
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff; 
+}
+
 
 .contact {
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px; 
+  border-radius: 8px; 
+  transition: background-color 0.2s ease;
   img {
     height: 50px;
     width: 50px;
@@ -83,49 +134,10 @@ form {
   }
 }
 
-.selected-users {
-  position: absolute;
-  left: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.contact:not(:last-child) {
+  border-bottom: 1px solid #eee;
 }
 
-.selected-contact {
-  display: flex;
-  align-items: center;
-  border-radius: 35px;
-  gap: 8px;
-  padding: 3px 20px;
-  background: #eceefe;
-  img {
-    height: 34px;
-    width: 40px;
-    object-fit: cover;
-    border-radius: 40px;
-  }
-  p {
-    font-family: Nunito;
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 24.55px;
-    text-align: left;
-  }
-}
-
-.status-border {
-  position: absolute;
-  background-color: white;
-  padding: 2px;
-  border-radius: 100%;
-  top: 48px;
-  left: 58px;
-
-  span {
-    display: block;
-    background-color: #92c83e;
-    height: 14px;
-    width: 14px;
-    border-radius: 100%;
-  }
+.contact:hover {
+  background-color: #f2f3ff; 
 }

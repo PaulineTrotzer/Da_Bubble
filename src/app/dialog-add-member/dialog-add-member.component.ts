@@ -21,6 +21,7 @@ export class DialogAddMemberComponent implements OnInit {
   filteredUsers: any[] = [];
   selectedUsers: any[] = [];
   searchInput: string = '';
+  errorMessage: string = '';
 
   ngOnInit(): void {
     this.getAllUsers();
@@ -60,17 +61,28 @@ export class DialogAddMemberComponent implements OnInit {
 
   selectUser(index: number) {
     const selectedUser = this.filteredUsers[index];
+    
+    // 1) Zuerst prüfen, ob bereits im Kanal:
+    if (this.channel.userIds && this.channel.userIds.includes(selectedUser.uid)) {
+      this.errorMessage = 'Benutzer ist bereits Mitglied im Kanal!';
+      return; // Methode an dieser Stelle beenden
+    }
+    
+    // 2) Prüfen, ob der User bereits in der Liste der auszuwählenden User liegt
     if (!this.selectedUsers.includes(selectedUser)) {
       this.selectedUsers.push(selectedUser);
     }
-    this.allUsers = this.allUsers.filter(
-      (user) => user.uid !== selectedUser.uid
-    );
-    this.filteredUsers = this.filteredUsers.filter(
-      (user) => user.uid !== selectedUser.uid
-    );
+  
+    // 3) Aus allUsers und filteredUsers wieder entfernen, sodass er nicht noch einmal angeklickt werden kann
+    this.allUsers = this.allUsers.filter(user => user.uid !== selectedUser.uid);
+    this.filteredUsers = this.filteredUsers.filter(user => user.uid !== selectedUser.uid);
+  
+    // 4) Eingabe leeren
     this.searchInput = '';
+    // 5) Da der Select erfolgreich durchlief, evtl. errorMessage zurücksetzen
+    this.errorMessage = '';
   }
+  
 
   deleteUser(index: number) {
     const removedUser = this.selectedUsers[index];
