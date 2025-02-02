@@ -28,7 +28,6 @@ import { DialogHeaderDropdownComponent } from '../dialog-header-dropdown/dialog-
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { switchMap } from 'rxjs';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -51,7 +50,6 @@ import { GlobalVariableService } from '../services/global-variable.service';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  auth = inject(AuthService);
   firestore = inject(Firestore);
   user: User = new User();
   userID: any;
@@ -59,13 +57,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
   clicked = false;
   allUsers: User[] = [];
   unsub?: () => void;
-  overlayStatusService = inject(OverlayStatusService);
   overlayOpen = false;
   private overlayStatusSub!: Subscription;
   searcheNameOrChannel: string = '';
+  showUserList: boolean = false;
+  showChannelList: boolean = false;
+  auth = inject(AuthService);
   global = inject(GlobalVariableService);
+  overlayStatusService = inject(OverlayStatusService);
   overlay = inject(OverlayStatusService);
   @Output() headerUserSelected = new EventEmitter<any>();
+  @Output() headerChannelSelcted = new EventEmitter<any>();
+  listlastResultResult: boolean = false;
 
   constructor(private route: ActivatedRoute, private eRef: ElementRef) {}
 
@@ -92,16 +95,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   subscribeOverlayService() {
-    this.overlayStatusSub = this.overlayStatusService.overlayStatus$.subscribe(
-      (status) => {
-        this.overlayOpen = status;
-      }
-    );
+    this.overlayStatusSub = this.overlayStatusService.overlayStatus$.subscribe(status => {
+      this.overlayOpen = status;
+    });
   }
+  
 
-  closePicker() {
-    this.overlay.setOverlayStatus(false);
-  }
 
   ngOnDestroy(): void {
     if (this.unsub) {
@@ -116,33 +115,34 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.clicked = !this.clicked;
     this.overlayStatusService.setOverlayStatus(this.clicked);
   }
+  
 
-  closeDropDown() {
-    this.overlayStatusService.setOverlayStatus(false);
+  onOverlayClosed(){
+    this.overlayOpen = false;
+    this.clicked = false;
   }
+
 
   @HostListener('document:click', ['$event'])
-  closeDropdowns(event: Event): void {
+  closeDropdowns(event: MouseEvent): void {
     const clickedElement = event.target as HTMLElement;
     if (
-      !clickedElement.closest('.mainSearch-box') &&
-      !clickedElement.closest('input')
+      clickedElement.closest('.mainSearch-box') ||
+      clickedElement.closest('input') ||
+      clickedElement.closest('.overlay')
     ) {
-      this.showUserList = false;
-      this.showChannelList = false;
-      this.listlastResultResult = false;
-      this.searcheNameOrChannel = '';
+      return;
     }
+    this.showUserList = false;
+    this.showChannelList = false;
+    this.listlastResultResult = false;
+    this.searcheNameOrChannel = '';
   }
-
-  listlastResultResult: boolean = false;
+  
 
   handleFocus(): void {
     this.listlastResultResult = true;
   }
-
-  showUserList: boolean = false;
-  showChannelList: boolean = false;
 
   checkInputValue() {
     if (
@@ -268,10 +268,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.channelIdHover = '';
   }
 
-  @Output() headerChannelSelcted = new EventEmitter<any>();
-
   async enterChannel(channel: any) {
-    console.log(channel.messages);
     const channelRef = doc(this.firestore, 'searchHeaderResult', this.userID);
     await setDoc(
       channelRef,
@@ -289,7 +286,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   getUser(currentId: any) {
     const docRef = doc(this.firestore, 'searchHeaderResult', currentId);
     if (!this.userID) {
-      console.error('UserID is undefined');
       return;
     }
     onSnapshot(docRef, (docSnapshot) => {
@@ -323,8 +319,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   deleteUser(user: any) {
-    console.log(user);
-    console.log('delete');
     const docRef = doc(this.firestore, 'searchHeaderResult', this.userID);
     updateDoc(docRef, { searchHeaderResult: arrayRemove(user) });
   }

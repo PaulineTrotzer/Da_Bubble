@@ -30,6 +30,7 @@
 }
 
 .members-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -38,29 +39,27 @@
 }
 
 .member {
-  position: relative;
-  font-family: Nunito;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 24.55px;
-  text-align: left;
-  cursor: pointer;
-}
-
-span {
-  display: inline-flex;
+  display: flex;           
   align-items: center;
-  gap: 8px;
-  padding: 4px 20px;
-  border-radius: 35px;
+  justify-content: flex-start; 
+  padding: 8px 16px;   
+  border-radius: 35px;        
+  cursor: pointer;
+  &:hover {
+    background-color: #eceefe;
+  }
+  transition: background-color 0.2s ease;
   img {
     height: 50px;
     width: 50px;
     border-radius: 100%;
     object-fit: cover;
+    margin-right: 8px; 
   }
-  &:hover {
-    background: #eceefe;
+  span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 }
 

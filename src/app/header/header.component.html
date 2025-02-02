@@ -134,7 +134,8 @@
                 </svg>
             </button>
             <div *ngIf="clicked">
-                <app-dialog-header-dropdown></app-dialog-header-dropdown>
+                <div class="overlay"></div>
+                <app-dialog-header-dropdown  (closeOverlayFromDropDown)="onOverlayClosed()"></app-dialog-header-dropdown>
             </div>
         </div>
     </div>

@@ -9,11 +9,11 @@
   border-radius: 22px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* Ermöglicht das Scrollen */
-  max-height: 100vh; /* Begrenzt die Höhe der Karte */
+  overflow-y: auto; 
+  max-height: 100vh; 
   background-color: white;
+  z-index: 999;
 }
-
 
 .name-escape-flex {
   display: flex;

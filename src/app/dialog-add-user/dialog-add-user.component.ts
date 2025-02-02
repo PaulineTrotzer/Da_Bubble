@@ -164,12 +164,6 @@ export class DialogAddUserComponent implements OnInit {
     const selectedUser = this.filteredUsers[index];
     if (!this.selectedUsers.includes(selectedUser)) {
       this.selectedUsers.push(selectedUser);
-      console.log(
-        '✅ Nutzer hinzugefügt:',
-        selectedUser.name,
-        ' | Anzahl:',
-        this.selectedUsers.length
-      );
     }
     this.allUsers = this.allUsers.filter(
       (user) => user.uid !== selectedUser.uid
@@ -212,7 +206,7 @@ export class DialogAddUserComponent implements OnInit {
   toggleAllUsers() {
     this.addAllUsers = true;
     this.selectUsers = false;
-    this.selectedUsers = []; // Falls vorher Nutzer ausgewählt wurden, löschen
+    this.selectedUsers = []; 
     this.updateDialogHeight();
   }
 

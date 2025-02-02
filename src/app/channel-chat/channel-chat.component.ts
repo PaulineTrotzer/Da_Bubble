@@ -33,6 +33,7 @@ import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { InputFieldComponent } from "../input-field/input-field.component";
 
 interface Message {
   formattedText: any;
@@ -55,7 +56,8 @@ interface Message {
     PickerComponent,
     FormsModule,
     MentionMessageBoxComponent,
-  ],
+    InputFieldComponent,
+],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
   animations: [
@@ -113,7 +115,6 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
-    await this.loadChannelMessages();
     await this.loadCurrentUserEmojis();
     await this.getAllUsersname();
     await this.loadUserNames();
@@ -124,6 +125,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
       console.log('selectedChannel (channel):', channel);
       this.selectedChannel = channel;
+       this.loadChannelMessages();
     });
   }
 

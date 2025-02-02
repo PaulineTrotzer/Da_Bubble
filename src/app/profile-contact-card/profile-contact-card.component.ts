@@ -48,7 +48,6 @@ export class ProfileContactCardComponent implements OnInit {
 
   closeProfileCard() {
     this.contactCardopen = false;
-    this.overlayStatusService.setOverlayStatus(false);
     this.closeProfile.emit();
   }
 }

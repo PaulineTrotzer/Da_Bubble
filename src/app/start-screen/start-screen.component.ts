@@ -36,6 +36,7 @@ import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.class';
 import { WorkspaceService } from '../services/workspace.service';
 import { Channel } from '../models/channel.class';
+import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 
 interface ChannelData {
   userIds: string[];
@@ -54,6 +55,7 @@ interface ChannelData {
     DialogAddMemberComponent,
     ProfileContactCardComponent,
     ChatComponent,
+    ChannelChatComponent,
     WelcomeSheetComponent,
   ],
   templateUrl: './start-screen.component.html',
@@ -121,6 +123,16 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   ngAfterViewChecked() {
     this.cdr.detectChanges();
   }
+
+/*   chatByUserName: any;
+  @Output() enterChatUser = new EventEmitter<any>();
+
+  enterChatByUserName(user: any) {
+    this.chatByUserName = user;
+    this.enterChatUser.emit(this.chatByUserName);
+    this.selectUser(user);
+    this.wasClickedChatInput = false;
+  } */
 
   async ngOnInit(): Promise<void> {
     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
@@ -267,7 +279,7 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() onHeaderChannel: any;
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['onHeaderUser'] && this.onHeaderUser) {
+/*     if (changes['onHeaderUser'] && this.onHeaderUser) {
       this.selectedChannel = null;
       this.onHeaderChannel = null;
       this.global.channelSelected = false;
@@ -282,8 +294,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.selectedChannel = this.onHeaderChannel;
       this.fetchChannelMembers();
       this.global.setCurrentChannel(this.onHeaderChannel);
-    }
-    if (changes['selectedUser'] && this.selectedUser) {
+
+    } */
+    if (changes['selectedChannel']) {
+      this.workspaceService.setSelectedChannel(this.selectedChannel);
     }
   }
 
@@ -405,8 +419,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   showMyUserProfile() {
     this.resetProfileSelection();
     this.checkProfileType();
-    this.openMyProfile = true;
-    this.overlayStatusService.setOverlayStatus(this.openMyProfile);
+    setTimeout(() => {
+      this.openMyProfile = true;
+    });
   }
 
   checkProfileType() {

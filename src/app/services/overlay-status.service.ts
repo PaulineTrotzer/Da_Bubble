@@ -11,7 +11,7 @@ export class OverlayStatusService {
   constructor() {}
 
   setOverlayStatus(status: boolean): void {
-    this.overlayStatus.next(status); 
+    this.overlayStatus.next(status);
   }
 
   getOverlayStatus(): boolean {

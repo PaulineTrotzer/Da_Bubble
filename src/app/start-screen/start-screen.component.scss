@@ -3,6 +3,17 @@ mat-card {
   border-style: none;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 11;
+}
+
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -37,40 +48,40 @@ mat-card {
   font-weight: 700;
   color: black;
 }
-
 .user-chat-info {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
+  gap: 8px;
+  width: 100%; 
+  min-height: 58px; 
+  padding: 8px 16px; 
   cursor: pointer;
-  padding: 4px 8px;
-  width: fit-content;
-  height: 58px;
+  border-radius: 30px;
+  transition: background-color 0.2s ease, color 0.2s ease;
   &:hover {
     background: #eceefe;
-    border-radius: 30px;
   }
+
   img {
     width: 50px;
     height: 50px;
-    border-radius: 25px;
+    border-radius: 50%;
     object-fit: cover;
   }
+
   h4 {
-    white-space: nowrap;
-    padding-right: 12px;
-    font-size: 24px;
+    margin: 0; 
+    font-size: 20px;
     font-weight: 700;
-    line-height: 32.74px;
-    text-align: left;
-    color: #000000;
-    :hover {
+    line-height: 24px;
+    color: #000; 
+    white-space: nowrap; 
+    &:hover {
       color: #444df2;
-      border-radius: 30px;
     }
   }
 }
+
 
 .drop-down-div {
   display: flex;

@@ -35,6 +35,7 @@ export class DialogAddMemberComponent implements OnInit {
   errorMessage: string = '';
 
   ngOnInit(): void {
+    console.log('Channel Data:', this.channel);
     this.getAllUsers();
   }
 

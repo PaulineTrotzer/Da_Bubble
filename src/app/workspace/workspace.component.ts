@@ -197,7 +197,6 @@ export class WorkspaceComponent implements OnInit {
       this.id = user.id;
       this.global.currentThreadMessageSubject.next('');
       this.global.channelThreadSubject.next(null);
-
       const actuallyId = this.id;
       if (
         this.userId &&
@@ -215,7 +214,6 @@ export class WorkspaceComponent implements OnInit {
       this.hiddenVoolThreadBox();
       this.checkWidtSize();
       this.cheackChatOpen();
-      this.cdr.detectChanges();
     });
   }
 

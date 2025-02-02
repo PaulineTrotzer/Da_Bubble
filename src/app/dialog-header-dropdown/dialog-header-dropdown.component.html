@@ -8,5 +8,5 @@
 </div>
 
 <div *ngIf="wasClicked">
-    <app-dialog-header-profil-card></app-dialog-header-profil-card>
+    <app-dialog-header-profil-card (closeProfile)="closeProfileFromCard()" ></app-dialog-header-profil-card>
 </div>

@@ -15,15 +15,15 @@
                 ? global.currentUserData.picture
                 : selectedUser?.picture
             " />
-             <h4>
-              {{
-                global.currentUserData.name === 'Gast' + 'Du'
-                  ? 'Gast'
-                  : global.currentUserData.name === selectedUser?.name
-                    ? global.currentUserData.name + ' (Du)'
-                    : selectedUser?.name
-              }}
-            </h4>
+          <h4>
+            {{
+            global.currentUserData.name === 'Gast' + 'Du'
+            ? 'Gast'
+            : global.currentUserData.name === selectedUser?.name
+            ? global.currentUserData.name + ' (Du)'
+            : selectedUser?.name
+            }}
+          </h4>
         </div>
 
       </div>
@@ -43,9 +43,17 @@
     </mat-card-header>
 
     <div *ngIf="!afterLoginSheet">
-      <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
-        [selectedChannel]="selectedChannel" [onHeaderUser]="onHeaderUser"
-        (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
+      <div *ngIf="!global.channelSelected">
+        <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
+          [selectedChannel]="selectedChannel" [onHeaderUser]="onHeaderUser"
+          (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
+      </div>
+
+      <div *ngIf="global.channelSelected">
+        <app-channel-chat [inputMessagesData]="messagesData" [selectedChannel]="selectedChannel"></app-channel-chat>
+      </div>
+
+
       <div class="members-container" *ngIf="global.channelSelected">
         <div class="member-avatars" (click)="openMemberDialog()">
           <div class="avatar-container">
@@ -71,3 +79,4 @@
         </div>
       </div>
     </div>
+    <div class="overlay" *ngIf="openMyProfile && contactWasSelected"></div>

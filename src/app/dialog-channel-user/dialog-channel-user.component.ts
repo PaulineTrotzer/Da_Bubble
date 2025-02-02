@@ -39,7 +39,6 @@ export class DialogChannelUserComponent implements OnInit {
       (members) => {
         this.members = members;
         this.allMembers.push(...members); 
-        console.log('Aktualisierte Mitglieder:', this.allMembers);
       },
       (error) => {
         console.error('Fehler beim Abrufen der Mitglieder:', error);
@@ -49,7 +48,6 @@ export class DialogChannelUserComponent implements OnInit {
     this.channelSubscription = this.memberDataService.channel$.subscribe(
       (channel) => {
         this.channel = channel;
-        console.log('Aktualisierter Channel:', this.channel);
       },
       (error) => {
         console.error('Fehler beim Abrufen des Channels:', error);
@@ -71,14 +69,22 @@ export class DialogChannelUserComponent implements OnInit {
   }
 
   openAddMemberDialog() {
-    this.closeDialog();
+    const channel = this.workspaceService.selectedChannelSubject.value;
+
+    if (!channel) {
+      console.warn('Kein Channel ausgewählt, kann Dialog nicht öffnen!');
+      return;
+    }
+    this.dialog.closeAll();
     this.dialog.open(DialogAddMemberComponent, {
-      data: this.channel,
+      data: channel,
       panelClass: 'add-member-dialog',
       maxWidth: '514px',
       maxHeight: '294px',
     });
   }
+
+  
 
   openProfileDialog(member: any) {
     this.closeDialog();

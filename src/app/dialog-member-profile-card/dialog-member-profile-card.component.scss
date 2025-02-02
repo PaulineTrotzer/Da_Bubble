@@ -92,6 +92,10 @@ h3 {
 
 .email {
   color: #444df2;
+  display: block;
+  max-width: 308px;
+  overflow-wrap: break-word;
+  text-align: center;
 }
 
 .contact-container {

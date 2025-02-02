@@ -414,9 +414,7 @@
                         </div>
                     </div>
                 </div>
-                <app-channel-chat [inputMessagesData]="messagesData"
-                    (enterChatFromChannel)="enterChatByUserName($event)" *ngIf="global.channelSelected"
-                    [selectedChannel]="selectedChannel"></app-channel-chat>
+
                 <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText && !hasMessagesValue">
                     <div class="self-name-and-img">
                         <img class="self-chat-img" src={{global.currentUserData.picture}}>
@@ -446,6 +444,6 @@
         </div>
     </div>
     <app-input-field (messageCreated)="onMessageCreated($event)" [currentComponentId]="'chat'"
-        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedChannel]="selectedChannel"
+        (mentionCardOpened)="handleMentionCardOpened($event)"
         [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 </div>

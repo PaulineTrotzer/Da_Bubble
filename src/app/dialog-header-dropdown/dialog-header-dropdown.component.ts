@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { DialogHeaderProfilCardComponent } from '../dialog-header-profil-card/dialog-header-profil-card.component';
@@ -46,13 +46,20 @@ export class DialogHeaderDropdownComponent implements OnInit, OnDestroy {
     this.updateStatus(this.userId);
   }
 
+
+  @Output() closeOverlayFromDropDown = new EventEmitter<void>();
+
   handleClickOutside = (event: MouseEvent) => {
     const dropdown = document.querySelector('.dialog-ct');
     if (dropdown && !dropdown.contains(event.target as Node)) {
       this.showDropDownOptions = false;
-      this.overlayStatusService.setOverlayStatus(false);
+      this.closeOverlayFromDropDown.emit();
     }
   };
+
+  closeProfileFromCard() {
+    this.closeOverlayFromDropDown.emit();
+  }
 
   async updateStatus(userId: string) {
     const docRef = doc(this.firestore, 'users', userId);
