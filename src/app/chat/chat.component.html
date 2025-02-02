@@ -443,7 +443,7 @@
             </div>
         </div>
     </div>
-    <app-input-field (messageCreated)="onMessageCreated($event)" [currentComponentId]="'chat'"
+    <app-input-field (messageCreated)="onMessageCreated($event)" [activeComponentId]="'chat'"
         (mentionCardOpened)="handleMentionCardOpened($event)"
         [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
 </div>

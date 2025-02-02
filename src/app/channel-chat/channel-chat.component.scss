@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 32px;
   margin-top: 2px;
+  height: 952px; 
   position: relative;
 }
 
@@ -36,11 +37,14 @@
   }
 }
 
-.message-scroll-container{
-  height: 705px;
+.message-scroll-container {
+  display: flex;
+  flex-direction: column;
+  height: 750px;  
+  padding-top: 23px;
+  overflow: auto;
   scroll-behavior: smooth;
-  overflow-y: auto;
-  padding-top: 17px;
+  position: relative;
 }
 
 .message-from-user {

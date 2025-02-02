@@ -70,6 +70,17 @@
               <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
             </label>
           </div>
+
+          <div *ngIf="currentComponentId === 'channel'">
+
+            <input type="file" id="upload-chat" (change)="onFileSelected($event, currentComponentId)" hidden />
+
+            <label for="upload-chat">
+              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
+            </label>
+          </div>
+
+
         </div>
 
         <img class="vector" src="./assets/img/vector_4.svg">

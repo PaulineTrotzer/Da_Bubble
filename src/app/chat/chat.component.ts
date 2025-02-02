@@ -144,7 +144,7 @@ export class ChatComponent implements OnInit, OnChanges {
   isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
   hasMessagesValue = false;
-  @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
+/*   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent; */
   sanitizer = inject(DomSanitizer);
   inputFieldService = inject(InputfieldService);
 
@@ -467,14 +467,14 @@ export class ChatComponent implements OnInit, OnChanges {
       this.showTwoPersonConversationTxt = false;
       await this.getMessages();
       console.log('selectedUser changes');
-      this.focusInputField();
+/*       this.focusInputField(); */
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.showWelcomeChatText = false;
       this.showTwoPersonConversationTxt = false;
       this.clearInput();
       console.log('selectedChannel changes');
-      this.focusInputField();
+/*       this.focusInputField(); */
     }
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
       this.showWelcomeChatText = false;
@@ -504,11 +504,11 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
-  focusInputField(): void {
-    if (this.inputFieldComponent) {
+/*   focusInputField(): void {
+    if (this.inputFieldComponent) { */
       /*       this.inputFieldComponent.focusInputField(); */
-    }
-  }
+/*     }
+  } */
 
   showBeginningText() {
     this.showWelcomeChatText = true;

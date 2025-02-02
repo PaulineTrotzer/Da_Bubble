@@ -105,7 +105,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   inputFieldRef!: ElementRef<HTMLTextAreaElement>;
 
   inputFieldService = inject(InputfieldService);
-  activeComponentId!: string;
+  @Input() activeComponentId!: string;
   @Output() messageCreated = new EventEmitter<any>();
 
   ngOnChanges(changes: SimpleChanges) {
@@ -144,10 +144,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.currentChannelThreadId = messageId;
     });
     this.selectedChannel = this.global.currentChannel;
-
-    this.inputFieldService.activeComponentId$.subscribe((id) => {
+/*     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
-    });
+    }); */
+    console.log('after oninit',this.activeComponentId);
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -157,7 +157,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
   sendMessageClick(): void {
-    const selectedFiles = this.inputFieldService.getFiles('chat');
+    debugger;
+    const selectedFiles = this.inputFieldService.getFiles(
+      this.activeComponentId
+    );
+    console.log('can send?', this.activeComponentId);
+
     if (
       this.chatMessage.trim() === '' &&
       (!selectedFiles || selectedFiles.length === 0)
@@ -165,11 +170,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Keine Nachricht und keine Dateien zum Senden.');
       return;
     }
+
     if (!this.selectedChannel && !this.selectedUser?.id) {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
-    this.formattedMessage = '';
+
+    // Hier rufst du jetzt dieselbe Logik auf wie beim Enter-Event:
+    this.processSendMessage();
   }
 
   shouldSendMessage(event: KeyboardEvent): boolean {
@@ -189,6 +197,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   sendingStatus: string | null = null;
 
   async processSendMessage(): Promise<void> {
+    debugger;
     // 1) Eingabe & Dateien prüfen
     if (!this.canSendMessage()) {
       return;
@@ -212,6 +221,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     const selectedFiles = this.inputFieldService.getFiles(
       this.currentComponentId
     );
+
     const noText = !this.chatMessage || this.chatMessage.trim().length === 0;
     const noFiles = !selectedFiles || selectedFiles.length === 0;
 
@@ -585,10 +595,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       editedTextShow: false,
     };
     await addDoc(channelMessagesRef, messageData);
-    this.chatMessage = '';
-    this.selectFiles = [];
+    this.resetInputdata();
     this.messageSent.emit();
   }
+
   messageData(
     chatMessage: string,
     senderStickerCount: number = 0,

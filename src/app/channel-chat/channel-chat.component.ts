@@ -33,7 +33,8 @@ import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { InputFieldComponent } from "../input-field/input-field.component";
+import { InputFieldComponent } from '../input-field/input-field.component';
+import { InputfieldService } from '../services/inputfield.service';
 
 interface Message {
   formattedText: any;
@@ -57,7 +58,7 @@ interface Message {
     FormsModule,
     MentionMessageBoxComponent,
     InputFieldComponent,
-],
+  ],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
   animations: [
@@ -79,9 +80,9 @@ interface Message {
     ]),
   ],
 })
-export class ChannelChatComponent implements OnInit, AfterViewInit {
+export class ChannelChatComponent implements OnInit {
   isEdited = false;
-  @Input() inputMessagesData: any[] = [];
+  /*   @Input() inputMessagesData: any[] = []; */
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
@@ -111,6 +112,9 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
   shouldScroll = true;
   userChannelSelectService = inject(UserChannelSelectService);
   sanitizer = inject(DomSanitizer);
+  currentComponentId = 'channels';
+  inputFieldService = inject(InputfieldService);
+  selectFiles: any[] = [];
 
   constructor(private elRef: ElementRef) {}
 
@@ -125,36 +129,34 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
       console.log('selectedChannel (channel):', channel);
       this.selectedChannel = channel;
-       this.loadChannelMessages();
+      this.loadChannelMessages();
+    });
+    this.inputFieldService.files$.subscribe((filesByComponent) => {
+      this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
   }
 
-  ngAfterViewInit() {
-    /*     this.scrollToBottom(); */
-  }
 
   scrollToBottom(): void {
-    if (this.messageContainer && this.messageContainer.nativeElement) {
-      const container = this.messageContainer.nativeElement;
-      const lastMessage = container.querySelector(
-        '.message-container:last-child'
-      );
-      if (lastMessage) {
-        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    if (this.messageContainer) {
+      if(this.shouldScroll){
+        this.messageContainer.nativeElement.scrollTop =
+        this.messageContainer.nativeElement.scrollHeight;
       }
     }
   }
+
   async ngOnChanges(changes: SimpleChanges) {
-    if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
+    /*     if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
       console.log('Input Nachrichten geändert:', this.inputMessagesData);
       this.messagesData = this.inputMessagesData;
       this.shouldScroll = true;
       this.loadUserNames();
-    }
+    } */
     if (changes['selectedChannel'] && this.selectedChannel) {
-      debugger;
       this.shouldScroll = true;
       await this.loadChannelMessages();
+      this.scrollToBottom();
     }
   }
 
@@ -247,16 +249,16 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
     return cleanedParts;
   }
 
-  
   isMention(textPart: string): boolean {
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
       user.name.trim().toLowerCase()
     );
-    const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
+    const mentionName = textPart.startsWith('@')
+      ? textPart.substring(1).toLowerCase()
+      : '';
     return normalizedUserNames.includes(mentionName);
   }
 
-  
   async loadUserNames() {
     try {
       const auth = getAuth();
@@ -293,7 +295,7 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
       console.warn('No channel selected');
       return;
     }
-  
+
     const messagesRef = collection(
       this.firestore,
       'channels',
@@ -308,12 +310,15 @@ export class ChannelChatComponent implements OnInit, AfterViewInit {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
         data.formattedText = this.formatMentions(data.text);
-  
         return { id: doc.id, ...data };
       });
+
+      // Jetzt: Zeit fürs Rendern geben und erst danach scrollen
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 0);
     });
   }
-  
 
   formatMentions(text: string): SafeHtml {
     const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
