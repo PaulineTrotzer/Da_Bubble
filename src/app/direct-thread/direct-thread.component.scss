@@ -15,9 +15,9 @@
   max-height: 170px;
 }
 
-/* .last-messagebubble {
-  margin-top: 20px;
-} */
+.full-parent-message {
+  padding-top: 7px;
+}
 .first-messagebubble {
   max-height: 218px;
 }
@@ -32,7 +32,6 @@
   color: black;
   font-weight: normal;
   letter-spacing: 0.5px;
-
 }
 
 .text-info-edit-chatpartner {
@@ -296,7 +295,6 @@
   flex-direction: column;
 }
 
-
 .render-reaction-ct-recipient {
   display: flex;
   align-items: center;
@@ -545,7 +543,7 @@ h3 {
   width: 100%;
   border: 1px solid #adb0d9;
 }
-.p-top27{
+.p-top27 {
   padding-top: 27px;
 }
 

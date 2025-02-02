@@ -135,9 +135,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   lastProcessedThreadMessageId: string | null = null;
   unsubscribe$ = new Subject<void>();
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
+  parentMessage: any;
+  public firstThreadMessageId: string | null = null;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
+/*     console.log('threadOpenend');
     this.threadControlService.editedMessage$
       .pipe(filter((message) => !!message))
       .subscribe((updatedMessage) => {
@@ -146,7 +149,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           updatedMessage
         );
         this.updateThreadMessage(updatedMessage);
-      });
+      }); */
     this.shouldScrollToBottom = true;
     await this.initializeComponent();
     this.subscribeToThreadChanges();
@@ -154,18 +157,18 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.checkIfSelfThread();
   }
 
-  focusInputField(): void {
-    if (this.inputFieldComponent) {
+/*   focusInputField(): void {
+    if (this.inputFieldComponent) { */
 /*       this.inputFieldComponent.focusInputField(); */
-    }
-  }
+ /*    }
+  } */
 
-  activeComponentId: string = 'direct-thread';
+/*   activeComponentId: string = 'direct-thread';
   handleInputFieldFocused(componentId: string): void {
     console.log('InputField focused in component:', componentId);
     this.activeComponentId = componentId; // Setze die aktive Komponente
   }
-
+ */
   handleClickOnMention(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target && target.classList.contains('mention-message')) {
@@ -187,57 +190,78 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   subscribeToThreadChanges() {
     this.threadControlService.firstThreadMessageId$
-      .pipe(
-        filter((id) => !!id),
-        filter((id) => id !== this.lastProcessedThreadMessageId),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe({
-        next: async (firstThreadMessageId) => {
-          try {
-            this.lastProcessedThreadMessageId = firstThreadMessageId;
-            await this.processThreadMessages(firstThreadMessageId!);
-          } catch (error) {
-            console.error('Fehler bei der Verarbeitung des Threads:', error);
-          }
-        },
-        error: (err) => {
-          console.error('Fehler im Thread-Listener:', err);
-        },
-        complete: () => {
-          console.log('Thread-Listener beendet.');
-        },
-      });
+    .pipe(
+      filter((id: string | null): id is string => !!id)
+      //                 ^^^^^^^^^^^^^^^  type guard
+    )
+    .subscribe((id: string) => {
+      // Jetzt weiß TS, id ist ein string
+      this.firstThreadMessageId = id;
+      this.subscribeToParentDoc(id);
+      this.subscribeToThreadReplies(id);
+    });  
   }
 
-  async updateThreadMessage(updatedMessage: any): Promise<void> {
-    await this.ensureMessagesLoaded();
-    if (updatedMessage.timestamp && updatedMessage.timestamp.toDate) {
-      updatedMessage.timestamp = updatedMessage.timestamp.toDate();
-    }
-    if (this.messagesData && this.messagesData.length > 0) {
-      const firstMessage = this.messagesData[0];
-
-      if (firstMessage.parentId === updatedMessage.id) {
-        firstMessage.text = updatedMessage.text;
-        firstMessage.editedTextShow = updatedMessage.editedTextShow;
-        firstMessage.editedAt = updatedMessage.editedAt;
-
-        console.log(
-          'Thread-Nachricht aktualisiert (über Parent-ID):',
-          firstMessage
-        );
+  private subscribeToParentDoc(parentId: string) {
+    const parentRef = doc(this.firestore, 'messages', parentId);
+    onSnapshot(parentRef, (docSnap) => {
+      if (docSnap.exists()) {
+        let data = docSnap.data() as any;
+  
+        // Falls data.timestamp ein Firestore.Timestamp ist, wandelst du es um:
+        if (data.timestamp && data.timestamp.toDate) {
+          data.timestamp = data.timestamp.toDate(); // → jetzt ein JS-Date
+        }
+  
+        this.parentMessage = { id: docSnap.id, ...data };
+        console.log('Aktualisierte Parent-Nachricht:', this.parentMessage);
+  
+        this.scrollAutoDown();
+        this.cdr.detectChanges();
       } else {
-        console.warn(
-          'Keine Thread-Nachricht gefunden, die zur Parent-ID passt:',
-          updatedMessage
-        );
+        console.warn('Parent-Dokument existiert nicht mehr:', parentId);
       }
-    } else {
-      return;
-    }
-    this.messagesData = [...this.messagesData];
+    });
   }
+  
+  
+  private subscribeToThreadReplies(parentId: string) {
+    const repliesRef = collection(this.firestore, `messages/${parentId}/threadMessages`);
+    const q = query(repliesRef, orderBy('timestamp', 'asc'));
+    onSnapshot(q, (snapshot) => {
+      this.messagesData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        // ggf. Timestamp anpassen
+        if (data['timestamp']?.toDate) {
+          data['timestamp'] = data['timestamp'].toDate();
+        }
+        return { id: doc.id, ...data };
+      });
+      console.log('Aktualisierte Replies:', this.messagesData);
+      this.scrollAutoDown();
+      this.cdr.detectChanges();
+    });
+  }
+  
+
+/*   updateThreadMessage(updatedMessage: any): void {
+    // Falls der "bearbeitete" Datensatz die Parent-Nachricht ist:
+    if (updatedMessage.id === this.parentMessage?.id) {
+      // Aktualisiere einfach die Parent-Message-Felder
+      this.parentMessage.text = updatedMessage.text;
+      this.parentMessage.editedTextShow = updatedMessage.editedTextShow;
+      this.parentMessage.editedAt = updatedMessage.editedAt;
+      console.log('Parent-Nachricht lokal aktualisiert:', this.parentMessage);
+  
+      // ggf. detectChanges
+      this.cdr.detectChanges();
+    } else {
+      // Falls du hier noch Sub-Replies updaten willst (z.B. es war eine Antwort im Thread)
+      // Dann müsstest du messagesData[...] anpassen.
+      console.warn('Kein Update nötig, denn es ist keine Parent-Message:', updatedMessage.id);
+    }
+  }
+   */
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
@@ -325,6 +349,26 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       new Date(previousMessage.timestamp)
     );
   }
+
+  displayDayInfoForParent(): string {
+    if (!this.parentMessage?.timestamp) {
+      return '';
+    }
+    const date = this.parentMessage.timestamp as Date;
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+  
+    if (this.isSameDay(date, today)) {
+      return 'Heute';
+    } else if (this.isSameDay(date, yesterday)) {
+      return 'Gestern';
+    } else {
+      return this.formatDate(date);
+    }
+  }
+  
+
 
   editMessages(message: any) {
     this.editWasClicked = true;
@@ -425,50 +469,39 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         console.error('Invalid message object passed to saveOrDeleteMessage');
         return;
       }
-
-      const messageRef = doc(
-        this.firestore,
-        `messages/${this.firstInitialisedThreadMsg}/threadMessages/${message.id}`
-      );
-
-      if (!this.editableMessageText || this.editableMessageText.trim() === '') {
-        // Nachricht löschen
-        await deleteDoc(messageRef);
-
-        // Nur wenn es sich um die erste Nachricht handelt
-        if (message.isParent == true) {
-          this.threadControlService.setEditedMessage({
-            id: this.firstInitialisedThreadMsg,
-            deleted: true,
-          });
-        }
+  
+      let docPath: string;
+      if (message.isParent) {
+        // → Parent-Dokument
+        //  In message.id steckt dann "parentId"
+        docPath = `messages/${message.id}`;
       } else {
-        // Nachricht bearbeiten
+        // → Sub-Dokument (Reply)
+        docPath = `messages/${this.firstInitialisedThreadMsg}/threadMessages/${message.id}`;
+      }
+  
+      const messageRef = doc(this.firestore, docPath);
+  
+      // Dann wie gehabt: löschen oder bearbeiten ...
+      if (!this.editableMessageText || this.editableMessageText.trim() === '') {
+        await deleteDoc(messageRef);
+        console.log('Nachricht gelöscht:', message.id);
+      } else {
         const updatedFields = {
           text: this.editableMessageText,
           editedTextShow: true,
           editedAt: new Date().toISOString(),
         };
-
-        // Nur bestimmte Felder aktualisieren
         await updateDoc(messageRef, updatedFields);
         console.log('Nachricht aktualisiert:', message.id);
-
-        // Nur wenn es sich um die erste Nachricht handelt
-        if (message.isParent == true) {
-          this.threadControlService.setEditedMessage({
-            id: this.firstInitialisedThreadMsg,
-            ...updatedFields,
-          });
-        }
       }
-
+  
       this.resetEditMode();
     } catch (error) {
       console.error('Error in saveOrDeleteMessage:', error);
     }
   }
-
+  
   resetEditMode() {
     this.editMessageId = null;
     this.editableMessageText = '';
@@ -606,55 +639,51 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   async processThreadMessages(firstInitialisedThreadMsg: string) {
-    this.firstInitialisedThreadMsg = firstInitialisedThreadMsg;
-    if (this.firstInitialisedThreadMsg) {
-      await this.handleFirstThreadMessageAndPush(
-        this.firstInitialisedThreadMsg
-      );
-      await this.getThreadMessages(this.firstInitialisedThreadMsg);
+    // Nur zur Absicherung, dass parentDoc existiert => kein Duplikat in Subcollection
+    const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
+    const docSnapshot = await getDoc(docRef);
+    if (!docSnapshot.exists()) {
+      // Falls es das Dokument gar nicht gab, legen wir es minimal an
+      await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
+      console.log('Erstes Parent-Dokument angelegt:', firstInitialisedThreadMsg);
     }
+    // Dann brauchst du es gar nicht weiter duplizieren;
+    // Dein subscribeToThreadChanges() holt sich den Parent + Replies via onSnapshot.
   }
+
 
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
   }
 
-  async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: any) {
-    debugger;
-    try {
-      const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
-      const docSnapshot = await getDoc(docRef);
-      if (docSnapshot.exists()) {
-        const docData = docSnapshot.data();
-        if (docData?.['firstMessageCreated']) {
-          this.currentThreadMessage = {
-            id: docSnapshot.id,
-            ...docData,
-          };
-          return;
-        }
+  async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: string) {
+    const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
+    const docSnapshot = await getDoc(docRef);
+  
+    if (docSnapshot.exists()) {
+      const docData = docSnapshot.data();
+      if (docData?.['firstMessageCreated']) {
+        // Parent existiert schon, nichts weiter tun
+        this.currentThreadMessage = { id: docSnapshot.id, ...docData };
+        return;
       }
-      await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
-      this.currentThreadMessage = {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      };
-      const threadMessagesRef = collection(
-        this.firestore,
-        `messages/${firstInitialisedThreadMsg}/threadMessages`
-      );
-      await this.settingDataforFireBase(threadMessagesRef, {
-        ...this.currentThreadMessage,
-        parentId: firstInitialisedThreadMsg,
-        isParent: true,
-      });
-    } catch (error) {
-      console.error('Fehler der Thread-Nachricht:', error);
     }
+  
+    // Falls wir sicherstellen wollen, dass es existiert
+    await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
+    this.currentThreadMessage = {
+      id: docSnapshot.id,
+      ...docSnapshot.data(),
+    };
+  
+    // KEIN zusätzliches addDoc(...) an threadMessagesRef mehr
+    // -> So sparst du dir das Duplikat der Parent.
   }
+  
+  
 
-  async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
-    try {
+/*   async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
+    try { */
       /*       if (
         !this.selectedUser ||
         !this.selectedUser.uid ||
@@ -666,7 +695,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
         );
       } */
-      const messageData = {
+/*       const messageData = {
         senderId: threadMessageData.senderId,
         senderName: threadMessageData.senderName,
         senderPicture: threadMessageData.senderPicture || '',
@@ -689,18 +718,16 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Nachricht:', error);
     }
-  }
+  } */
 
   async getThreadMessages(messageId: any) {
     try {
-      const threadMessagesRef = collection(
-        this.firestore,
-        `messages/${messageId}/threadMessages`
-      );
+      const threadMessagesRef = collection(this.firestore, `messages/${messageId}/threadMessages`);
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
       onSnapshot(q, (querySnapshot) => {
         this.messagesData = querySnapshot.docs.map((doc) => {
           const messageData = doc.data();
+          console.log('ThreadDoc data:', doc.id, messageData);
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
             messageData['timestamp'] = messageData['timestamp'].toDate();
           }
@@ -710,13 +737,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           };
         });
 
+  
         this.scrollAutoDown();
         this.cdr.detectChanges();
       });
     } catch (error) {
-      console.error('fehler getMessagws', error);
-    }
-  }
+      console.error('[getThreadMessages] fehler:', error);
+    }}
 
   scrollAutoDown() {
     if (this.shouldScrollToBottom) {

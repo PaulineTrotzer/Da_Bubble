@@ -144,10 +144,10 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.currentChannelThreadId = messageId;
     });
     this.selectedChannel = this.global.currentChannel;
-/*     this.inputFieldService.activeComponentId$.subscribe((id) => {
+    /*     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
     }); */
-    console.log('after oninit',this.activeComponentId);
+    console.log('after oninit', this.activeComponentId);
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -219,7 +219,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   canSendMessage(): boolean {
     const selectedFiles = this.inputFieldService.getFiles(
-      this.currentComponentId
+      this.activeComponentId
     );
 
     const noText = !this.chatMessage || this.chatMessage.trim().length === 0;
@@ -251,7 +251,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   private async sendStandardMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
-      this.currentComponentId
+      this.activeComponentId
     );
 
     try {
@@ -261,7 +261,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
         text: this.chatMessage,
         sending: true,
         timestamp: new Date(),
-        // Dateivorschau: data-URLs
         selectedFiles: selectedFiles.map((file) => ({
           url: file.data,
           type: file.type,
@@ -299,8 +298,9 @@ export class InputFieldComponent implements OnInit, OnChanges {
       if (this.editableDivRef?.nativeElement) {
         this.editableDivRef.nativeElement.style.height = '130px';
       }
-      this.inputFieldService.updateFiles(this.currentComponentId, []);
+      this.inputFieldService.updateFiles(this.activeComponentId, []);
       this.sendingStatus = null;
+      this.handleResetErrors();
     }
   }
 
@@ -447,7 +447,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (
       !this.isDirectThreadOpen ||
       (this.chatMessage.trim() === '' &&
-        this.inputFieldService.getFiles(this.currentComponentId).length === 0)
+        this.inputFieldService.getFiles(this.activeComponentId).length === 0)
     ) {
       console.warn(
         'Thread is not open or message is empty and no files are selected'
@@ -460,7 +460,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
     try {
       const selectedFiles = this.inputFieldService.getFiles(
-        this.currentComponentId
+        this.activeComponentId
       );
       let uploadedFiles: any[] = [];
       if (selectedFiles.length > 0) {
@@ -488,10 +488,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
       const docRef = await addDoc(threadMessagesRef, messageData);
       this.resetInputdata();
       this.messageSent.emit();
-      this.inputFieldService.updateFiles(this.currentComponentId, []);
-      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      if (this.editableDivRef?.nativeElement) {
+        this.editableDivRef.nativeElement.style.height = '130px';
+      }
+      this.inputFieldService.updateFiles(this.activeComponentId, []);
+      this.sendingStatus = null;
+      this.handleResetErrors();
     }
   }
 
@@ -571,32 +576,68 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.currentThreadMessageId = threadMessageId;
     this.threadControlService.setCurrentThreadMessageId(threadMessageId);
   }
-  async sendChannelMessage() {
-    if (!this.selectedChannel || this.chatMessage.trim() === '') {
-      console.warn('Channel is not selected or message is empty');
+
+  async sendChannelMessage(): Promise<void> {
+    if (!this.selectedChannel) {
+      console.warn('Channel is not selected');
       return;
     }
-
-    const channelMessagesRef = collection(
-      this.firestore,
-      'channels',
-      this.selectedChannel.id,
-      'messages'
+    const selectedFiles = this.inputFieldService.getFiles(
+      this.activeComponentId
     );
-    /*     const fileData = await this.uploadFilesToFirebaseStorage(); */
 
-    const messageData = {
-      text: this.chatMessage,
-      senderId: this.global.currentUserData.id,
-      senderName: this.global.currentUserData.name,
-      senderPicture: this.global.currentUserData.picture || '',
-      timestamp: new Date(),
-      /*       selectedFiles: fileData, */
-      editedTextShow: false,
-    };
-    await addDoc(channelMessagesRef, messageData);
-    this.resetInputdata();
-    this.messageSent.emit();
+    try {
+      const localTempId = `temp_${Date.now()}_${Math.random()}`;
+      const localMessage = {
+        id: localTempId,
+        text: this.chatMessage,
+        sending: true,
+        timestamp: new Date(),
+        selectedFiles: selectedFiles.map((file) => ({
+          url: file.data,
+          type: file.type,
+          name: file.name,
+        })),
+      };
+      this.messageCreated.emit(localMessage);
+      const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
+
+      const messageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        editedTextShow: false,
+        selectedFiles: fileData.map((file) => ({
+          url: file.url,
+          type: file.type,
+          name: file.name,
+        })),
+      };
+
+      const channelMessagesRef = collection(
+        this.firestore,
+        'channels',
+        this.selectedChannel.id,
+        'messages'
+      );
+      const docRef = await addDoc(channelMessagesRef, messageData);
+      const messageWithId = { ...messageData, id: docRef.id };
+      this.messagesData.push(messageWithId);
+
+      this.messageSent.emit();
+      this.resetInputdata();
+    } catch (error) {
+      console.error('Fehler beim Senden der Channel-Nachricht:', error);
+    } finally {
+      if (this.editableDivRef?.nativeElement) {
+        this.editableDivRef.nativeElement.style.height = '130px';
+      }
+      this.inputFieldService.updateFiles(this.activeComponentId, []);
+      this.sendingStatus = null;
+      this.handleResetErrors();
+    }
   }
 
   messageData(
@@ -811,16 +852,15 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  onFileSelectedThread(event: Event, componentId: string): void {
-    if (componentId !== 'direct-thread') {
+  onFileSelectedChannel(event: Event, componentId: string): void {
+    if (componentId !== 'channel') {
       console.error(
-        'onFileSelectedThread called with wrong componentId: in Thread',
+        'onFileSelectedThread called with wrong componentId: in channel',
         componentId
       );
       return;
     }
-
-    this.inputFieldService.setActiveComponent('direct-thread');
+    this.inputFieldService.setActiveComponent(componentId);
     const input = event.target as HTMLInputElement;
 
     // Überprüfen, ob bereits eine Datei existiert
@@ -858,13 +898,82 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
         // Datei speichern
         this.inputFieldService.updateFiles(componentId, [fileData]);
-        this.cdr.detectChanges();
+        const chatDiv = this.editableDivRef.nativeElement;
+        if (chatDiv) {
+          chatDiv.style.height = '250px';
+        }
+        console.log('File added in channel:', fileData);
+      };
+
+      reader.readAsDataURL(selectedFile);
+      input.value = '';
+    }
+  }
+
+  handlePreviewUpdated(hasFiles: boolean) {
+    if (!hasFiles) {
+      const chatDiv = this.editableDivRef.nativeElement;
+      if (chatDiv) {
+        chatDiv.style.height = '130px';
+      }
+    }
+  }
+
+  onFileSelectedThread(event: Event, componentId: string): void {
+    if (componentId !== 'direct-thread') {
+      console.error(
+        'onFileSelectedThread called with wrong componentId: in Thread',
+        componentId
+      );
+      return;
+    }
+
+    this.inputFieldService.setActiveComponent(componentId);
+    const input = event.target as HTMLInputElement;
+
+    // Überprüfen, ob bereits eine Datei existiert
+    const existingFiles = this.inputFieldService.getFiles(componentId);
+    if (existingFiles.length > 0) {
+      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
+      this.multipleFilesErrorMessage =
+        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
+      this.fileTooLargeMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
+      return;
+    }
+
+    // Überprüfen, ob eine Datei ausgewählt wurde
+    if (input.files && input.files.length > 0) {
+      const selectedFile = input.files[0];
+      const allowedTypes = ['image/', 'application/pdf'];
+
+      // Prüfung: Unterstützte Dateitypen
+      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
+        console.error('Unsupported file type:', selectedFile.type);
+        this.fileTooLargeMessage =
+          'Nur Bilder und PDFs können hochgeladen werden.';
+        this.multipleFilesErrorMessage = null; // Sicherstellen, dass andere Fehlermeldungen zurückgesetzt werden
+        return;
+      }
+
+      // Datei laden
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: reader.result as string,
+        };
+
+        this.inputFieldService.updateFiles(componentId, [fileData]);
+        const chatDiv = this.editableDivRef.nativeElement;
+        if (chatDiv) {
+          chatDiv.style.height = '250px';
+        }
         console.log('File added in thread:', fileData);
       };
 
       reader.readAsDataURL(selectedFile);
-      input.value = ''; // Input-Feld zurücksetzen
-      /*       this.isPreviewActive = true; // Vorschau aktivieren */
+      input.value = '';
     }
   }
 

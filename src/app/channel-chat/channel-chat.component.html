@@ -93,6 +93,27 @@
                     {{ mentionName }}
                   </span>
                 </ng-container>
+
+                <div class="show-selected-files">
+                  <div *ngFor="let file of message.selectedFiles">
+                    <div class="mai-file" *ngIf="file.url">
+                      <!-- Für Bilder -->
+                      <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                        <a [href]="file.url" target="_blank">
+                          <img [src]="file.url" alt="Image File" />
+                        </a>
+                      </div>
+
+                      <!-- Für PDFs -->
+                      <div class="file-info" *ngIf="file.type === 'application/pdf'">
+                        <a [href]="file.url" target="_blank">
+                          <img src="../../assets/img/pdf.png" alt="PDF File" />
+                        </a>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <span *ngIf="message.isEdited && global.currentUserData.id == message.senderId"
@@ -159,37 +180,6 @@
           </div>
         </form>
         <img [src]="message.senderPicture" />
-      </div>
-
-      <div class="show-selected-files">
-        <div *ngFor="let file of message.selectedFiles">
-
-          <div class="file-info" *ngIf="file.type.startsWith('image/')">
-            <a [href]="file.url" target="_blank">
-              <img [src]="file.data">
-            </a>
-          </div>
-
-          <div class="file-info" *ngIf="file.type==='application/pdf'">
-            <a [href]="file.url" target="_blank">
-              <img src="../../assets/img/pdf.png">
-            </a>
-          </div>
-
-          <div class="file-info" *ngIf="file.type==='text/plain'">
-            <a [href]="file.url" target="_blank">
-              <img src="../../assets/img/textfile.png">
-            </a>
-          </div>
-
-          <div class="file-info" *ngIf="!file.type.startsWith('image/') && 
-      file.type !== 'application/pdf' && file.type!== 'text/plain'">
-            <a [href]="file.url" target="_blank">
-              <img src="../../assets/img/alldatei.png">
-            </a>
-          </div>
-
-        </div>
       </div>
 
     </div>

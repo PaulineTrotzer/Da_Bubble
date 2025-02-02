@@ -13,23 +13,24 @@
     </div>
     <!--    <div class="highlight" #highlightDiv  [innerHTML]="formattedMessage"></div>
     <textarea id="msg-input" placeholder="Schreib etwas..." class="chat-input" [(ngModel)]="chatMessage"
-      (scroll)="onScroll($event)" (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea> -->
-    <div class="flex-preview"
-      *ngIf="currentComponentId === 'direct-thread' && currentComponentId === activeComponentId">
+      
+    (scroll)="onScroll($event)" (input)="onInput($event)" (keydown)="sendMessage($event)" #inputField></textarea> -->
+    <div class="flex-preview" *ngIf="activeComponentId === 'direct-thread'">
       <div class="error-message" *ngIf="multipleFilesErrorMessage">
         {{ multipleFilesErrorMessage }}
       </div>
-
 
 
       <!-- Feedback für zu große Datei -->
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview (resetErrors)="handleResetErrors()"
-        [currentComponentId]="currentComponentId"></app-files-preview>
+      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+        [currentComponentId]="activeComponentId"></app-files-preview>
     </div>
-    <div class="flex-preview" *ngIf="currentComponentId === 'chat' && currentComponentId === activeComponentId">
+
+
+    <div class="flex-preview" *ngIf="activeComponentId === 'chat'">
       <div class="error-message" *ngIf="multipleFilesErrorMessage">
         {{ multipleFilesErrorMessage }}
       </div>
@@ -38,11 +39,24 @@
       <div class="error-message" *ngIf="fileTooLargeMessage">
         {{ fileTooLargeMessage }}
       </div>
-      <app-files-preview (resetErrors)="handleResetErrors()"
-        [currentComponentId]="currentComponentId"></app-files-preview>
+      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+        [currentComponentId]="activeComponentId"></app-files-preview>
+    </div>
+
+
+    <div class="flex-preview" *ngIf="activeComponentId === 'channel'">
+      <div class="error-message" *ngIf="multipleFilesErrorMessage">
+        {{ multipleFilesErrorMessage }}
+      </div>
+
+      <!-- Feedback für zu große Datei -->
+      <div class="error-message" *ngIf="fileTooLargeMessage">
+        {{ fileTooLargeMessage }}
+      </div>
+      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+        [currentComponentId]="activeComponentId"></app-files-preview>
     </div>
   </div>
-
 
 
 
@@ -52,9 +66,9 @@
       <div class="plus-separator-flex">
 
         <div>
-          <div *ngIf="currentComponentId === 'direct-thread'">
+          <div *ngIf="activeComponentId === 'direct-thread'">
 
-            <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, currentComponentId)" hidden />
+            <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, activeComponentId)" hidden />
 
 
             <label for="upload-thread">
@@ -62,18 +76,18 @@
             </label>
           </div>
 
-          <div *ngIf="currentComponentId === 'chat'">
+          <div *ngIf="activeComponentId === 'chat'">
 
-            <input type="file" id="upload-chat" (change)="onFileSelected($event, currentComponentId)" hidden />
+            <input type="file" id="upload-chat" (change)="onFileSelected($event, activeComponentId)" hidden />
 
             <label for="upload-chat">
               <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
             </label>
           </div>
 
-          <div *ngIf="currentComponentId === 'channel'">
+          <div *ngIf="activeComponentId === 'channel'">
 
-            <input type="file" id="upload-chat" (change)="onFileSelected($event, currentComponentId)" hidden />
+            <input type="file" id="upload-chat" (change)="onFileSelectedChannel($event, activeComponentId)" hidden />
 
             <label for="upload-chat">
               <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />

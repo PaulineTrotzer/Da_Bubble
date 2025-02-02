@@ -221,23 +221,6 @@
                                                         </a>
                                                         <div class="file-name">{{ file.name }}</div>
                                                     </div>
-
-                                                    <!-- Für Textdateien -->
-                                                    <div class="file-info" *ngIf="file.type === 'text/plain'">
-                                                        <a [href]="file.url" target="_blank">
-                                                            <img src="../../assets/img/textfile.png" alt="Text File" />
-                                                        </a>
-                                                        <div class="file-name">{{ file.name }}</div>
-                                                    </div>
-
-                                                    <!-- Für andere Dateitypen -->
-                                                    <div class="file-info"
-                                                        *ngIf="!file.type.startsWith('image/') && file.type !== 'application/pdf' && file.type !== 'text/plain'">
-                                                        <a [href]="file.url" target="_blank">
-                                                            <img src="../../assets/img/alldatei.png" alt="Other File" />
-                                                        </a>
-                                                        <div class="file-name">{{ file.name }}</div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

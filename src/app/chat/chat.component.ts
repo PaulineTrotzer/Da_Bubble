@@ -517,110 +517,126 @@ export class ChatComponent implements OnInit, OnChanges {
   clearInput() {
     this.messagesData = [];
   }
-  saveOrDeleteMessage(message: any) {
-    this.shouldScroll = false;
+  /**
+ * Bearbeitet oder löscht eine Nachricht in der Haupt-Collection `messages/{id}`.
+ * -> Nutzt KEINE zusätzliche Subcollection für die gleiche Nachricht.
+ *
+ * @param message Nachricht-Objekt mit mindestens `id` (Firestore-Dokument-ID).
+ */
+async saveOrDeleteMessage(message: any) {
+  this.shouldScroll = false;
 
-    // ID-Prüfung
-    if (!message.id) {
-      console.error('Ungültige Nachricht-ID:', message);
-      return;
+  // 1) Plausibilitäts-Check: Hat das Objekt eine gültige Firestore-ID?
+  if (!message.id) {
+    console.error('Ungültige Nachricht-ID:', message);
+    return;
+  }
+
+  // 2) Referenz auf das Firestore-Dokument in `messages/{message.id}`
+  const messageRef = doc(this.firestore, 'messages', message.id);
+
+  // 3) Prüfe, ob der Text nach dem Bearbeiten ggf. leer ist:
+  if (this.editableMessageText.trim() === '') {
+    // ---- LÖSCHEN ----
+    try {
+      const docSnapshot = await getDoc(messageRef);
+
+      if (!docSnapshot.exists()) {
+        console.warn(`Nachricht existiert nicht (ID: ${message.id}).`);
+        return;
+      }
+
+      await deleteDoc(messageRef);
+      console.log('Nachricht gelöscht:', message.id);
+
+      // Lokale Array-Aktualisierung: Nachricht aus messagesData entfernen
+      this.messagesData = this.messagesData.filter(
+        (msg: any) => msg.id !== message.id
+      );
+
+      // Als "gelöscht" kennzeichnen (optional, für UI o.Ä.)
+      const deletedMessage = { id: message.id, deleted: true };
+      this.messagesData.push(deletedMessage);
+
+      //  Änderung an Thread-Komponente weitergeben,
+      //  falls dort die Nachricht als "Parent" angezeigt wird
+      this.threadControlService.setEditedMessage(deletedMessage);
+
+      // Resets
+      this.editMessageId = null;
+      this.isFirstClick = true;
+      this.checkEditbox = false;
+
+    } catch (error) {
+      console.error(
+        `Fehler beim Löschen der Nachricht (ID: ${message.id}):`,
+        error
+      );
     }
 
-    const messageRef = doc(this.firestore, 'messages', message.id);
+  } else {
+    // ---- BEARBEITEN ----
+    try {
+      const docSnapshot = await getDoc(messageRef);
 
-    if (this.editableMessageText.trim() === '') {
-      getDoc(messageRef)
-        .then((docSnapshot) => {
-          if (docSnapshot.exists()) {
-            deleteDoc(messageRef).then(() => {
-              console.log('Nachricht gelöscht:', message.id);
+      if (!docSnapshot.exists()) {
+        console.warn(
+          `Nachricht kann nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
+        );
+        return;
+      }
 
-              // Nachricht aus messagesData entfernen
-              this.messagesData = this.messagesData.filter(
-                (msg: any) => msg.id !== message.id
-              );
+      const editMessage = {
+        text: this.editableMessageText,
+        editedTextShow: true,
+        // Optional: Falls du einen Timestamp für die Bearbeitung
+        // mitschreiben willst:
+        editedAt: new Date().toISOString(),
+      };
 
-              // Dummy-Objekt hinzufügen
-              const deletedMessage = { id: message.id, deleted: true };
-              this.messagesData.push(deletedMessage);
+      await updateDoc(messageRef, editMessage);
+      console.log('Nachricht bearbeitet:', message.id);
 
-              // Änderungen weitergeben
-              this.threadControlService.setEditedMessage(deletedMessage);
+      // 4) Lokale Array-Aktualisierung (damit UI sofort reagiert)
+      const index = this.messagesData.findIndex(
+        (msg: any) => msg.id === message.id
+      );
+      if (index !== -1) {
+        this.messagesData[index] = {
+          ...this.messagesData[index],
+          ...editMessage,
+        };
+      } else {
+        // Falls Nachricht lokal noch nicht existiert, hinzufügen
+        console.warn('Nachricht nicht gefunden, füge sie hinzu:', message.id);
+        this.messagesData.push({ id: message.id, ...editMessage });
+      }
 
-              this.editMessageId = null;
-              this.isFirstClick = true;
-              this.checkEditbox = false;
-            });
-          } else {
-            console.warn(
-              `Nachricht konnte nicht gelöscht werden, da sie nicht existiert: ${message.id}`
-            );
-          }
-        })
-        .catch((error) => {
-          console.error(
-            `Fehler beim Überprüfen oder Löschen der Nachricht: ${message.id}`,
-            error
-          );
-        });
-    } else {
-      // Nachricht bearbeiten
-      getDoc(messageRef)
-        .then((docSnapshot) => {
-          if (docSnapshot.exists()) {
-            const editMessage = {
-              text: this.editableMessageText,
-              editedTextShow: true,
-            };
+      // 5) Signal an Thread-Komponente (falls sie dieses Dokument ebenfalls anzeigt)
+      this.threadControlService.setEditedMessage({
+        id: message.id,
+        ...editMessage,
+      });
 
-            updateDoc(messageRef, editMessage).then(() => {
-              console.log('Nachricht bearbeitet:', message.id);
+      // Resets
+      this.editMessageId = null;
+      this.checkEditbox = false;
+      this.isFirstClick = true;
 
-              // Nachricht in messagesData aktualisieren
-              const index = this.messagesData.findIndex(
-                (msg: any) => msg.id === message.id
-              );
-              if (index !== -1) {
-                this.messagesData[index] = {
-                  ...this.messagesData[index],
-                  ...editMessage,
-                };
-              } else {
-                console.warn(
-                  'Nachricht nicht gefunden, füge sie hinzu:',
-                  message.id
-                );
-                this.messagesData.push({ id: message.id, ...editMessage });
-              }
+      // Evtl. scrollen:
+      setTimeout(() => {
+        this.shouldScroll = true;
+      }, 1000);
 
-              // Änderungen weitergeben
-              this.threadControlService.setEditedMessage({
-                id: message.id,
-                ...editMessage,
-              });
-
-              this.editMessageId = null;
-              this.checkEditbox = false;
-              this.isFirstClick = true;
-
-              setTimeout(() => {
-                this.shouldScroll = true;
-              }, 1000);
-            });
-          } else {
-            console.warn(
-              `Nachricht konnte nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
-            );
-          }
-        })
-        .catch((error) => {
-          console.error(
-            `Fehler beim Überprüfen oder Bearbeiten der Nachricht: ${message.id}`,
-            error
-          );
-        });
+    } catch (error) {
+      console.error(
+        `Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`,
+        error
+      );
     }
   }
+}
+
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;
@@ -836,7 +852,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async openThread(messageId: any) {
-    this.threadControlService.setFirstThreadMessageId(null);
+/*     this.threadControlService.setFirstThreadMessageId(null); */
     this.chosenThreadMessage = null;
     try {
       this.threadOpened.emit();

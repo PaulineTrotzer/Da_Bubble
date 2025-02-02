@@ -35,19 +35,19 @@ export class ThreadComponent {
 
 
   ngAfterViewInit(): void {
-    if (this.directThreadId) {
+ /*    if (this.directThreadId) {
       this.focusDirectThreadInput();
-    }
+    } */
     if (this.channelThreadId) {
       this.focusChannelThreadInput();
     }
   }
 
-  focusDirectThreadInput(): void {
+/*   focusDirectThreadInput(): void {
     if (this.directThreadComp) {
       this.directThreadComp.focusInputField();
     }
-  }
+  } */
 
   focusChannelThreadInput(): void {
     if (this.channelThreadComp) {

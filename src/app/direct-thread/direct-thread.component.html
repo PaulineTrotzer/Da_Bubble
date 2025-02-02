@@ -1,33 +1,240 @@
-<div [ngClass]="{'hidden-width':global.checkWideChannelOrUserThreadBox,'reset-width':global.openChannelOrUserThread}"
-  class="full-page-content">
+<!-- AUSSEN-Container: .full-page-content -->
+<div [ngClass]="{
+    'hidden-width': global.checkWideChannelOrUserThreadBox,
+    'reset-width': global.openChannelOrUserThread
+  }" class="full-page-content">
   <header>
     <div class="headline-ct">
       <h3>Thread</h3>
       <span class="hashtag">#</span>
     </div>
     <div (click)="onClose()" class="close-icon-container">
-      <svg class="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-        class="icon">
-        <mask id="mask0_85344_17707" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
-          height="24">
-          <rect width="24" height="24" fill="#D9D9D9" />
-        </mask>
-        <g mask="url(#mask0_85344_17707)">
-          <path
-            d="M12 13.4L7.10005 18.3C6.91672 18.4834 6.68338 18.575 6.40005 18.575C6.11672 18.575 5.88338 18.4834 5.70005 18.3C5.51672 18.1167 5.42505 17.8834 5.42505 17.6C5.42505 17.3167 5.51672 17.0834 5.70005 16.9L10.6 12L5.70005 7.10005C5.51672 6.91672 5.42505 6.68338 5.42505 6.40005C5.42505 6.11672 5.51672 5.88338 5.70005 5.70005C5.88338 5.51672 6.11672 5.42505 6.40005 5.42505C6.68338 5.42505 6.91672 5.51672 7.10005 5.70005L12 10.6L16.9 5.70005C17.0834 5.51672 17.3167 5.42505 17.6 5.42505C17.8834 5.42505 18.1167 5.51672 18.3 5.70005C18.4834 5.88338 18.575 6.11672 18.575 6.40005C18.575 6.68338 18.4834 6.91672 18.3 7.10005L13.4 12L18.3 16.9C18.4834 17.0834 18.575 17.3167 18.575 17.6C18.575 17.8834 18.4834 18.1167 18.3 18.3C18.1167 18.4834 17.8834 18.575 17.6 18.575C17.3167 18.575 17.0834 18.4834 16.9 18.3L12 13.4Z"
-            fill="black" />
-        </g>
-      </svg>
+      <svg class="close-icon" width="24" height="24">...</svg>
     </div>
   </header>
+
   <div class="header-seperator"></div>
 
-  <app-mention-message-box (cancelMessageBoxCard)="onCancelMessageBox()" *ngIf="wasClickedInDirectThread"
+  <!-- Falls du ein Mention-Box anzeigst -->
+  <app-mention-message-box *ngIf="wasClickedInDirectThread" (cancelMessageBoxCard)="onCancelMessageBox()"
     (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
 
+  <!-- 1) .overflow-container -->
   <div class="overflow-container" #scrollContainer>
+
+    <!-- 2) .all-thread-message-container -->
     <div #messageContainer class="all-thread-message-container">
+
+      <!-- 3) color-separator, nur gerendert wenn parentMessage existiert -->
+      <div class="color-separator" *ngIf="parentMessage as pm"
+        (mouseenter)="toggleOptionBar(pm.id, true); onMouseEnter(pm)"
+        (mouseleave)="toggleOptionBar(pm.id, false); onMouseLeave(pm)">
+        <!-- Tag/Datum-Anzeige -->
+        <div class="new-day-info">
+          <div class="day-info">
+            <div class="line"></div>
+            <span class="day-span">
+              {{ displayDayInfoForParent() }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Sticker-Hover, Edit-Icons etc. -->
+        <div class="sticker-hover-ct" *ngIf="pm.id && showOptionBar[pm.id]">
+          <div class="show-set" @slideIn>
+            <div class="img-flex-bar-options">
+              <!-- Add Reaction-Icon -->
+              <div class="add-reaction-ct" (click)="openEmojiPicker()">
+                <!-- Icon oder SVG -->
+              </div>
+              <!-- Edit-Icon nur, wenn aktueller User === Sender -->
+              <div class="edit-icon-holder" *ngIf="pm.senderId === currentUser.uid" (click)="editMessages(pm)">
+                <!-- Stift-Icon -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit-Mat-Card, falls Bearbeitung -->
+        <mat-card *ngIf="pm.id && showEditOption[pm.id] && !editWasClicked" class="edit-messages-card"
+          appearance="outlined" (mouseleave)="toggleEditOption(pm.id, false)">
+          <mat-card-content class="edit-message-content">
+            <span *ngIf="!editWasClicked" (click)="editMessages(pm)">Nachricht bearbeiten</span>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Falls Sender = aktueller User; ansonsten Partner-Block -->
+        <ng-container *ngIf="pm.senderId === currentUser.uid; else partnerBlock">
+          <!-- LAYOUT FÜR DEN CURRENT USER -->
+          <div class="cu-message-container">
+            <div class="avatar-container">
+              <img [src]="currentUser.picture" alt="{{ currentUser.name }}" />
+            </div>
+            <div class="cu-message-column">
+              <div class="time-name-flex">
+                <h4>{{ currentUser.name }}</h4>
+                <span class="message-time">
+                  {{ pm.timestamp | date:'HH:mm' }} Uhr
+                </span>
+              </div>
+
+              <div class="message-holder">
+                <div class="cu-msg-text">
+                  <!-- Mentions -->
+                  <ng-container *ngFor="let mentionName of splitMessage(pm.text)">
+                    <span *ngIf="isMention(mentionName)" class="mention-message"
+                      (click)="handleMentionClick(mentionName)">{{ mentionName }}</span>
+                    <span class="only-name" *ngIf="!isMention(mentionName)">{{ mentionName }}</span>
+                  </ng-container>
+                </div>
+                <!-- Bearbeitet-Label -->
+                <div *ngIf="pm.editedTextShow" class="text-info-edit">
+                  (Bearbeitet)
+                </div>
+                <!-- Dateien -->
+                <div class="show-selected-files" *ngIf="pm.selectedFiles?.length">
+                  <div *ngFor="let file of pm.selectedFiles">
+                    <div class="mai-file" *ngIf="file.url">
+                      <div class="file-info" *ngIf="file.type?.startsWith('image/')">
+                        <a [href]="file.url" target="_blank">
+                          <img [src]="file.url" alt="Image File" />
+                        </a>
+                      </div>
+                      <div class="file-info" *ngIf="file.type==='application/pdf'">
+                        <a [href]="file.url" target="_blank">
+                          <img src="../../assets/img/pdf.png" alt="PDF File" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reactions vom currentUser-SENDER-Blick -->
+          <div class="render-reaction-ct-sender"
+            *ngIf="pm.reactions && !areEmojisSame(pm.reactions) && pm.senderId===currentUser.uid">
+            <div class="emoji-holder" *ngIf="pm.reactions[pm.senderId]?.counter > 0"
+              (mouseenter)="toggleReactionInfoSenderAtCurrentUser(pm.id,true)"
+              (mouseleave)="toggleReactionInfoSenderAtCurrentUser(pm.id,false)">
+              <span class="single-emoji">
+                {{ pm.reactions[pm.senderId]?.emoji }}
+              </span>
+              <span class="reaction-counter" *ngIf="pm.reactions[pm.senderId]?.counter>0">{{
+                pm.reactions[pm.senderId]?.counter }}</span>
+            </div>
+          </div>
+
+          <!-- Reaction-PopUp currentUser -->
+          <div class="reaction-name-info-ct-sender" [hidden]="!showReactionPopUpSenderAtCu[pm.id]" [ngClass]="{
+              hovered: showReactionPopUpSenderAtCu[pm.id],
+              'you-reacted':
+                pm.senderId===currentUser.uid &&
+                pm.reactions[pm.senderId]?.counter>0
+            }">
+            <span class="reaction-info-txt">
+              Du hast mit
+              <span class="react-emoji-value">
+                {{ pm.reactions[pm.senderId]?.emoji }}
+              </span>
+              reagiert
+            </span>
+          </div>
+        </ng-container>
+
+        <!-- Partner-Block -->
+        <ng-template #partnerBlock>
+          <!-- ================
+              Layout für Partner
+              ================ -->
+          <div class="chatpartner-message-container">
+            <div class="avatar-container-partner">
+              <img [src]="selectedUser.picture" alt="{{ selectedUser.name }}" />
+            </div>
+            <div class="partner-message-column">
+              <div class="time-name-flex-partner">
+                <h4>{{ selectedUser.name }}</h4>
+                <span class="message-time">
+                  {{ pm?.timestamp | date:'HH:mm' }} Uhr
+                </span>
+              </div>
+
+              <div (click)="handleClickOnMention($event)" [ngClass]="{
+                  'message-content-bubble': pm?.isHovered,
+                  'static-bubble': !pm?.isHovered
+                }">
+                <ng-container *ngFor="let mentionName of splitMessage(pm?.text)">
+                  <span *ngIf="isMention(mentionName)" class="mention-message"
+                    (click)="handleMentionClick(mentionName)">{{ mentionName }}</span>
+                  <span class="only-name" *ngIf="!isMention(mentionName)">
+                    {{ mentionName }}
+                  </span>
+                </ng-container>
+                <!-- Dateien -->
+                <div class="show-selected-files" *ngIf="pm?.selectedFiles?.length">
+                  <div *ngFor="let file of pm?.selectedFiles">
+                    <div class="mai-file" *ngIf="file.url">
+                      <div class="file-info" *ngIf="file.type?.startsWith('image/')">
+                        <a [href]="file.url" target="_blank">
+                          <img [src]="file.url" alt="Image File" />
+                        </a>
+                      </div>
+                      <div class="file-info" *ngIf="file.type==='application/pdf'">
+                        <a [href]="file.url" target="_blank">
+                          <img src="../../assets/img/pdf.png" alt="PDF File" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="pm?.editedTextShow" class="text-info-edit-chatpartner">
+                (Bearbeitet)
+              </div>
+
+              <!-- Reactions vom Partner-SENDER-Blick -->
+              <div class="render-reaction-ct-recipient" *ngIf="
+                  pm.reactions &&
+                  !areEmojisSame(pm.reactions) &&
+                  pm.senderId===selectedUser.id
+                ">
+                <div class="emoji-holder" *ngIf="pm.reactions[pm.senderId]?.counter>0"
+                  (mouseenter)="toggleReactionInfoSenderAtSelectedUser(pm.id,true)"
+                  (mouseleave)="toggleReactionInfoSenderAtSelectedUser(pm.id,false)">
+                  <span class="single-emoji">
+                    {{ pm.reactions[pm.senderId]?.emoji }}
+                  </span>
+                  <span class="reaction-counter" *ngIf="pm.reactions[pm.senderId]?.counter>0">{{
+                    pm.reactions[pm.senderId]?.counter }}</span>
+                </div>
+              </div>
+
+              <!-- Reaction-PopUp for Partner-Sender -->
+              <div class="reaction-name-info-ct-recipient"
+                [ngStyle]="{ 'opacity': showReactionPopUpSenderAtSu[pm.id] ? 1 : 0 }" [ngClass]="{
+                  hovered: showReactionPopUpSenderAtSu[pm.id],
+                  'reaction-name-info-has-reacted':
+                    pm.senderId===selectedUser.id &&
+                    pm.reactions[pm.senderId]?.counter>0
+                }">
+                <span class="reaction-info-txt">
+                  {{ pm.senderName }} hat mit
+                  <span class="react-emoji-value">
+                    {{ pm?.reactions[pm.senderId]?.emoji }}
+                  </span>
+                  reagiert
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+      </div> <!-- color-separator -->
+
+
 
       <div *ngFor="let message of messagesData; let i=index" [id]="message.id" [ngClass]="{
         'message-bubble': true, 
@@ -87,21 +294,6 @@
                           </a>
                         </div>
 
-                        <!-- Für Textdateien -->
-                        <div class="file-info" *ngIf="file.type === 'text/plain'">
-                          <a [href]="file.url" target="_blank">
-                            <img src="../../assets/img/textfile.png" alt="Text File" />
-                          </a>
-                        </div>
-
-                        <!-- Für andere Dateitypen -->
-                        <div class="file-info" *ngIf="!file.type.startsWith('image/') &&
-                               file.type !== 'application/pdf' &&
-                               file.type !== 'text/plain'">
-                          <a [href]="file.url" target="_blank">
-                            <img src="../../assets/img/alldatei.png" alt="Other File" />
-                          </a>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -257,21 +449,6 @@
                               </a>
                             </div>
 
-                            <!-- Für Textdateien -->
-                            <div class="file-info" *ngIf="file.type === 'text/plain'">
-                              <a [href]="file.url" target="_blank">
-                                <img src="../../assets/img/textfile.png" alt="Text File" />
-                              </a>
-                            </div>
-
-                            <!-- Für andere Dateitypen -->
-                            <div class="file-info" *ngIf="!file.type.startsWith('image/') &&
-                                   file.type !== 'application/pdf' &&
-                                   file.type !== 'text/plain'">
-                              <a [href]="file.url" target="_blank">
-                                <img src="../../assets/img/alldatei.png" alt="Other File" />
-                              </a>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -537,7 +714,7 @@
         </div>
       </div>
       <div class="input-holder">
-        <app-input-field [currentComponentId]="'direct-thread'" (inputFieldFocused)="handleInputFieldFocused($event)"
-          [selectedUser]="selectedUser" [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
+        <app-input-field [activeComponentId]="'direct-thread'" [selectedUser]="selectedUser"
+          [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
       </div>
     </div>

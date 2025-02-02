@@ -20,7 +20,6 @@ export class FilesPreviewComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    console.log('cuurentCoompId', this.currentComponentId);
     this.inputFieldService.activeComponentId$.subscribe((id) => {
       this.activeComponentId = id;
     });
