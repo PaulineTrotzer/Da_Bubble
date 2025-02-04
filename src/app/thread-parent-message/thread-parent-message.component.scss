@@ -13,6 +13,14 @@
   transition: opacity 0.3s ease;
 }
 
+app-thread-parent-message {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  position: relative;
+  margin-top: 2px;
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -72,7 +80,10 @@
 .message-container {
   display: flex;
   flex-direction: column;
-  position: relative;
+  /*   position: relative; */
+  &.has-sticker {
+    padding-bottom: 28px;
+  }
 
   &.is-current-user {
     align-items: flex-end;
@@ -85,9 +96,8 @@
 
 .avatar-container {
   position: absolute;
-  top: 35px;
-  right: 50px;
-
+  top: 30px;
+  right: 36px;
   img {
     width: 50px;
     height: 50px;
@@ -159,15 +169,21 @@
   font-weight: 400;
   line-height: 24.55px;
   padding: 16px;
-
+  position: relative;
   &.is-partner {
-    background-color: #eceefe;
+    background-color: #f3f4f6;
     margin-top: 15px;
     border-top-right-radius: 20px;
-    border-top-left-radius: 30px;
+    border-top-left-radius: 0px;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+    color: black;
   }
+}
+
+/* Wenn du .message-container.is-partner als „fremde Nachricht“ definiert hast */
+.message-bubble.is-partner:hover {
+  background-color: #fff;
 }
 
 .text-info-edit {
@@ -215,11 +231,62 @@
 
 .sticker-view-ct {
   position: absolute;
-  right: 130px;
-  bottom: 0;
-  /* Ggf. links fürs Partner-Layout abweichend;
-       oder du nutzt hier ebenfalls .is-partner, 
-       analog zum Avatar. */
+  bottom: -39px;
+  z-index: 20;
+  display: flex;
+}
+
+.sticker-view-right {
+  right: 0;
+  /* eventuelle Abstände oder justierungen */
+}
+
+/* Wenn Partner / Fremder der Sender ist */
+.sticker-view-left {
+  left: 0;
+  /* eventuelle Abstände oder justierungen */
+}
+
+/* Infobox: .reaction-name-info-ct-sender */
+.reaction-name-info-ct-sender {
+  position: absolute;
+  bottom: 110%; /* oder 100% + etwas Abstand -> Infobox erscheint über dem Emoji */
+  left: 100%; /* oder left: 0, je nach Wunsch */
+  transform: translateX(-50%); /* zentriert die Box horizontal über dem Emoji */
+
+  background-color: #444df2;
+  color: #fff;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 30px;
+  padding: 8px 11px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Standard: versteckt */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* verhindert Klicks, wenn unsichtbar */
+  transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+}
+
+/* Wenn .hovered-Klasse dazukommt, wird's sichtbar */
+.reaction-name-info-ct-sender.hovered {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Optional: Pfeil (Triangle) unter der Box) */
+.reaction-name-info-ct-sender::after {
+  content: "";
+  position: absolute;
+  bottom: -8px; /* Pfeil ragt 8px runter */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px; /* Größe des Pfeils */
+  border-style: solid;
+  border-color: #444df2 transparent transparent transparent; /* Pfeil in Box-Farbe */
 }
 
 .option-flex {
@@ -264,16 +331,24 @@
 }
 
 .last-emoji-holder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 6px;
-    .single-emoji {
-      font-size: 16px;
-      cursor: default;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  .single-emoji {
+    font-size: 16px;
+    cursor: pointer;
   }
-  
+}
+
+.comment-senderSticker-box,
+.comment-recipientSticker-box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2px 6px;
+  /* oder einfach inline-block */
+  display: inline-block;
+}
 
 .emoji-picker {
   width: 300px;
@@ -308,15 +383,14 @@
   position: relative;
   cursor: pointer;
   padding-top: 16px;
-  padding-bottom: 16px;
-
+  padding-bottom: 13px;
   &:hover {
     background-color: #eceefe;
   }
 
   &.first-separator {
     padding-top: 0;
-    margin-top: 16px;
+    margin-top: 17px;
   }
 }
 
@@ -326,19 +400,33 @@
 }
 
 .new-day-info {
+  bottom: 14px;
+  margin: 16px 0;
+  /* Positionierung relativ, damit Pseudo-Elemente oder day-span gut funktionieren */
   position: relative;
-  padding: 8px 35px;
-}
+  /* Optional: zentrierter Inhalt (falls du inlines hast) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.line {
-  width: 100%;
-  border: 1px solid #adb0d9;
+  /* Die horizontale Linie erzeugen wir als Pseudo-Element */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%; // vertikal zentriert
+    left: 0; // geht von ganz links...
+    right: 0; // ...bis ganz rechts
+    height: 1px;
+    background-color: rgba(173, 176, 217, 0.4); // halbtransparent
+    z-index: 0; // hinter day-span
+    transform: translateY(-50%);
+  }
 }
 
 .day-span {
   border-radius: 30px;
   z-index: 2;
-  border: 1px solid #adb0d9;
+  border: 1px solid rgba(173, 176, 217, 0.4);
   padding: 1px 13px;
   background-color: #ffffff;
   position: absolute;
@@ -349,7 +437,8 @@
   font-weight: 400;
   line-height: 24.55px;
   text-align: center;
-  color: #000000;
+  color: rgba(0, 0, 0, 0.7);
+
 }
 
 /* Sticker-Hover, Edit-Icons usw. */
@@ -411,6 +500,7 @@
 }
 .edit-icon-holder {
   position: relative;
+  z-index: 20x;
   svg {
     display: block;
     width: 36px;
@@ -436,29 +526,27 @@
 }
 .edit-message-content {
   box-shadow: 0px 6px 14px 0px #00000033;
-  color: #000000;
+  color: #000;
   width: 100%;
-  overflow-wrap: break-word;
-  border-top-right-radius: 30px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-  padding: 11px;
-  span {
-    display: inline-block; // Damit Padding sauber greift
-    padding: 4px; // Gleicher Wert für normal und hover
-    border-radius: 30px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
+  padding: 8px 12px;
+  border-radius: 30px;
   &:hover {
     background-color: white;
     span {
       color: #444df2;
       background-color: #eceefe;
-      // padding: 4px; <-- Weglassen oder bei Hover beibehalten
     }
   }
 }
+
+.edit-message-content span {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 15px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+}
+
 .add-reaction-ct {
   svg {
     width: 36px;
@@ -483,12 +571,11 @@
   gap: 20px;
   margin: 0 30px;
   position: relative;
-  bottom: -33px;
   width: 87%;
   padding-bottom: 11px;
   h3 {
     white-space: nowrap;
-    color: #adb0d9;
+    color: #444df299;
     font-family: Nunito;
     font-size: 16px;
     font-weight: 400;
@@ -498,9 +585,5 @@
 }
 .line-separator {
   width: 100%;
-  border: 1px solid #adb0d9;
-}
-
-.p-top27 {
-  padding-top: 27px;
+  border: 1px solid rgba(173, 176, 217, 0.4);
 }

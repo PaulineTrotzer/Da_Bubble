@@ -1,12 +1,20 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { Firestore, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { GlobalVariableService } from '../services/global-variable.service';
+import { MentionThreadService } from '../services/mention-thread.service';
 
 @Component({
   selector: 'app-thread-parent-message',
@@ -45,7 +53,7 @@ import { GlobalVariableService } from '../services/global-variable.service';
     ]),
   ],
 })
-export class ThreadParentMessageComponent {
+export class ThreadParentMessageComponent implements OnInit {
   @Input() pm: any;
   @Input() currentUser: any;
   @Input() selectedUser: any;
@@ -57,11 +65,11 @@ export class ThreadParentMessageComponent {
   editableMessageText = '';
   isOverlay = false;
   global = inject(GlobalVariableService);
-
+  mentionService = inject(MentionThreadService);
   isEmojiPickerVisible = false;
   isEmojiPickerEditVisible = false;
   firestore = inject(Firestore);
-
+  wasClickedInDirectThread = false;
   @Output() toggleOptionBarEvent = new EventEmitter<{
     messageId: string;
     show: boolean;
@@ -70,6 +78,16 @@ export class ThreadParentMessageComponent {
     messageId: string;
     show: boolean;
   }>();
+  getAllUsersName: any[] = [];
+
+
+  async ngOnInit() {
+    await this.mentionService.getAllUsersname();
+    // Jetzt ist die Userliste im Service gefüllt
+    this.getAllUsersName = this.mentionService.allUsersName;
+    // -> Hier kannst du optional noch weitere Aktionen starten
+  }
+  
 
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
@@ -78,6 +96,37 @@ export class ThreadParentMessageComponent {
   toggleOptionBar(messageId: string, show: boolean) {
     console.log('toggleOptionBar:', messageId, '=>', show);
     this.showOptionBar[messageId] = show;
+  }
+
+  handleClickOnMention(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('mention-message')) {
+      const mentionName = target.textContent?.trim();
+      if (mentionName) {
+        if (this.getAllUsersName.length === 0) {
+          console.warn('Mentions-Daten sind noch nicht geladen.');
+          return;
+        }
+        this.handleMentionClick(mentionName);
+      }
+    }
+  }
+  @Output() mentionClicked = new EventEmitter<string>();
+
+  async handleMentionClick(mention: string) {
+    this.mentionClicked.emit(mention); 
+    const cleanName = mention.substring(1).trim().toLowerCase();
+    const user = await this.mentionService.ensureUserDataLoaded(cleanName);
+    console.log('[handleMentionClick] found user:', user);
+
+    if (!user) {
+      console.warn('[handleMentionClick] No user found for:', mention);
+      return;
+    }
+
+    this.global.getUserByName = user;
+    this.global.openMentionMessageBox = true;
+    console.log('[handleMentionClick] Mention box opened for user:', user.name);
   }
 
   editMessage(pm: any) {
@@ -287,6 +336,17 @@ export class ThreadParentMessageComponent {
     this.closePicker();
   }
 
+  showPopUpSender: { [key: string]: boolean } = {};
+  showPopUpRecipient: { [key: string]: boolean } = {};
+
+  toggleReactionSenderInfo(id: string, show: boolean) {
+    this.showPopUpSender[id] = show;
+  }
+
+  toggleReactionRecipientInfo(id: string, show: boolean) {
+    this.showPopUpRecipient[id] = show;
+  }
+
   async storeLastUsedEmojiGlobally(emoji: string) {
     if (!this.currentUser?.uid) {
       console.warn('Kein currentUser.uid vorhanden!');
@@ -295,7 +355,6 @@ export class ThreadParentMessageComponent {
     const userDocRef = doc(this.firestore, 'users', this.currentUser.uid);
     await updateDoc(userDocRef, { lastUsedEmoji: emoji });
   }
-  
 
   getReplyCountText(): string {
     const replyCount =

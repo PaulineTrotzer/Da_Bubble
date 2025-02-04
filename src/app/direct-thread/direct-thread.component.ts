@@ -23,7 +23,6 @@ import {
   orderBy,
   setDoc,
   deleteDoc,
-  getDocs,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -41,6 +40,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { ThreadParentMessageComponent } from '../thread-parent-message/thread-parent-message.component';
+import { MentionThreadService } from '../services/mention-thread.service';
 
 @Component({
   selector: 'app-direct-thread',
@@ -138,15 +138,20 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   parentMessage: any;
   public firstThreadMessageId: string | null = null;
   isOverlayOpen = false;
+  mentionService=inject(MentionThreadService);
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
-    // Erst sicherstellen, dass 'this.global.currentUserData.id' existiert!
+    await this.mentionService.getAllUsersname();
     this.shouldScrollToBottom = true;
     await this.initializeComponent();
     this.subscribeToThreadChanges();
     this.setCurrentUserId();
     this.checkIfSelfThread();
+  }
+
+  onMentionClicked(mentionValue: string) {
+    this.wasClickedInDirectThread = true;
   }
 
   handleClickOnMention(event: MouseEvent): void {
@@ -165,7 +170,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async initializeComponent(): Promise<void> {
     await this.initializeUser();
-    await this.getAllUsersname();
+/*     await this.getAllUsersname(); */
   }
 
   subscribeToThreadChanges() {
@@ -187,10 +192,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         if (data.timestamp && data.timestamp.toDate) {
           data.timestamp = data.timestamp.toDate();
         }
-
         this.parentMessage = { id: docSnap.id, ...data };
-        console.log('Aktualisierte Parent-Nachricht:', this.parentMessage);
-
         this.scrollAutoDown();
         this.cdr.detectChanges();
       } else {
@@ -208,40 +210,16 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     onSnapshot(q, (snapshot) => {
       this.messagesData = snapshot.docs.map((doc) => {
         const data = doc.data();
-        // ggf. Timestamp anpassen
         if (data['timestamp']?.toDate) {
           data['timestamp'] = data['timestamp'].toDate();
         }
-        console.log(
-          '%c Updated thread message data:', 
-          'color: green; font-weight: bold;', 
-          doc.id, JSON.stringify(data)
-        );
-  
         return { id: doc.id, ...data };
       });
-      console.log('Aktualisierte Replies:', this.messagesData);
       this.scrollAutoDown();
       this.cdr.detectChanges();
     });
   }
 
-  async ensureMessagesLoaded(): Promise<void> {
-    if (!this.messagesData || this.messagesData.length === 0) {
-      console.log('Lade Nachrichten...');
-      const snapshot = await getDocs(
-        collection(
-          this.firestore,
-          `messages/${this.firstInitialisedThreadMsg}/threadMessages`
-        )
-      );
-      this.messagesData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log('Nachrichten erfolgreich geladen:', this.messagesData);
-    }
-  }
 
   setCurrentUserId(): void {
     this.currentUserId = this.route.snapshot.paramMap.get('id');
@@ -343,30 +321,29 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   async handleMentionClick(mention: string) {
+    console.log('[handleMentionClick] mention raw:', mention);
+  
     this.wasClickedInDirectThread = true;
+  
+    // Falls das mention ein @-Zeichen hat, entfernen
     const cleanName = mention.substring(1).trim().toLowerCase();
-    const user = await this.ensureUserDataLoaded(cleanName);
-
+    console.log('[handleMentionClick] cleanName:', cleanName);
+  
+    // User per Service laden
+    const user = await this.mentionService.ensureUserDataLoaded(cleanName);
+    console.log('[handleMentionClick] found user:', user);
+  
     if (!user) {
+      console.warn('[handleMentionClick] No user found for:', mention);
       return;
     }
+  
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
+    console.log('[handleMentionClick] Mention box opened for user:', user.name);
   }
+  
 
-  async ensureUserDataLoaded(name: string): Promise<any> {
-    while (this.getAllUsersName.length === 0) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    const foundUser = this.getAllUsersName.find(
-      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
-    );
-    if (!foundUser) {
-      console.warn('Benutzer nicht gefunden:', name);
-      return null;
-    }
-    return foundUser;
-  }
 
   closeMentionBoxHandler() {
     this.wasClickedInDirectThread = false;
@@ -385,35 +362,8 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     return cleanedParts;
   }
 
-  isMention(textPart: string): boolean {
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name.trim().toLowerCase()
-    );
-    const mentionName = textPart.startsWith('@')
-      ? textPart.substring(1).toLowerCase()
-      : '';
-    return normalizedUserNames.includes(mentionName);
-  }
 
-  async getAllUsersname(): Promise<void> {
-    const userRef = collection(this.firestore, 'users');
-    return new Promise((resolve) => {
-      onSnapshot(userRef, (querySnapshot) => {
-        this.getAllUsersName = [];
-        querySnapshot.forEach((doc) => {
-          const dataUser = doc.data();
-          this.getAllUsersName.push({
-            name: dataUser['name'],
-            email: dataUser['email'],
-            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
-            id: doc.id,
-            lastUsedEmoji: dataUser['lastUsedEmoji'] || ''
-          });
-        });
-        resolve();
-      });
-    });
-  }
+
 
   cancelEdit() {
     this.editMessageId = null;
@@ -436,7 +386,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       const messageRef = doc(this.firestore, docPath);
       if (!this.editableMessageText || this.editableMessageText.trim() === '') {
         await deleteDoc(messageRef);
-        console.log('Nachricht gelöscht:', message.id);
       } else {
         const updatedFields = {
           text: this.editableMessageText.trim(),
@@ -444,7 +393,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, updatedFields);
-        console.log('Nachricht aktualisiert:', message.id);
       }
       this.resetEditMode();
     } catch (error) {
@@ -563,55 +511,29 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async loadCurrentUser(userID: string) {
     try {
-      console.log('[loadCurrentUser] userID param:', userID);
-  
-      // 1) Einmalig die Daten holen
       const userResult = await this.userService.getUser(userID);
-  
-      console.log('[loadCurrentUser] userResult (VOR set):', userResult);
-  
       if (userResult) {
         this.currentUser = userResult;
-        console.log('[loadCurrentUser] this.currentUser (NACH set):', this.currentUser);
       }
-  
-      // 2) Snapshot-Live-Listener
       const userDocRef = doc(this.firestore, 'users', userID);
-      console.log('[loadCurrentUser] userDocRef path:', userDocRef.path);
-  
       onSnapshot(userDocRef, (docSnap) => {
         if (!docSnap.exists()) {
-          console.warn('[loadCurrentUser] onSnapshot -> Kein User-Dokument vorhanden:', userID);
           return;
         }
         const data = docSnap.data();
-        console.log('[loadCurrentUser] onSnapshot -> docSnap data:', data);
-  
-        // Hier aktualisierst du nur die Felder, die Firestore liefert:
-        this.currentUser.lastUsedEmoji = data?.['lastUsedEmoji'] || '';
-        // this.currentUser.name = data?.['name'] ?? this.currentUser.name;
-        // etc.
-  
-        console.log('[loadCurrentUser] onSnapshot -> this.currentUser (nach Update):', this.currentUser); 
+        this.currentUser.lastUsedEmoji = data?.['lastUsedEmoji'] || ''; 
       }); 
     } catch (error) {
       console.error('Fehler beim Laden des Benutzers:', error);
     }
   }
   
-  
 
   async processThreadMessages(firstInitialisedThreadMsg: string) {
-    // Nur zur Absicherung, dass parentDoc existiert => kein Duplikat in Subcollection
     const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
     const docSnapshot = await getDoc(docRef);
     if (!docSnapshot.exists()) {
-      // Falls es das Dokument gar nicht gab, legen wir es minimal an
       await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
-      console.log(
-        'Erstes Parent-Dokument angelegt:',
-        firstInitialisedThreadMsg
-      );
     }
   }
 
@@ -659,7 +581,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           message.senderPicture !== newPhotoUrl
       );
       if (messagesToUpdate.length === 0) {
-        console.log('Keine Änderungen an senderPicture erkannt');
         return;
       }
       messagesToUpdate.forEach((message) => {
@@ -679,7 +600,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       });
 
       await Promise.all(updatePromises);
-      console.log('Firestore-Updates für Thread-Nachrichten abgeschlossen');
     } catch (error) {
       console.error(
         'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
@@ -922,7 +842,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   applyGlobalEmojiToThread(emoji: string, message: any) {
     const fakeEvent = { emoji: { native: emoji } };
-    // Hier wollen wir "global" speichern:
     this.addEmoji(fakeEvent, message.id, this.currentUser.uid, 'FROM_APPLY');
   }
   
