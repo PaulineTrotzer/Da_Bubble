@@ -357,8 +357,7 @@ export class ThreadParentMessageComponent implements OnInit {
   }
 
   getReplyCountText(): string {
-    const replyCount =
-      this.messagesData.length > 1 ? this.messagesData.length - 1 : 0;
+    const replyCount = this.messagesData.length;
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {

@@ -35,8 +35,6 @@ export class MentionThreadService {
     const normalizedUserNames = this.allUsersName.map((user: any) =>
       user.name.trim().toLowerCase()
     );
-    console.log("allUsersName =>", this.allUsersName.map(u => u.name.toLowerCase()));
-
     const mentionName = textPart.startsWith('@')
       ? textPart.substring(1).toLowerCase()
       : '';
@@ -47,12 +45,11 @@ export class MentionThreadService {
     if (!text) {
       return [];
     }
-    const regex = /(@[A-Za-z0-9 _\-\!\$\*]+)/g;
+    const regex = /(@[\w\-_!$*]+)/g;
     const parts = text.split(regex);
     const cleanedParts = parts
       .map((part) => part.trim())
       .filter((part) => part.length > 0);
-    console.log('splitMessage() cleanedParts:', cleanedParts); // <-- neu
     return cleanedParts;
   }
 

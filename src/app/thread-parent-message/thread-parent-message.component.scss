@@ -13,6 +13,8 @@
   transition: opacity 0.3s ease;
 }
 
+
+
 app-thread-parent-message {
   display: flex;
   flex-direction: column;
@@ -446,6 +448,7 @@ app-thread-parent-message {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 999;
   &.left-hover {
     top: 10px;
     left: 200px;
@@ -521,8 +524,8 @@ app-thread-parent-message {
   position: absolute;
   top: 8px;
   left: -10px;
-  z-index: 999;
   margin-top: 4px;
+
 }
 .edit-message-content {
   box-shadow: 0px 6px 14px 0px #00000033;
@@ -530,6 +533,11 @@ app-thread-parent-message {
   width: 100%;
   padding: 8px 12px;
   border-radius: 30px;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+
   &:hover {
     background-color: white;
     span {
