@@ -6,6 +6,7 @@ export class User {
     picture?: string;
     status: string;
     lastEmojis: string[];
+    lastUsedEmoji?: string;
   
     constructor(obj?: any, uid?: string) {
       this.uid = uid || obj?.uid || '';
@@ -15,6 +16,7 @@ export class User {
       this.picture = obj?.picture || 'assets/img/picture_frame.png';
       this.status = obj?.status || '';
       this.lastEmojis = obj?.lastEmojis || ['😍', '😇'];
+      this.lastUsedEmoji = obj?.lastUsedEmoji || '';
     }
   
     public toJSON() {
@@ -25,6 +27,7 @@ export class User {
         picture: this.picture,
         status: this.status,
         lastEmojis: this.lastEmojis,
+        lastUsedEmoji : this.lastUsedEmoji,
       };
     }
   }

@@ -184,6 +184,7 @@ export class ThreadParentMessageComponent {
       return;
     }
     message.lastUsedEmoji = chosenEmoji;
+
     if (this.global.currentUserData?.id === message.senderId) {
       // ============= Der aktuelle User ist der Sender =============
       message.senderchoosedStickereBackColor = emoji;
@@ -282,8 +283,19 @@ export class ThreadParentMessageComponent {
       lastUsedEmoji: message.lastUsedEmoji || '',
     };
     await updateDoc(stickerRef, stikerObj);
-    this.closePicker(); 
+    await this.storeLastUsedEmojiGlobally(chosenEmoji);
+    this.closePicker();
   }
+
+  async storeLastUsedEmojiGlobally(emoji: string) {
+    if (!this.currentUser?.uid) {
+      console.warn('Kein currentUser.uid vorhanden!');
+      return;
+    }
+    const userDocRef = doc(this.firestore, 'users', this.currentUser.uid);
+    await updateDoc(userDocRef, { lastUsedEmoji: emoji });
+  }
+  
 
   getReplyCountText(): string {
     const replyCount =
@@ -328,5 +340,11 @@ export class ThreadParentMessageComponent {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
+  }
+
+  applyGlobalEmoji(emoji: string, parentMessage: any) {
+    const fakeEvent = { emoji: { native: emoji } };
+    // Im Prinzip derselbe Aufruf
+    this.addEmoji(fakeEvent, parentMessage);
   }
 }

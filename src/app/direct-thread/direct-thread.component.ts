@@ -142,33 +142,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     // Erst sicherstellen, dass 'this.global.currentUserData.id' existiert!
-    if (!this.global.currentUserData || !this.global.currentUserData.id) {
-      console.warn('No currentUserData or ID found at init...');
-      // Du kannst hier return oder warten, bis ein anderes Event den User lädt
-      return;
-    }
-
-    // Jetzt existiert 'this.global.currentUserData.id'
-    const userDocRef = doc(
-      this.firestore,
-      'users',
-      this.global.currentUserData.id
-    );
-
-    onSnapshot(userDocRef, (docSnap) => {
-      if (!docSnap.exists()) {
-        console.warn(
-          'Kein User-Dokument vorhanden:',
-          this.global.currentUserData.id
-        );
-        return;
-      }
-
-      const data = docSnap.data();
-      // lastEmojis (z.B. string[])
-      this.global.currentUserData.lastEmojis = data?.['lastEmojis'] || [];
-    });
-
     this.shouldScrollToBottom = true;
     await this.initializeComponent();
     this.subscribeToThreadChanges();
@@ -434,6 +407,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
             email: dataUser['email'],
             picture: dataUser['picture'] || 'assets/img/default-avatar.png',
             id: doc.id,
+            lastUsedEmoji: dataUser['lastUsedEmoji'] || ''
           });
         });
         resolve();
@@ -485,12 +459,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.editWasClicked = false;
     this.showOptionBar = {};
   }
-
-  /*   onInput(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    const height = (textarea.scrollTop = textarea.scrollHeight);
-    this.scrollHeightInput = height;
-  } */
 
   getDayInfoForMessage(index: number): string {
     const messageDate = new Date(this.messagesData[index].timestamp);
@@ -588,21 +556,50 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(async (paramMap) => {
       const userID = paramMap.get('id');
       if (userID) {
-        await this.loadCurrentUser(userID);
+        await this.loadCurrentUser(userID); 
       }
     });
   }
 
   async loadCurrentUser(userID: string) {
     try {
+      console.log('[loadCurrentUser] userID param:', userID);
+  
+      // 1) Einmalig die Daten holen
       const userResult = await this.userService.getUser(userID);
+  
+      console.log('[loadCurrentUser] userResult (VOR set):', userResult);
+  
       if (userResult) {
         this.currentUser = userResult;
+        console.log('[loadCurrentUser] this.currentUser (NACH set):', this.currentUser);
       }
+  
+      // 2) Snapshot-Live-Listener
+      const userDocRef = doc(this.firestore, 'users', userID);
+      console.log('[loadCurrentUser] userDocRef path:', userDocRef.path);
+  
+      onSnapshot(userDocRef, (docSnap) => {
+        if (!docSnap.exists()) {
+          console.warn('[loadCurrentUser] onSnapshot -> Kein User-Dokument vorhanden:', userID);
+          return;
+        }
+        const data = docSnap.data();
+        console.log('[loadCurrentUser] onSnapshot -> docSnap data:', data);
+  
+        // Hier aktualisierst du nur die Felder, die Firestore liefert:
+        this.currentUser.lastUsedEmoji = data?.['lastUsedEmoji'] || '';
+        // this.currentUser.name = data?.['name'] ?? this.currentUser.name;
+        // etc.
+  
+        console.log('[loadCurrentUser] onSnapshot -> this.currentUser (nach Update):', this.currentUser); 
+      }); 
     } catch (error) {
       console.error('Fehler beim Laden des Benutzers:', error);
     }
   }
+  
+  
 
   async processThreadMessages(firstInitialisedThreadMsg: string) {
     // Nur zur Absicherung, dass parentDoc existiert => kein Duplikat in Subcollection
@@ -640,39 +637,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     };
   }
 
-/*   async getThreadMessages(messageId: any) {
-    try {
-      const threadMessagesRef = collection(
-        this.firestore,
-        `messages/${messageId}/threadMessages`
-      );
-      const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
-      onSnapshot(q, (querySnapshot) => {
-        this.messagesData = querySnapshot.docs.map((doc) => {
-          const messageData = doc.data();
-          console.log('ThreadDoc data:', doc.id, messageData);
-          if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-            messageData['timestamp'] = messageData['timestamp'].toDate();
-          }
-
-          return {
-            id: doc.id,
-            ...messageData,
-          };
-        });
-        console.log(
-          '%c ThreadDoc data AFTER Reaction Update:',
-          'color: orange; font-weight: bold;',
-  
-        );
-
-        this.scrollAutoDown();
-        this.cdr.detectChanges();
-      });
-    } catch (error) {
-      console.error('[getThreadMessages] fehler:', error);
-    }
-  } */
 
   scrollAutoDown() {
     if (this.shouldScrollToBottom) {
@@ -787,50 +751,33 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     return threadMessageDoc.data();
   }
 
-  async addEmoji(event: any, currentMessageId: string, userId: string) {
-    try {
-      // "emoji" ist dein gewählter Emoji
-      const emoji = event?.emoji?.native; // optional chaining
-
-      // Früh raus, wenn nichts da
-      if (!emoji) {
-        console.error('Kein Emoji im Event gefunden.');
-        return;
-      }
-
-      const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
-      const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
-
-      if (!threadMessageDoc) {
-        console.error('Keine Daten für die Nachricht gefunden.');
-        return;
-      }
-
-      // Reaction-Objekt aktualisieren
-      const reactions = threadMessageDoc['reactions'] || {};
-      const userReaction = reactions[userId];
-      if (userReaction && userReaction.emoji === emoji) {
-        reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
-      } else {
-        reactions[userId] = { emoji, counter: 1 };
-      }
-
-      // (1) Emoji global in Firestore beim User ablegen
-      await this.storeLastUsedEmojiGlobally(emoji);
-
-      // (2) UI & Dokument aktualisieren
-      this.closePicker();
-      this.shouldScrollToBottom = false;
-      await updateDoc(threadMessageRef, { reactions });
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen des Emojis:', error);
+  async addEmoji(event: any, currentMessageId: string, userId: string, origin: string) {
+    const emoji = event?.emoji?.native;
+    if (!emoji) return;
+  
+    const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
+    const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
+    if (!threadMessageDoc) return;
+  
+    const reactions = threadMessageDoc['reactions'] || {};
+    const userReaction = reactions[userId];
+    if (userReaction && userReaction.emoji === emoji) {
+      reactions[userId].counter = userReaction.counter === 0 ? 1 : 0;
+    } else {
+      reactions[userId] = { emoji, counter: 1 };
     }
+      await this.storeLastUsedEmojiGlobally(emoji);
+    this.closePicker();
+    this.shouldScrollToBottom = false;
+    await updateDoc(threadMessageRef, { reactions });
   }
-
+  
+  
   async storeLastUsedEmojiGlobally(emoji: string) {
-    const userDocRef = doc(this.firestore, 'users', this.currentUser.uid);
+    const userDocRef = doc(this.firestore, 'users', this.currentUser?.uid);
     await updateDoc(userDocRef, { lastUsedEmoji: emoji });
   }
+  
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -974,10 +921,10 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   applyGlobalEmojiToThread(emoji: string, message: any) {
-    // Fake event
-    const fakeEvent = {
-      emoji: { native: emoji },
-    };
-    this.addEmoji(fakeEvent, message.id, this.currentUser.uid);
+    const fakeEvent = { emoji: { native: emoji } };
+    // Hier wollen wir "global" speichern:
+    this.addEmoji(fakeEvent, message.id, this.currentUser.uid, 'FROM_APPLY');
   }
+  
+  
 }

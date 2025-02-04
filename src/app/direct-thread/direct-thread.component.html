@@ -115,25 +115,21 @@
                         </g>
                       </svg>
                     </div>
-
-                    <div
-                    class="last-emoji-holder"
-                    *ngIf="currentUser && currentUser.lastEmojis && currentUser.lastEmojis.length > 0"
-                    (click)="applyGlobalEmojiToThread(currentUser.lastEmojis[currentUser.lastEmojis.length - 1], message)"
-                  >
-                    <span class="single-emoji">
-                      {{ currentUser.lastEmojis[currentUser.lastEmojis.length - 1] }}
-                    </span>
-                  </div>
-                  
+    <!--                 <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
+                      (click)="applyGlobalEmojiToThread(currentUser.lastUsedEmoji, message)">
+                      <span class="single-emoji">
+                        {{ currentUser.lastUsedEmoji }}
+                      </span>
+                    </div>
+ -->
 
 
 
                     <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                       <div class="emoji-picker">
                         <emoji-mart (click)="letPickerVisible($event)"
-                          (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker"
-                          size="18"></emoji-mart>
+                          (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')"
+                          class="emoji-picker" size="18"></emoji-mart>
                       </div>
                     </div>
                     <img>
@@ -147,7 +143,7 @@
           <!-- CURRENT USER I FOLLOWING-->
 
           <div
-            *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name || message.senderName == currentUser.name && message.recipientName == currentUser.name"
+            *ngIf="message.senderName === currentUser.name && message.recipientName !== currentUser.name || message.senderName == currentUser.name && message.recipientName == currentUser.name"
             class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
             (mouseleave)="toggleOptionBar(message.id,false)" (mouseleave)="toggleEditOption(message.id, false)"
             [ngClass]="{'first-message-position': isFirstMessage(i)}">
@@ -184,20 +180,18 @@
                     </svg>
                   </div>
 
-                  <div
-                  class="last-emoji-holder"
-                  *ngIf="currentUser && currentUser.lastEmojis && currentUser.lastEmojis.length > 0"
-                  (click)="applyGlobalEmojiToThread(currentUser.lastEmojis[currentUser.lastEmojis.length - 1], message)"
-                >
-                  <span class="single-emoji">
-                    {{ currentUser.lastEmojis[currentUser.lastEmojis.length - 1] }}
-                  </span>
-                </div>
+                  <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
+                    (click)="applyGlobalEmojiToThread(currentUser.lastUsedEmoji, message)">
+                    <span class="single-emoji">
+                      {{ currentUser.lastUsedEmoji }}
+                    </span>
+                  </div>
 
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
                       <emoji-mart (click)="letPickerVisible($event)"
-                        (emojiClick)="addEmoji($event, message.id, currentUser.uid)" class="emoji-picker" size="18">
+                        (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')" class="emoji-picker"
+                        size="18">
                       </emoji-mart>
                     </div>
                   </div>
@@ -212,8 +206,7 @@
               </mat-card-content>
             </mat-card>
 
-            <div *ngIf="message.senderName === currentUser.name && message.recipientName === selectedUser.name"
-              class="cu-message-container">
+            <div *ngIf="message.senderId=== currentUser.uid" class="cu-message-container">
 
               <div class="avatar-container">
                 <img [src]="currentUser.picture" alt="{{ currentUser.name }}" />

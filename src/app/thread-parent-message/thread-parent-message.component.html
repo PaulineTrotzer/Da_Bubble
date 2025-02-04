@@ -63,14 +63,17 @@
                     </svg>
                 </div>
 
-                <div class="last-emoji-holder" *ngIf="pm.lastUsedEmoji">
-                    <span class="single-emoji">{{ pm.lastUsedEmoji }}</span>
-                  </div>
+                <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
+                    (click)="applyGlobalEmoji(currentUser.lastUsedEmoji, pm)">
+                    <span class="single-emoji">
+                        {{ currentUser.lastUsedEmoji }}
+                    </span>
+                </div>
                 <!-- / Reaction-Icon -->
             </div>
         </div>
     </div>
-            
+
     <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
         <div class="emoji-picker">
             <emoji-mart (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event, pm)" class="emoji-picker"
