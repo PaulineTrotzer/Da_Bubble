@@ -1,0 +1,506 @@
+.mat-mdc-card {
+  border-style: none;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  position: absolute;
+  left: 100px;
+  top: 34px;
+  width: fit-content;
+  white-space: nowrap;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 11;
+}
+
+.reaction-icon-container-editMode {
+  position: absolute;
+  bottom: 58px;
+  left: 42px;
+  z-index: 3;
+  svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      cursor: pointer;
+
+      path {
+        fill: #444df2;
+      }
+    }
+  }
+}
+
+.edit-input {
+  position: relative;
+  left: 34px;
+  z-index: 2;
+  bottom: 39px;
+  width: 280px;
+  height: 152px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  resize: none;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+  font-family: Nunito, "Helvetica Neue";
+  font-size: 18px;
+  overflow-y: auto;
+  &:focus {
+    border-color: #444df2;
+    outline: none;
+  }
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  &.is-current-user {
+    align-items: flex-end;
+  }
+
+  &.is-partner {
+    align-items: flex-start;
+  }
+}
+
+.avatar-container {
+  position: absolute;
+  top: 35px;
+  right: 50px;
+
+  img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  &.is-partner {
+    left: 50px;
+    right: auto;
+    top: 46px;
+  }
+}
+
+.message-column {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: flex-end;
+  right: 95px;
+
+  h4 {
+    font-family: Nunito;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24.55px;
+    text-align: left;
+    &:hover {
+      color: #444df2;
+      cursor: pointer;
+    }
+  }
+
+  &.is-partner {
+    align-items: flex-start;
+    left: 125px;
+    right: auto;
+  }
+}
+
+.time-name-flex {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 23px;
+
+  &.is-partner {
+    flex-direction: row;
+  }
+}
+
+.message-time {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.1px;
+  color: #686868;
+  position: relative;
+  left: 8px;
+}
+
+.message-bubble {
+  max-width: 350px;
+  background-color: #797ef3;
+  border-top-right-radius: 0;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24.55px;
+  padding: 16px;
+
+  &.is-partner {
+    background-color: #eceefe;
+    margin-top: 15px;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+}
+
+.text-info-edit {
+  position: absolute;
+  font-size: 12px;
+  font-family: "Nunito";
+  text-align: center;
+  bottom: -10px;
+  left: -80px;
+  color: black;
+  &.is-partner {
+    bottom: -22px;
+    font-weight: 600;
+    left: auto;
+  }
+}
+
+.show-selected-files {
+  max-height: 86px;
+  max-width: 88px;
+}
+.file-info {
+  display: flex;
+  width: 105px;
+  justify-content: center;
+  height: 75px;
+  align-items: center;
+  border-radius: 5%;
+  cursor: pointer;
+
+  img {
+    width: 50px;
+    height: 50px;
+    border-radius: 13px;
+  }
+  &:hover {
+    img {
+      transform: scale(1.05);
+    }
+    span {
+      color: #444df2;
+    }
+  }
+}
+
+.sticker-view-ct {
+  position: absolute;
+  right: 130px;
+  bottom: 0;
+  /* Ggf. links fürs Partner-Layout abweichend;
+       oder du nutzt hier ebenfalls .is-partner, 
+       analog zum Avatar. */
+}
+
+.option-flex {
+  display: flex;
+  position: absolute;
+  right: -14px;
+  bottom: 61px;
+  gap: 10px;
+  z-index: 3;
+}
+
+.save-icon {
+  object-fit: contain;
+  width: 24px;
+  padding: 2px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
+  }
+}
+
+.cancel-icon {
+  object-fit: contain;
+  width: 22px;
+  padding: 3px;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
+  }
+}
+
+.emoji-picker-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.last-emoji-holder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    .single-emoji {
+      font-size: 16px;
+      cursor: default;
+    }
+  }
+  
+
+.emoji-picker {
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.emoji-holder {
+  position: relative;
+  font-size: 14px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  border: 1px solid #adb0d9;
+  border-radius: 16px;
+  padding: 3px;
+  max-width: 100%;
+  gap: 3px;
+  width: 40px;
+  &:hover {
+    border-color: #444df2;
+    cursor: pointer;
+  }
+}
+
+.color-separator {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  padding-top: 16px;
+  padding-bottom: 16px;
+
+  &:hover {
+    background-color: #eceefe;
+  }
+
+  &.first-separator {
+    padding-top: 0;
+    margin-top: 16px;
+  }
+}
+
+.day-info {
+  display: flex;
+  align-items: center;
+}
+
+.new-day-info {
+  position: relative;
+  padding: 8px 35px;
+}
+
+.line {
+  width: 100%;
+  border: 1px solid #adb0d9;
+}
+
+.day-span {
+  border-radius: 30px;
+  z-index: 2;
+  border: 1px solid #adb0d9;
+  padding: 1px 13px;
+  background-color: #ffffff;
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  transform: translate(50%, -50%);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 24.55px;
+  text-align: center;
+  color: #000000;
+}
+
+/* Sticker-Hover, Edit-Icons usw. */
+.sticker-hover-ct {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  &.left-hover {
+    top: 10px;
+    left: 200px;
+  }
+  &.right-hover {
+    top: 10px;
+    right: 50px;
+  }
+}
+.show-set {
+  position: absolute;
+  border: 1px solid #adb0d9;
+  background-color: white;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  /* Falls oben immer abgerundet sein soll: */
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+}
+
+/* Rechts: bottom-left = rund, bottom-right = 0 */
+.show-set-right {
+  /* z.B. in der Nähe des "Edit/Reaction"-Buttons für CurrentUser */
+  right: 20px;
+  top: -22px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0;
+}
+
+/* Links: bottom-left = 0, bottom-right = rund */
+.show-set-left {
+  /* z.B. in der Nähe des Chatpartners */
+  left: 25px;
+  top: 0; /* anpassen nach Bedarf */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 30px;
+}
+
+.img-flex-bar-options {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  padding: 3px 12px;
+  gap: 3px;
+  img {
+    object-fit: contain;
+  }
+}
+
+.edit-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.edit-icon-holder {
+  position: relative;
+  svg {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      border-radius: 100%;
+      path {
+        fill: #444df2;
+      }
+    }
+  }
+}
+.edit-messages-card {
+  position: absolute;
+  top: 8px;
+  left: -10px;
+  z-index: 999;
+  margin-top: 4px;
+}
+.edit-message-content {
+  box-shadow: 0px 6px 14px 0px #00000033;
+  color: #000000;
+  width: 100%;
+  overflow-wrap: break-word;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  padding: 11px;
+  span {
+    display: inline-block; // Damit Padding sauber greift
+    padding: 4px; // Gleicher Wert für normal und hover
+    border-radius: 30px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  &:hover {
+    background-color: white;
+    span {
+      color: #444df2;
+      background-color: #eceefe;
+      // padding: 4px; <-- Weglassen oder bei Hover beibehalten
+    }
+  }
+}
+.add-reaction-ct {
+  svg {
+    width: 36px;
+    height: 36px;
+    display: block;
+    background-color: transparent;
+    border-radius: 50%;
+    &:hover {
+      background-color: #eceefe;
+      cursor: pointer;
+      path {
+        fill: #444df2;
+      }
+    }
+  }
+}
+
+.seperator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 0 30px;
+  position: relative;
+  bottom: -33px;
+  width: 87%;
+  padding-bottom: 11px;
+  h3 {
+    white-space: nowrap;
+    color: #adb0d9;
+    font-family: Nunito;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24.55px;
+    text-align: left;
+  }
+}
+.line-separator {
+  width: 100%;
+  border: 1px solid #adb0d9;
+}
+
+.p-top27 {
+  padding-top: 27px;
+}

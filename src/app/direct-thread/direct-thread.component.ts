@@ -20,7 +20,6 @@ import {
   onSnapshot,
   query,
   updateDoc,
-  addDoc,
   orderBy,
   setDoc,
   deleteDoc,
@@ -41,6 +40,7 @@ import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { SendMessageInfo } from '../models/send-message-info.interface';
+import { ThreadParentMessageComponent } from '../thread-parent-message/thread-parent-message.component';
 
 @Component({
   selector: 'app-direct-thread',
@@ -52,6 +52,7 @@ import { SendMessageInfo } from '../models/send-message-info.interface';
     FormsModule,
     MatCardModule,
     MentionMessageBoxComponent,
+    ThreadParentMessageComponent,
   ],
   templateUrl: './direct-thread.component.html',
   styleUrls: ['./direct-thread.component.scss'],
@@ -102,7 +103,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     iconThird: 'assets/img/third.svg',
   };
   isDirectThreadOpen: boolean = true;
-  overlayStatusService = inject(OverlayStatusService);
   reactions: { [messageId: string]: any[] } = {};
   selectFiles: any[] = [];
   threadControlService = inject(ThreadControlService);
@@ -137,19 +137,38 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
   parentMessage: any;
   public firstThreadMessageId: string | null = null;
+  isOverlayOpen = false;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
-/*     console.log('threadOpenend');
-    this.threadControlService.editedMessage$
-      .pipe(filter((message) => !!message))
-      .subscribe((updatedMessage) => {
-        console.log(
-          'Bearbeitete Nachricht erhalten im Thread:',
-          updatedMessage
+    // Erst sicherstellen, dass 'this.global.currentUserData.id' existiert!
+    if (!this.global.currentUserData || !this.global.currentUserData.id) {
+      console.warn('No currentUserData or ID found at init...');
+      // Du kannst hier return oder warten, bis ein anderes Event den User lädt
+      return;
+    }
+
+    // Jetzt existiert 'this.global.currentUserData.id'
+    const userDocRef = doc(
+      this.firestore,
+      'users',
+      this.global.currentUserData.id
+    );
+
+    onSnapshot(userDocRef, (docSnap) => {
+      if (!docSnap.exists()) {
+        console.warn(
+          'Kein User-Dokument vorhanden:',
+          this.global.currentUserData.id
         );
-        this.updateThreadMessage(updatedMessage);
-      }); */
+        return;
+      }
+
+      const data = docSnap.data();
+      // lastEmojis (z.B. string[])
+      this.global.currentUserData.lastEmojis = data?.['lastEmojis'] || [];
+    });
+
     this.shouldScrollToBottom = true;
     await this.initializeComponent();
     this.subscribeToThreadChanges();
@@ -157,18 +176,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.checkIfSelfThread();
   }
 
-/*   focusInputField(): void {
-    if (this.inputFieldComponent) { */
-/*       this.inputFieldComponent.focusInputField(); */
- /*    }
-  } */
-
-/*   activeComponentId: string = 'direct-thread';
-  handleInputFieldFocused(componentId: string): void {
-    console.log('InputField focused in component:', componentId);
-    this.activeComponentId = componentId; // Setze die aktive Komponente
-  }
- */
   handleClickOnMention(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target && target.classList.contains('mention-message')) {
@@ -190,16 +197,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   subscribeToThreadChanges() {
     this.threadControlService.firstThreadMessageId$
-    .pipe(
-      filter((id: string | null): id is string => !!id)
-      //                 ^^^^^^^^^^^^^^^  type guard
-    )
-    .subscribe((id: string) => {
-      // Jetzt weiß TS, id ist ein string
-      this.firstThreadMessageId = id;
-      this.subscribeToParentDoc(id);
-      this.subscribeToThreadReplies(id);
-    });  
+      .pipe(filter((id: string | null): id is string => !!id))
+      .subscribe((id: string) => {
+        this.firstThreadMessageId = id;
+        this.subscribeToParentDoc(id);
+        this.subscribeToThreadReplies(id);
+      });
   }
 
   private subscribeToParentDoc(parentId: string) {
@@ -207,15 +210,14 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     onSnapshot(parentRef, (docSnap) => {
       if (docSnap.exists()) {
         let data = docSnap.data() as any;
-  
-        // Falls data.timestamp ein Firestore.Timestamp ist, wandelst du es um:
+
         if (data.timestamp && data.timestamp.toDate) {
-          data.timestamp = data.timestamp.toDate(); // → jetzt ein JS-Date
+          data.timestamp = data.timestamp.toDate();
         }
-  
+
         this.parentMessage = { id: docSnap.id, ...data };
         console.log('Aktualisierte Parent-Nachricht:', this.parentMessage);
-  
+
         this.scrollAutoDown();
         this.cdr.detectChanges();
       } else {
@@ -223,10 +225,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
-  
+
   private subscribeToThreadReplies(parentId: string) {
-    const repliesRef = collection(this.firestore, `messages/${parentId}/threadMessages`);
+    const repliesRef = collection(
+      this.firestore,
+      `messages/${parentId}/threadMessages`
+    );
     const q = query(repliesRef, orderBy('timestamp', 'asc'));
     onSnapshot(q, (snapshot) => {
       this.messagesData = snapshot.docs.map((doc) => {
@@ -235,6 +239,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         if (data['timestamp']?.toDate) {
           data['timestamp'] = data['timestamp'].toDate();
         }
+        console.log(
+          '%c Updated thread message data:', 
+          'color: green; font-weight: bold;', 
+          doc.id, JSON.stringify(data)
+        );
+  
         return { id: doc.id, ...data };
       });
       console.log('Aktualisierte Replies:', this.messagesData);
@@ -242,26 +252,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
   }
-  
-
-/*   updateThreadMessage(updatedMessage: any): void {
-    // Falls der "bearbeitete" Datensatz die Parent-Nachricht ist:
-    if (updatedMessage.id === this.parentMessage?.id) {
-      // Aktualisiere einfach die Parent-Message-Felder
-      this.parentMessage.text = updatedMessage.text;
-      this.parentMessage.editedTextShow = updatedMessage.editedTextShow;
-      this.parentMessage.editedAt = updatedMessage.editedAt;
-      console.log('Parent-Nachricht lokal aktualisiert:', this.parentMessage);
-  
-      // ggf. detectChanges
-      this.cdr.detectChanges();
-    } else {
-      // Falls du hier noch Sub-Replies updaten willst (z.B. es war eine Antwort im Thread)
-      // Dann müsstest du messagesData[...] anpassen.
-      console.warn('Kein Update nötig, denn es ist keine Parent-Message:', updatedMessage.id);
-    }
-  }
-   */
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
@@ -285,7 +275,8 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   getReplyCountText(): string {
-    const replyCount = this.messagesData.length > 1 ? this.messagesData.length - 1 : 0;
+    const replyCount =
+      this.messagesData.length > 1 ? this.messagesData.length - 1 : 0;
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {
@@ -358,7 +349,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-  
+
     if (this.isSameDay(date, today)) {
       return 'Heute';
     } else if (this.isSameDay(date, yesterday)) {
@@ -367,8 +358,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       return this.formatDate(date);
     }
   }
-  
-
 
   editMessages(message: any) {
     this.editWasClicked = true;
@@ -465,43 +454,30 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async saveOrDeleteMessage(message: SendMessageInfo) {
     try {
-      if (!message || !message.id) {
-        console.error('Invalid message object passed to saveOrDeleteMessage');
+      if (!this.firstThreadMessageId) {
+        console.error('Kein Parent (firstThreadMessageId) vorhanden.');
         return;
       }
-  
-      let docPath: string;
-      if (message.isParent) {
-        // → Parent-Dokument
-        //  In message.id steckt dann "parentId"
-        docPath = `messages/${message.id}`;
-      } else {
-        // → Sub-Dokument (Reply)
-        docPath = `messages/${this.firstInitialisedThreadMsg}/threadMessages/${message.id}`;
-      }
-  
+      const docPath = `messages/${this.firstThreadMessageId}/threadMessages/${message.id}`;
       const messageRef = doc(this.firestore, docPath);
-  
-      // Dann wie gehabt: löschen oder bearbeiten ...
       if (!this.editableMessageText || this.editableMessageText.trim() === '') {
         await deleteDoc(messageRef);
         console.log('Nachricht gelöscht:', message.id);
       } else {
         const updatedFields = {
-          text: this.editableMessageText,
+          text: this.editableMessageText.trim(),
           editedTextShow: true,
           editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, updatedFields);
         console.log('Nachricht aktualisiert:', message.id);
       }
-  
       this.resetEditMode();
     } catch (error) {
       console.error('Error in saveOrDeleteMessage:', error);
     }
   }
-  
+
   resetEditMode() {
     this.editMessageId = null;
     this.editableMessageText = '';
@@ -594,16 +570,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.showReactionPopUpBoth[messageId] = show;
   }
 
-  /*  async subscribeToThreadMessages() {
-    this.threadControlService.firstThreadMessageId$.subscribe(
-      async (firstInitialisedThreadMsg) => {
-        if (firstInitialisedThreadMsg) {
-          await this.processThreadMessages(firstInitialisedThreadMsg);
-        }
-      }
-    );
-  } */
-
   getUserIds(reactions: {
     [key: string]: { emoji: string; counter: number };
   }): string[] {
@@ -645,12 +611,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     if (!docSnapshot.exists()) {
       // Falls es das Dokument gar nicht gab, legen wir es minimal an
       await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
-      console.log('Erstes Parent-Dokument angelegt:', firstInitialisedThreadMsg);
+      console.log(
+        'Erstes Parent-Dokument angelegt:',
+        firstInitialisedThreadMsg
+      );
     }
-    // Dann brauchst du es gar nicht weiter duplizieren;
-    // Dein subscribeToThreadChanges() holt sich den Parent + Replies via onSnapshot.
   }
-
 
   toggleThreadStatus(status: boolean) {
     this.isDirectThreadOpen = status;
@@ -659,70 +625,27 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   async handleFirstThreadMessageAndPush(firstInitialisedThreadMsg: string) {
     const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
     const docSnapshot = await getDoc(docRef);
-  
+
     if (docSnapshot.exists()) {
       const docData = docSnapshot.data();
       if (docData?.['firstMessageCreated']) {
-        // Parent existiert schon, nichts weiter tun
         this.currentThreadMessage = { id: docSnapshot.id, ...docData };
         return;
       }
     }
-  
-    // Falls wir sicherstellen wollen, dass es existiert
     await setDoc(docRef, { firstMessageCreated: true }, { merge: true });
     this.currentThreadMessage = {
       id: docSnapshot.id,
       ...docSnapshot.data(),
     };
-  
-    // KEIN zusätzliches addDoc(...) an threadMessagesRef mehr
-    // -> So sparst du dir das Duplikat der Parent.
   }
-  
-  
 
-/*   async settingDataforFireBase(threadMessagesRef: any, threadMessageData: any) {
-    try { */
-      /*       if (
-        !this.selectedUser ||
-        !this.selectedUser.uid ||
-        !this.global.currentUserData
-      ) {
-        throw new Error(
-          `Ungültige Daten: selectedUser = ${JSON.stringify(
-            this.selectedUser
-          )}, currentUserData = ${JSON.stringify(this.global.currentUserData)}`
-        );
-      } */
-/*       const messageData = {
-        senderId: threadMessageData.senderId,
-        senderName: threadMessageData.senderName,
-        senderPicture: threadMessageData.senderPicture || '',
-        timestamp: new Date(),
-        selectedFiles: this.selectFiles || [],
-        editedTextShow: false,
-        recipientId: threadMessageData.recipientId,
-        recipientName: threadMessageData.recipientName,
-        recipientStickerCount: 0,
-        recipientSticker: '',
-        text: this.currentThreadMessage?.text || '',
-        firstMessageCreated: true,
-        reactions: '',
-        isParent: threadMessageData.isParent ?? false,
-        parentId: this.firstInitialisedThreadMsg,
-      };
-      const docRef = await addDoc(threadMessagesRef, messageData);
-      console.log('Erstellte Nachricht-ID:', docRef.id);
-      // this.threadControlService.setLastMessageId(docRef.id);
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen der Nachricht:', error);
-    }
-  } */
-
-  async getThreadMessages(messageId: any) {
+/*   async getThreadMessages(messageId: any) {
     try {
-      const threadMessagesRef = collection(this.firestore, `messages/${messageId}/threadMessages`);
+      const threadMessagesRef = collection(
+        this.firestore,
+        `messages/${messageId}/threadMessages`
+      );
       const q = query(threadMessagesRef, orderBy('timestamp', 'asc'));
       onSnapshot(q, (querySnapshot) => {
         this.messagesData = querySnapshot.docs.map((doc) => {
@@ -731,19 +654,25 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           if (messageData['timestamp'] && messageData['timestamp'].toDate) {
             messageData['timestamp'] = messageData['timestamp'].toDate();
           }
+
           return {
             id: doc.id,
             ...messageData,
           };
         });
-
+        console.log(
+          '%c ThreadDoc data AFTER Reaction Update:',
+          'color: orange; font-weight: bold;',
   
+        );
+
         this.scrollAutoDown();
         this.cdr.detectChanges();
       });
     } catch (error) {
       console.error('[getThreadMessages] fehler:', error);
-    }}
+    }
+  } */
 
   scrollAutoDown() {
     if (this.shouldScrollToBottom) {
@@ -797,22 +726,22 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   closePicker() {
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
   }
 
   closePickerEdit() {
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.isEmojiPickerEditVisible = false;
   }
 
   openEmojiPickerEditMode() {
     this.isEmojiPickerEditVisible = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   addEmojiToEdit(event: any) {
@@ -860,7 +789,15 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async addEmoji(event: any, currentMessageId: string, userId: string) {
     try {
-      const emoji = event.emoji.native;
+      // "emoji" ist dein gewählter Emoji
+      const emoji = event?.emoji?.native; // optional chaining
+
+      // Früh raus, wenn nichts da
+      if (!emoji) {
+        console.error('Kein Emoji im Event gefunden.');
+        return;
+      }
+
       const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
       const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
 
@@ -868,6 +805,8 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         console.error('Keine Daten für die Nachricht gefunden.');
         return;
       }
+
+      // Reaction-Objekt aktualisieren
       const reactions = threadMessageDoc['reactions'] || {};
       const userReaction = reactions[userId];
       if (userReaction && userReaction.emoji === emoji) {
@@ -875,12 +814,22 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       } else {
         reactions[userId] = { emoji, counter: 1 };
       }
+
+      // (1) Emoji global in Firestore beim User ablegen
+      await this.storeLastUsedEmojiGlobally(emoji);
+
+      // (2) UI & Dokument aktualisieren
       this.closePicker();
       this.shouldScrollToBottom = false;
       await updateDoc(threadMessageRef, { reactions });
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Emojis:', error);
     }
+  }
+
+  async storeLastUsedEmojiGlobally(emoji: string) {
+    const userDocRef = doc(this.firestore, 'users', this.currentUser.uid);
+    await updateDoc(userDocRef, { lastUsedEmoji: emoji });
   }
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
@@ -1022,5 +971,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   onMessageSent(): void {
     this.shouldScrollToBottom = true;
     this.scrollAutoDown();
+  }
+
+  applyGlobalEmojiToThread(emoji: string, message: any) {
+    // Fake event
+    const fakeEvent = {
+      emoji: { native: emoji },
+    };
+    this.addEmoji(fakeEvent, message.id, this.currentUser.uid);
   }
 }
