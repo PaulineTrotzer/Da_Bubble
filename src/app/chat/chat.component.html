@@ -4,7 +4,7 @@
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
 
-    <div *ngIf="selectedUser  || global.channelSelected || selectedChannel" class="main-current-messagebox">
+    <div class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
             <div *ngFor="let message of messagesData; let i=index">
                 <div *ngIf="!message.deleted">
@@ -397,36 +397,37 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="self-chat-opener-ct" *ngIf="showWelcomeChatText && !hasMessagesValue">
-                    <div class="self-name-and-img">
-                        <img class="self-chat-img" src={{global.currentUserData.picture}}>
-                        <p>{{global.currentUserData?.name }}</p>
-                        <p class="you">(Du)</p>
-                    </div>
-                    <span class="self-chat-txt">
-                        <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
-                        auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
-                        gerne Dinge mit dir selbst besprechen.
-                    </span>
+            <div class="self-chat-opener-ct" *ngIf="isSelfChat  && hasNoMessages">
+                <div class="self-name-and-img">
+                    <img class="self-chat-img" src={{global.currentUserData.picture}}>
+                    <p>{{global.currentUserData?.name }}</p>
+                    <p class="you">(Du)</p>
                 </div>
-                <div class="two-chat-opener-ct" *ngIf="showTwoPersonConversationTxt && !hasMessagesValue">
-                    <div class="img-and-name">
-                        <img class="self-chat-img" src={{selectedUser?.picture}}>
-                        <p>{{selectedUser?.name}}</p>
-                    </div>
-                    <div class="two-chat-txt">
-                        Diese Unterhaltung findet nur zwischen
-                        <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span>
-                        und
-                        dir
-                        statt
-                    </div>
+                <span class="self-chat-txt">
+                    <b>Dieser Raum ist nur für dich da.</b> Mache dir Notizen, liste deine To-dos
+                    auf oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch
+                    gerne Dinge mit dir selbst besprechen.
+                </span>
+            </div>
+            <div class="two-chat-opener-ct" *ngIf="!isSelfChat  && hasNoMessages">
+                <div class="img-and-name">
+                    <img class="self-chat-img" src={{selectedUser?.picture}}>
+                    <p>{{selectedUser?.name}}</p>
+                </div>
+                <div class="two-chat-txt">
+                    Diese Unterhaltung findet nur zwischen
+                    <span (click)="onUserNameClick()" class="name-chat-partner">&#64;{{selectedUser?.name}}</span>
+                    und
+                    dir
+                    statt
                 </div>
             </div>
+
         </div>
     </div>
     <app-input-field (messageCreated)="onMessageCreated($event)" [activeComponentId]="'chat'"
-        (mentionCardOpened)="handleMentionCardOpened($event)"
-        [selectedUser]="selectedUser" (messageSent)="onMessageSent()"></app-input-field>
+        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedUser]="selectedUser"
+        (messageSent)="onMessageSent()"></app-input-field>
 </div>

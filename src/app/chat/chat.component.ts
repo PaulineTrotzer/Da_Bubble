@@ -143,10 +143,12 @@ export class ChatComponent implements OnInit, OnChanges {
   userChannelService = inject(UserChannelSelectService);
   isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
-  hasMessagesValue = false;
-/*   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent; */
+  /*   hasMessagesValue = false; */
+  /*   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent; */
   sanitizer = inject(DomSanitizer);
   inputFieldService = inject(InputfieldService);
+  isSelfChat?: boolean;
+  hasNoMessages?: boolean;
 
   constructor() {}
 
@@ -177,7 +179,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
-
     this.threadControlService.editedMessage$
       .pipe(
         filter((message: any) => !!message), // Nachricht darf nicht null oder undefined sein
@@ -194,6 +195,7 @@ export class ChatComponent implements OnInit, OnChanges {
         }
       })
     ); */
+    this.updateSubscriptionText();
     await this.getAllUsersname();
   }
 
@@ -206,6 +208,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.shouldScroll = false;
     if (updatedMessage.deleted) {
       await this.handleDeletedMessage(updatedMessage);
+      this.updateSubscriptionText();
       return;
     }
 
@@ -321,10 +324,10 @@ export class ChatComponent implements OnInit, OnChanges {
     this.subscribeToThreadAnswers();
     this.checkForSelfChat();
   } */
-
+  /* 
   hasMessages(): boolean {
     return this.messagesData && this.messagesData.length > 0;
-  }
+  } */
 
   ngOnDestroy() {
     this.workspaceSubscription?.unsubscribe();
@@ -464,21 +467,21 @@ export class ChatComponent implements OnInit, OnChanges {
       console.log('Selected Files:', this.selectFiles);
       this.chatMessage = '';
       this.global.clearCurrentChannel();
-      this.showTwoPersonConversationTxt = false;
+      /*       this.showTwoPersonConversationTxt = false; */
       await this.getMessages();
       console.log('selectedUser changes');
-/*       this.focusInputField(); */
+      /*       this.focusInputField(); */
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
-      this.showWelcomeChatText = false;
-      this.showTwoPersonConversationTxt = false;
+/*       this.showWelcomeChatText = false; */
+      /*       this.showTwoPersonConversationTxt = false; */
       this.clearInput();
       console.log('selectedChannel changes');
-/*       this.focusInputField(); */
+      /*       this.focusInputField(); */
     }
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
-      this.showWelcomeChatText = false;
-      this.showTwoPersonConversationTxt = false;
+/*       this.showWelcomeChatText = false; */
+      /*       this.showTwoPersonConversationTxt = false; */
       this.clearInput();
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
@@ -504,139 +507,131 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
-/*   focusInputField(): void {
+  /*   focusInputField(): void {
     if (this.inputFieldComponent) { */
-      /*       this.inputFieldComponent.focusInputField(); */
-/*     }
+  /*       this.inputFieldComponent.focusInputField(); */
+  /*     }
   } */
-
-  showBeginningText() {
-    this.showWelcomeChatText = true;
-  }
 
   clearInput() {
     this.messagesData = [];
   }
   /**
- * Bearbeitet oder löscht eine Nachricht in der Haupt-Collection `messages/{id}`.
- * -> Nutzt KEINE zusätzliche Subcollection für die gleiche Nachricht.
- *
- * @param message Nachricht-Objekt mit mindestens `id` (Firestore-Dokument-ID).
- */
-async saveOrDeleteMessage(message: any) {
-  this.shouldScroll = false;
+   * Bearbeitet oder löscht eine Nachricht in der Haupt-Collection `messages/{id}`.
+   * -> Nutzt KEINE zusätzliche Subcollection für die gleiche Nachricht.
+   *
+   * @param message Nachricht-Objekt mit mindestens `id` (Firestore-Dokument-ID).
+   */
+  async saveOrDeleteMessage(message: any) {
+    this.shouldScroll = false;
 
-  // 1) Plausibilitäts-Check: Hat das Objekt eine gültige Firestore-ID?
-  if (!message.id) {
-    console.error('Ungültige Nachricht-ID:', message);
-    return;
-  }
-
-  // 2) Referenz auf das Firestore-Dokument in `messages/{message.id}`
-  const messageRef = doc(this.firestore, 'messages', message.id);
-
-  // 3) Prüfe, ob der Text nach dem Bearbeiten ggf. leer ist:
-  if (this.editableMessageText.trim() === '') {
-    // ---- LÖSCHEN ----
-    try {
-      const docSnapshot = await getDoc(messageRef);
-
-      if (!docSnapshot.exists()) {
-        console.warn(`Nachricht existiert nicht (ID: ${message.id}).`);
-        return;
-      }
-
-      await deleteDoc(messageRef);
-      console.log('Nachricht gelöscht:', message.id);
-
-      // Lokale Array-Aktualisierung: Nachricht aus messagesData entfernen
-      this.messagesData = this.messagesData.filter(
-        (msg: any) => msg.id !== message.id
-      );
-
-      // Als "gelöscht" kennzeichnen (optional, für UI o.Ä.)
-      const deletedMessage = { id: message.id, deleted: true };
-      this.messagesData.push(deletedMessage);
-
-      //  Änderung an Thread-Komponente weitergeben,
-      //  falls dort die Nachricht als "Parent" angezeigt wird
-      this.threadControlService.setEditedMessage(deletedMessage);
-
-      // Resets
-      this.editMessageId = null;
-      this.isFirstClick = true;
-      this.checkEditbox = false;
-
-    } catch (error) {
-      console.error(
-        `Fehler beim Löschen der Nachricht (ID: ${message.id}):`,
-        error
-      );
+    // 1) Plausibilitäts-Check: Hat das Objekt eine gültige Firestore-ID?
+    if (!message.id) {
+      console.error('Ungültige Nachricht-ID:', message);
+      return;
     }
 
-  } else {
-    // ---- BEARBEITEN ----
-    try {
-      const docSnapshot = await getDoc(messageRef);
+    // 2) Referenz auf das Firestore-Dokument in `messages/{message.id}`
+    const messageRef = doc(this.firestore, 'messages', message.id);
 
-      if (!docSnapshot.exists()) {
-        console.warn(
-          `Nachricht kann nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
+    // 3) Prüfe, ob der Text nach dem Bearbeiten ggf. leer ist:
+    if (this.editableMessageText.trim() === '') {
+      // ---- LÖSCHEN ----
+      try {
+        const docSnapshot = await getDoc(messageRef);
+
+        if (!docSnapshot.exists()) {
+          console.warn(`Nachricht existiert nicht (ID: ${message.id}).`);
+          return;
+        }
+
+        await deleteDoc(messageRef);
+        console.log('Nachricht gelöscht:', message.id);
+
+        // Lokale Array-Aktualisierung: Nachricht aus messagesData entfernen
+        this.messagesData = this.messagesData.filter(
+          (msg: any) => msg.id !== message.id
         );
-        return;
+
+        // Als "gelöscht" kennzeichnen (optional, für UI o.Ä.)
+        const deletedMessage = { id: message.id, deleted: true };
+        this.messagesData.push(deletedMessage);
+
+        //  Änderung an Thread-Komponente weitergeben,
+        //  falls dort die Nachricht als "Parent" angezeigt wird
+        this.threadControlService.setEditedMessage(deletedMessage);
+
+        // Resets
+        this.editMessageId = null;
+        this.isFirstClick = true;
+        this.checkEditbox = false;
+      } catch (error) {
+        console.error(
+          `Fehler beim Löschen der Nachricht (ID: ${message.id}):`,
+          error
+        );
       }
+    } else {
+      // ---- BEARBEITEN ----
+      try {
+        const docSnapshot = await getDoc(messageRef);
 
-      const editMessage = {
-        text: this.editableMessageText,
-        editedTextShow: true,
-        // Optional: Falls du einen Timestamp für die Bearbeitung
-        // mitschreiben willst:
-        editedAt: new Date().toISOString(),
-      };
+        if (!docSnapshot.exists()) {
+          console.warn(
+            `Nachricht kann nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
+          );
+          return;
+        }
 
-      await updateDoc(messageRef, editMessage);
-      console.log('Nachricht bearbeitet:', message.id);
-
-      // 4) Lokale Array-Aktualisierung (damit UI sofort reagiert)
-      const index = this.messagesData.findIndex(
-        (msg: any) => msg.id === message.id
-      );
-      if (index !== -1) {
-        this.messagesData[index] = {
-          ...this.messagesData[index],
-          ...editMessage,
+        const editMessage = {
+          text: this.editableMessageText,
+          editedTextShow: true,
+          // Optional: Falls du einen Timestamp für die Bearbeitung
+          // mitschreiben willst:
+          editedAt: new Date().toISOString(),
         };
-      } else {
-        // Falls Nachricht lokal noch nicht existiert, hinzufügen
-        console.warn('Nachricht nicht gefunden, füge sie hinzu:', message.id);
-        this.messagesData.push({ id: message.id, ...editMessage });
+
+        await updateDoc(messageRef, editMessage);
+        console.log('Nachricht bearbeitet:', message.id);
+
+        // 4) Lokale Array-Aktualisierung (damit UI sofort reagiert)
+        const index = this.messagesData.findIndex(
+          (msg: any) => msg.id === message.id
+        );
+        if (index !== -1) {
+          this.messagesData[index] = {
+            ...this.messagesData[index],
+            ...editMessage,
+          };
+        } else {
+          // Falls Nachricht lokal noch nicht existiert, hinzufügen
+          console.warn('Nachricht nicht gefunden, füge sie hinzu:', message.id);
+          this.messagesData.push({ id: message.id, ...editMessage });
+        }
+
+        // 5) Signal an Thread-Komponente (falls sie dieses Dokument ebenfalls anzeigt)
+        this.threadControlService.setEditedMessage({
+          id: message.id,
+          ...editMessage,
+        });
+
+        // Resets
+        this.editMessageId = null;
+        this.checkEditbox = false;
+        this.isFirstClick = true;
+
+        // Evtl. scrollen:
+        setTimeout(() => {
+          this.shouldScroll = true;
+        }, 1000);
+      } catch (error) {
+        console.error(
+          `Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`,
+          error
+        );
       }
-
-      // 5) Signal an Thread-Komponente (falls sie dieses Dokument ebenfalls anzeigt)
-      this.threadControlService.setEditedMessage({
-        id: message.id,
-        ...editMessage,
-      });
-
-      // Resets
-      this.editMessageId = null;
-      this.checkEditbox = false;
-      this.isFirstClick = true;
-
-      // Evtl. scrollen:
-      setTimeout(() => {
-        this.shouldScroll = true;
-      }, 1000);
-
-    } catch (error) {
-      console.error(
-        `Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`,
-        error
-      );
     }
   }
-}
-
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;
@@ -735,7 +730,7 @@ async saveOrDeleteMessage(message: any) {
 
   async getMessages() {
     try {
-      if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
+      if (!this.selectedUser?.uid || !this.global.currentUserData?.uid) {
         return;
       }
       const docRef = collection(this.firestore, 'messages');
@@ -790,8 +785,10 @@ async saveOrDeleteMessage(message: any) {
             this.messagesData.sort(
               (a: any, b: any) => a.timestamp - b.timestamp
             );
-            this.hasMessagesValue = this.messagesData.length > 0;
+
             this.updateSubscriptionText();
+
+            /*             this.hasMessagesValue = this.messagesData.length > 0; */
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
@@ -808,15 +805,26 @@ async saveOrDeleteMessage(message: any) {
       console.error('Error initializing messages query:', error);
     }
   }
-
   updateSubscriptionText() {
-    const isSelfChat =
-      this.selectedUser?.uid === this.global.currentUserData?.id;
-    const hasNoMessages = this.messagesData.length === 0;
-
-    this.showWelcomeChatText = isSelfChat && hasNoMessages;
-    this.showTwoPersonConversationTxt = !isSelfChat && hasNoMessages;
+    this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
+    this.hasNoMessages = this.messagesData.length === 0;
+  
+    // Erst alles auf false setzen
+    this.showWelcomeChatText = false;
+    this.showTwoPersonConversationTxt = false;
+  
+    // Nun gezielt nach Self-/Non-Self unterscheiden
+    if (this.isSelfChat && this.hasNoMessages) {
+      this.showWelcomeChatText = true;
+    } else if (!this.isSelfChat && this.hasNoMessages) {
+      this.showTwoPersonConversationTxt = true;
+    }
+  
+    console.log('isSelfChat=', this.isSelfChat, 'hasNoMessages=', this.hasNoMessages);
+    console.log('showTwoPersonConversationTxt =', this.showTwoPersonConversationTxt);
   }
+  
+  
 
   async updateMessagesWithNewPhoto() {
     try {
@@ -852,7 +860,7 @@ async saveOrDeleteMessage(message: any) {
   }
 
   async openThread(messageId: any) {
-/*     this.threadControlService.setFirstThreadMessageId(null); */
+    /*     this.threadControlService.setFirstThreadMessageId(null); */
     this.chosenThreadMessage = null;
     try {
       this.threadOpened.emit();

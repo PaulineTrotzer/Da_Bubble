@@ -317,7 +317,7 @@
                 <span class="single-emoji">
                   {{ message.reactions[message.senderId]?.emoji }}
                 </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
                   {{ message.reactions[message.senderId]?.counter }}
                 </span>
               </div>
@@ -328,7 +328,7 @@
                 <span class="single-emoji">
                   {{ message.reactions[message.senderId]?.emoji }}
                 </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
                   {{ message.reactions[message.senderId]?.counter }}
                 </span>
               </div>
@@ -339,7 +339,7 @@
                 <span class="single-emoji">
                   {{ message.reactions[message.recipientId]?.emoji }}
                 </span>
-                <span *ngIf="message.reactions[message.recipientId]?.counter > 0" class="reaction-counter">
+                <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
                   {{ message.reactions[message.recipientId]?.counter }}
                 </span>
               </div>
@@ -386,7 +386,7 @@
                   <span class="single-emoji">
                     {{ message.reactions[message.recipientId]?.emoji }}
                   </span>
-                  <span *ngIf="message.reactions[message.recipientId]?.counter > 0" class="reaction-counter">
+                  <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
                     {{ message.reactions[message.recipientId]?.counter }}
                   </span>
                 </div>
@@ -397,7 +397,7 @@
                   <span class="single-emoji">
                     {{ message.reactions[message.senderId]?.emoji }}
                   </span>
-                  <span *ngIf="message.reactions[message.senderId]?.counter > 0" class="reaction-counter">
+                  <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
                     {{ message.reactions[message.senderId]?.counter }}
                   </span>
                 </div>

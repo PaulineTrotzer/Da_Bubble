@@ -60,14 +60,43 @@ app-input-field {
   position: relative;
 }
 
-.self-chat-opener-ct {
+
+
+.self-chat-opener-ct,
+.two-chat-opener-ct {
+  /* Layout */
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 36px;
+  align-items: flex-start;  
+  gap: 20px;
   position: absolute;
+  left: 50%;            
   bottom: 30px;
+  transform: translateX(-50%); 
+  width: 100%;  
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
 }
+
+.self-chat-txt, .two-chat-txt {
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  padding: 0 42px;
+  transition: color 0.2s ease;
+}
+
+
 
 .you {
   position: relative;
@@ -82,14 +111,14 @@ app-input-field {
   font-weight: 700;
 }
 
-.self-chat-txt {
+/* .self-chat-txt {
   color: grey;
   font-weight: 400;
   font-size: 20px;
   display: flex;
   flex-direction: column;
   padding: 0 42px;
-}
+} */
 
 .self-chat-img {
   width: 100px;
@@ -97,14 +126,6 @@ app-input-field {
   object-fit: cover;
   border-radius: 50px;
   margin-left: 32px;
-}
-
-.two-chat-opener-ct {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  position: absolute;
-  bottom: 30px;
 }
 
 .img-and-name {
@@ -115,11 +136,11 @@ app-input-field {
   font-weight: 700;
 }
 
-.two-chat-txt {
+/* .two-chat-txt {
   font-size: 20px;
   color: grey;
   padding: 0 42px;
-}
+} */
 
 .name-chat-partner {
   color: #535af1;

@@ -8,7 +8,8 @@
   left: 100px;
   top: 34px;
   width: fit-content;
-  white-space: nowrap;
+  white-space: normal;        // statt nowrap
+  word-wrap: break-word;
   font-size: 14px;
   transition: opacity 0.3s ease;
 }
@@ -82,6 +83,7 @@ app-thread-parent-message {
 .message-container {
   display: flex;
   flex-direction: column;
+  padding-bottom: 9px;
   /*   position: relative; */
   &.has-sticker {
     padding-bottom: 28px;
@@ -523,7 +525,7 @@ app-thread-parent-message {
 .edit-messages-card {
   position: absolute;
   top: 8px;
-  left: -10px;
+  left: 8px;
   margin-top: 4px;
 
 }
@@ -533,11 +535,12 @@ app-thread-parent-message {
   width: 100%;
   padding: 8px 12px;
   border-radius: 30px;
+  width: auto;  
+  min-width: max-content;
   border-top-right-radius: 30px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-
   &:hover {
     background-color: white;
     span {
