@@ -80,21 +80,16 @@ export class ThreadParentMessageComponent implements OnInit {
   }>();
   getAllUsersName: any[] = [];
 
-
   async ngOnInit() {
     await this.mentionService.getAllUsersname();
-    // Jetzt ist die Userliste im Service gefüllt
     this.getAllUsersName = this.mentionService.allUsersName;
-    // -> Hier kannst du optional noch weitere Aktionen starten
   }
-  
 
   toggleEditOption(messageId: string, show: boolean) {
     this.showEditOption[messageId] = show;
   }
 
   toggleOptionBar(messageId: string, show: boolean) {
-    console.log('toggleOptionBar:', messageId, '=>', show);
     this.showOptionBar[messageId] = show;
   }
 
@@ -114,19 +109,15 @@ export class ThreadParentMessageComponent implements OnInit {
   @Output() mentionClicked = new EventEmitter<string>();
 
   async handleMentionClick(mention: string) {
-    this.mentionClicked.emit(mention); 
+    this.mentionClicked.emit(mention);
     const cleanName = mention.substring(1).trim().toLowerCase();
     const user = await this.mentionService.ensureUserDataLoaded(cleanName);
-    console.log('[handleMentionClick] found user:', user);
-
     if (!user) {
       console.warn('[handleMentionClick] No user found for:', mention);
       return;
     }
-
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
-    console.log('[handleMentionClick] Mention box opened for user:', user.name);
   }
 
   editMessage(pm: any) {
@@ -142,18 +133,14 @@ export class ThreadParentMessageComponent implements OnInit {
       );
       return;
     }
-
-    // Pfad: immer "messages/<parentId>"
     const docPath = `messages/${pm.id}`;
     const messageRef = doc(this.firestore, docPath);
 
     try {
-      // Wenn Text leer, -> löschen
       if (!this.editableMessageText.trim()) {
         await deleteDoc(messageRef);
         console.log('Nachricht gelöscht:', pm.id);
       } else {
-        // Sonst: updaten
         const updatedFields = {
           text: this.editableMessageText.trim(),
           editedTextShow: true,
@@ -165,8 +152,6 @@ export class ThreadParentMessageComponent implements OnInit {
     } catch (error) {
       console.error('Error in saveOrDeleteParentMessage:', error);
     }
-
-    // Edit-Mode verlassen
     this.resetEditMode();
   }
 
@@ -226,7 +211,6 @@ export class ThreadParentMessageComponent implements OnInit {
 
   async addEmoji(event: any, message: any) {
     const chosenEmoji = event?.emoji?.native;
-    // 1) Emoji aus event holen
     const emoji = event?.emoji?.native;
     if (!emoji) {
       console.error('Kein Emoji im Event gefunden');
@@ -235,11 +219,9 @@ export class ThreadParentMessageComponent implements OnInit {
     message.lastUsedEmoji = chosenEmoji;
 
     if (this.global.currentUserData?.id === message.senderId) {
-      // ============= Der aktuelle User ist der Sender =============
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
 
-      // Toggling der senderSticker
       if (message.senderSticker === emoji) {
         message.senderSticker = '';
         if (message.senderStickerCount === 2) {
@@ -250,7 +232,6 @@ export class ThreadParentMessageComponent implements OnInit {
         message.senderStickerCount = 1;
       }
 
-      // Falls Empfänger denselben Sticker hat
       if (message.recipientSticker === emoji) {
         message.recipientStickerCount =
           (message.recipientStickerCount || 1) + 1;
@@ -274,11 +255,9 @@ export class ThreadParentMessageComponent implements OnInit {
       this.isEmojiPickerVisible = false;
       this.messageIdHovered = null;
     } else {
-      // ============= Der aktuelle User ist NICHT der Sender =============
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
 
-      // Toggling recipientSticker
       if (message.recipientSticker === emoji) {
         message.recipientSticker = '';
         if (message.recipientStickerCount === 2) {
@@ -289,7 +268,6 @@ export class ThreadParentMessageComponent implements OnInit {
         message.recipientStickerCount = 1;
       }
 
-      // Falls Sender denselben Sticker hat
       if (message.senderSticker === emoji) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
         if (message.senderStickerCount >= 3) {
@@ -305,19 +283,14 @@ export class ThreadParentMessageComponent implements OnInit {
       if (message.recipientSticker === message.senderSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
-
       this.isEmojiPickerVisible = false;
       this.messageIdHovered = null;
     }
-
-    // 3) Firestore-Update
     if (!message.id) {
       console.error('Keine Message-ID gefunden');
       return;
     }
     const stickerRef = doc(this.firestore, 'messages', message.id);
-
-    // Objekt für Firestore
     const stikerObj = {
       senderSticker: message.senderSticker || '',
       senderStickerCount: message.senderStickerCount || 0,
@@ -341,6 +314,12 @@ export class ThreadParentMessageComponent implements OnInit {
 
   toggleReactionSenderInfo(id: string, show: boolean) {
     this.showPopUpSender[id] = show;
+  }
+
+  showPopUpBoth: { [messageId: string]: boolean } = {};
+
+  toggleReactionBothInfo(msgId: string, show: boolean) {
+    this.showPopUpBoth[msgId] = show;
   }
 
   toggleReactionRecipientInfo(id: string, show: boolean) {
@@ -402,7 +381,6 @@ export class ThreadParentMessageComponent implements OnInit {
 
   applyGlobalEmoji(emoji: string, parentMessage: any) {
     const fakeEvent = { emoji: { native: emoji } };
-    // Im Prinzip derselbe Aufruf
     this.addEmoji(fakeEvent, parentMessage);
   }
 }

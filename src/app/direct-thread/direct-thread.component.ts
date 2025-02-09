@@ -138,7 +138,8 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   parentMessage: any;
   public firstThreadMessageId: string | null = null;
   isOverlayOpen = false;
-  mentionService=inject(MentionThreadService);
+  mentionService = inject(MentionThreadService);
+  localUserLastEmoji: any;
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -148,6 +149,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.subscribeToThreadChanges();
     this.setCurrentUserId();
     this.checkIfSelfThread();
+  }
+
+  showTooltipForSenderEmoji: { [messageId: string]: boolean } = {};
+
+  toggleReactionInfoForSenderEmoji(messageId: string, show: boolean) {
+    this.showTooltipForSenderEmoji[messageId] = show;
   }
 
   onMentionClicked(mentionValue: string) {
@@ -170,7 +177,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async initializeComponent(): Promise<void> {
     await this.initializeUser();
-/*     await this.getAllUsersname(); */
+    /*     await this.getAllUsersname(); */
   }
 
   subscribeToThreadChanges() {
@@ -220,9 +227,11 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     });
   }
 
-
   setCurrentUserId(): void {
     this.currentUserId = this.route.snapshot.paramMap.get('id');
+    if (this.currentUserId) {
+      this.subscribeToLastUsedEmoji(this.currentUserId);
+    }
   }
 
   getReplyCountText(): string {
@@ -322,28 +331,26 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async handleMentionClick(mention: string) {
     console.log('[handleMentionClick] mention raw:', mention);
-  
+
     this.wasClickedInDirectThread = true;
-  
+
     // Falls das mention ein @-Zeichen hat, entfernen
     const cleanName = mention.substring(1).trim().toLowerCase();
     console.log('[handleMentionClick] cleanName:', cleanName);
-  
+
     // User per Service laden
     const user = await this.mentionService.ensureUserDataLoaded(cleanName);
     console.log('[handleMentionClick] found user:', user);
-  
+
     if (!user) {
       console.warn('[handleMentionClick] No user found for:', mention);
       return;
     }
-  
+
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
     console.log('[handleMentionClick] Mention box opened for user:', user.name);
   }
-  
-
 
   closeMentionBoxHandler() {
     this.wasClickedInDirectThread = false;
@@ -361,9 +368,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
     return cleanedParts;
   }
-
-
-
 
   cancelEdit() {
     this.editMessageId = null;
@@ -504,7 +508,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(async (paramMap) => {
       const userID = paramMap.get('id');
       if (userID) {
-        await this.loadCurrentUser(userID); 
+        await this.loadCurrentUser(userID);
       }
     });
   }
@@ -521,13 +525,12 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
           return;
         }
         const data = docSnap.data();
-        this.currentUser.lastUsedEmoji = data?.['lastUsedEmoji'] || ''; 
-      }); 
+        this.currentUser.lastUsedEmoji = data?.['lastUsedEmoji'] || '';
+      });
     } catch (error) {
       console.error('Fehler beim Laden des Benutzers:', error);
     }
   }
-  
 
   async processThreadMessages(firstInitialisedThreadMsg: string) {
     const docRef = doc(this.firestore, 'messages', firstInitialisedThreadMsg);
@@ -558,7 +561,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       ...docSnapshot.data(),
     };
   }
-
 
   scrollAutoDown() {
     if (this.shouldScrollToBottom) {
@@ -671,14 +673,19 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     return threadMessageDoc.data();
   }
 
-  async addEmoji(event: any, currentMessageId: string, userId: string, origin: string) {
+  async addEmoji(
+    event: any,
+    currentMessageId: string,
+    userId: string,
+    origin: string
+  ) {
     const emoji = event?.emoji?.native;
     if (!emoji) return;
-  
+
     const threadMessageRef = await this.getThreadMessageRef(currentMessageId);
     const threadMessageDoc = await this.getThreadMessageDoc(threadMessageRef);
     if (!threadMessageDoc) return;
-  
+
     const reactions = threadMessageDoc['reactions'] || {};
     const userReaction = reactions[userId];
     if (userReaction && userReaction.emoji === emoji) {
@@ -686,18 +693,37 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     } else {
       reactions[userId] = { emoji, counter: 1 };
     }
-      await this.storeLastUsedEmojiGlobally(emoji);
+    await this.saveLastUsedEmoji(userId, emoji);
     this.closePicker();
     this.shouldScrollToBottom = false;
     await updateDoc(threadMessageRef, { reactions });
   }
   
-  
-  async storeLastUsedEmojiGlobally(emoji: string) {
-    const userDocRef = doc(this.firestore, 'users', this.currentUser?.uid);
-    await updateDoc(userDocRef, { lastUsedEmoji: emoji });
+
+  async saveLastUsedEmoji(uid: string, emoji: string) {
+    const emojiDocRef = doc(
+      this.firestore,
+      `users/${uid}/privateMeta`,
+      'emojiMeta'
+    );
+    await setDoc(emojiDocRef, { lastUsedEmoji: emoji }, { merge: true });
   }
-  
+
+  subscribeToLastUsedEmoji(uid: string) {
+    const emojiDocRef = doc(
+      this.firestore,
+      `users/${uid}/privateMeta`,
+      'emojiMeta'
+    );
+    onSnapshot(emojiDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        this.localUserLastEmoji = data['lastUsedEmoji'] || null;
+      } else {
+        this.localUserLastEmoji = null;
+      }
+    });
+  }
 
   TwoReactionsTwoEmojis(recipientId: any, senderId: any): boolean {
     if (recipientId?.counter > 0 && senderId?.counter > 0) {
@@ -844,6 +870,4 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     const fakeEvent = { emoji: { native: emoji } };
     this.addEmoji(fakeEvent, message.id, this.currentUser.uid, 'FROM_APPLY');
   }
-  
-  
 }

@@ -8,13 +8,11 @@
   left: 100px;
   top: 34px;
   width: fit-content;
-  white-space: normal;        // statt nowrap
+  white-space: normal;
   word-wrap: break-word;
   font-size: 14px;
   transition: opacity 0.3s ease;
 }
-
-
 
 app-thread-parent-message {
   display: flex;
@@ -84,7 +82,6 @@ app-thread-parent-message {
   display: flex;
   flex-direction: column;
   padding-bottom: 9px;
-  /*   position: relative; */
   &.has-sticker {
     padding-bottom: 28px;
   }
@@ -185,7 +182,6 @@ app-thread-parent-message {
   }
 }
 
-/* Wenn du .message-container.is-partner als „fremde Nachricht“ definiert hast */
 .message-bubble.is-partner:hover {
   background-color: #fff;
 }
@@ -201,7 +197,7 @@ app-thread-parent-message {
   &.is-partner {
     bottom: -22px;
     font-weight: 600;
-    left: auto;
+    left: 145px;
   }
 }
 
@@ -236,27 +232,24 @@ app-thread-parent-message {
 .sticker-view-ct {
   position: absolute;
   bottom: -39px;
-  z-index: 20;
+  z-index: 10;
   display: flex;
+  gap: 4px;
 }
 
 .sticker-view-right {
   right: 0;
-  /* eventuelle Abstände oder justierungen */
 }
 
-/* Wenn Partner / Fremder der Sender ist */
 .sticker-view-left {
   left: 0;
-  /* eventuelle Abstände oder justierungen */
 }
 
-/* Infobox: .reaction-name-info-ct-sender */
 .reaction-name-info-ct-sender {
   position: absolute;
-  bottom: 110%; /* oder 100% + etwas Abstand -> Infobox erscheint über dem Emoji */
-  left: 100%; /* oder left: 0, je nach Wunsch */
-  transform: translateX(-50%); /* zentriert die Box horizontal über dem Emoji */
+  bottom: 110%;
+  left: 100%;
+  transform: translateX(-50%);
 
   background-color: #444df2;
   color: #fff;
@@ -266,31 +259,27 @@ app-thread-parent-message {
   border-bottom-right-radius: 30px;
   padding: 8px 11px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-  /* Standard: versteckt */
   opacity: 0;
   visibility: hidden;
-  pointer-events: none; /* verhindert Klicks, wenn unsichtbar */
+  pointer-events: none;
   transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
 }
 
-/* Wenn .hovered-Klasse dazukommt, wird's sichtbar */
 .reaction-name-info-ct-sender.hovered {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
 }
 
-/* Optional: Pfeil (Triangle) unter der Box) */
 .reaction-name-info-ct-sender::after {
   content: "";
   position: absolute;
-  bottom: -8px; /* Pfeil ragt 8px runter */
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 8px; /* Größe des Pfeils */
+  border-width: 8px;
   border-style: solid;
-  border-color: #444df2 transparent transparent transparent; /* Pfeil in Box-Farbe */
+  border-color: #444df2 transparent transparent transparent;
 }
 
 .option-flex {
@@ -350,7 +339,6 @@ app-thread-parent-message {
   background-color: #fff;
   border-radius: 8px;
   padding: 2px 6px;
-  /* oder einfach inline-block */
   display: inline-block;
 }
 
@@ -368,7 +356,7 @@ app-thread-parent-message {
   height: 30px;
   display: flex;
   justify-content: center;
-  align-items: baseline;
+  align-items: center;
   border: 1px solid #adb0d9;
   border-radius: 16px;
   padding: 3px;
@@ -406,23 +394,19 @@ app-thread-parent-message {
 .new-day-info {
   bottom: 14px;
   margin: 16px 0;
-  /* Positionierung relativ, damit Pseudo-Elemente oder day-span gut funktionieren */
   position: relative;
-  /* Optional: zentrierter Inhalt (falls du inlines hast) */
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Die horizontale Linie erzeugen wir als Pseudo-Element */
   &::before {
     content: "";
     position: absolute;
-    top: 50%; // vertikal zentriert
-    left: 0; // geht von ganz links...
-    right: 0; // ...bis ganz rechts
+    top: 50%;
+    left: 0;
+    right: 0;
     height: 1px;
-    background-color: rgba(173, 176, 217, 0.4); // halbtransparent
-    z-index: 0; // hinter day-span
+    background-color: rgba(173, 176, 217, 0.4);
+    z-index: 0;
     transform: translateY(-50%);
   }
 }
@@ -442,22 +426,20 @@ app-thread-parent-message {
   line-height: 24.55px;
   text-align: center;
   color: rgba(0, 0, 0, 0.7);
-
 }
 
-/* Sticker-Hover, Edit-Icons usw. */
 .sticker-hover-ct {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 999;
+  z-index: 5;
   &.left-hover {
     top: 10px;
     left: 200px;
   }
   &.right-hover {
     top: 10px;
-    right: 50px;
+    right: 150px;
   }
 }
 .show-set {
@@ -465,25 +447,20 @@ app-thread-parent-message {
   border: 1px solid #adb0d9;
   background-color: white;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  /* Falls oben immer abgerundet sein soll: */
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
 }
 
-/* Rechts: bottom-left = rund, bottom-right = 0 */
 .show-set-right {
-  /* z.B. in der Nähe des "Edit/Reaction"-Buttons für CurrentUser */
   right: 20px;
   top: -22px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 0;
 }
 
-/* Links: bottom-left = 0, bottom-right = rund */
 .show-set-left {
-  /* z.B. in der Nähe des Chatpartners */
   left: 25px;
-  top: 0; /* anpassen nach Bedarf */
+  top: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 30px;
 }
@@ -527,7 +504,6 @@ app-thread-parent-message {
   top: 8px;
   left: 8px;
   margin-top: 4px;
-
 }
 .edit-message-content {
   box-shadow: 0px 6px 14px 0px #00000033;
@@ -535,7 +511,7 @@ app-thread-parent-message {
   width: 100%;
   padding: 8px 12px;
   border-radius: 30px;
-  width: auto;  
+  width: auto;
   min-width: max-content;
   border-top-right-radius: 30px;
   border-top-left-radius: 0;

@@ -166,8 +166,14 @@
 
 .people-mention-card {
   position: absolute;
-  left: 128px;
-  top: -421px;
+  left: 0;
+  bottom: 50px;
+  margin-top: 8px; // kleine Lücke zum Input
+  z-index: 999;    // sicherstellen, dass die Card vorne liegt
+
+  // Mit transform kannst du die Card etwas sanfter ein- oder ausblenden
+  transform: translateY(0);
+  transition: transform 0.2s ease;
 }
 /* 
 .mention {

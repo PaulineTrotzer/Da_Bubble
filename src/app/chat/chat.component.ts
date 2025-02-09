@@ -143,8 +143,6 @@ export class ChatComponent implements OnInit, OnChanges {
   userChannelService = inject(UserChannelSelectService);
   isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
-  /*   hasMessagesValue = false; */
-  /*   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent; */
   sanitizer = inject(DomSanitizer);
   inputFieldService = inject(InputfieldService);
   isSelfChat?: boolean;
@@ -168,25 +166,25 @@ export class ChatComponent implements OnInit, OnChanges {
   currentComponentId = 'chat';
 
   async ngOnInit(): Promise<void> {
-    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+/*     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
           await this.getMessages();
         }
       }
-    );
+    ); */
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
-    this.threadControlService.editedMessage$
+/*     this.threadControlService.editedMessage$
       .pipe(
         filter((message: any) => !!message), // Nachricht darf nicht null oder undefined sein
         filter((message: any) => message.text && message.text.trim() !== '') // Nachricht darf keinen leeren Text haben
       )
       .subscribe((updatedMessage) => {
         this.updateMessage(updatedMessage);
-      });
+      }); */
 
     /*     this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
@@ -247,7 +245,7 @@ export class ChatComponent implements OnInit, OnChanges {
       );
     }
 
-    return; // Füge ein explizites return hinzu
+    return;
   }
 
   async addNewMessage(updatedMessage: any): Promise<void> {
@@ -300,34 +298,6 @@ export class ChatComponent implements OnInit, OnChanges {
       console.log('Nachrichten geladen:', this.messagesData);
     }
   }
-
-  /* 
-  updateMessages() {
-    // Gelöschte Nachrichten ausschließen
-    this.messagesData = this.messagesData.filter(
-      (message: any) => !message.deleted
-    );
-
-    // Nachrichten sortieren
-    this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-
-    // Datenstatus setzen
-    this.dataLoaded = true;
-
-    // Automatisch scrollen, falls aktiviert
-    if (this.shouldScroll) {
-      this.scrollAutoDown();
-    }
-
-    // Zusätzliche Updates
-    this.updateMessagesWithNewPhoto();
-    this.subscribeToThreadAnswers();
-    this.checkForSelfChat();
-  } */
-  /* 
-  hasMessages(): boolean {
-    return this.messagesData && this.messagesData.length > 0;
-  } */
 
   ngOnDestroy() {
     this.workspaceSubscription?.unsubscribe();
@@ -401,21 +371,16 @@ export class ChatComponent implements OnInit, OnChanges {
   displayDayInfo(index: number): boolean {
     if (index === 0) {
       const firstMessage = this.messagesData[index];
-      // Überprüfen, ob die erste Nachricht gelöscht ist
       if (firstMessage.deleted) {
         return false;
       }
       return true;
     }
-
     const currentMessage = this.messagesData[index];
     const previousMessage = this.messagesData[index - 1];
-
-    // Gelöschte Nachrichten ausschließen
     if (currentMessage.deleted || previousMessage.deleted) {
       return false;
     }
-
     return !this.isSameDay(
       new Date(currentMessage.timestamp),
       new Date(previousMessage.timestamp)
@@ -467,21 +432,14 @@ export class ChatComponent implements OnInit, OnChanges {
       console.log('Selected Files:', this.selectFiles);
       this.chatMessage = '';
       this.global.clearCurrentChannel();
-      /*       this.showTwoPersonConversationTxt = false; */
-      await this.getMessages();
       console.log('selectedUser changes');
-      /*       this.focusInputField(); */
+      console.log('ngOnChanges => selectedUser neu zugewiesen:', this.selectedUser);
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
-/*       this.showWelcomeChatText = false; */
-      /*       this.showTwoPersonConversationTxt = false; */
       this.clearInput();
       console.log('selectedChannel changes');
-      /*       this.focusInputField(); */
     }
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
-/*       this.showWelcomeChatText = false; */
-      /*       this.showTwoPersonConversationTxt = false; */
       this.clearInput();
     }
     if (changes['onHeaderUser'] && this.onHeaderUser) {
@@ -507,61 +465,32 @@ export class ChatComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
-  /*   focusInputField(): void {
-    if (this.inputFieldComponent) { */
-  /*       this.inputFieldComponent.focusInputField(); */
-  /*     }
-  } */
-
   clearInput() {
     this.messagesData = [];
   }
-  /**
-   * Bearbeitet oder löscht eine Nachricht in der Haupt-Collection `messages/{id}`.
-   * -> Nutzt KEINE zusätzliche Subcollection für die gleiche Nachricht.
-   *
-   * @param message Nachricht-Objekt mit mindestens `id` (Firestore-Dokument-ID).
-   */
+
+
   async saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
-
-    // 1) Plausibilitäts-Check: Hat das Objekt eine gültige Firestore-ID?
     if (!message.id) {
       console.error('Ungültige Nachricht-ID:', message);
       return;
     }
-
-    // 2) Referenz auf das Firestore-Dokument in `messages/{message.id}`
     const messageRef = doc(this.firestore, 'messages', message.id);
-
-    // 3) Prüfe, ob der Text nach dem Bearbeiten ggf. leer ist:
     if (this.editableMessageText.trim() === '') {
-      // ---- LÖSCHEN ----
       try {
         const docSnapshot = await getDoc(messageRef);
-
         if (!docSnapshot.exists()) {
           console.warn(`Nachricht existiert nicht (ID: ${message.id}).`);
           return;
         }
-
         await deleteDoc(messageRef);
-        console.log('Nachricht gelöscht:', message.id);
-
-        // Lokale Array-Aktualisierung: Nachricht aus messagesData entfernen
         this.messagesData = this.messagesData.filter(
           (msg: any) => msg.id !== message.id
         );
-
-        // Als "gelöscht" kennzeichnen (optional, für UI o.Ä.)
         const deletedMessage = { id: message.id, deleted: true };
         this.messagesData.push(deletedMessage);
-
-        //  Änderung an Thread-Komponente weitergeben,
-        //  falls dort die Nachricht als "Parent" angezeigt wird
         this.threadControlService.setEditedMessage(deletedMessage);
-
-        // Resets
         this.editMessageId = null;
         this.isFirstClick = true;
         this.checkEditbox = false;
@@ -572,29 +501,20 @@ export class ChatComponent implements OnInit, OnChanges {
         );
       }
     } else {
-      // ---- BEARBEITEN ----
       try {
         const docSnapshot = await getDoc(messageRef);
-
         if (!docSnapshot.exists()) {
           console.warn(
             `Nachricht kann nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
           );
           return;
         }
-
         const editMessage = {
           text: this.editableMessageText,
           editedTextShow: true,
-          // Optional: Falls du einen Timestamp für die Bearbeitung
-          // mitschreiben willst:
           editedAt: new Date().toISOString(),
         };
-
         await updateDoc(messageRef, editMessage);
-        console.log('Nachricht bearbeitet:', message.id);
-
-        // 4) Lokale Array-Aktualisierung (damit UI sofort reagiert)
         const index = this.messagesData.findIndex(
           (msg: any) => msg.id === message.id
         );
@@ -604,23 +524,16 @@ export class ChatComponent implements OnInit, OnChanges {
             ...editMessage,
           };
         } else {
-          // Falls Nachricht lokal noch nicht existiert, hinzufügen
           console.warn('Nachricht nicht gefunden, füge sie hinzu:', message.id);
           this.messagesData.push({ id: message.id, ...editMessage });
         }
-
-        // 5) Signal an Thread-Komponente (falls sie dieses Dokument ebenfalls anzeigt)
         this.threadControlService.setEditedMessage({
           id: message.id,
           ...editMessage,
         });
-
-        // Resets
         this.editMessageId = null;
         this.checkEditbox = false;
         this.isFirstClick = true;
-
-        // Evtl. scrollen:
         setTimeout(() => {
           this.shouldScroll = true;
         }, 1000);
@@ -730,7 +643,7 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async getMessages() {
     try {
-      if (!this.selectedUser?.uid || !this.global.currentUserData?.uid) {
+      if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
         return;
       }
       const docRef = collection(this.firestore, 'messages');
@@ -752,25 +665,18 @@ export class ChatComponent implements OnInit, OnChanges {
             this.messagesData = [];
             querySnapshot.forEach((doc) => {
               const messageData = doc.data();
-
-              // Sicherstellen, dass selectedUser und currentUserData verfügbar sind
               if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
                 console.warn(
                   'Selected user or current user data is not available.'
                 );
                 return;
               }
-
               if (messageData['timestamp'] && messageData['timestamp'].toDate) {
                 messageData['timestamp'] = messageData['timestamp'].toDate();
               }
-
-              // Mentions formatieren
               messageData['formattedText'] = this.formatMentions(
                 messageData['text']
               );
-
-              // Filtere nur Nachrichten zwischen currentUser und selectedUser
               if (
                 (messageData['senderId'] === this.global.currentUserData.id &&
                   messageData['recipientId'] === this.selectedUser.id) ||
@@ -781,18 +687,15 @@ export class ChatComponent implements OnInit, OnChanges {
               }
             });
             await this.updateMessagesWithNewPhoto();
-            await this.subscribeToThreadAnswers();
             this.messagesData.sort(
               (a: any, b: any) => a.timestamp - b.timestamp
             );
-
             this.updateSubscriptionText();
-
-            /*             this.hasMessagesValue = this.messagesData.length > 0; */
             if (this.shouldScroll) {
               this.scrollAutoDown();
             }
             this.dataLoaded = true;
+            await this.subscribeToThreadAnswers();
           } catch (innerError) {
             console.error('Error while querySnapshot:', innerError);
           }
@@ -805,6 +708,8 @@ export class ChatComponent implements OnInit, OnChanges {
       console.error('Error initializing messages query:', error);
     }
   }
+
+
   updateSubscriptionText() {
     this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
     this.hasNoMessages = this.messagesData.length === 0;
@@ -860,7 +765,6 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async openThread(messageId: any) {
-    /*     this.threadControlService.setFirstThreadMessageId(null); */
     this.chosenThreadMessage = null;
     try {
       this.threadOpened.emit();
@@ -880,7 +784,6 @@ export class ChatComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
-
     this.openvollThreadBox();
     this.hiddenFullChannelOrUserThreadBox();
     this.checkWidthSize();

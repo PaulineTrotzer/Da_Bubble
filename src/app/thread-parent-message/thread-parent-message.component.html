@@ -4,7 +4,7 @@
 <!-- Haupt-Container für eine Parent-Nachricht / "color-separator" -->
 <div class="color-separator" (mouseenter)="toggleOptionBar(pm.id, true)" (mouseleave)="toggleOptionBar(pm.id, false)"
     [ngClass]="{
-    'first-separator': displayDayInfoForParent(),
+    'first-separator': displayDayInfoForParent()
   }">
     <!-- Anzeige "Neuer Tag" usw. -->
     <div class="new-day-info">
@@ -19,7 +19,6 @@
         [ngClass]="pm.senderId === currentUser.uid ? 'left-hover' : 'right-hover'">
         <div class="show-set" [ngClass]="pm.senderId === currentUser.uid ? 'show-set-right' : 'show-set-left'" @slideIn>
             <div class="img-flex-bar-options">
-
                 <!-- Edit-Wrapper nur für eigenen User -->
                 <div class="edit-wrapper" *ngIf="pm.senderId === currentUser.uid">
                     <!-- Edit-Icon -->
@@ -72,7 +71,6 @@
                     </span>
                 </div>
                 <!-- / Reaction-Icon -->
-
             </div>
         </div>
     </div>
@@ -95,15 +93,10 @@
     }">
         <!-- Avatar -->
         <div class="avatar-container" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-            <img [src]="
-          pm.senderId === currentUser.uid
-            ? currentUser.picture
-            : selectedUser.picture
-        " alt="{{
-          pm.senderId === currentUser.uid
-            ? currentUser.name
-            : selectedUser.name
-        }}" />
+            <img [src]="pm.senderPicture
+          " alt="
+          no Picture found
+        " />
         </div>
         <!-- / avatar-container -->
 
@@ -130,7 +123,6 @@
                     <div class="message-bubble" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
                         <!-- Nachrichtentext -->
                         <ng-container *ngFor="let mentionName of mentionService.splitMessage(pm.text)">
-
                             <!-- FALL A: es ist ein @mention -->
                             <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
                                 (click)="handleMentionClick(mentionName)">
@@ -172,7 +164,6 @@
                 </ng-container>
             </div>
 
-
             <!-- =========== EDIT-MODUS =========== -->
             <ng-template #editMode>
                 <div class="message-bubble-edit">
@@ -182,7 +173,7 @@
                     <!-- Emoji-Picker für Edit-Mode -->
                     <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- ... -->
+                            <!-- ... dein Icon-Pfad ... -->
                         </svg>
                     </div>
 
@@ -205,88 +196,96 @@
             <!-- ================== REACTIONS / STICKERS ================== -->
             <!-- Container für die Sticker/Emoji-Reaktionen -->
             <div class="sticker-view-ct" [ngClass]="{
-                'sticker-view-right': pm.senderId === currentUser.uid,
-                'sticker-view-left': pm.senderId !== currentUser.uid
-              }">
+          'sticker-view-right': pm.senderId === currentUser.uid,
+          'sticker-view-left': pm.senderId !== currentUser.uid
+        }">
+                <!-- Fall A: Beide Sticker identisch => ein Emoji mit Counter "2" -->
+                <ng-container *ngIf="
+            pm.senderSticker &&
+            pm.recipientSticker &&
+            pm.senderSticker === pm.recipientSticker;
+            else differentStickers
+          ">
+                    <div class="emoji-holder" (mouseenter)="toggleReactionBothInfo(pm.id, true)"
+                        (mouseleave)="toggleReactionBothInfo(pm.id, false)">
+                        <!-- EINE Emoji-Anzeige + Counter 2 -->
+                        <span class="single-emoji">{{ pm.senderSticker }}</span>
+                        <span class="reaction-counter">2</span>
 
-                <div class="emoji-holder" *ngIf="pm.senderSticker" (mouseenter)="toggleReactionSenderInfo(pm.id, true)"
-                    (mouseleave)="toggleReactionSenderInfo(pm.id, false)">
-                    <span class="single-emoji">{{ pm.senderSticker }}</span>
-
-                    <!-- Infobox (am Sender-Emoji) -->
-                    <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpSender[pm.id]"
-                        *ngIf="pm.senderSticker">
-                        <span class="reaction-info-txt">
-                            Du hast mit <span class="react-emoji-value">{{ pm.senderSticker }}</span> reagiert
-                        </span>
+                        <!-- Hover-Info (z. B. "Ihr beide habt mit … reagiert") -->
+                        <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpBoth[pm.id]"
+                            *ngIf="pm.senderSticker">
+                            <span class="reaction-info-txt">
+                                Ihr beide habt mit
+                                <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                reagiert
+                            </span>
+                        </div>
                     </div>
-                </div>
+                </ng-container>
 
-                <!-- Beispiel: Empfänger-Emoji -->
-                <div class="emoji-holder" *ngIf="pm.recipientSticker"
-                    (mouseenter)="toggleReactionRecipientInfo(pm.id,true)"
-                    (mouseleave)="toggleReactionRecipientInfo(pm.id,false)">
-                    <span class="single-emoji">{{ pm.recipientSticker }}</span>
+                <!-- Fall B: Unterschiedliche Sticker oder nur einer vorhanden -->
+                <ng-template #differentStickers>
+                    <!-- Sender-Sticker (falls vorhanden) -->
+                    <div class="emoji-holder" *ngIf="pm.senderSticker"
+                        (mouseenter)="toggleReactionSenderInfo(pm.id, true)"
+                        (mouseleave)="toggleReactionSenderInfo(pm.id, false)">
+                        <span class="single-emoji">{{ pm.senderSticker }}</span>
 
-                    <!-- Infobox (am Recipient-Emoji) -->
-                    <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpRecipient[pm.id]"
-                        *ngIf="pm.recipientSticker">
-                        <span class="reaction-info-txt">
-                            {{ selectedUser.name }} hat mit {{ pm.recipientSticker }} reagiert
-                        </span>
+                        <!-- Infobox (am Sender-Emoji) -->
+                        <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpSender[pm.id]"
+                            *ngIf="pm.senderSticker">
+                            <span class="reaction-info-txt">
+                                <ng-container *ngIf="pm.senderId === currentUser.uid; else partnerSenderText">
+                                    <!-- Falls currentUser = Sender -->
+                                    Du hast mit
+                                    <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                    reagiert
+                                </ng-container>
+                                <ng-template #partnerSenderText>
+                                    {{ pm.senderName }} hat mit
+                                    <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                    reagiert
+                                </ng-template>
+                            </span>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Empfänger-Sticker (falls vorhanden) -->
+                    <div class="emoji-holder" *ngIf="pm.recipientSticker"
+                        (mouseenter)="toggleReactionRecipientInfo(pm.id, true)"
+                        (mouseleave)="toggleReactionRecipientInfo(pm.id, false)">
+                        <span class="single-emoji">{{ pm.recipientSticker }}</span>
+
+                        <!-- Infobox (am Recipient-Emoji) -->
+                        <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpRecipient[pm.id]"
+                            *ngIf="pm.recipientSticker">
+                            <span class="reaction-info-txt">
+                                <ng-container *ngIf="pm.recipientId === currentUser.uid; else partnerRecipientText">
+                                    Du hast mit
+                                    <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
+                                    reagiert
+                                </ng-container>
+                                <ng-template #partnerRecipientText>
+                                    {{ pm.recipientName }} hat mit
+                                    <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
+                                    reagiert
+                                </ng-template>
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
             </div>
-
-
-            <!-- Beide gleich -->
-            <div class="both-same-sticker" *ngIf="
-              pm.recipientSticker !== '' &&
-              pm.recipientSticker === pm.senderSticker
-            ">
-                <span>
-                    Ihr beide habt mit {{ pm.senderSticker }} reagiert
-                </span>
-            </div>
-
-
-            <!-- PARTNER-SENDER-BLOCK -->
-            <ng-template #partnerStickerBlock>
-                <!-- SENDER (pm.senderSticker) -->
-                <div class="comment-senderSticker-box" *ngIf="pm.senderSticker !== ''">
-                    <span>{{ pm.senderSticker }}</span>
-                </div>
-
-                <!-- DU bist recipient -->
-                <div class="comment-recipientSticker-box" *ngIf="
-              pm.recipientSticker !== '' &&
-              pm.recipientSticker !== pm.senderSticker
-            ">
-                    <span>{{ pm.recipientSticker }}</span>
-                </div>
-
-                <!-- Beide gleich -->
-                <div class="both-same-sticker" *ngIf="
-              pm.recipientSticker !== '' &&
-              pm.recipientSticker === pm.senderSticker
-            ">
-                    <span>
-                        {{ pm.senderName }} und du haben mit
-                        {{ pm.senderSticker }} reagiert
-                    </span>
-                </div>
-            </ng-template>
+            <!-- / sticker-view-ct -->
         </div>
-        <!-- / sticker-view-ct -->
+        <!-- / message-column -->
     </div>
-    <!-- / message-column -->
-</div>
-<!-- / message-container -->
+    <!-- / message-container -->
 
-<!-- Separator (Antwort-Anzeige?), je nach Bedarf -->
+    <!-- Separator (Antwort-Anzeige?), je nach Bedarf -->
+    <!-- / color-separator -->
+</div>
 <div class="seperator">
     <h3>{{ getReplyCountText() }}</h3>
     <div class="line-separator"></div>
 </div>
-<!-- </div> -->
-<!-- / color-separator -->

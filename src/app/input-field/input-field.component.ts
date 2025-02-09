@@ -110,6 +110,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
+      console.log('selectedUser changed in inputC', this.selectedUser);
       this.resetInputdata();
       this.handleResetErrors();
     }
@@ -144,10 +145,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.currentChannelThreadId = messageId;
     });
     this.selectedChannel = this.global.currentChannel;
-    /*     this.inputFieldService.activeComponentId$.subscribe((id) => {
-      this.activeComponentId = id;
-    }); */
-    console.log('after oninit', this.activeComponentId);
   }
 
   async sendMessage(event: KeyboardEvent): Promise<void> {
@@ -156,13 +153,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
       await this.processSendMessage();
     }
   }
+
   sendMessageClick(): void {
-    debugger;
     const selectedFiles = this.inputFieldService.getFiles(
       this.activeComponentId
     );
     console.log('can send?', this.activeComponentId);
-
     if (
       this.chatMessage.trim() === '' &&
       (!selectedFiles || selectedFiles.length === 0)
@@ -170,13 +166,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.warn('Keine Nachricht und keine Dateien zum Senden.');
       return;
     }
-
     if (!this.selectedChannel && !this.selectedUser?.id) {
       console.error('Kein Benutzer oder Kanal ausgewählt.');
       return;
     }
 
-    // Hier rufst du jetzt dieselbe Logik auf wie beim Enter-Event:
     this.processSendMessage();
   }
 
@@ -197,7 +191,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   sendingStatus: string | null = null;
 
   async processSendMessage(): Promise<void> {
-    debugger;
     // 1) Eingabe & Dateien prüfen
     if (!this.canSendMessage()) {
       return;
@@ -206,7 +199,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     // 2) Senden je nach Channel/Thread/Direct
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
-    } else if (this.isDirectThreadOpen) {
+    } else if (this.isDirectThreadOpen && this.selectedUser) {
       await this.sendDirectThreadMessage();
       await this.setMessageCount();
     } else if (this.isChannelThreadOpen) {
@@ -304,103 +297,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
-  /* 
-
-  async processSendMessage(): Promise<void> {
-    const selectedFiles = this.inputFieldService.getFiles(
-      this.currentComponentId
-    );
-    if (
-      (!this.chatMessage || this.chatMessage.trim().length === 0) &&
-      selectedFiles.length === 0
-    ) {
-      this.sendingStatus = null;
-      console.warn('Leere Nachricht kann nicht gesendet werden.');
-      return;
-    }
-
-    const MAX_FILE_SIZE = 500 * 1024; // 500 KB
-
-    // Prüfen, ob die hochgeladene Datei zu groß ist
-    if (selectedFiles.length === 1) {
-      this.sendingStatus = 'Message is reaching chat partner...';
-      const file = selectedFiles[0];
-      const fileBlob = this.dataURLToBlob(file.data);
-
-      if (fileBlob.size > MAX_FILE_SIZE) {
-        this.fileTooLargeMessage = `Bitte konvertiere deine Datei (max. 500 KB):`;
-        this.multipleFilesErrorMessage = null;
-        this.sendingStatus = null;
-        return;
-      }
-    }
-
-    // Restliche Logik bleibt unverändert
-    if (this.selectedChannel && !this.isChannelThreadOpen) {
-      await this.sendChannelMessage();
-    } else if (this.isDirectThreadOpen) {
-      await this.sendDirectThreadMessage();
-      await this.setMessageCount();
-    } else if (this.isChannelThreadOpen) {
-      await this.sendChannelThreadMessage();
-    } else {
-      try {
-        const localTempId = `temp_${Date.now()}_${Math.random()}`;
-        const localMessage = {
-          id: localTempId,
-          text: this.chatMessage,
-          sending: true, // oder ein Status-Feld
-          timestamp: new Date(),
-          selectedFiles: selectedFiles.map(file => ({
-            url: file.data,         // oder eine dataURL
-            type: file.type,
-            name: file.name,
-          })),
-        };
-
-        this.messageCreated.emit(localMessage);
-
-        const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
-
-        // Nachrichtendaten vorbereiten
-        const messageData = this.messageData(
-          this.chatMessage,
-          this.senderStickerCount,
-          this.recipientStickerCount
-        );
-
-        // URLs und Typen der hochgeladenen Dateien hinzufügen
-        messageData.selectedFiles = fileData.map((file) => ({
-          url: file.url,
-          type: file.type,
-          name: file.name,
-        }));
-
-        // Nachricht in Firestore speichern
-        const messagesRef = collection(this.firestore, 'messages');
-        const docRef = await addDoc(messagesRef, messageData);
-
-        // Nachricht in die lokale Liste einfügen
-        const messageWithId = { ...messageData, id: docRef.id };
-        this.messagesData.push(messageWithId);
-
-        await this.setMessageCount();
-        this.messageSent.emit();
-        this.resetInputdata();
-      } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error);
-      }
-      finally {
-        const chatDiv = this.editableDivRef.nativeElement;
-        if (chatDiv) {
-          chatDiv.style.height = '130px';
-        }
-        this.inputFieldService.updateFiles(this.currentComponentId, []);
-        this.sendingStatus = null;
-      }
-    }
-  } */
-
   dataURLToBlob(dataURL: string): Blob {
     const byteString = atob(dataURL.split(',')[1]);
     const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
@@ -444,28 +340,49 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
+    console.log('Start sending direct thread message...');
     if (
       !this.isDirectThreadOpen ||
       (this.chatMessage.trim() === '' &&
         this.inputFieldService.getFiles(this.activeComponentId).length === 0)
     ) {
       console.warn(
-        'Thread is not open or message is empty and no files are selected'
+        'Thread ist nicht offen oder die Nachricht ist leer und es sind keine Dateien ausgewählt'
       );
       return;
     }
+
     if (!this.currentThreadMessageId) {
-      console.error('No current message selected.');
+      console.error('Keine Thread-ID (currentThreadMessageId) vorhanden.');
       return;
     }
+
+    console.log('selectedUser:', this.selectedUser);
+    if (!this.selectedUser) {
+      console.error('Kein Empfänger (this.selectedUser) ist definiert.');
+      return;
+    }
+    if (!this.selectedUser.name) {
+      console.error('Es fehlt der Name des Empfängers!');
+      return;
+    }
+
+    console.log('selectedUser.uid:', this.selectedUser.uid);
+    if (!this.selectedUser.uid) {
+      console.error('Keine UID bei selectedUser vorhanden.');
+      return;
+    }
+
     try {
       const selectedFiles = this.inputFieldService.getFiles(
         this.activeComponentId
       );
       let uploadedFiles: any[] = [];
       if (selectedFiles.length > 0) {
+        console.log('Selected Files:', selectedFiles);
         uploadedFiles = await this.uploadFilesToFirebaseStorage(selectedFiles);
       }
+
       const threadMessagesRef = collection(
         this.firestore,
         `messages/${this.currentThreadMessageId}/threadMessages`
@@ -482,10 +399,19 @@ export class InputFieldComponent implements OnInit, OnChanges {
         })),
         editedTextShow: false,
         recipientId: this.selectedUser.uid,
-        recipientName: this.selectedUser.name,
+        recipientName: this.selectedUser.name ?? '',
         reactions: '',
       };
-      const docRef = await addDoc(threadMessagesRef, messageData);
+      console.log(
+        'Sende final: selectedUser.name =',
+        this.selectedUser.name,
+        ' => messageData =',
+        messageData
+      );
+      console.log('messageData:', messageData);
+      await addDoc(threadMessagesRef, messageData);
+      console.log('Message successfully sent to Firestore!');
+
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
@@ -504,14 +430,12 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.chatMessage = '';
     this.selectFiles = [];
     this.formattedChatMessage = '';
-
-    // 2) Contenteditable-DIV leeren
     if (this.editableDivRef?.nativeElement) {
       this.editableDivRef.nativeElement.innerHTML = '';
-      // Fokus setzen
       this.editableDivRef.nativeElement.focus();
     }
   }
+
   async setMessageCount() {
     try {
       if (!this.userId || !this.selectedUser?.uid) {
@@ -742,11 +666,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.multipleFilesErrorMessage = null;
   }
 
-  updateSelectedUser(newUser: any) {
+  /*   updateSelectedUser(newUser: any) {
     this.selectedUser = newUser;
     this.cdr.detectChanges();
   }
-
+ */
   openMentionPeople() {
     this.isMentionPeopleCardVisible = !this.isMentionPeopleCardVisible;
   }
@@ -761,6 +685,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   addEmoji(event: any) {
+    this.chatMessage = '';
+    this.formattedChatMessage = '';
     const emoji = event.emoji.native;
     this.chatMessage += emoji;
     this.formattedMessage += emoji;
@@ -979,20 +905,4 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   @Input() currentComponentId!: string;
   @Output() inputFieldFocused = new EventEmitter<string>();
-
-  /*   onFocus() {
-    console.log('Focusing component with ID:', this.currentComponentId);
-    if (!this.currentComponentId) {
-      console.error('currentComponentId is undefined or empty!');
-      return;
-    }
-    this.inputFieldService.setActiveComponent(this.currentComponentId);
-  } */
-
-  /*   deleteFile(index: number) {
-    this.selectFiles.splice(index, 1);
-    this.isPreviewActive = this.selectFiles.length > 0;
-    this.cdr.detectChanges();
-    console.log('isPreviewActive:', this.isPreviewActive, 'selectFiles:', this.selectFiles);
-  } */
 }

@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  Renderer2,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 import { WorkspaceComponent } from '../workspace/workspace.component';
 import { StartScreenComponent } from '../start-screen/start-screen.component';
@@ -10,7 +18,12 @@ import { MatCardModule } from '@angular/material/card';
 import { Subscription } from 'rxjs';
 import { getAuth, onAuthStateChanged } from '@angular/fire/auth';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
-import { Firestore, collection, doc, onSnapshot } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  doc,
+  onSnapshot,
+} from '@angular/fire/firestore';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -48,13 +61,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild(WorkspaceComponent) workspaceComponent!: WorkspaceComponent;
   loginAuthService = inject(LoginAuthService);
   isOverlayVisible = true;
-  userChannelService=inject(UserChannelSelectService);
-  firestore=inject(Firestore);
-  authService=inject(AuthService);
-  isOverlayOpen= false;
+  userChannelService = inject(UserChannelSelectService);
+  firestore = inject(Firestore);
+  authService = inject(AuthService);
+  isOverlayOpen = false;
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
- 
+
   ngOnInit(): void {
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
@@ -70,20 +83,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
   async loadUserData(userId: string) {
     const userRef = collection(this.firestore, 'users');
     const userDocRef = doc(userRef, userId);
-    onSnapshot(userDocRef, (docSnapshot: { data: () => any; }) => {
+    onSnapshot(userDocRef, (docSnapshot: { data: () => any }) => {
       const dataUser = docSnapshot.data();
       if (dataUser) {
         const userName = dataUser['name'];
-        const userPicture = dataUser['profilePicture'];  
+        const userPicture = dataUser['profilePicture'];
         const uid = dataUser['uid'];
-  
+
         if (uid === userId) {
           this.selectedUser = { userName, userPicture, uid };
         }
       }
     });
   }
-
 
   handleEnterChat(member: any) {
     if (this.workspaceComponent) {
@@ -99,7 +111,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
           this.isOverlayVisible = false;
         }, 1100);
-        
+
         this.loadUserData(user.uid);
       } else {
         this.isOverlayVisible = false;
@@ -109,18 +121,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.workspaceComponent.userSelected.subscribe((user: any) => {
+    /*     this.workspaceComponent.userSelected.subscribe((user: any) => {
       this.selectedUser = user;
       this.userChannelService.setSelectedUser(user);
-    });
+    }); */
     this.workspaceComponent.channelSelected.subscribe((channel: any) => {
       this.selectedChannel = channel;
-      console.log('selectedChannel home)', channel)
       this.global.channelSelected = true;
       this.userChannelService.setSelectedChannel(channel);
     });
     const header = this.el.nativeElement.querySelector('app-header');
-    const fullPageContent = this.el.nativeElement.querySelector('.full-page-content');
+    const fullPageContent =
+      this.el.nativeElement.querySelector('.full-page-content');
 
     if (header && fullPageContent) {
       const headerHeight = header.offsetHeight;
@@ -131,7 +143,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       );
     }
   }
-
 
   setDirectThread() {
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -179,7 +190,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* Output vn Startscreen*/
   onUserSelected(user: any) {
     this.selectedUser = user;
     this.global.clearCurrentChannel();
@@ -189,7 +199,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.selectedChannel = channel;
     this.global.setCurrentChannel(channel);
   }
-  /*--*/
+
   handleUserSelectionFromStartscreen(user: any) {
     this.selectedUser = user;
     this.onHeaderUser = user;

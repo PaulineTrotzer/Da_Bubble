@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { collection, getDocs, query, where } from '@firebase/firestore';
-import { Firestore, limit, onSnapshot, orderBy } from '@angular/fire/firestore';
-import { SendMessageInfo } from '../models/send-message-info.interface';
+import { collection } from '@firebase/firestore';
+import { Firestore, onSnapshot } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -22,24 +21,28 @@ export class ThreadControlService {
   currentThreadMessageIdSubject = new BehaviorSubject<string | null>(null);
   currentThreadMessageId$ = this.currentThreadMessageIdSubject.asObservable();
 
-
   private threadMessageSubject = new BehaviorSubject<any>(null);
   public threadMessage$ = this.threadMessageSubject.asObservable();
 
   private parentToThreadMapping = new Map<string, string>();
 
-
   constructor() {}
 
-  setParentToThreadMessageMapping(mapping: { parentMessageId: string; threadMessageId: string }) {
-    this.parentToThreadMapping.set(mapping.parentMessageId, mapping.threadMessageId);
+  setParentToThreadMessageMapping(mapping: {
+    parentMessageId: string;
+    threadMessageId: string;
+  }) {
+    this.parentToThreadMapping.set(
+      mapping.parentMessageId,
+      mapping.threadMessageId
+    );
   }
 
-
-getThreadMessageIdByParentMessageId(parentMessageId: string): string | undefined {
-  return this.parentToThreadMapping.get(parentMessageId);
-}
-  
+  getThreadMessageIdByParentMessageId(
+    parentMessageId: string
+  ): string | undefined {
+    return this.parentToThreadMapping.get(parentMessageId);
+  }
 
   updateThreadMessage(updatedMessage: any) {
     this.threadMessageSubject.next(updatedMessage);
@@ -49,10 +52,6 @@ getThreadMessageIdByParentMessageId(parentMessageId: string): string | undefined
     this.editedMessageSubject.next(message);
   }
 
-/*   get currentFirstThreadMessageId(): string | null {
-    return this.firstThreadMessageIdSubject.value;
-  }
- */
 
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);
@@ -61,7 +60,6 @@ getThreadMessageIdByParentMessageId(parentMessageId: string): string | undefined
   getFirstThreadMessageId(): string | null {
     return this.firstThreadMessageIdSubject.value;
   }
-
 
   setCurrentThreadMessageId(id: string) {
     if (id) {
@@ -72,16 +70,12 @@ getThreadMessageIdByParentMessageId(parentMessageId: string): string | undefined
     }
   }
 
-/*   getCurrentThreadMessageId(): string | null {
-    return this.currentThreadMessageIdSubject.value;
-  } */
-
   getReplyCount(messageId: string): Observable<number> {
     return new Observable<number>((observer) => {
       const unsubscribe = onSnapshot(
         collection(this.firestore, `messages/${messageId}/threadMessages`),
         (snapshot) => {
-          const replyCount = snapshot.size - 1;
+          const replyCount = snapshot.size;
           observer.next(replyCount);
         }
       );

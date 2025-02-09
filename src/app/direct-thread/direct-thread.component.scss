@@ -22,16 +22,15 @@
 .message-bubble {
   display: flex;
   flex-direction: column;
-  max-height: 170px;
 }
 
-.full-parent-message {
+/* .full-parent-message {
   padding-top: 7px;
 }
-
-.first-messagebubble {
+ */
+/* .first-messagebubble {
   max-height: 218px;
-}
+} */
 
 .text-info-edit {
   position: absolute;
@@ -101,7 +100,7 @@
   position: absolute;
   z-index: 2;
   top: 12px;
-  left:125px;
+  left: 125px;
   margin-top: 4px;
 }
 
@@ -118,7 +117,7 @@
   gap: 8px;
   position: relative;
   right: 121px;
-  bottom: 33px;
+  bottom: 26px;
   justify-content: end;
   align-items: center;
 }
@@ -204,10 +203,8 @@
   background-color: #eceefe;
 }
 
-/* Optional: .single-emoji könnte ein fixes line-height oder Font-Size haben */
 .single-emoji {
-  font-size: 16px; /* z.B. 20px */
-  line-height: 1; /* Verhindert ungewollte Höhe */
+  font-size: 14px; 
 }
 
 .img-flex-bar-options {
@@ -276,15 +273,12 @@
   align-items: center;
   border-radius: 5%;
   cursor: pointer;
-  &:hover {
-    background-color: #eceefe;
-    span {
-      color: #444df2;
-    }
-  }
   img {
     width: 50px;
     height: 50px;
+    &:hover {
+      transform: scale(1.05);
+    }
   }
 }
 
@@ -337,23 +331,15 @@
   align-items: center;
   gap: 14px;
   position: absolute;
-  top: -1px;
+  top: 1px;
   max-height: 33px;
-}
-
-.render-reaction-first-message-recipient {
-  bottom: -13px;
-}
-
-.render-reaction-first-message-sender {
-  bottom: -23px !important;
 }
 
 .render-reaction-ct-sender {
   display: flex;
   align-items: center;
   position: absolute;
-  bottom: -30px;
+  bottom: -25px;
   gap: 14px;
   right: 0;
   max-height: 33px;
@@ -365,8 +351,7 @@
 
 .emoji-holder {
   position: relative;
-  font-size: 14px;
-  height: 30px;
+  height: 24px;
   display: flex;
   align-items: center;
   border: 1px solid #adb0d9;
@@ -375,7 +360,7 @@
   max-width: 100%;
   gap: 3px;
   justify-content: center;
-  min-width: 40px;
+  min-width: 38px;
   &:hover {
     border-color: #444df2;
     cursor: pointer;
@@ -383,6 +368,8 @@
 }
 
 .emoji-holder-both {
+  display: flex;
+  align-items: center;
   max-height: 33px;
 }
 
@@ -505,18 +492,18 @@ h3 {
 .all-thread-message-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
 .cu-msg-text {
   max-width: 350px;
-  max-height: 105px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   background-color: #797ef3;
   border-top-right-radius: 0;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-  max-width: max-content;
   color: white;
   font-size: 16px;
   font-weight: 400;
@@ -545,6 +532,13 @@ h3 {
       }
     }
   }
+}
+
+.reaction-counter{
+  font-size: 13px;
+  position: relative;
+  left: -2px;
+  top: 1px;
 }
 
 .add-reaction-ct {
@@ -628,6 +622,12 @@ h3 {
 
 .you-reacted {
   bottom: 15px;
+  right: -20px;
+  max-width: 110px;
+}
+
+.only-you-reacted{
+  bottom: 15px;
   right: -73px;
   max-width: 110px;
 }
@@ -657,8 +657,8 @@ h3 {
   border-top-left-radius: 30px;
   border-bottom-right-radius: 30px;
   border-bottom-left-radius: 0;
-  bottom: 76px;
-  left: 12px;
+  bottom: 32px;
+  left: -36px;
 }
 
 .two-single {
@@ -794,7 +794,7 @@ h3 {
 .reaction-name-info-has-reacted {
   position: absolute;
   bottom: 39px;
-  left: 5px;
+  left: 54px;
 }
 .has-reacted-first {
   left: 5px;
@@ -814,13 +814,12 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  height: 170px;
-  max-height: 170px;
+  padding-bottom: 12px;
+
 }
 
 .first-message-position {
-  position: relative;
-  bottom: 8px;
+  padding-bottom: 36px !important;
 }
 
 .color-separator {
@@ -828,9 +827,7 @@ h3 {
   flex-direction: column;
   position: relative;
   cursor: pointer;
-  max-height: 170px;
-  height: 100%;
-  padding-top: 16px;
+  padding: 16px 0 30px 0;
   &:hover {
     background-color: #eceefe;
   }
@@ -877,7 +874,8 @@ h3 {
   background-color: white;
   padding: 15px;
   margin-top: 15px;
-  width: fit-content;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
@@ -889,7 +887,9 @@ h3 {
   background-color: #eceefe;
   align-self: baseline;
   padding: 15px;
-  width: fit-content;
+  max-width: 350px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   margin-top: 15px;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -919,8 +919,6 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  height: 170px;
-  max-height: 170px;
 }
 
 .message-text {
