@@ -39,7 +39,6 @@ import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { OverlayStatusService } from '../services/overlay-status.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -115,14 +114,6 @@ export class ChatComponent implements OnInit, OnChanges {
   checkEditbox: boolean = false;
   @ViewChild('editableTextarea')
   editableTextarea!: ElementRef<HTMLTextAreaElement>;
-  commentStricker: string[] = [
-    '../../assets/img/comment/face.png',
-    '../../assets/img/comment/rocket.png',
-  ];
-  commentImages: string[] = [
-    '../../assets/img/comment/hand.png',
-    '../../assets/img/comment/celebration.png',
-  ];
   isFirstClick: boolean = true;
   replyCounts: Map<string, number> = new Map();
   replyCountValue: number = 0;
@@ -131,8 +122,6 @@ export class ChatComponent implements OnInit, OnChanges {
   isEmojiPickerVisibleEdit: boolean = false;
   @Output() userMention = new EventEmitter<any>();
   getAllUsersName: any[] = [];
-  overlayStatusService = inject(OverlayStatusService);
-  overlayOpen = false;
   isMentionCardOpenInChat: boolean = false;
   isMentionCardOpen: boolean = false;
   wasClickedChatInput = false;
@@ -147,6 +136,7 @@ export class ChatComponent implements OnInit, OnChanges {
   inputFieldService = inject(InputfieldService);
   isSelfChat?: boolean;
   hasNoMessages?: boolean;
+  isOverlayOpen = false;
 
   constructor() {}
 
@@ -166,33 +156,9 @@ export class ChatComponent implements OnInit, OnChanges {
   currentComponentId = 'chat';
 
   async ngOnInit(): Promise<void> {
-/*     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
-      async (user) => {
-        if (user) {
-          this.selectedUser = user;
-          await this.getMessages();
-        }
-      }
-    ); */
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
-/*     this.threadControlService.editedMessage$
-      .pipe(
-        filter((message: any) => !!message), // Nachricht darf nicht null oder undefined sein
-        filter((message: any) => message.text && message.text.trim() !== '') // Nachricht darf keinen leeren Text haben
-      )
-      .subscribe((updatedMessage) => {
-        this.updateMessage(updatedMessage);
-      }); */
-
-    /*     this.workspaceSubscription.add(
-      this.workspaceService.selectedChannel$.subscribe((channel) => {
-        if (channel) {
-          this.selectedChannel = channel;
-        }
-      })
-    ); */
     this.updateSubscriptionText();
     await this.getAllUsersname();
   }
@@ -319,23 +285,23 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   closePicker() {
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
   }
 
   openEmojiPicker() {
     this.isEmojiPickerVisible = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   openEmojiPickerEdit() {
     this.isEmojiPickerVisible = false;
     this.isEmojiPickerVisibleEdit = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   closePickerEdit() {
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.isEmojiPickerVisibleEdit = false;
   }
 
@@ -433,7 +399,10 @@ export class ChatComponent implements OnInit, OnChanges {
       this.chatMessage = '';
       this.global.clearCurrentChannel();
       console.log('selectedUser changes');
-      console.log('ngOnChanges => selectedUser neu zugewiesen:', this.selectedUser);
+      console.log(
+        'ngOnChanges => selectedUser neu zugewiesen:',
+        this.selectedUser
+      );
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.clearInput();
@@ -468,7 +437,6 @@ export class ChatComponent implements OnInit, OnChanges {
   clearInput() {
     this.messagesData = [];
   }
-
 
   async saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
@@ -709,27 +677,32 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-
   updateSubscriptionText() {
     this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
     this.hasNoMessages = this.messagesData.length === 0;
-  
+
     // Erst alles auf false setzen
     this.showWelcomeChatText = false;
     this.showTwoPersonConversationTxt = false;
-  
+
     // Nun gezielt nach Self-/Non-Self unterscheiden
     if (this.isSelfChat && this.hasNoMessages) {
       this.showWelcomeChatText = true;
     } else if (!this.isSelfChat && this.hasNoMessages) {
       this.showTwoPersonConversationTxt = true;
     }
-  
-    console.log('isSelfChat=', this.isSelfChat, 'hasNoMessages=', this.hasNoMessages);
-    console.log('showTwoPersonConversationTxt =', this.showTwoPersonConversationTxt);
+
+    console.log(
+      'isSelfChat=',
+      this.isSelfChat,
+      'hasNoMessages=',
+      this.hasNoMessages
+    );
+    console.log(
+      'showTwoPersonConversationTxt =',
+      this.showTwoPersonConversationTxt
+    );
   }
-  
-  
 
   async updateMessagesWithNewPhoto() {
     try {

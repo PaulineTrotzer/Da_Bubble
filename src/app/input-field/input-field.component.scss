@@ -1,8 +1,5 @@
 .msg-input-ct {
-  /*   display: flex !important; */
   padding: 32px;
-  /*   position: relative;
-  flex-direction: column-reverse; */
 }
 
 .error-message {
@@ -25,55 +22,10 @@
   }
 }
 
-/* .chat-input {
-  position: relative;
-  -webkit-text-fill-color: transparent;
-  min-height: 130px; // Grundhöhe
-  max-height: 200px;
-  flex: 1;
-
-  border: none;
-  outline: none;
-
-  padding: 20px 20px 40px 18px;
-  position: relative;
-  resize: none;
-  font-size: 18px !important;
-  font-family: "Nunito";
-  background: none;
-  color: transparent;
-  caret-color: black;
-  width: 100%;
-  white-space: pre-wrap;
-  overflow-y: auto;
-
-  word-wrap: break-word;
-  z-index: 4;
-
-  &::placeholder {
-    color: grey;
-    opacity: 0.9;
-    font-style: italic;
-
-    -webkit-text-fill-color: grey;
-  }
-
-
-  &::-webkit-input-placeholder {
-    color: grey;
-    -webkit-text-fill-color: grey;
-  }
-} */
-
 .chat-input:focus {
-  outline: none; // wichtig für manche Browser
+  outline: none; 
 }
 
-/* .chat-input::selection {
-  color: #ffffff;
-  background: #444df2;
-}
- */
 .interactions-send-msg-ct {
   display: flex;
   align-items: center;
@@ -168,17 +120,12 @@
   position: absolute;
   left: 0;
   bottom: 50px;
-  margin-top: 8px; // kleine Lücke zum Input
-  z-index: 999;    // sicherstellen, dass die Card vorne liegt
-
-  // Mit transform kannst du die Card etwas sanfter ein- oder ausblenden
+  margin-top: 8px;
+  z-index: 999;
   transform: translateY(0);
   transition: transform 0.2s ease;
 }
-/* 
-.mention {
-  color: #444df2;
-} */
+
 
 .msg-send {
   width: 34px;
@@ -240,38 +187,6 @@ position: relative;
   }
 }
 
-/* .main-input-area:focus-within {
-  // Border-Farbe bei Fokus
-  border-color: blue;
-  // oder wenn du magst outline:
-  // outline: 2px solid blue;
-  // outline-offset: 0;
-} */
-
-/* .highlight {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  border: none;
-  outline: none;
-  resize: none;
-  font-family: "Nunito";
-  background: none;
-  color: transparent;
-
-  min-height: 130px; // Grundhöhe
-  max-height: 200px;
-
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  color: black;
-  overflow: hidden;
-  padding: 20px 20px 40px 18px;
-  font-size: 18px !important;
-  z-index: 1;
-}
- */
 .vector {
   height: 33px;
   width: 7px;

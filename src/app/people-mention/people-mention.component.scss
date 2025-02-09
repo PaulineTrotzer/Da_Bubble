@@ -55,12 +55,12 @@
 
 input {
     background-color: #eceefe;
-    padding: 18px 32px;
+    padding: 12px 32px;
     width: 100%;
-    height: 60px;
+    height: 50px;
     border-radius: 100px;
     border: 2px solid transparent;
-    cursor: pointer;
+    cursor: text;
     font-family: 'Nunito';
 
     &:hover {
@@ -78,7 +78,7 @@ input {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: 268px;
+    height: 240px;
     overflow-y: auto;
 } 
 
@@ -94,7 +94,8 @@ input {
     align-items: center;
     gap: 21px;
     position: relative;
-   
+    transition: background-color 0.2s ease, border-radius 0.2s ease;
+
     &:hover{
         cursor: pointer;
         background-color: rgb(236, 238, 254);

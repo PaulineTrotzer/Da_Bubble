@@ -1,5 +1,5 @@
+<div *ngIf="isOverlayOpen" class="overlay"></div>
 <div class="full-app-content">
-
     <app-mention-message-box (cancelMessageBoxCard)="onCancelMentionBox()" *ngIf="wasClickedChatInput"
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
@@ -244,7 +244,6 @@
                                         }}</span>
                                 </div>
                             </div>
-
 
 
                             <!--        <div class="avatar-box"> -->

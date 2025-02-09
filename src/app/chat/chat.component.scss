@@ -2,6 +2,16 @@
   border-style: none;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 11;
+}
+
 .mat-mdc-card-content {
   padding: 0 6px;
 }
@@ -52,8 +62,8 @@
   right: 0;
   bottom: 0;
   z-index: 2;
-  background: transparent; /* Unsichtbar, blockiert aber Klicks */
-  pointer-events: none; /* Klicks auf sichtbare Elemente weiterleiten */
+  background: transparent;
+  pointer-events: none;
 }
 
 app-input-field {
@@ -61,10 +71,8 @@ app-input-field {
 }
 
 
-
 .self-chat-opener-ct,
 .two-chat-opener-ct {
-  /* Layout */
   display: flex;
   flex-direction: column;
   align-items: flex-start;  
@@ -96,8 +104,6 @@ app-input-field {
   transition: color 0.2s ease;
 }
 
-
-
 .you {
   position: relative;
   left: -14px;
@@ -110,15 +116,6 @@ app-input-field {
   font-size: 24px;
   font-weight: 700;
 }
-
-/* .self-chat-txt {
-  color: grey;
-  font-weight: 400;
-  font-size: 20px;
-  display: flex;
-  flex-direction: column;
-  padding: 0 42px;
-} */
 
 .self-chat-img {
   width: 100px;
@@ -135,12 +132,6 @@ app-input-field {
   font-size: 24px;
   font-weight: 700;
 }
-
-/* .two-chat-txt {
-  font-size: 20px;
-  color: grey;
-  padding: 0 42px;
-} */
 
 .name-chat-partner {
   color: #535af1;
@@ -192,12 +183,6 @@ app-input-field {
   margin-top: 33px;
 }
 
-/* .show-reactions-transition {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-} */
-
 .main-mesage-info-current {
   width: 100%;
   position: relative;
@@ -230,7 +215,6 @@ app-input-field {
   width: 100%;
   position: relative;
   padding-top: 16px;
-  /*   height: 192px; */
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -272,25 +256,21 @@ app-input-field {
 
 .message-content-current {
   margin: 16px auto 16px auto;
-
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  max-width: 80%; /* Begrenze die maximale Breite */
+  max-width: 80%; 
   word-wrap: break-word;
-  /*   height: 160px; */
 }
 
 .message-content-user {
   margin: 16px auto 16px auto;
-
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 80%; /* Begrenze die maximale Breite */
+  max-width: 80%; 
   word-wrap: break-word;
-  /*   height: 160px; */
 }
 
 .current-name-box {
@@ -323,40 +303,40 @@ app-input-field {
 
 .message-card-current {
   position: relative;
-  background-color: #797ef3; /* Primärfarbe für eigene Nachrichten */
+  background-color: #797ef3; 
   border-top-right-radius: 0;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   padding: 10px 15px;
-  width: 80%; /* Maximal 80% der Breite */
-  width: fit-content; /* Passt sich dynamisch an den Inhalt an */
+  width: 80%;
+  width: fit-content;
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-height: max-content;
-  display: inline-block; /* Passt sich dem Inhalt an */
+  display: inline-block; 
   margin: 10px 0;
-  color: #ffffff; /* Weißer Text */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sanfter Schatten */
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
 
 .message-card-user {
   position: relative;
-  background-color: #f3f4f6; /* Sekundärfarbe für empfangene Nachrichten */
+  background-color: #f3f4f6; 
   border-top-left-radius: 0;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   padding: 10px 15px;
-  width: 80%; /* Maximal 80% der Breite */
-  width: fit-content; /* Passt sich dynamisch an den Inhalt an */
+  width: 80%; 
+  width: fit-content;
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-height: max-content;
-  display: inline-block; /* Passt sich dem Inhalt an */
+  display: inline-block; 
   margin: 10px 0;
-  color: #000000; /* Schwarzer Text */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sanfter Schatten */
+  color: #000000; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
 
 .card-content-current {
@@ -624,7 +604,7 @@ app-input-field {
 }
 
 .sticker-item {
-  position: relative; // Wichtig
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -632,8 +612,8 @@ app-input-field {
   border-radius: 13px;
   padding: 5px;
   gap: 1px;
-  height: 35px;
-  width: 38px;
+  height: 31px;
+  width: 35px;
   font-size: 14px;
   &:hover {
     border-color: #444df2;
@@ -662,28 +642,25 @@ app-input-field {
   padding: 8px;
   width: fit-content;
   opacity: 0;
-  visibility: hidden; /* Damit es nicht klickbar ist */
-  pointer-events: none; /* Kein Maus-Fokus */
+  visibility: hidden;
+  pointer-events: none; 
   transition: opacity 0.3s ease-in-out;
   z-index: 999;
 
   &.is-current {
     background-color: #444df2;
-    // if you want a different style for the current user
   }
   &.is-other {
     background-color: #444df2;
-    // if you want a different style for the other user
   }
 }
 
 .sticker-info-tooltip.show {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto; /* Wieder anklickbar */
+  pointer-events: auto; 
 }
 
-/* Tooltip verstecken ohne "blauen Tropfen" */
 .sticker-info-tooltip:not(.show) {
   opacity: 0;
   visibility: hidden;
@@ -875,8 +852,8 @@ app-mention-message-box {
   font-size: 15px;
   gap: 8px;
   img {
-    max-width: 100px; /* Maximale Breite für Bilder */
-    max-height: 100px; /* Maximale Höhe für Bilder */
+    max-width: 100px; 
+    max-height: 100px; 
     object-fit: cover;
     border-radius: 8px;
   }
@@ -930,7 +907,7 @@ app-mention-message-box {
 }
 
 .placeholder-thread-answer {
-  height: 15px; /* Mindestens Platz für den Platzhalter */
+  height: 15px;
   width: 45px;
   display: flex;
   justify-content: center;
@@ -944,12 +921,12 @@ app-mention-message-box {
   font-weight: 500;
   font-size: 14px;
   height: auto;
-  opacity: 0; /* Unsichtbar im Startzustand */
+  opacity: 0; 
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .thread-answer-display.show {
-  opacity: 1; /* Sichtbar, wenn `.show` aktiv ist */
+  opacity: 1; 
   transform: translateY(0);
 }
 
