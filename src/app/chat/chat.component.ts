@@ -429,13 +429,18 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   formatMentions(text: string): SafeHtml {
-    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
+    // Erlaube bis zu 3 Wörter:
+    // Erster Block, dann (0 bis 2 weitere Blöcke)
+    const regex = /@([\w\-\*_!$]+(?:\s+[\w\-\*_!$]+)?)/g;
+
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
       user.name ? user.name.trim().toLowerCase() : ''
     );
 
     const formattedText = text.replace(regex, (match) => {
       const mentionName = match.substring(1).trim().toLowerCase();
+      console.log('mentionName:', JSON.stringify(mentionName));
+      console.log('normalizedUserNames:', normalizedUserNames);
       if (normalizedUserNames.includes(mentionName)) {
         return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
       }
@@ -790,25 +795,43 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  splitMessage(text: string): string[] {
-    const regex = /(@[\w\-_!$*]+)/g;
-    const parts = text.split(regex);
-    const cleanedParts = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
-    return cleanedParts;
-  }
+  // 1) splitMessage => max. 2 Wörter bei @...
+splitMessage(text: string): string[] {
+  // Regex wie in formatMentions
+  const mentionRegex = /(@[\w\-_!$*]+(?:\s+[\w\-_!$*]+)?)/g;
+  const parts = text.split(mentionRegex);
+  return parts
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+}
+
+
 
   isMention(textPart: string): boolean {
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name.trim().toLowerCase()
+      user.name
+        ? user.name
+            .toLowerCase()
+            .replace(/\s+/g, ' ')
+            .trim()
+        : ''
     );
-    const mentionName = textPart.startsWith('@')
-      ? textPart.substring(1).toLowerCase()
-      : '';
+  
+    // textPart z.B. "@Test  Name"
+    let mentionName = '';
+    if (textPart.startsWith('@')) {
+      mentionName = textPart.substring(1) // "Test  Name"
+        .toLowerCase()
+        // Entferne unsichtbare Whitespaces wie \u00A0:
+        .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
+        // Dann 2+ Spaces => 1 Space
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+  
     return normalizedUserNames.includes(mentionName);
   }
-
+  
   closeMentionBoxHandler() {
     this.wasClickedChatInput = false;
   }
@@ -911,31 +934,28 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = true;
   }
 
-
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
     this.shouldScroll = false;
-    const currentUserIsSender = (this.global.currentUserData?.id === message.senderId);
+    const currentUserIsSender =
+      this.global.currentUserData?.id === message.senderId;
     if (currentUserIsSender) {
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.senderSticker === emoji) {
         message.senderSticker = '';
         message.senderStickerCount = 0;
-      } 
-      else {
+      } else {
         message.senderSticker = emoji;
         message.senderStickerCount = 1;
       }
-    } 
-    else {
+    } else {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.recipientSticker === emoji) {
         message.recipientSticker = '';
         message.recipientStickerCount = 0;
-      } 
-      else {
+      } else {
         message.recipientSticker = emoji;
         message.recipientStickerCount = 1;
       }
@@ -949,14 +969,14 @@ export class ChatComponent implements OnInit, OnChanges {
       recipientSticker: message.recipientSticker,
       recipientStickerCount: message.recipientStickerCount,
       senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-      recipientChoosedStickerBackColor: message.recipientChoosedStickerBackColor,
+      recipientChoosedStickerBackColor:
+        message.recipientChoosedStickerBackColor,
       stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-      stickerBoxOpacity: message.stickerBoxOpacity
+      stickerBoxOpacity: message.stickerBoxOpacity,
     });
-  
+
     this.closePicker();
   }
-  
 
   async emojiSender(message: any) {
     this.wasRemoved = false;
@@ -967,16 +987,14 @@ export class ChatComponent implements OnInit, OnChanges {
     message.stickerBoxCurrentStyle = true;
   }
 
-
-async emojirecipient(message: any) {
-  this.wasRemoved = false;
-  if (message.recipientSticker) {
-    const event = { emoji: { native: message.recipientSticker } };
-    await this.addEmoji(event, message);
+  async emojirecipient(message: any) {
+    this.wasRemoved = false;
+    if (message.recipientSticker) {
+      const event = { emoji: { native: message.recipientSticker } };
+      await this.addEmoji(event, message);
+    }
+    message.stickerBoxCurrentStyle = true;
   }
-  message.stickerBoxCurrentStyle = true;
-}
-
 
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;

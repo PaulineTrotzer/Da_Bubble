@@ -31,26 +31,35 @@ export class MentionThreadService {
     });
   }
 
-   isMention(textPart: string): boolean {
-    const normalizedUserNames = this.allUsersName.map((user: any) =>
-      user.name.trim().toLowerCase()
-    );
-    const mentionName = textPart.startsWith('@')
-      ? textPart.substring(1).toLowerCase()
-      : '';
-    return normalizedUserNames.includes(mentionName);
-  } 
-  
-  splitMessage(text: string | undefined): string[] {
-    if (!text) {
-      return [];
+  isMention(textPart: string): boolean {
+    const normalizedUserNames = this.allUsersName.map((user) => {
+      return user.name
+        .toLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ') 
+        .replace(/\s+/g, ' ')
+        .trim();
+    });
+
+    let mentionName = '';
+    if (textPart.startsWith('@')) {
+      mentionName = textPart
+        .substring(1)
+        .toLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
-    const regex = /(@[\w\-_!$*]+)/g;
-    const parts = text.split(regex);
-    const cleanedParts = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
-    return cleanedParts;
+
+    return normalizedUserNames.includes(mentionName);
+  }
+
+  
+  splitMessage(text: string): string[] {
+    const mentionRegex = /(@[\w\-_!$*]+(?:\s+[\w\-_!$*]+)?)/g;
+    const parts = text.split(mentionRegex);
+    return parts
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
   }
 
   async ensureUserDataLoaded(name: string): Promise<any> {

@@ -835,7 +835,7 @@ app-input-field {
 }
 
 .edited-both-view {
-  right: 0;
+  right: 100px;
 }
 
 .edited-sender-view {
@@ -870,6 +870,12 @@ app-mention-message-box {
 
 .show-selected-files {
   margin-top: 5px;
+}
+
+.included-file {
+  width: 50px;
+  height: auto;
+  object-fit: cover;
 }
 
 .file-info {

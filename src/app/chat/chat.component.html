@@ -208,7 +208,7 @@
                                                 <div class="mai-file" *ngIf="file.url">
                                                     <!-- Für Bilder -->
                                                     <div class="file-info" *ngIf="file.type.startsWith('image/')">
-                                                        <a [href]="file.url" target="_blank">
+                                                        <a class="included-file" [href]="file.url" target="_blank">
                                                             <img [src]="file.url" alt="Image File" />
                                                         </a>
                                                         <div class="file-name">{{ file.name }}</div>
@@ -356,7 +356,6 @@
                                     </mat-card-content>
                                 </mat-card>
                             </ng-template>
-
 
 
                         </div>
