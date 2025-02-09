@@ -189,6 +189,20 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData = [...this.messagesData];
   }
 
+  isCurrentUserSender(message: any): boolean {
+    // Falls du IDs verwendest:
+    return message.senderId === this.global.currentUserData.uid;
+    // Oder bei Namensvergleich:
+    // return message.senderName === this.global.currentUserData.name;
+  }
+
+  isCurrentUserRecipient(message: any): boolean {
+    // Falls du IDs verwendest:
+    return message.recipientId === this.global.currentUserData.uid;
+    // Oder bei Namensvergleich:
+    // return message.recipientName === this.global.currentUserData.name;
+  }
+
   async updateExistingMessage(
     index: number,
     updatedMessage: any
@@ -391,6 +405,7 @@ export class ChatComponent implements OnInit, OnChanges {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
+
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
       console.log('this Suser from onChanges', this.selectedUser);
@@ -398,11 +413,6 @@ export class ChatComponent implements OnInit, OnChanges {
       console.log('Selected Files:', this.selectFiles);
       this.chatMessage = '';
       this.global.clearCurrentChannel();
-      console.log('selectedUser changes');
-      console.log(
-        'ngOnChanges => selectedUser neu zugewiesen:',
-        this.selectedUser
-      );
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.clearInput();
@@ -680,28 +690,13 @@ export class ChatComponent implements OnInit, OnChanges {
   updateSubscriptionText() {
     this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
     this.hasNoMessages = this.messagesData.length === 0;
-
-    // Erst alles auf false setzen
     this.showWelcomeChatText = false;
     this.showTwoPersonConversationTxt = false;
-
-    // Nun gezielt nach Self-/Non-Self unterscheiden
     if (this.isSelfChat && this.hasNoMessages) {
       this.showWelcomeChatText = true;
     } else if (!this.isSelfChat && this.hasNoMessages) {
       this.showTwoPersonConversationTxt = true;
     }
-
-    console.log(
-      'isSelfChat=',
-      this.isSelfChat,
-      'hasNoMessages=',
-      this.hasNoMessages
-    );
-    console.log(
-      'showTwoPersonConversationTxt =',
-      this.showTwoPersonConversationTxt
-    );
   }
 
   async updateMessagesWithNewPhoto() {
@@ -916,277 +911,72 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = true;
   }
 
+
   async addEmoji(event: any, message: any) {
     const emoji = event.emoji.native;
     this.shouldScroll = false;
-    if (this.global.currentUserData?.id === message.senderId) {
+    const currentUserIsSender = (this.global.currentUserData?.id === message.senderId);
+    if (currentUserIsSender) {
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.senderSticker === emoji) {
         message.senderSticker = '';
-        if (message.senderStickerCount === 2) {
-          message.senderStickerCount = 1;
-        }
-      } else {
+        message.senderStickerCount = 0;
+      } 
+      else {
         message.senderSticker = emoji;
         message.senderStickerCount = 1;
       }
-      if (message.recipientSticker === emoji) {
-        message.recipientStickerCount =
-          (message.recipientStickerCount || 1) + 1;
-        message.senderSticker = '';
-        if (message.recipientStickerCount === 2) {
-          message.senderSticker = message.recipientSticker;
-        }
-        if (message.recipientStickerCount >= 3) {
-          message.recipientStickerCount = 1;
-        }
-      }
-      if (message.senderSticker !== message.recipientSticker) {
-        message.recipientStickerCount = 1;
-      }
-
-      if (message.senderSticker === message.recipientSticker) {
-        message.senderStickerCount = (message.senderStickerCount || 1) + 1;
-      }
-      this.isEmojiPickerVisible = false;
-      this.messageIdHovered = null;
-    } else if (this.global.currentUserData?.id !== message.senderId) {
+    } 
+    else {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.recipientSticker === emoji) {
         message.recipientSticker = '';
-        if (message.recipientStickerCount === 2) {
-          message.recipientStickerCount = 1;
-        }
-      } else {
+        message.recipientStickerCount = 0;
+      } 
+      else {
         message.recipientSticker = emoji;
         message.recipientStickerCount = 1;
       }
-      if (message.senderSticker === emoji) {
-        message.senderStickerCount = (message.senderStickerCount || 1) + 1;
-        if (message.senderStickerCount >= 3) {
-          message.senderStickerCount = 1;
-        }
-      }
-      if (message.recipientSticker !== '' && message.senderStickerCount === 2) {
-        message.senderStickerCount = 1;
-        message.recipientSticker = emoji;
-      }
-      if (message.recipientSticker === message.senderSticker) {
-        message.senderStickerCount = (message.senderStickerCount || 1) + 1;
-      }
-      this.isEmojiPickerVisible = false;
-      this.messageIdHovered = null;
     }
-    const chatMessage = message.chatMessage || '';
-    const messageData = this.messageData(
-      chatMessage,
-      message.senderStickerCount,
-      message.recipientStickerCount
-    );
-    const strickerRef = doc(this.firestore, 'messages', message.id);
-    const stikerObj = {
+    this.isEmojiPickerVisible = false;
+    this.messageIdHovered = null;
+    const docRef = doc(this.firestore, 'messages', message.id);
+    await updateDoc(docRef, {
       senderSticker: message.senderSticker,
       senderStickerCount: message.senderStickerCount,
       recipientSticker: message.recipientSticker,
       recipientStickerCount: message.recipientStickerCount,
       senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-      recipientChoosedStickerBackColor:
-        message.recipientChoosedStickerBackColor,
+      recipientChoosedStickerBackColor: message.recipientChoosedStickerBackColor,
       stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-      stickerBoxOpacity: message.stickerBoxOpacity,
-    };
-    /*    setTimeout(() => {
-      this.shouldScroll = true;
-    }, 1000); */
-    await updateDoc(strickerRef, stikerObj);
+      stickerBoxOpacity: message.stickerBoxOpacity
+    });
+  
     this.closePicker();
   }
+  
 
-  removeSenderSticker(message: any) {
-    this.shouldScroll = false;
-    const docRef = doc(this.firestore, 'messages', message.id);
-    if (this.global.currentUserData?.id === message.senderId) {
-      if (message.senderSticker && message.senderStickerCount === 1) {
-        this.messageIdHovered = null;
-        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
-      } else if (
-        message.senderSticker &&
-        message.senderStickerCount === 2 &&
-        message.recipientStickerCount === 1 &&
-        message.recipientSticker
-      ) {
-        updateDoc(docRef, {
-          senderSticker: '',
-          senderStickerCount: null,
-          recipientStickerCount: 1,
-        });
-      } else if (
-        message.senderSticker &&
-        message.senderStickerCount === 2 &&
-        message.recipientStickerCount === 2 &&
-        message.recipientSticker
-      ) {
-        updateDoc(docRef, {
-          senderSticker: '',
-          senderStickerCount: null,
-          recipientStickerCount: 1,
-        });
-      } else if (
-        message.senderSticker &&
-        message.senderStickerCount === 1 &&
-        message.recipientSticker &&
-        message.recipientStickerCount === 1 &&
-        message.senderSticker !== message.recipientSticker
-      ) {
-        updateDoc(docRef, {
-          senderSticker: '',
-          senderStickerCount: null,
-          recipientStickerCount: 1,
-        });
-      }
-    } else if (this.global.currentUserData?.id !== message.senderId) {
-      if (
-        message.recipientSticker &&
-        message.recipientStickerCount === 2 &&
-        message.senderStickerCount === 2 &&
-        message.senderSticker
-      ) {
-        updateDoc(docRef, {
-          recipientSticker: '',
-          senderStickerCount: 1,
-          recipientStickerCount: null,
-        });
-      } else if (
-        message.senderStickerCount === 2 &&
-        message.senderSticker &&
-        message.recipientSticker &&
-        message.recipientStickerCount === 1
-      ) {
-        updateDoc(docRef, {
-          recipientSticker: '',
-          recipientCount: null,
-          senderStickerCount: 1,
-        });
-      } else if (
-        message.senderStickerCount === 2 &&
-        message.senderSticker &&
-        message.recipientSticker &&
-        message.recipientStickerCount === null
-      ) {
-        updateDoc(docRef, {
-          recipientSticker: '',
-          recipientCount: null,
-          senderStickerCount: 1,
-        });
-      }
-    }
-  }
-
-  removeRecipientSticker(message: any) {
-    this.shouldScroll = false;
-    const docRef = doc(this.firestore, 'messages', message.id);
-    if (this.global.currentUserData?.id !== message.senderId) {
-      this.hoveredName = null;
-      this.messageIdHovered = null;
-      if (message.recipientSticker && message.recipientStickerCount === 1) {
-        updateDoc(docRef, {
-          recipientSticker: '',
-          recipientStickerCount: null,
-        });
-      }
-    }
-  }
-
-  emojiSender(message: any) {
+  async emojiSender(message: any) {
     this.wasRemoved = false;
-    const docRef = doc(this.firestore, 'messages', message.id);
-    if (this.global.currentUserData?.id === message.senderId) {
-      const docRef = doc(this.firestore, 'messages', message.id);
-      if (message.senderSticker && message.senderStickerCount === 1) {
-        this.messageIdHovered = null;
-        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
-      } else if (message.senderStickerCount === 2 && message.senderSticker) {
-        updateDoc(docRef, { senderSticker: '', senderStickerCount: null });
-      } else if (
-        message.senderStickerCount === 2 &&
-        message.senderSticker === message.recipientSticker
-      ) {
-        updateDoc(docRef, { senderStickerCount: 1, recipientSticker: '' });
-      }
-    } else if (this.global.currentUserData?.id !== message.senderId) {
-      const docRef = doc(this.firestore, 'messages', message.id);
-      if (message.senderSticker) {
-        const senderemoji = message.senderSticker;
-        updateDoc(docRef, {
-          recipientSticker: senderemoji,
-          senderStickerCount: 2,
-        });
-        if (message.senderStickerCount === 2 && message.recipientSticker) {
-          updateDoc(docRef, { recipientSticker: '', senderStickerCount: 1 });
-        }
-      }
+    if (message.senderSticker) {
+      const event = { emoji: { native: message.senderSticker } };
+      await this.addEmoji(event, message);
     }
     message.stickerBoxCurrentStyle = true;
-    updateDoc(docRef, {
-      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-      stickerBoxOpacity: message.stickerBoxOpacity,
-      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-      recipientChoosedStickerBackColor:
-        message.recipientChoosedStickerBackColor,
-    });
   }
 
-  emojirecipient(message: any) {
-    this.wasRemoved = false;
-    const docRef = doc(this.firestore, 'messages', message.id);
-    if (this.global.currentUserData?.id === message.senderId) {
-      if (
-        message.recipientSticker &&
-        message.senderSticker &&
-        message.senderSticker !== message.recipientSticker
-      ) {
-        const senderemoji = message.recipientSticker;
-        if (message.recipientSticker) {
-          updateDoc(docRef, {
-            senderSticker: senderemoji,
-            recipientStickerCount: 2,
-            senderStickerCount: 2,
-          });
-        }
-      }
-      if (message.senderSticker === '' && message.senderStickerCount === null) {
-        if (message.recipientSticker) {
-          const senderemoji = message.recipientSticker;
-          updateDoc(docRef, {
-            senderSticker: senderemoji,
-            senderStickerCount: 2,
-          });
-        }
-      }
-    } else if (this.global.currentUserData?.id !== message.senderId) {
-      if (message.senderStickerCount === 2) {
-        updateDoc(docRef, { senderStickerCount: 1, recipientSticker: '' });
-      } else if (
-        message.recipientSticker &&
-        message.recipientStickerCount === 1
-      ) {
-        updateDoc(docRef, {
-          recipientSticker: '',
-          recipientStickerCount: null,
-        });
-      }
-    }
-    message.stickerBoxCurrentStyle = true;
-    updateDoc(docRef, {
-      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-      stickerBoxOpacity: message.stickerBoxOpacity,
-      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-      recipientChoosedStickerBackColor:
-        message.recipientChoosedStickerBackColor,
-    });
+
+async emojirecipient(message: any) {
+  this.wasRemoved = false;
+  if (message.recipientSticker) {
+    const event = { emoji: { native: message.recipientSticker } };
+    await this.addEmoji(event, message);
   }
+  message.stickerBoxCurrentStyle = true;
+}
+
 
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;

@@ -135,22 +135,22 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   } */
 
   async ngOnInit(): Promise<void> {
-    /*     this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
       async (user) => {
         if (user) {
           this.selectedUser = user;
-          console.log('user chat comp',user);
+          console.log('user chat comp', user);
         }
       }
-    ); */
+    );
 
-    /*     this.workspaceSubscription.add(
+    this.workspaceSubscription.add(
       this.workspaceService.selectedChannel$.subscribe((channel) => {
         if (channel) {
           this.selectedChannel = channel;
         }
       })
-    ); */
+    );
     this.checkStatus();
     this.initializeGlobalState();
     await this.loadUserData();

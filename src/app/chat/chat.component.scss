@@ -70,18 +70,17 @@ app-input-field {
   position: relative;
 }
 
-
 .self-chat-opener-ct,
 .two-chat-opener-ct {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;  
+  align-items: flex-start;
   gap: 20px;
   position: absolute;
-  left: 50%;            
+  left: 50%;
   bottom: 30px;
-  transform: translateX(-50%); 
-  width: 100%;  
+  transform: translateX(-50%);
+  width: 100%;
   padding: 16px 24px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -89,17 +88,18 @@ app-input-field {
   backdrop-filter: blur(6px);
   opacity: 1;
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Nunito", "Helvetica Neue", Arial, sans-serif;
   color: #333;
 }
 
-.self-chat-txt, .two-chat-txt {
+.self-chat-txt,
+.two-chat-txt {
   color: rgba(0, 0, 0, 0.7);
   font-size: 20px;
   line-height: 1.5;
   font-weight: 400;
   letter-spacing: 0.01em;
-  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Nunito", "Helvetica Neue", Arial, sans-serif;
   padding: 0 42px;
   transition: color 0.2s ease;
 }
@@ -158,23 +158,27 @@ app-input-field {
 }
 
 .day-span {
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  transform: translate(50%, -50%);
   border-radius: 30px;
   border: 1px solid #adb0d9;
   padding: 5px 15px;
   background-color: #ffffff;
-  position: absolute;
   z-index: 2;
   right: 50%;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 400;
   text-align: left;
-  color: #000000;
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .main-current-messagebox {
   position: absolute;
-  top: 140px;
+  top: 93px;
   width: 100%;
-  max-height: 750px;
+  /*   max-height: 750px; */
   overflow-y: auto;
   scroll-behavior: smooth;
 }
@@ -260,7 +264,7 @@ app-input-field {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  max-width: 80%; 
+  max-width: 80%;
   word-wrap: break-word;
 }
 
@@ -269,7 +273,7 @@ app-input-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 80%; 
+  max-width: 80%;
   word-wrap: break-word;
 }
 
@@ -303,7 +307,7 @@ app-input-field {
 
 .message-card-current {
   position: relative;
-  background-color: #797ef3; 
+  background-color: #797ef3;
   border-top-right-radius: 0;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -314,29 +318,29 @@ app-input-field {
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-height: max-content;
-  display: inline-block; 
+  display: inline-block;
   margin: 10px 0;
   color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .message-card-user {
   position: relative;
-  background-color: #f3f4f6; 
+  background-color: #f3f4f6;
   border-top-left-radius: 0;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   padding: 10px 15px;
-  width: 80%; 
+  width: 80%;
   width: fit-content;
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-height: max-content;
-  display: inline-block; 
+  display: inline-block;
   margin: 10px 0;
-  color: #000000; 
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  color: #000000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .card-content-current {
@@ -578,12 +582,11 @@ app-input-field {
   position: relative;
 }
 
-/* .comment-sticker-holder {
-  position: relative;
+.comment-sticker-holder {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-} */
+  gap: 5px;
+  min-width: 30px;
+}
 
 .show-comment-stricker {
   position: relative;
@@ -631,34 +634,45 @@ app-input-field {
 .sticker-info-tooltip {
   position: absolute;
   bottom: 35px;
-  left: 55px;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 30px;
   border-top-right-radius: 30px;
   background-color: #444df2;
   color: #ffffff;
-  max-width: 200px;
   padding: 8px;
-  width: fit-content;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none; 
-  transition: opacity 0.3s ease-in-out;
   z-index: 999;
 
-  &.is-current {
-    background-color: #444df2;
-  }
-  &.is-other {
-    background-color: #444df2;
-  }
+  max-width: 120px;
+  max-height: 120px;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sticker-info-tooltip.tooltip-current-user {
+  right: 96px;
+  background-color: #f0f;
+}
+.sticker-info-tooltip.tooltip-sender-active {
+  right: 117px;
+}
+
+.sticker-info-tooltip.tooltip-other-user {
+  left: 200px;
+  background-color: #0ff;
+}
+
+.sticker-info-tooltip.tooltip-recipient-active {
+  left: 242px;
 }
 
 .sticker-info-tooltip.show {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto; 
+  pointer-events: auto;
 }
 
 .sticker-info-tooltip:not(.show) {
@@ -678,7 +692,7 @@ app-input-field {
   display: flex;
   padding: 8px !important;
   position: absolute;
-  width: fit-content;
+  max-height: 100px;
   /*   top: -400px;
   left: -40px; */
   opacity: 0;
@@ -788,7 +802,20 @@ app-input-field {
 .new-day-info {
   position: relative;
   top: 0;
-  padding: 0 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(173, 176, 217, 0.4);
+    z-index: 0;
+    transform: translateY(-50%);
+  }
 }
 
 .text-info-edit {
@@ -852,8 +879,8 @@ app-mention-message-box {
   font-size: 15px;
   gap: 8px;
   img {
-    max-width: 100px; 
-    max-height: 100px; 
+    max-width: 100px;
+    max-height: 100px;
     object-fit: cover;
     border-radius: 8px;
   }
@@ -921,12 +948,12 @@ app-mention-message-box {
   font-weight: 500;
   font-size: 14px;
   height: auto;
-  opacity: 0; 
+  opacity: 0;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .thread-answer-display.show {
-  opacity: 1; 
+  opacity: 1;
   transform: translateY(0);
 }
 
