@@ -428,24 +428,39 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
+  // Zum Beispiel in deiner formatMentions(...):
   formatMentions(text: string): SafeHtml {
-    // Erlaube bis zu 3 Wörter:
-    // Erster Block, dann (0 bis 2 weitere Blöcke)
-    const regex = /@([\w\-\*_!$]+(?:\s+[\w\-\*_!$]+)?)/g;
+    // Einfaches Regex: Bis zum nächsten Leerzeichen
+    // (Optional kannst du STILL 2 Wörter erlauben,
+    //  aber wir wollen ja nur 1 Wort in der DB.)
+    const regex = /@(\S+)/g; // @ + beliebige Nicht-Leerzeichen
 
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name ? user.name.trim().toLowerCase() : ''
+    const normalizedUserNames = this.getAllUsersName.map(
+      (user: any) => user.name?.trim().toLowerCase() || ''
     );
 
     const formattedText = text.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim().toLowerCase();
-      console.log('mentionName:', JSON.stringify(mentionName));
-      console.log('normalizedUserNames:', normalizedUserNames);
+      // match = z. B. "@pauline ws"
+      let mentionName = match
+        .substring(1) // "pauline ws"
+        .toLowerCase()
+        .trim();
+
+      // Nur das erste Wort nehmen => "pauline"
+      mentionName = mentionName.split(' ')[0];
+
+      // Check DB
       if (normalizedUserNames.includes(mentionName)) {
-        return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
+        // => => Markiere
+        // Der sichtbare Text (im Chat) kann aber weiterhin "@pauline ws" sein:
+        return `<span class="mention">@${mentionName}</span>`;
+        // oder wenn du den vollen Original-String beibehalten willst
+        // => `<span class="mention">${match}</span>`;
+      } else {
+        return match; // Keine Markierung
       }
-      return match;
     });
+
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
@@ -795,43 +810,40 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  // 1) splitMessage => max. 2 Wörter bei @...
-splitMessage(text: string): string[] {
-  // Regex wie in formatMentions
-  const mentionRegex = /(@[\w\-_!$*]+(?:\s+[\w\-_!$*]+)?)/g;
-  const parts = text.split(mentionRegex);
-  return parts
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0);
-}
-
-
+  splitMessage(text: string): string[] {
+    // Regex matcht: '@' + beliebige Nicht-Leerzeichen
+    // => bei erstem Space wird abgebrochen
+    // => z.B. "hey @Jim plus text" => ["hey", "@Jim", "plus text"]
+    const mentionRegex = /(@\S+)/g; 
+  
+    const parts = text.split(mentionRegex);
+    return parts
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+  }
 
   isMention(textPart: string): boolean {
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name
-        ? user.name
-            .toLowerCase()
-            .replace(/\s+/g, ' ')
-            .trim()
-        : ''
-    );
-  
-    // textPart z.B. "@Test  Name"
-    let mentionName = '';
-    if (textPart.startsWith('@')) {
-      mentionName = textPart.substring(1) // "Test  Name"
-        .toLowerCase()
-        // Entferne unsichtbare Whitespaces wie \u00A0:
-        .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
-        // Dann 2+ Spaces => 1 Space
-        .replace(/\s+/g, ' ')
-        .trim();
+    // 1) Muss mit '@' anfangen, sonst kein Mention
+    if (!textPart.startsWith('@')) {
+      return false;
     }
   
+    // 2) DB-Einträge normalisieren
+    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
+      user.name?.toLowerCase().replace(/\s+/g, ' ').trim() || ''
+    );
+  
+    // 3) => z.B. "@Jim"
+    let mentionName = textPart.substring(1) // => "Jim"
+      .toLowerCase()
+      .trim();
+  
+    // => Check in DB
     return normalizedUserNames.includes(mentionName);
   }
   
+  
+
   closeMentionBoxHandler() {
     this.wasClickedChatInput = false;
   }

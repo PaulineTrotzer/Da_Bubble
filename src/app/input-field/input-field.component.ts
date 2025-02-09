@@ -625,7 +625,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
 
   updateFormattedMessage() {
-    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
+    const regex = /@([\w\-\*_!$]+(?:\s+[\w\-\*_!$]+)?)/g;
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
       const mentionName = match.substring(1).trim().toLowerCase();
       const normalizedUserNames = this.mentionUserName.map((name) =>
@@ -665,13 +665,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   addEmoji(event: any) {
-    this.chatMessage = '';
-    this.formattedChatMessage = '';
     const emoji = event.emoji.native;
     this.chatMessage += emoji;
-    this.formattedMessage += emoji;
+    this.updateFormattedMessage();
+    const editableDiv = this.editableDivRef?.nativeElement;
+    if (editableDiv) {
+      editableDiv.innerHTML = this.formattedMessage;
+    }
     this.isEmojiPickerVisible = false;
   }
+
+  
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {

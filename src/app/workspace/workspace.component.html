@@ -156,7 +156,7 @@
             'message-drawer-closed': !messageDrawerOpen
           }">
           <div class="contacts">
-            <div class="contact" (click)="selectCurrentUser()">
+            <div class="contact" (click)="selectUser(this.global.currentUserData)">
               <div class="active-user-div" [class.active]="selectedUser === global.currentUserData">
                 <img [src]="global.currentUserData.picture" class="avatar" />
                 <div class="status-border">

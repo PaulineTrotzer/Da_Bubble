@@ -140,6 +140,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   isOverlayOpen = false;
   mentionService = inject(MentionThreadService);
   localUserLastEmoji: any;
+  showTooltipForSenderEmoji: { [messageId: string]: boolean } = {};
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
@@ -150,8 +151,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.setCurrentUserId();
     this.checkIfSelfThread();
   }
-
-  showTooltipForSenderEmoji: { [messageId: string]: boolean } = {};
 
   toggleReactionInfoForSenderEmoji(messageId: string, show: boolean) {
     this.showTooltipForSenderEmoji[messageId] = show;
@@ -177,7 +176,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async initializeComponent(): Promise<void> {
     await this.initializeUser();
-    /*     await this.getAllUsersname(); */
   }
 
   subscribeToThreadChanges() {
@@ -261,7 +259,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       );
       return;
     }
-
     if (!this.selectedUser || !this.selectedUser.id) {
       console.warn(
         'selectedUser oder dessen ID ist nicht definiert:',
@@ -330,43 +327,19 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   }
 
   async handleMentionClick(mention: string) {
-    console.log('[handleMentionClick] mention raw:', mention);
-
     this.wasClickedInDirectThread = true;
-
-    // Falls das mention ein @-Zeichen hat, entfernen
     const cleanName = mention.substring(1).trim().toLowerCase();
     console.log('[handleMentionClick] cleanName:', cleanName);
-
-    // User per Service laden
     const user = await this.mentionService.ensureUserDataLoaded(cleanName);
-    console.log('[handleMentionClick] found user:', user);
-
     if (!user) {
-      console.warn('[handleMentionClick] No user found for:', mention);
       return;
     }
-
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
-    console.log('[handleMentionClick] Mention box opened for user:', user.name);
   }
 
   closeMentionBoxHandler() {
     this.wasClickedInDirectThread = false;
-  }
-
-  splitMessage(text: string | undefined): string[] {
-    if (!text) {
-      return [];
-    }
-    const regex = /(@[\w\-_!$*]+)/g;
-    const parts = text.split(regex);
-    const cleanedParts = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
-
-    return cleanedParts;
   }
 
   cancelEdit() {
@@ -698,7 +671,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.shouldScrollToBottom = false;
     await updateDoc(threadMessageRef, { reactions });
   }
-  
 
   async saveLastUsedEmoji(uid: string, emoji: string) {
     const emojiDocRef = doc(

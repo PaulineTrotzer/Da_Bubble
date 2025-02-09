@@ -251,6 +251,7 @@ export class WorkspaceComponent implements OnInit {
 
   selectCurrentUser() {
     this.selectedChannel = null;
+    this.userService.setSelectedUser(this.global.currentUserData);
     this.selectedUser = this.global.currentUserData;
     this.userSelected.emit(this.global.currentUserData);
     this.global.statusCheck = true;
