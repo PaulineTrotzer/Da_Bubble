@@ -195,7 +195,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
 
-
     if (this.selectedChannel && !this.isChannelThreadOpen) {
       await this.sendChannelMessage();
     } else if (this.isDirectThreadOpen && this.selectedUser) {
@@ -586,13 +585,17 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   getByUserName() {
-    const docRef = collection(this.firestore, 'users');
-    onSnapshot(docRef, (querySnapshot) => {
+    const usersCollection = collection(this.firestore, 'users');
+    onSnapshot(usersCollection, (querySnapshot) => {
       this.mentionUserName = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const userName = data['name'];
-        this.mentionUserName.push(userName);
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        // Statt data['name'] -> data['username']:
+        const userName = data['username'];
+        // Optional: Normalisiert abspeichern:
+        if (userName) {
+          this.mentionUserName.push(userName.toLowerCase().trim());
+        }
       });
     });
   }
@@ -620,25 +623,29 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   handleCardClosed() {
-    this.isMentionPeopleCardVisible = false; 
+    this.isMentionPeopleCardVisible = false;
   }
 
-
   updateFormattedMessage() {
-    const regex = /@([\w\-\*_!$]+(?:\s+[\w\-\*_!$]+)?)/g;
+    const regex = /@([\w\-\*_!$]+(?:\s+[\w\-\*_!$]+)*)/g
+
+    console.log('mentionUserName ARRAY:', this.mentionUserName); // Debug
+
     this.formattedMessage = this.chatMessage.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim().toLowerCase();
+      const mentionName = match.substring(1).toLowerCase().trim();
+      console.log('mentionName GETIPPT:', mentionName); // Debug
+
       const normalizedUserNames = this.mentionUserName.map((name) =>
-        name.trim().toLowerCase()
+        name.toLowerCase().trim()
       );
+      console.log('normalizedUserNames:', normalizedUserNames);
 
       if (normalizedUserNames.includes(mentionName)) {
-        return `<span class="mention">${match.trim()}</span>`;
+        return `<span class="mention">${match}</span>`;
       } else {
-        return match.trim();
+        return match;
       }
     });
-    this.formattedMessage = this.formattedMessage.replace(/\s\s+/g, ' ');
   }
 
   onInput(event: Event): void {
@@ -674,8 +681,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
     this.isEmojiPickerVisible = false;
   }
-
-  
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -721,19 +726,19 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Es kann nur eine Datei hochgeladen werden.');
       this.multipleFilesErrorMessage =
         'Es kann nur eine Datei hochgeladen werden.';
-      this.fileTooLargeMessage = null; 
+      this.fileTooLargeMessage = null;
       return;
     }
 
     if (input.files && input.files.length > 0) {
-      const selectedFile = input.files[0]; 
+      const selectedFile = input.files[0];
       const allowedTypes = ['image/', 'application/pdf'];
 
       if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
         console.error('Unsupported file type:', selectedFile.type);
         this.fileTooLargeMessage =
           'Nur Bilder und PDFs können hochgeladen werden.';
-        this.multipleFilesErrorMessage = null; 
+        this.multipleFilesErrorMessage = null;
         return;
       }
 
@@ -745,7 +750,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
           data: reader.result as string,
         };
 
-
         this.inputFieldService.updateFiles(componentId, [fileData]);
         const chatDiv = this.editableDivRef.nativeElement;
         if (chatDiv) {
@@ -754,7 +758,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       };
       reader.readAsDataURL(selectedFile);
 
-      input.value = ''; 
+      input.value = '';
     }
   }
 
@@ -774,7 +778,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
       this.multipleFilesErrorMessage =
         'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
-      this.fileTooLargeMessage = null; 
+      this.fileTooLargeMessage = null;
       return;
     }
 

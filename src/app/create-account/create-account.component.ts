@@ -55,38 +55,54 @@ export class CreateAccountComponent implements OnInit {
     }
   }
 
+  makeSlug(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '');
+  }
+
+  generateUsername(fullName: string): string {
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[0];
+    const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+    const base = lastName ? `${firstName} ${lastName}` : firstName;
+
+    return this.makeSlug(base);
+  }
+
   async createAuthUser(email: string, password: string) {
-    debugger;
-    if (this.userLoggedIn && this.userLoggedIn === email.trim().toLowerCase()) {
-      this.userError = true;
-      return;
-    }
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        this.auth,
-        email,
-        password
-      );
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       const authUser = userCredential.user;
+  
+      const generatedUsername = this.generateUsername(this.userData.name);
       this.newUser = new User({
         uid: authUser.uid,
         name: this.userData.name,
+        username: generatedUsername,
         email: authUser.email || email,
         picture: '',
         password: '',
         status: 'offline',
       });
-      this.openLinkSend();
-      await sendEmailVerification(authUser);
+  
       await this.addUserToFirestore(this.newUser);
+  
+      // Direkt zur Avatar-Seite
+      this.router.navigate(['/avatar', this.newUser.uid]);
+  
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
-       this.linkAlreadySended = true;
+        this.linkAlreadySended = true;
       } else {
         console.error('Fehler beim Erstellen des Benutzers:', error);
       }
     }
   }
+  
 
   async addUserToFirestore(user: User) {
     try {

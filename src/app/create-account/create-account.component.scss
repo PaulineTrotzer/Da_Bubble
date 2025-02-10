@@ -274,7 +274,9 @@ input[type="checkbox"] {
   top: 66px;
   left: 22px;
   font-size: 12px;
-  color: red;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
 }
 .top {
   top: 28px !important;
@@ -336,7 +338,9 @@ input[type="checkbox"] {
   }
 }
 .err-user-exists {
-  background-color: red;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
 }
 
 @media (max-width: 930px) {

@@ -190,17 +190,11 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   isCurrentUserSender(message: any): boolean {
-    // Falls du IDs verwendest:
     return message.senderId === this.global.currentUserData.uid;
-    // Oder bei Namensvergleich:
-    // return message.senderName === this.global.currentUserData.name;
   }
 
   isCurrentUserRecipient(message: any): boolean {
-    // Falls du IDs verwendest:
     return message.recipientId === this.global.currentUserData.uid;
-    // Oder bei Namensvergleich:
-    // return message.recipientName === this.global.currentUserData.name;
   }
 
   async updateExistingMessage(
@@ -811,39 +805,30 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   splitMessage(text: string): string[] {
-    // Regex matcht: '@' + beliebige Nicht-Leerzeichen
-    // => bei erstem Space wird abgebrochen
-    // => z.B. "hey @Jim plus text" => ["hey", "@Jim", "plus text"]
-    const mentionRegex = /(@\S+)/g; 
-  
+    // Captured: @ + alle Zeichen bis zum nächsten Leerzeichen
+    const mentionRegex = /(@[\w\-\*_!$]+)/g;
     const parts = text.split(mentionRegex);
-    return parts
-      .map((p) => p.trim())
-      .filter((p) => p.length > 0);
+
+    return parts.map((p) => p.trim()).filter((p) => p.length > 0);
   }
 
   isMention(textPart: string): boolean {
-    // 1) Muss mit '@' anfangen, sonst kein Mention
+    // Muss mit '@' anfangen
     if (!textPart.startsWith('@')) {
       return false;
     }
   
-    // 2) DB-Einträge normalisieren
+    // "Alles" nach dem '@'
+    const mentionName = textPart.substring(1).toLowerCase().trim();
+  
+    // Vergleiche mit dem Feld `username` (nicht `name`)
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name?.toLowerCase().replace(/\s+/g, ' ').trim() || ''
+      (user.username ?? '').toLowerCase().trim()
     );
   
-    // 3) => z.B. "@Jim"
-    let mentionName = textPart.substring(1) // => "Jim"
-      .toLowerCase()
-      .trim();
-  
-    // => Check in DB
     return normalizedUserNames.includes(mentionName);
   }
   
-  
-
   closeMentionBoxHandler() {
     this.wasClickedChatInput = false;
   }
@@ -883,8 +868,9 @@ export class ChatComponent implements OnInit, OnChanges {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     const foundUser = this.getAllUsersName.find(
-      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
+      (user) => (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
     );
+    
     if (!foundUser) {
       console.warn('Benutzer nicht gefunden:', name);
       return null;
@@ -897,19 +883,21 @@ export class ChatComponent implements OnInit, OnChanges {
     return new Promise((resolve) => {
       onSnapshot(userRef, (querySnapshot) => {
         this.getAllUsersName = [];
-        querySnapshot.forEach((doc) => {
-          const dataUser = doc.data();
+        querySnapshot.forEach((docSnap) => {
+          const dataUser = docSnap.data();
           this.getAllUsersName.push({
+            id: docSnap.id,
             name: dataUser['name'],
+            username: dataUser['username'] || '',  // <-- Wichtig, falls du es brauchst!
             email: dataUser['email'],
             picture: dataUser['picture'] || 'assets/img/default-avatar.png',
-            id: doc.id,
           });
         });
         resolve();
       });
     });
   }
+  
 
   scrollHeightInput: any;
 

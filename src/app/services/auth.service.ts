@@ -49,7 +49,6 @@ export class AuthService {
     });
   }
 
-
   initAuthListener() {
     const auth = getAuth();
 
@@ -118,7 +117,10 @@ export class AuthService {
         this.globalVariable.setCurrentUserData(this.user);
         this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
-        this.router.navigate(['/welcome', this.user.uid]);
+        this.router.navigate(['/welcome', this.user.uid]).then(() => {
+          // >>> WICHTIG: Reload NACH erfolgreicher Navigation <<<
+          window.location.reload();
+        });
         setTimeout(() => {
           this.LogInAuth.setLoginSuccessful(false);
         }, 1500);
@@ -132,14 +134,17 @@ export class AuthService {
     const userRef = doc(this.firestore, 'users', user.uid);
     const userSnapshot = await getDoc(userRef);
     if (!userSnapshot.exists()) {
+      const slugUsername = this.generateUsername(user.name || 'Benutzer');
+
       await setDoc(userRef, {
         name: user.name || 'Benutzer',
+        username: slugUsername,
         email: user.email,
         picture: user.picture || '',
         createdAt: new Date(),
         googleAccount: true,
       });
-      console.log('User erstellt.');
+      console.log('Google-User erstellt.', slugUsername);
     } else {
       const existingUserData = userSnapshot.data();
       if (!existingUserData?.['googleAccount']) {
@@ -150,6 +155,23 @@ export class AuthService {
         console.log('User ist bereits ein Google-Account Nutzer.');
       }
     }
+  }
+
+   generateUsername(fullName: string): string {
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[0];
+    const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+    const base = lastName ? `${firstName} ${lastName}` : firstName;
+    return this.makeSlug(base);
+  }
+
+   makeSlug(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '');
   }
 
   async logOut() {
@@ -184,6 +206,7 @@ export class AuthService {
       const guestUser = new User({
         uid: result.user.uid,
         name: 'Gast',
+        username: 'Gast',
         email: `guest_${result.user.uid}@anonymous.com`,
         picture: './assets/img/picture_frame.png',
         status: 'online',

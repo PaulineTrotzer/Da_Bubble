@@ -1,6 +1,7 @@
 export class User {
     uid: string;
     name: string;
+    username: string;
     email: string;
     password: string;
     picture?: string;
@@ -11,6 +12,7 @@ export class User {
     constructor(obj?: any, uid?: string) {
       this.uid = uid || obj?.uid || '';
       this.name = obj?.name || '';
+      this.username = obj?.username || '';
       this.email = obj?.email || '';
       this.password = obj?.password || '';
       this.picture = obj?.picture || 'assets/img/picture_frame.png';
@@ -23,6 +25,7 @@ export class User {
       return {
         uid: this.uid,
         name: this.name,
+        username: this.username,
         email: this.email,
         picture: this.picture,
         status: this.status,

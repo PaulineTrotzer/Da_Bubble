@@ -1,6 +1,6 @@
 .profile-card-ct {
   position: absolute;
-  z-index:50;
+  z-index: 50;
   height: 610px;
   background-color: white;
   top: 85px;
@@ -114,6 +114,8 @@
   display: flex;
   justify-content: center;
   margin: 10px 0 0 35px;
+  max-width: 320px;
+  word-break: break-all;
 }
 
 .online-status-div {
@@ -121,23 +123,23 @@
   gap: 8px;
 }
 
-@media(max-width:750px){
-  .profile-card-ct{
+@media (max-width: 750px) {
+  .profile-card-ct {
     width: unset;
     height: unset;
     padding-bottom: 26px;
   }
 
-  .img-frame{
-      img{
-        width: 150px;
-        height: 150px;    
-      }
+  .img-frame {
+    img {
+      width: 150px;
+      height: 150px;
+    }
   }
 
-  .edit-option-title{
-    height: unset; 
+  .edit-option-title {
+    height: unset;
     display: flex;
     align-items: center;
-} 
+  }
 }

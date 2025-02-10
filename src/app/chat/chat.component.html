@@ -252,7 +252,8 @@
     message.senderSticker === message.recipientSticker
     ; else differentStickers
   ">
-                                <div class="comment-sticker-holder" [ngClass]="{
+                                <div *ngIf="(message.text && message.text.trim() !== '')" class="comment-sticker-holder"
+                                    [ngClass]="{
       'comment-sticker-holder-partner': message.senderName === selectedUser.name
     }">
                                     <!-- EIN gemeinsamer Sticker-Item mit Counter=2 -->
@@ -283,7 +284,7 @@
                             <!-- B) Unterschiedliche Sticker oder nur einer => Standard-Code -->
                             <ng-template #differentStickers>
                                 <div class="comment-sticker-holder" [ngClass]="{
-      'comment-sticker-holder-partner': message.senderName === selectedUser.name
+      'comment-sticker-holder-partner': message.senderName === selectedUser?.name
     }">
                                     <!-- SENDER-STICKER -->
                                     <div class="sticker-item" *ngIf="message.senderSticker !== ''" (mouseenter)="

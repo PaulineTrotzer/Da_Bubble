@@ -82,13 +82,13 @@ export class WorkspaceComponent implements OnInit {
     this.global.currentUserData$.subscribe((data: any) => {
       this.currentUserData = data;
     });
-    this.initializeChannelsAndUsers();
-    this.observeUserChanges();
-    this.subscribeToGuestLoginStatus();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.initializeUserData(this.userId);
     }
+    this.initializeChannelsAndUsers();
+    this.observeUserChanges();
+    this.subscribeToGuestLoginStatus();
     this.subscribeToWorkspaceChanges();
   }
 
@@ -170,24 +170,6 @@ export class WorkspaceComponent implements OnInit {
     );
   }
 
-  
-/*   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['selectedUserHome'] &&
-      !changes['selectedUserHome'].firstChange
-    ) {
-      this.selectedUser = this.selectedUserHome;
-      this.userSelected.emit(this.selectedUser);
-    }
-    if (
-      changes['selectedChannelHome'] &&
-      !changes['selectedChannelHome'].firstChange
-    ) {
-      this.selectedChannel = this.selectedChannelHome;
-      this.channelSelected.emit(this.selectedChannel);
-    }
-  } */
-
   selectUser(user: any) {
     this.userService.setSelectedUser(user);
     this.selectedChannel = null;
@@ -249,14 +231,6 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  selectCurrentUser() {
-    this.selectedChannel = null;
-    this.userService.setSelectedUser(this.global.currentUserData);
-    this.selectedUser = this.global.currentUserData;
-    this.userSelected.emit(this.global.currentUserData);
-    this.global.statusCheck = true;
-    this.checkWidtSize();
-  }
 
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
@@ -354,7 +328,6 @@ export class WorkspaceComponent implements OnInit {
     onSnapshot(usersCollection, (snapshot) => {
       this.allUsers = [];
       this.checkUsersExsists = false;
-
       snapshot.forEach((doc) => {
         const userData = { id: doc.id, ...doc.data() };
         if (doc.id !== this.userId && this.isValidUser(userData)) {
@@ -370,7 +343,6 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
-/*     this.workspaceService.updateChannel(channel); */
     this.selectedUser = null;
     this.selectedChannel = null;
     setTimeout(() => {

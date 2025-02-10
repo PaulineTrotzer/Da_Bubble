@@ -7,7 +7,7 @@ describe('StartScreenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [StartScreenComponent] // Verwende declarations statt imports
+      declarations: [StartScreenComponent] 
     }).compileComponents();
 
     fixture = TestBed.createComponent(StartScreenComponent);
