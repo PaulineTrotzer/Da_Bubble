@@ -336,7 +336,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendDirectThreadMessage() {
-    console.log('Start sending direct thread message...');
     if (
       !this.isDirectThreadOpen ||
       (this.chatMessage.trim() === '' &&
@@ -363,8 +362,8 @@ export class InputFieldComponent implements OnInit, OnChanges {
       return;
     }
 
-    console.log('selectedUser.uid:', this.selectedUser.uid);
-    if (!this.selectedUser.uid) {
+    console.log('selectedUser.uid:', this.selectedUser.id);
+    if (!this.selectedUser.id) {
       console.error('Keine UID bei selectedUser vorhanden.');
       return;
     }
@@ -394,20 +393,13 @@ export class InputFieldComponent implements OnInit, OnChanges {
           type: file.type,
         })),
         editedTextShow: false,
-        recipientId: this.selectedUser.uid,
+        recipientId: this.selectedUser.id,
         recipientName: this.selectedUser.name ?? '',
         reactions: '',
       };
-      console.log(
-        'Sende final: selectedUser.name =',
-        this.selectedUser.name,
-        ' => messageData =',
-        messageData
-      );
       console.log('messageData:', messageData);
       await addDoc(threadMessagesRef, messageData);
       console.log('Message successfully sent to Firestore!');
-
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {
@@ -434,14 +426,14 @@ export class InputFieldComponent implements OnInit, OnChanges {
 
   async setMessageCount() {
     try {
-      if (!this.userId || !this.selectedUser?.uid) {
+      if (!this.userId || !this.selectedUser?.id) {
         console.error('User ID or selected user ID is missing.');
         return;
       }
       const messageCountDocRef = doc(
         this.firestore,
         'messageCounts',
-        this.selectedUser?.uid
+        this.selectedUser?.id
       );
       const userUpdate: any = {};
       userUpdate[`messageCount.${this.userId}`] = increment(1);

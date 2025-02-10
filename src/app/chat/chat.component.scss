@@ -22,7 +22,7 @@
   justify-content: flex-start;
   align-items: center;
   padding: 5px 12px;
-/*   gap: 8px; */
+  gap: 8px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -81,7 +81,7 @@ app-input-field {
   bottom: 30px;
   transform: translateX(-50%);
   width: 100%;
-  padding: 16px 24px;
+  padding: 8px 24px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background-color: rgba(255, 255, 255, 0.85);

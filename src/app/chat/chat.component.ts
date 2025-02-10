@@ -888,7 +888,7 @@ export class ChatComponent implements OnInit, OnChanges {
           this.getAllUsersName.push({
             id: docSnap.id,
             name: dataUser['name'],
-            username: dataUser['username'] || '',  // <-- Wichtig, falls du es brauchst!
+            username: dataUser['username'] || '',
             email: dataUser['email'],
             picture: dataUser['picture'] || 'assets/img/default-avatar.png',
           });

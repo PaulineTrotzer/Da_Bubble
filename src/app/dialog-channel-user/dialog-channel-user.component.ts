@@ -30,30 +30,38 @@ export class DialogChannelUserComponent implements OnInit {
   detailedMember: any;
   showDetails: boolean = false;
   workspaceService = inject(WorkspaceService);
-  memberDataService=inject(MemberDataService);
+  memberDataService = inject(MemberDataService);
   membersSubscription?: Subscription;
   channelSubscription?: Subscription;
+  guest = true;
 
   ngOnInit(): void {
-    this.membersSubscription = this.memberDataService.members$.subscribe(
-      (members) => {
-        this.members = members;
-        this.allMembers.push(...members); 
+    this.subscribeMembers();
+    this.subscribeChannel();
+  }
+
+  subscribeMembers() {
+    this.membersSubscription = this.memberDataService.members$.subscribe({
+      next: (members) => {
+        this.allMembers = members.filter((m) => m?.name && m.name !== 'Gast');
       },
-      (error) => {
-        console.error('Fehler beim Abrufen der Mitglieder:', error);
-      }
-    );
-  
-    this.channelSubscription = this.memberDataService.channel$.subscribe(
-      (channel) => {
+      error: (err) => {
+        console.error('Fehler beim Abrufen der Mitglieder:', err);
+      },
+    });
+  }
+
+  subscribeChannel() {
+    this.channelSubscription = this.memberDataService.channel$.subscribe({
+      next: (channel) => {
         this.channel = channel;
       },
-      (error) => {
-        console.error('Fehler beim Abrufen des Channels:', error);
-      }
-    );
+      error: (err) => {
+        console.error('Fehler beim Abrufen des Channels:', err);
+      },
+    });
   }
+
   ngOnDestroy() {
     if (this.membersSubscription) {
       this.membersSubscription.unsubscribe();
@@ -62,7 +70,6 @@ export class DialogChannelUserComponent implements OnInit {
       this.channelSubscription.unsubscribe();
     }
   }
-
 
   closeDialog() {
     this.dialog.closeAll();
@@ -83,8 +90,6 @@ export class DialogChannelUserComponent implements OnInit {
       maxHeight: '294px',
     });
   }
-
-  
 
   openProfileDialog(member: any) {
     this.closeDialog();
