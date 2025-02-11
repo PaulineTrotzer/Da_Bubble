@@ -137,6 +137,7 @@ export class ChatComponent implements OnInit, OnChanges {
   isSelfChat?: boolean;
   hasNoMessages?: boolean;
   isOverlayOpen = false;
+  showReactionPopUpSenderAtCu: { [messageId: string]: boolean } = {};
 
   constructor() {}
 
@@ -161,6 +162,19 @@ export class ChatComponent implements OnInit, OnChanges {
     });
     this.updateSubscriptionText();
     await this.getAllUsersname();
+    this.messagesData.forEach(msg => {
+      this.showReactionPopUpSenderAtCu[msg.id] = false;
+    });
+  }
+
+  toggleReactionInfoSender(messageId: string, status: boolean) {
+    this.showReactionPopUpSenderAtCu[messageId] = status;
+  }
+
+  showReactionPopUpRecipientAtCu: { [messageId: string]: boolean } = {};
+  // Neu: Aufgerufen vom EMPFÄNGER-Hover
+  toggleReactionInfoRecipient(messageId: string, status: boolean) {
+    this.showReactionPopUpRecipientAtCu[messageId] = status;
   }
 
   isFirstDayInfoVisible(i: number): boolean {

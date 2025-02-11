@@ -118,7 +118,6 @@ export class AuthService {
         this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
         this.router.navigate(['/welcome', this.user.uid]).then(() => {
-          // >>> WICHTIG: Reload NACH erfolgreicher Navigation <<<
           window.location.reload();
         });
         setTimeout(() => {

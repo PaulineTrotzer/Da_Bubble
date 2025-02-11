@@ -28,7 +28,6 @@ import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { OverlayStatusService } from '../services/overlay-status.service';
 import { filter, firstValueFrom, Subject, Subscription, takeUntil } from 'rxjs';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { ThreadControlService } from '../services/thread-control.service';
@@ -166,7 +165,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       const mentionName = target.textContent?.trim();
       if (mentionName) {
         if (this.getAllUsersName.length === 0) {
-          console.warn('Mentions-Daten sind noch nicht geladen.');
           return;
         }
         this.handleMentionClick(mentionName);
@@ -829,7 +827,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.global.currentThreadMessageSubject.next(null);
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-
     this.unsubscribe$ = new Subject<void>();
   }
 
