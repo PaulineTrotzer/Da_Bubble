@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { getAuth, signInWithPopup, signOut } from '@angular/fire/auth';
+import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInAnonymously } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { User } from '../models/user.class';
 import {
   Firestore,
@@ -18,9 +17,9 @@ import {
 import { OverlayStatusService } from './overlay-status.service';
 import { GlobalService } from '../global.service';
 import { LoginAuthService } from './login-auth.service';
-import { onAuthStateChanged } from '@angular/fire/auth';
 import { GlobalVariableService } from './global-variable.service';
 import { BehaviorSubject } from 'rxjs';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +39,7 @@ export class AuthService {
   workspaceInitializedSubject = new BehaviorSubject<boolean>(false);
 
   constructor() {
+    // Falls du beim Fenster-Schließen offline setzen willst:
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -89,11 +89,10 @@ export class AuthService {
         console.error('Fehler beim Aktualisieren des Benutzerstatus: ', err);
       }
     } else {
-      console.warn(
-        `Dokument für Benutzer ${userId} existiert nicht. Wird übersprungen.`
-      );
+      console.warn(`Dokument für Benutzer ${userId} existiert nicht. Übersprungen.`);
     }
   }
+
   async googleLogIn() {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
@@ -114,12 +113,16 @@ export class AuthService {
           email: email,
         });
         await this.saveUserAfterLogin(this.user);
+
         this.globalVariable.setCurrentUserData(this.user);
         this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
+
+        // Nach dem Login zur Welcome-Seite, dann reload:
         this.router.navigate(['/welcome', this.user.uid]).then(() => {
           window.location.reload();
         });
+
         setTimeout(() => {
           this.LogInAuth.setLoginSuccessful(false);
         }, 1500);
@@ -129,17 +132,27 @@ export class AuthService {
     }
   }
 
-  async saveUserAfterLogin(user: any) {
+  async saveUserAfterLogin(user: User) {
     const userRef = doc(this.firestore, 'users', user.uid);
     const userSnapshot = await getDoc(userRef);
-    if (!userSnapshot.exists()) {
-      const slugUsername = this.generateUsername(user.name || 'Benutzer');
 
+    if (!userSnapshot.exists()) {
+      let finalPhotoUrl = user.picture || '';
+
+      if (user.picture) {
+        try {
+          finalPhotoUrl = await this.uploadGooglePhotoToStorage(user.picture, user.uid);
+        } catch (e) {
+          console.warn('Konnte Google-Foto nicht hochladen, nutze leer', e);
+        }
+      }
+
+      const slugUsername = this.generateUsername(user.name || 'Benutzer');
       await setDoc(userRef, {
         name: user.name || 'Benutzer',
         username: slugUsername,
         email: user.email,
-        picture: user.picture || '',
+        picture: finalPhotoUrl,
         createdAt: new Date(),
         googleAccount: true,
       });
@@ -147,16 +160,32 @@ export class AuthService {
     } else {
       const existingUserData = userSnapshot.data();
       if (!existingUserData?.['googleAccount']) {
-        console.log(
-          'User bereits vorhanden, keine Überschreibung des Google Accounts.'
-        );
+        console.log('User bereits vorhanden, kein Überschreiben des Google Accounts.');
       } else {
         console.log('User ist bereits ein Google-Account Nutzer.');
       }
     }
   }
 
-   generateUsername(fullName: string): string {
+  private async uploadGooglePhotoToStorage(googlePhotoURL: string, userUid: string): Promise<string> {
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `avatars/${userUid}/googlePhoto.jpg`);
+      const response = await fetch(googlePhotoURL);
+      if (!response.ok) {
+        throw new Error('Fehler beim Laden des Google-Fotos: ' + response.status);
+      }
+      const blob = await response.blob();
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error('uploadGooglePhotoToStorage:', error);
+      throw error;
+    }
+  }
+
+  generateUsername(fullName: string): string {
     const parts = fullName.trim().split(/\s+/);
     const firstName = parts[0];
     const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
@@ -164,7 +193,7 @@ export class AuthService {
     return this.makeSlug(base);
   }
 
-   makeSlug(value: string): string {
+  makeSlug(value: string): string {
     return value
       .toLowerCase()
       .normalize('NFD')
