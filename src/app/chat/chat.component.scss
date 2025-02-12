@@ -48,9 +48,10 @@
   flex-direction: column;
   gap: 20px;
   overflow: auto;
-  height: 750px;
+  height: 730px;
   scroll-behavior: smooth !important;
   position: relative;
+  top: 17px;
 }
 
 .message-preview {
@@ -817,7 +818,6 @@ app-input-field {
 }
 
 .text-info-edit {
-  position: relative;
   font-size: 12px;
   position: absolute;
   bottom: -25px;
@@ -829,7 +829,7 @@ app-input-field {
 }
 
 .edited-recipient-view {
-  right: 0;
+  right: -50px;
 }
 
 .edited-both-view {
@@ -837,7 +837,7 @@ app-input-field {
 }
 
 .edited-sender-view {
-  left: 0;
+  left: -45px;
 }
 
 .mention-message {

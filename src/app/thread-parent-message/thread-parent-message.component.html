@@ -1,186 +1,60 @@
 <!-- Optional: Overlay, falls nötig -->
 <div *ngIf="isOverlay" class="overlay"></div>
 
-<!-- WICHTIG: Warte, bis pm UND currentUser existieren -->
-<div class="thread-container" *ngIf="pm && currentUser; else loadingState">
-    <!-- Dein gesamtes Thread-Layout (Messages, etc.) -->
-
-
-    <!-- Hier beginnt dein eigentlicher Thread-Code -->
-
-    <!-- Haupt-Container für eine Parent-Nachricht / "color-separator" -->
-    <div class="color-separator" (mouseenter)="toggleOptionBar(pm.id, true)"
-        (mouseleave)="toggleOptionBar(pm.id, false)" [ngClass]="{
-         'first-separator': displayDayInfoForParent()
-       }">
-
-        <!-- Anzeige "Neuer Tag" usw. -->
-        <div class="new-day-info">
-            <div class="day-info">
-                <div class="line"></div>
-                <span class="day-span">{{ displayDayInfoForParent() }}</span>
-            </div>
-        </div>
-
-        <!-- Sticker-Hover-Icons (Edit & Reaction), je nach User rechts/links -->
-        <div class="sticker-hover-ct" *ngIf="showOptionBar[pm.id]"
-            [ngClass]="pm.senderId === currentUser.uid ? 'left-hover' : 'right-hover'">
-            <div class="show-set" [ngClass]="pm.senderId === currentUser.uid ? 'show-set-right' : 'show-set-left'"
-                @slideIn>
-                <div class="img-flex-bar-options">
-
-                    <!-- Edit-Wrapper nur für eigenen User -->
-                    <div class="edit-wrapper" *ngIf="pm.senderId === currentUser.uid">
-                        <!-- Edit-Icon -->
-                        <div class="edit-icon-holder" (mouseenter)="toggleEditOption(pm.id, true)">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
-                                    y="8" width="24" height="24">
-                                    <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
-                                </mask>
-                                <g mask="url(#mask0_1817_16003)">
-                                    <path
-                                        d="M20 28C19.45 28 18.9792 27.8042 18.5875 27.4125C18.1958 27.0208 18 26.55 18 26C18 25.45 18.1958 24.9792 18.5875 24.5875C18.9792 24.1958 19.45 24 20 24C20.55 24 21.0208 24.1958 21.4125 24.5875C21.8042 24.9792 22 25.45 22 26C22 26.55 21.8042 27.0208 21.4125 27.4125C21.0208 27.8042 20.55 28 20 28ZM20 22C19.45 22 18.9792 21.8042 18.5875 21.4125C18.1958 21.0208 18 20.55 18 20C18 19.45 18.1958 18.9792 18.5875 18.5875C18.9792 18.1958 19.45 18 20 18C20.55 18 21.0208 18.1958 21.4125 18.5875C21.8042 18.9792 22 19.45 22 20C22 20.55 21.8042 21.0208 21.4125 21.4125C21.0208 21.8042 20.55 22 20 22ZM20 16C19.45 16 18.9792 15.8042 18.5875 15.4125C18.1958 15.0208 18 14.55 18 14C18 13.45 18.1958 12.9792 18.5875 12.5875C18.9792 12.1958 19.45 12 20 12C20.55 12 21.0208 12.1958 21.4125 12.5875C21.8042 12.9792 22 13.45 22 14C22 14.55 21.8042 15.0208 21.4125 15.4125C21.0208 15.8042 20.55 16 20 16Z"
-                                        fill="#1C1B1F" />
-                                </g>
-                            </svg>
-                        </div>
-                        <!-- / Edit-Icon -->
-
-                        <!-- Edit-Karte (Optional) -->
-                        <mat-card *ngIf="showEditOption[pm.id] && !editWasClicked" class="edit-messages-card"
-                            appearance="outlined" (mouseleave)="toggleEditOption(pm.id, false)">
-                            <mat-card-content class="edit-message-content" (click)="editMessage(pm)"
-                                (mouseleave)="toggleEditOption(pm.id, false)">
-                                <span *ngIf="!editWasClicked">Nachricht bearbeiten</span>
-                            </mat-card-content>
-                        </mat-card>
-                    </div>
-                    <!-- / edit-wrapper -->
-
-                    <!-- Reaction-Icon (Emoji) -->
-                    <div class="add-reaction-ct" (click)="openEmojiPicker()">
-                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
-                                width="24" height="24">
-                                <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
-                            </mask>
-                            <g mask="url(#mask0_489_4318)">
-                                <path
-                                    d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30Z"
-                                    fill="black" />
-                            </g>
-                        </svg>
-                    </div>
-
-                    <!-- Last-Emoji (Global) -->
-                    <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
-                        (click)="applyGlobalEmoji(currentUser.lastUsedEmoji, pm)">
-                        <span class="single-emoji">
-                            {{ currentUser.lastUsedEmoji }}
-                        </span>
-                    </div>
-                    <!-- / Reaction-Icon -->
+<ng-container>
+    <div *ngIf="pm && currentUser" class="thread-container" else #load>
+        <!-- Haupt-Container für eine Parent-Nachricht / "color-separator" -->
+        <div class="color-separator" (mouseenter)="toggleOptionBar(pm.id, true)"
+            (mouseleave)="toggleOptionBar(pm.id, false)" [ngClass]="{
+    'first-separator': displayDayInfoForParent()
+  }">
+            <!-- Anzeige "Neuer Tag" usw. -->
+            <div class="new-day-info">
+                <div class="day-info">
+                    <div class="line"></div>
+                    <span class="day-span">{{ displayDayInfoForParent() }}</span>
                 </div>
             </div>
-        </div>
-        <!-- / sticker-hover-ct -->
 
-        <!-- Emoji-Picker als Overlay -->
-        <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-            <div class="emoji-picker">
-                <emoji-mart (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event, pm)" class="emoji-picker"
-                    size="18">
-                </emoji-mart>
-            </div>
-        </div>
 
-        <!-- ================== MESSAGE-CONTAINER ================== -->
-        <div class="message-container" [ngClass]="{
-           'is-current-user': pm.senderId === currentUser.uid,
-           'is-partner': pm.senderId !== currentUser.uid,
-           'has-sticker': pm.senderSticker || pm.recipientSticker
-         }">
-            <!-- Avatar -->
-            <div class="avatar-container" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                <img [src]="pm.senderPicture" alt=" no Picture found " />
-            </div>
-            <!-- / avatar-container -->
-
-            <!-- Spalte für Name, Uhrzeit & Message-Bubble -->
-            <div class="message-column" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-
-                <!-- Name & Uhrzeit -->
-                <div class="time-name-flex" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                    <h4>
-                        {{
-                        pm.senderId === currentUser.uid
-                        ? currentUser.name
-                        : selectedUser.name
-                        }}
-                    </h4>
-                    <span class="message-time">
-                        {{ pm.timestamp | date: 'HH:mm' }} Uhr
-                    </span>
-                </div>
-
-                <!-- ============ NORMALER MODUS vs. EDIT-MODUS ============ -->
-                <div (click)="handleClickOnMention($event)">
-                    <ng-container *ngIf="!(editWasClicked && editMessageId === pm.id); else editMode">
-                        <!-- =========== NORMALER MODUS =========== -->
-                        <div class="message-bubble" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                            <!-- Nachrichtentext -->
-                            <ng-container *ngFor="let mentionName of mentionService.splitMessage(pm.text)">
-                                <!-- FALL A: es ist ein @mention -->
-                                <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
-                                    (click)="handleMentionClick(mentionName)">
-                                    {{ mentionName }}
-                                </span>
-                                <!-- FALL B: normaler Text -->
-                                <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">
-                                    {{ mentionName }}
-                                </span>
-                            </ng-container>
-
-                            <!-- Dateianhänge -->
-                            <div class="show-selected-files" *ngIf="pm.selectedFiles?.length">
-                                <div *ngFor="let file of pm.selectedFiles">
-                                    <div class="file-info" *ngIf="file.url">
-                                        <!-- Bild -->
-                                        <ng-container *ngIf="file.type?.startsWith('image/')">
-                                            <a [href]="file.url" target="_blank">
-                                                <img [src]="file.url" alt="Image File" />
-                                            </a>
-                                        </ng-container>
-                                        <!-- PDF -->
-                                        <ng-container *ngIf="file.type === 'application/pdf'">
-                                            <a [href]="file.url" target="_blank">
-                                                <img src="../../assets/img/pdf.png" alt="PDF File" />
-                                            </a>
-                                        </ng-container>
-                                    </div>
-                                </div>
+            <!-- Sticker-Hover-Icons (Edit & Reaction), je nach User rechts/links -->
+            <div class="sticker-hover-ct" *ngIf="showOptionBar[pm.id]"
+                [ngClass]="pm.senderId === currentUser.uid ? 'left-hover' : 'right-hover'">
+                <div class="show-set" [ngClass]="pm.senderId === currentUser.uid ? 'show-set-right' : 'show-set-left'"
+                    @slideIn>
+                    <div class="img-flex-bar-options">
+                        <!-- Edit-Wrapper nur für eigenen User -->
+                        <div class="edit-wrapper" *ngIf="pm.senderId === currentUser.uid">
+                            <!-- Edit-Icon -->
+                            <div class="edit-icon-holder" (mouseenter)="toggleEditOption(pm.id, true)">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                                        y="8" width="24" height="24">
+                                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_1817_16003)">
+                                        <path
+                                            d="M20 28C19.45 28 18.9792 27.8042 18.5875 27.4125C18.1958 27.0208 18 26.55 18 26C18 25.45 18.1958 24.9792 18.5875 24.5875C18.9792 24.1958 19.45 24 20 24C20.55 24 21.0208 24.1958 21.4125 24.5875C21.8042 24.9792 22 25.45 22 26C22 26.55 21.8042 27.0208 21.4125 27.4125C21.0208 27.8042 20.55 28 20 28ZM20 22C19.45 22 18.9792 21.8042 18.5875 21.4125C18.1958 21.0208 18 20.55 18 20C18 19.45 18.1958 18.9792 18.5875 18.5875C18.9792 18.1958 19.45 18 20 18C20.55 18 21.0208 18.1958 21.4125 18.5875C21.8042 18.9792 22 19.45 22 20C22 20.55 21.8042 21.0208 21.4125 21.4125C21.0208 21.8042 20.55 22 20 22ZM20 16C19.45 16 18.9792 15.8042 18.5875 15.4125C18.1958 15.0208 18 14.55 18 14C18 13.45 18.1958 12.9792 18.5875 12.5875C18.9792 12.1958 19.45 12 20 12C20.55 12 21.0208 12.1958 21.4125 12.5875C21.8042 12.9792 22 13.45 22 14C22 14.55 21.8042 15.0208 21.4125 15.4125C21.0208 15.8042 20.55 16 20 16Z"
+                                            fill="#1C1B1F" />
+                                    </g>
+                                </svg>
                             </div>
+                            <!-- / Edit-Icon -->
 
-                            <!-- Bearbeitet-Hinweis -->
-                            <div class="text-info-edit" *ngIf="pm.editedTextShow"
-                                [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                                (Bearbeitet)
-                            </div>
+                            <!-- Edit-Karte (Optional) -->
+                            <mat-card *ngIf="showEditOption[pm.id] && !editWasClicked" class="edit-messages-card"
+                                appearance="outlined" (mouseleave)="toggleEditOption(pm.id, false)">
+                                <mat-card-content class="edit-message-content" (click)="editMessage(pm)"
+                                    (mouseleave)="toggleEditOption(pm.id, false)">
+                                    <span *ngIf="!editWasClicked">Nachricht bearbeiten</span>
+                                </mat-card-content>
+                            </mat-card>
                         </div>
-                    </ng-container>
-                </div>
+                        <!-- / edit-wrapper -->
 
-                <!-- =========== EDIT-MODUS =========== -->
-                <ng-template #editMode>
-                    <div class="message-bubble-edit">
-                        <!-- Textarea -->
-                        <textarea rows="3" class="edit-input" [(ngModel)]="editableMessageText">
-            </textarea>
-
-                        <!-- Emoji-Picker für Edit-Mode -->
-                        <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
+                        <!-- Reaction-Icon (Emoji) -->
+                        <div class="add-reaction-ct" (click)="openEmojiPicker()">
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -195,126 +69,254 @@
                             </svg>
                         </div>
 
-                        <div *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container"
-                            (click)="closePickerEdit()">
-                            <div class="emoji-picker">
-                                <emoji-mart (click)="letPickerEditVisible($event)" (emojiClick)="addEmojiToEdit($event)"
-                                    class="emoji-picker" size="18">
-                                </emoji-mart>
-                            </div>
+                        <!-- Last-Emoji (Global) -->
+                        <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
+                            (click)="applyGlobalEmoji(currentUser.lastUsedEmoji, pm)">
+                            <span class="single-emoji">
+                                {{ currentUser.lastUsedEmoji }}
+                            </span>
                         </div>
-
-                        <!-- Buttons: Speichern / Abbrechen -->
-                        <div class="option-flex">
-                            <img class="save-icon" src="assets/img/check-mark.svg" alt="Speichern"
-                                (click)="saveOrDeleteMessage(pm)" />
-                            <img class="cancel-icon" src="assets/img/cross.svg" alt="Abbrechen"
-                                (click)="cancelEdit()" />
-                        </div>
+                        <!-- / Reaction-Icon -->
                     </div>
-                </ng-template>
-                <!-- ================== REACTIONS / STICKERS ================== -->
-                <!-- Container für die Sticker/Emoji-Reaktionen -->
-                <div class="sticker-view-ct" [ngClass]="{
-               'sticker-view-right': pm.senderId === currentUser.uid,
-               'sticker-view-left': pm.senderId !== currentUser.uid
-             }">
-                    <!-- Fall A: Beide Sticker identisch => ein Emoji mit Counter "2" -->
-                    <ng-container *ngIf="
-              pm.senderSticker &&
-              pm.recipientSticker &&
-              pm.senderSticker === pm.recipientSticker;
-              else differentStickers
-            ">
-                        <div class="emoji-holder" (mouseenter)="toggleReactionBothInfo(pm.id, true)"
-                            (mouseleave)="toggleReactionBothInfo(pm.id, false)">
-                            <!-- EINE Emoji-Anzeige + Counter 2 -->
-                            <span class="single-emoji">{{ pm.senderSticker }}</span>
-                            <span class="reaction-counter">2</span>
+                </div>
+            </div>
+            <!-- / sticker-hover-ct -->
 
-                            <!-- Hover-Info (z. B. "Ihr beide habt mit … reagiert") -->
-                            <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpBoth[pm.id]"
-                                *ngIf="pm.senderSticker">
-                                <span class="reaction-info-txt">
-                                    Ihr beide habt mit
-                                    <span class="react-emoji-value">{{ pm.senderSticker }}</span>
-                                    reagiert
-                                </span>
+            <!-- Emoji-Picker als Overlay -->
+            <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                <div class="emoji-picker">
+                    <emoji-mart (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event, pm)"
+                        class="emoji-picker" size="18">
+                    </emoji-mart>
+                </div>
+            </div>
+
+            <!-- ================== MESSAGE-CONTAINER ================== -->
+            <div class="message-container" [ngClass]="{
+      'is-current-user': pm.senderId === currentUser.uid,
+      'is-partner': pm.senderId !== currentUser.uid,
+      'has-sticker': pm.senderSticker || pm.recipientSticker
+    }">
+                <!-- Avatar -->
+                <div class="avatar-container" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
+                    <img [src]="pm.senderPicture
+          " alt="
+          no Picture found
+        " />
+                </div>
+                <!-- / avatar-container -->
+
+                <!-- Spalte für Name, Uhrzeit & Message-Bubble -->
+                <div class="message-column" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
+                    <!-- Name & Uhrzeit -->
+                    <div class="time-name-flex" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
+                        <h4>
+                            {{
+                            pm.senderId === currentUser.uid
+                            ? currentUser.name
+                            : selectedUser.name
+                            }}
+                        </h4>
+                        <span class="message-time">
+                            {{ pm.timestamp | date: 'HH:mm' }} Uhr
+                        </span>
+                    </div>
+
+                    <!-- ============ NORMALER MODUS vs. EDIT-MODUS ============ -->
+                    <div (click)="handleClickOnMention($event)">
+                        <ng-container *ngIf="!(editWasClicked && editMessageId === pm.id); else editMode">
+                            <!-- =========== NORMALER MODUS =========== -->
+                            <div class="message-bubble"
+                                [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
+                                <!-- Nachrichtentext -->
+                                <ng-container *ngFor="let mentionName of mentionService.splitMessage(pm.text)">
+                                    <!-- FALL A: es ist ein @mention -->
+                                    <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
+                                        (click)="handleMentionClick(mentionName)">
+                                        {{ mentionName }}
+                                    </span>
+
+                                    <!-- FALL B: normaler Text -->
+                                    <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">
+                                        {{ mentionName }}
+                                    </span>
+                                </ng-container>
+
+                                <!-- Dateianhänge -->
+                                <div class="show-selected-files" *ngIf="pm.selectedFiles?.length">
+                                    <div *ngFor="let file of pm.selectedFiles">
+                                        <div class="file-info" *ngIf="file.url">
+                                            <!-- Bild -->
+                                            <ng-container *ngIf="file.type?.startsWith('image/')">
+                                                <a [href]="file.url" target="_blank">
+                                                    <img [src]="file.url" alt="Image File" />
+                                                </a>
+                                            </ng-container>
+                                            <!-- PDF -->
+                                            <ng-container *ngIf="file.type === 'application/pdf'">
+                                                <a [href]="file.url" target="_blank">
+                                                    <img src="../../assets/img/pdf.png" alt="PDF File" />
+                                                </a>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bearbeitet-Hinweis -->
+
                             </div>
-                        </div>
-                    </ng-container>
+                        </ng-container>
+                    </div>
 
-                    <!-- Fall B: Unterschiedliche Sticker oder nur einer vorhanden -->
-                    <ng-template #differentStickers>
-                        <!-- Sender-Sticker (falls vorhanden) -->
-                        <div class="emoji-holder" *ngIf="pm.senderSticker"
-                            (mouseenter)="toggleReactionSenderInfo(pm.id, true)"
-                            (mouseleave)="toggleReactionSenderInfo(pm.id, false)">
-                            <span class="single-emoji">{{ pm.senderSticker }}</span>
+                    <!-- =========== EDIT-MODUS =========== -->
+                    <ng-template #editMode>
+                        <div class="message-bubble-edit">
+                            <!-- Textarea -->
+                            <textarea rows="3" class="edit-input" [(ngModel)]="editableMessageText"></textarea>
 
-                            <!-- Infobox (am Sender-Emoji) -->
-                            <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpSender[pm.id]"
-                                *ngIf="pm.senderSticker">
-                                <span class="reaction-info-txt">
-                                    <ng-container *ngIf="pm.senderId === currentUser.uid; else partnerSenderText">
-                                        <!-- Falls currentUser = Sender -->
-                                        Du hast mit
-                                        <span class="react-emoji-value">{{ pm.senderSticker }}</span>
-                                        reagiert
-                                    </ng-container>
-                                    <ng-template #partnerSenderText>
-                                        {{ pm.senderName }} hat mit
-                                        <span class="react-emoji-value">{{ pm.senderSticker }}</span>
-                                        reagiert
-                                    </ng-template>
-                                </span>
+                            <!-- Emoji-Picker für Edit-Mode -->
+                            <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8"
+                                        y="8" width="24" height="24">
+                                        <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_489_4318)">
+                                        <path
+                                            d="M20 30C18.6167 30 17.3167 29.7375 16.1 29.2125C14.8833 28.6875 13.825 27.975 12.925 27.075C12.025 26.175 11.3125 25.1167 10.7875 23.9C10.2625 22.6833 10 21.3833 10 20C10 18.6167 10.2625 17.3167 10.7875 16.1C11.3125 14.8833 12.025 13.825 12.925 12.925C13.825 12.025 14.8833 11.3125 16.1 10.7875C17.3167 10.2625 18.6167 10 20 10C20.75 10 21.4792 10.0792 22.1875 10.2375C22.8958 10.3958 23.5667 10.625 24.2 10.925C24.1333 11.0917 24.0833 11.2667 24.05 11.45C24.0167 11.6333 24 11.8167 24 12C24 12.2333 24.025 12.4542 24.075 12.6625C24.125 12.8708 24.1917 13.0667 24.275 13.25C23.6583 12.8667 22.9917 12.5625 22.275 12.3375C21.5583 12.1125 20.8 12 20 12C17.7833 12 15.8958 12.7792 14.3375 14.3375C12.7792 15.8958 12 17.7833 12 20C12 22.2167 12.7792 24.1042 14.3375 25.6625C15.8958 27.2208 17.7833 28 20 28C22.2167 28 24.1042 27.2208 25.6625 25.6625C27.2208 24.1042 28 22.2167 28 20C28 19.3333 27.9208 18.6917 27.7625 18.075C27.6042 17.4583 27.3833 16.875 27.1 16.325C27.3667 16.5417 27.6583 16.7083 27.975 16.825C28.2917 16.9417 28.6333 17 29 17C29.0833 17 29.1708 16.9958 29.2625 16.9875C29.3542 16.9792 29.4417 16.9667 29.525 16.95C29.675 17.4333 29.7917 17.9292 29.875 18.4375C29.9583 18.9458 30 19.4667 30 20C30 21.3833 29.7375 22.6833 29.2125 23.9C28.6875 25.1167 27.975 26.175 27.075 27.075C26.175 27.975 25.1167 28.6875 23.9 29.2125C22.6833 29.7375 21.3833 30 20 30ZM23.5 19C23.9333 19 24.2917 18.8583 24.575 18.575C24.8583 18.2917 25 17.9333 25 17.5C25 17.0667 24.8583 16.7083 24.575 16.425C24.2917 16.1417 23.9333 16 23.5 16C23.0667 16 22.7083 16.1417 22.425 16.425C22.1417 16.7083 22 17.0667 22 17.5C22 17.9333 22.1417 18.2917 22.425 18.575C22.7083 18.8583 23.0667 19 23.5 19ZM16.5 19C16.9333 19 17.2917 18.8583 17.575 18.575C17.8583 18.2917 18 17.9333 18 17.5C18 17.0667 17.8583 16.7083 17.575 16.425C17.2917 16.1417 16.9333 16 16.5 16C16.0667 16 15.7083 16.1417 15.425 16.425C15.1417 16.7083 15 17.0667 15 17.5C15 17.9333 15.1417 18.2917 15.425 18.575C15.7083 18.8583 16.0667 19 16.5 19ZM20 25.5C21.1833 25.5 22.2292 25.175 23.1375 24.525C24.0458 23.875 24.7 23.0333 25.1 22H14.9C15.3 23.0333 15.9542 23.875 16.8625 24.525C17.7708 25.175 18.8167 25.5 20 25.5ZM28 13H27C26.7167 13 26.4792 12.9042 26.2875 12.7125C26.0958 12.5208 26 12.2833 26 12C26 11.7167 26.0958 11.4792 26.2875 11.2875C26.4792 11.0958 26.7167 11 27 11H28V10C28 9.71667 28.0958 9.47917 28.2875 9.2875C28.4792 9.09583 28.7167 9 29 9C29.2833 9 29.5208 9.09583 29.7125 9.2875C29.9042 9.47917 30 9.71667 30 10V11H31C31.2833 11 31.5208 11.0958 31.7125 11.2875C31.9042 11.4792 32 11.7167 32 12C32 12.2833 31.9042 12.5208 31.7125 12.7125C31.5208 12.9042 31.2833 13 31 13H30V14C30 14.2833 29.9042 14.5208 29.7125 14.7125C29.5208 14.9042 29.2833 15 29 15C28.7167 15 28.4792 14.9042 28.2875 14.7125C28.0958 14.5208 28 14.2833 28 14V13Z"
+                                            fill="black" />
+                                    </g>
+                                </svg>
                             </div>
-                        </div>
 
-                        <!-- Empfänger-Sticker (falls vorhanden) -->
-                        <div class="emoji-holder" *ngIf="pm.recipientSticker"
-                            (mouseenter)="toggleReactionRecipientInfo(pm.id, true)"
-                            (mouseleave)="toggleReactionRecipientInfo(pm.id, false)">
-                            <span class="single-emoji">{{ pm.recipientSticker }}</span>
+                            <div *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container"
+                                (click)="closePickerEdit()">
+                                <div class="emoji-picker">
+                                    <emoji-mart (click)="letPickerEditVisible($event)"
+                                        (emojiClick)="addEmojiToEdit($event)" class="emoji-picker"
+                                        size="18"></emoji-mart>
+                                </div>
+                            </div>
 
-                            <!-- Infobox (am Recipient-Emoji) -->
-                            <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpRecipient[pm.id]"
-                                *ngIf="pm.recipientSticker">
-                                <span class="reaction-info-txt">
-                                    <ng-container *ngIf="pm.recipientId === currentUser.uid; else partnerRecipientText">
-                                        Du hast mit
-                                        <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
-                                        reagiert
-                                    </ng-container>
-                                    <ng-template #partnerRecipientText>
-                                        {{ pm.recipientName }} hat mit
-                                        <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
-                                        reagiert
-                                    </ng-template>
-                                </span>
+                            <!-- Buttons: Speichern / Abbrechen -->
+                            <div class="option-flex">
+                                <img class="save-icon" src="assets/img/check-mark.svg" alt="Speichern"
+                                    (click)="saveOrDeleteMessage(pm)" />
+                                <img class="cancel-icon" src="assets/img/cross.svg" alt="Abbrechen"
+                                    (click)="cancelEdit()" />
                             </div>
                         </div>
                     </ng-template>
+
+                    <div class="text-info-edit" *ngIf="pm.editedTextShow">
+                        (Bearbeitet)
+                    </div>
+
+                    <!-- ================== REACTIONS / STICKERS ================== -->
+                    <!-- Container für die Sticker/Emoji-Reaktionen -->
+                    <div class="sticker-view-ct" [ngClass]="{
+          'sticker-view-right': pm.senderId === currentUser.uid,
+          'sticker-view-left': pm.senderId !== currentUser.uid
+        }">
+                        <!-- Fall A: Beide Sticker identisch => ein Emoji mit Counter "2" -->
+                        <ng-container *ngIf="
+            pm.senderSticker &&
+            pm.recipientSticker &&
+            pm.senderSticker === pm.recipientSticker;
+            else differentStickers
+          ">
+                            <div class="emoji-holder" (mouseenter)="toggleReactionBothInfo(pm.id, true)"
+                                (mouseleave)="toggleReactionBothInfo(pm.id, false)">
+                                <!-- EINE Emoji-Anzeige + Counter 2 -->
+                                <span class="single-emoji">{{ pm.senderSticker }}</span>
+                                <span class="reaction-counter">2</span>
+
+                                <!-- Hover-Info (z. B. "Ihr beide habt mit … reagiert") -->
+                                <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpBoth[pm.id]"
+                                    *ngIf="pm.senderSticker">
+                                    <span class="reaction-info-txt">
+                                        Ihr beide habt mit
+                                        <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                        reagiert
+                                    </span>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <!-- Fall B: Unterschiedliche Sticker oder nur einer vorhanden -->
+                        <ng-template #differentStickers>
+                            <!-- Sender-Sticker (falls vorhanden) -->
+                            <div class="emoji-holder" *ngIf="pm.senderSticker"
+                                (mouseenter)="toggleReactionSenderInfo(pm.id, true)"
+                                (mouseleave)="toggleReactionSenderInfo(pm.id, false)">
+                                <span class="single-emoji">{{ pm.senderSticker }}</span>
+
+                                <!-- Infobox (am Sender-Emoji) -->
+                                <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpSender[pm.id]"
+                                    *ngIf="pm.senderSticker">
+                                    <span class="reaction-info-txt">
+                                        <ng-container *ngIf="pm.senderId === currentUser.uid; else partnerSenderText">
+                                            <!-- Falls currentUser = Sender -->
+                                            Du hast mit
+                                            <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                            reagiert
+                                        </ng-container>
+                                        <ng-template #partnerSenderText>
+                                            {{ pm.senderName }} hat mit
+                                            <span class="react-emoji-value">{{ pm.senderSticker }}</span>
+                                            reagiert
+                                        </ng-template>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Empfänger-Sticker (falls vorhanden) -->
+                            <div class="emoji-holder" *ngIf="pm.recipientSticker"
+                                (mouseenter)="toggleReactionRecipientInfo(pm.id, true)"
+                                (mouseleave)="toggleReactionRecipientInfo(pm.id, false)">
+                                <span class="single-emoji">{{ pm.recipientSticker }}</span>
+
+                                <!-- Infobox (am Recipient-Emoji) -->
+                                <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpRecipient[pm.id]"
+                                    *ngIf="pm.recipientSticker">
+                                    <span class="reaction-info-txt">
+                                        <ng-container
+                                            *ngIf="pm.recipientId === currentUser.uid; else partnerRecipientText">
+                                            Du hast mit
+                                            <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
+                                            reagiert
+                                        </ng-container>
+                                        <ng-template #partnerRecipientText>
+                                            {{ pm.recipientName }} hat mit
+                                            <span class="react-emoji-value">{{ pm.recipientSticker }}</span>
+                                            reagiert
+                                        </ng-template>
+                                    </span>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                    <!-- / sticker-view-ct -->
                 </div>
-                <!-- / sticker-view-ct -->
+                <!-- / message-column -->
             </div>
-            <!-- / message-column -->
         </div>
+
         <!-- / message-container -->
 
-        <!-- Separator (Antwort-Anzeige?) -->
+        <!-- Separator (Antwort-Anzeige?), je nach Bedarf -->
+        <!-- / color-separator -->
     </div>
-    <div class="seperator">
-        <h3>{{ getReplyCountText() }}</h3>
-        <div class="line-separator"></div>
-    </div>
-
+</ng-container>
+<div class="seperator">
+    <h3>{{ getReplyCountText() }}</h3>
+    <div class="line-separator"></div>
 </div>
 
-<!-- Fallback / Ladezustand, falls pm oder currentUser noch nicht da -->
-<ng-template #loadingState>
-    <div class="loading-thread">
-        <!-- z.B. Spinner oder "Lade..." -->
-        <p>Lade Thread...</p>
+<!-- <ng-template #loadingBlock>
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Lade Daten ...</p>
     </div>
-</ng-template>
+  </ng-template> -->

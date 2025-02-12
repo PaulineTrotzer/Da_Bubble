@@ -81,6 +81,9 @@ import { MentionThreadService } from '../services/mention-thread.service';
   ],
 })
 export class DirectThreadComponent implements OnInit, OnDestroy {
+toggleReactionInfoRecipient(arg0: any,arg1: boolean) {
+throw new Error('Method not implemented.');
+}
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   chatMessage: string = '';

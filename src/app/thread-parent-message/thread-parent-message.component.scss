@@ -16,7 +16,7 @@
 
 .thread-container {
   opacity: 0;
-  animation: fadeIn 0.95s ease forwards;
+  animation: fadeIn 1.25s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -24,6 +24,39 @@
     opacity: 1;
   }
 }
+
+/* .loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #444df2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+.loading-text {
+  color: #444df2;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} */
 
 app-thread-parent-message {
   display: flex;
@@ -198,18 +231,13 @@ app-thread-parent-message {
 }
 
 .text-info-edit {
-  position: absolute;
   font-size: 12px;
   font-family: "Nunito";
   text-align: center;
-  bottom: -10px;
-  left: -80px;
-  color: black;
-  &.is-partner {
-    bottom: -22px;
-    font-weight: 600;
-    left: 145px;
-  }
+  color: slategray;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
 }
 
 .show-selected-files {
@@ -364,7 +392,7 @@ app-thread-parent-message {
 .emoji-holder {
   position: relative;
   font-size: 14px;
-  height: 30px;
+  height: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -373,7 +401,7 @@ app-thread-parent-message {
   padding: 3px;
   max-width: 100%;
   gap: 3px;
-  width: 40px;
+  min-width: 38px;
   &:hover {
     border-color: #444df2;
     cursor: pointer;

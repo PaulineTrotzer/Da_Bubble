@@ -1,5 +1,7 @@
+<!-- Overlay (falls benötigt) -->
 <div *ngIf="isOverlayOpen" class="overlay"></div>
 
+<!-- Full-Page Content (Thread) -->
 <div [ngClass]="{
     'hidden-width': global.checkWideChannelOrUserThreadBox,
     'reset-width': global.openChannelOrUserThread
@@ -10,100 +12,75 @@
       <span class="hashtag">#</span>
     </div>
     <div (click)="onClose()" class="close-icon-container">
-      <svg class="close-icon" width="24" height="24">...</svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <mask id="mask0_85344_17707" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
+          height="24">
+          <rect width="24" height="24" fill="#D9D9D9" />
+        </mask>
+        <g mask="url(#mask0_85344_17707)">
+          <path
+            d="M12 13.4L7.10005 18.3C6.91672 18.4834 6.68338 18.575 6.40005 18.575C6.11672 18.575 5.88338 18.4834 5.70005 18.3C5.51672 18.1167 5.42505 17.8834 5.42505 17.6C5.42505 17.3167 5.51672 17.0834 5.70005 16.9L10.6 12L5.70005 7.10005C5.51672 6.91672 5.42505 6.68338 5.42505 6.40005C5.42505 6.11672 5.51672 5.88338 5.70005 5.70005C5.88338 5.51672 6.11672 5.42505 6.40005 5.42505C6.68338 5.42505 6.91672 5.51672 7.10005 5.70005L12 10.6L16.9 5.70005C17.0834 5.51672 17.3167 5.42505 17.6 5.42505C17.8834 5.42505 18.1167 5.51672 18.3 5.70005C18.4834 5.88338 18.575 6.11672 18.575 6.40005C18.575 6.68338 18.4834 6.91672 18.3 7.10005L13.4 12L18.3 16.9C18.4834 17.0834 18.575 17.3167 18.575 17.6C18.575 17.8834 18.4834 18.1167 18.3 18.3C18.1167 18.4834 17.8834 18.575 17.6 18.575C17.3167 18.575 17.0834 18.4834 16.9 18.3L12 13.4Z"
+            fill="black" />
+        </g>
+      </svg>
+
     </div>
   </header>
 
   <div class="header-seperator"></div>
 
-  <!-- Falls du ein Mention-Box anzeigst -->
+  <!-- Mention-Box (falls vorhanden) -->
   <app-mention-message-box *ngIf="wasClickedInDirectThread" (cancelMessageBoxCard)="onCancelMessageBox()"
     (enterChatUser)="selectUserForChat($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
 
   <!-- 1) .overflow-container -->
   <div class="overflow-container" #scrollContainer>
-
-    <!-- 2) .all-thread-message-container -->
     <div #messageContainer class="all-thread-message-container">
 
+      <!-- Parent-Message (Thread-Übersicht) -->
       <app-thread-parent-message (mentionClicked)="onMentionClicked($event)" *ngIf="parentMessage" [pm]="parentMessage"
-        [currentUser]="currentUser" [selectedUser]="selectedUser"
-        [messagesData]="messagesData"></app-thread-parent-message>
+        [currentUser]="currentUser" [selectedUser]="selectedUser" [messagesData]="messagesData">
+      </app-thread-parent-message>
 
+      <!-- Loop über alle Messages -->
       <div *ngFor="let message of messagesData; let i=index" [id]="message.id" [ngClass]="{
-        'message-bubble': true, 
-        'last-messagebubble': i === messagesData.length - 1,
-        'first-messagebubble': i === 0,
-      }">
-        <div *ngIf="(message.text && message.text.trim() !== '') 
-|| (message.selectedFiles && message.selectedFiles.length > 0)">
+          'message-bubble': true, 
+          'last-messagebubble': i === messagesData.length - 1,
+          'first-messagebubble': i === 0
+        }">
+        <!-- Prüfe, ob Text oder Attachments vorhanden sind -->
+        <div *ngIf="(message.text && message.text.trim() !== '')
+               || (message.selectedFiles && message.selectedFiles.length > 0)">
+          <!-- Neue Tagesinfo (Datum) -->
           <div *ngIf="displayDayInfo(i)" class="new-day-info" [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
             <div class="day-info">
               <div class="line"></div>
-              <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+              <span class="day-span">
+                {{ getDayInfoForMessage(i) }}
+              </span>
             </div>
-
           </div>
-          <div
-            *ngIf="message.senderName?.length && message.recipientName?.length && message.senderName === selectedUser.name && message.recipientName === currentUser.name && !isSelfThread && !showOneDisplay"
-            class="color-separator" (mouseenter)="toggleOptionBar(message.id, true)"
+
+          <!-- Nachricht des Chatpartners (Selected User) -->
+          <div *ngIf="
+              message.senderName === selectedUser?.name &&
+              message.recipientName === currentUser?.name &&
+              !isSelfThread &&
+              !showOneDisplay
+            " class="color-separator" (mouseenter)="toggleOptionBar(message.id, true)"
             (mouseleave)="toggleOptionBar(message.id, false)" (mouseenter)="onMouseEnter(message)"
             (mouseleave)="onMouseLeave(message)" [ngClass]="{'first-message-position': isFirstMessage(i)}">
-            <div
-              *ngIf="message.senderName === selectedUser.name && message.recipientName === currentUser.name && !isSelfThread && !showOneDisplay"
-              class="chatpartner-message-container">
-
+            <div class="chatpartner-message-container">
               <div class="avatar-container-partner">
                 <img [src]="selectedUser.picture" alt="{{ selectedUser.name }}" />
               </div>
 
-              <div class="partner-message-column">
-                <div class="time-name-flex-partner">
-                  <h4>{{ selectedUser.name }}</h4>
-                  <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
-                </div>
-
-                <div (click)="handleClickOnMention($event)"
-                  [ngClass]="{'message-content-bubble': message.isHovered, 'static-bubble': !message.isHovered}">
-                  <ng-container *ngFor="let mentionName of mentionService.splitMessage(message.text)">
-                    <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
-                      (click)="handleMentionClick(mentionName)">
-                      {{ mentionName }}
-                    </span>
-                    <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">{{ mentionName }}</span>
-                  </ng-container>
-                  <div class="show-selected-files">
-                    <div *ngFor="let file of message.selectedFiles">
-                      <div class="mai-file" *ngIf="file.url">
-                        <!-- Für Bilder -->
-                        <div class="file-info" *ngIf="file.type.startsWith('image/')">
-                          <a [href]="file.url" target="_blank">
-                            <img [src]="file.url" alt="Image File" />
-                          </a>
-                        </div>
-
-                        <!-- Für PDFs -->
-                        <div class="file-info" *ngIf="file.type === 'application/pdf'">
-                          <a [href]="file.url" target="_blank">
-                            <img src="../../assets/img/pdf.png" alt="PDF File" />
-                          </a>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-                <div *ngIf="message.editedTextShow" class="text-info-edit-chatpartner">
-                  (Bearbeitet)
-                </div>
-              </div>
-
+              <!-- Optionsleiste (Sticker-Hover-CT) -->
               <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
-                <div class="show-set" @slideIn>
+                <div class="show-set-reverse" @slideIn>
                   <div class="img-flex-bar-options">
-
+                    <!-- Emoji-Picker öffnen -->
                     <div class="add-reaction-ct" (click)="openEmojiPicker()">
                       <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -118,6 +95,7 @@
                       </svg>
                     </div>
 
+                    <!-- Letztes Emoji (Quick-Reaction) -->
                     <div class="last-emoji-holder" *ngIf="localUserLastEmoji"
                       (click)="applyGlobalEmojiToThread(localUserLastEmoji, message)">
                       <span class="single-emoji">
@@ -125,32 +103,204 @@
                       </span>
                     </div>
 
-                    <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-                      <div class="emoji-picker">
-                        <emoji-mart (click)="letPickerVisible($event)"
-                          (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')"
-                          class="emoji-picker" size="18"></emoji-mart>
-                      </div>
-                    </div>
+                    <!-- Emoji Picker -->
+
                     <img>
                   </div>
+
+                </div>
+              </div>
+              <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+                <div class="emoji-picker">
+                  <emoji-mart (click)="letPickerVisible($event)"
+                    (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')" class="emoji-picker"
+                    size="18"></emoji-mart>
                 </div>
               </div>
 
-            </div>
+
+              <div class="partner-message-column">
+                <div class="time-name-flex-partner">
+                  <h4>{{ selectedUser.name }}</h4>
+                  <span class="message-time">
+                    {{ message.timestamp | date : 'HH:mm' }} Uhr
+                  </span>
+                </div>
+
+                <!-- Text / Mentions / Anhänge -->
+                <div (click)="handleClickOnMention($event)" [ngClass]="{
+                    'message-content-bubble': message.isHovered, 
+                    'static-bubble': !message.isHovered
+                  }">
+                  <ng-container *ngFor="let mentionName of mentionService.splitMessage(message.text)">
+                    <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
+                      (click)="handleMentionClick(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                    <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                  </ng-container>
+
+                  <!-- Angehängte Dateien -->
+                  <div class="show-selected-files">
+                    <div *ngFor="let file of message.selectedFiles">
+                      <div class="mai-file" *ngIf="file.url">
+                        <!-- Bilder -->
+                        <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                          <a [href]="file.url" target="_blank">
+                            <img [src]="file.url" alt="Image File" />
+                          </a>
+                        </div>
+                        <!-- PDFs -->
+                        <div class="file-info" *ngIf="file.type === 'application/pdf'">
+                          <a [href]="file.url" target="_blank">
+                            <img src="../../assets/img/pdf.png" alt="PDF File" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="message.editedTextShow" class="text-info-edit">
+                  (Bearbeitet)
+                </div>
+
+
+                <!-- ========================================= -->
+                <!-- Reactions-Sektion direkt UNTER der Nachricht -->
+                <!-- ========================================= -->
+                <ng-container *ngIf="areEmojisSame(message.reactions); else separateReactionsPartner">
+                  <div class="emoji-position-ct">
+                    <div class="emoji-holder-both" (mouseenter)="toggleBothReactionInfo(message.id, true)"
+                      (mouseleave)="toggleBothReactionInfo(message.id, false)">
+                      <span class="single-emoji">
+                        {{ getEmojiFromFirstUser(message.reactions) }}
+                      </span>
+                      <span class="reaction-counter">
+                        {{ getTotalCounterForSameEmoji(message.reactions) }}
+                      </span>
+                    </div>
+
+                    <!-- Info-Text (Tooltip) oben am Emoji-Holder -->
+                    <div class="both-reaction-info-ct" [ngClass]="{
+                        'hovered': showReactionPopUpBoth[message.id]
+                      }">
+                      <!-- beide Reaction vs nur eine -->
+                      <span class="reaction-info-txt-both" *ngIf="
+                          TwoReactionsTwoEmojis(
+                            message.reactions[message.recipientId],
+                            message.reactions[message.senderId]
+                          )
+                        ">
+                        Du und {{ selectedUser.name }} habt mit
+                        <span class="reaction-emoji">
+                          {{ getEmojiFromFirstUser(message.reactions) }}
+                        </span>
+                        reagiert
+                      </span>
+
+                      <span class="reaction-info-txt-both" *ngIf="
+                          !TwoReactionsTwoEmojis(
+                            message.reactions[message.recipientId],
+                            message.reactions[message.senderId]
+                          )
+                        ">
+                        {{ selectedUser.name }} hat mit
+                        <span class="reaction-emoji">
+                          {{ getEmojiFromFirstUser(message.reactions) }}
+                        </span>
+                        reagiert
+                      </span>
+                    </div>
+                  </div>
+
+                </ng-container>
+
+                <!-- (B) Verschiedene Reactions (Partner) -->
+                <ng-template #separateReactionsPartner>
+                  <div class="reaction-container">
+
+                    <!-- SENDER-Emoji (Partner) -->
+                    <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
+                      (mouseenter)="toggleReactionInfoSenderAtSelectedUser(message.id, true)"
+                      (mouseleave)="toggleReactionInfoSenderAtSelectedUser(message.id, false)">
+                      <span class="single-emoji">
+                        {{ message.reactions[message.senderId]?.emoji }}
+                      </span>
+                      <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
+                        {{ message.reactions[message.senderId]?.counter }}
+                      </span>
+
+                      <!-- Hover-Popup SENDER -->
+                      <div class="reaction-name-info-ct-recipient" [ngClass]="{
+                          'hovered': showReactionPopUpSenderAtSu[message.id]
+                        }">
+                        <span class="reaction-info-txt" *ngIf="
+                          message.senderId === selectedUser.uid &&
+                          message.reactions[message.senderId]?.counter > 0
+                        ">
+                          {{ message.senderName }} hat mit
+                          <span class="react-emoji-value">
+                            {{ message.reactions[message.senderId]?.emoji }}
+                          </span>
+                          reagiert
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- RECIPIENT-Emoji (currentUser) -->
+                    <div *ngIf="message.reactions[message.recipientId]?.counter > 0" class="emoji-holder"
+                      (mouseenter)="toggleReactionInfoRecipientAtSelectedUser(message.id, true)"
+                      (mouseleave)="toggleReactionInfoRecipientAtSelectedUser(message.id, false)">
+                      <span class="single-emoji">
+                        {{ message.reactions[message.recipientId]?.emoji }}
+                      </span>
+                      <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
+                        {{ message.reactions[message.recipientId]?.counter }}
+                      </span>
+
+                      <!-- Hover-Popup RECIPIENT -->
+                      <div class="reaction-name-info-ct-recipient" [ngClass]="{
+                          'hovered': showReactionPopUpRecipientAtSu[message.id]
+                        }">
+                        <span class="reaction-info-txt" *ngIf="
+                          message.recipientId === currentUser.uid &&
+                          message.reactions[message.recipientId]?.counter > 0
+                        ">
+                          Du hast mit
+                          <span class="react-emoji-value">
+                            {{ message.reactions[message.recipientId]?.emoji }}
+                          </span>
+                          reagiert
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+                <!-- Ende Reactions Partner -->
+
+              </div><!-- Ende .partner-message-column -->
+            </div><!-- Ende .chatpartner-message-container -->
           </div>
+          <!-- Ende Nachricht Chatpartner -->
 
-          <!-- CURRENT USER I FOLLOWING-->
 
-          <div
-            *ngIf="message.senderName === currentUser.name && message.recipientName !== currentUser.name || message.senderName == currentUser.name && message.recipientName == currentUser.name"
-            class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
+          <!-- Nachricht des CURRENT USERS -->
+          <div *ngIf="
+              (message.senderName === currentUser?.name &&
+                message.recipientName !== currentUser?.name)
+              || (message.senderName === currentUser?.name &&
+                  message.recipientName === currentUser?.name)
+            " class="color-separator" (mouseenter)="toggleOptionBar(message.id,true)"
             (mouseleave)="toggleOptionBar(message.id,false)" (mouseleave)="toggleEditOption(message.id, false)"
             [ngClass]="{'first-message-position': isFirstMessage(i)}">
-
+            <!-- Sticker-Hover-CT -->
             <div class="sticker-hover-ct" *ngIf="showOptionBar[message.id]">
-              <div class="show-set-reverse" @slideIn>
+              <div class="show-set" @slideIn>
                 <div class="img-flex-bar-options">
+                  <!-- Edit-Icon -->
                   <div class="edit-icon-holder" (mouseenter)="toggleEditOption(message.id, true)">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <mask id="mask0_1817_16003" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
@@ -165,6 +315,7 @@
                     </svg>
                   </div>
 
+                  <!-- Emoji-Picker öffnen -->
                   <div class="add-reaction-ct" (mouseenter)="toggleEditOption(message.id, false)"
                     (click)="openEmojiPicker()">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -180,6 +331,7 @@
                     </svg>
                   </div>
 
+                  <!-- Letztes Emoji -->
                   <div class="last-emoji-holder" *ngIf="localUserLastEmoji"
                     (click)="applyGlobalEmojiToThread(localUserLastEmoji, message)">
                     <span class="single-emoji">
@@ -187,39 +339,45 @@
                     </span>
                   </div>
 
+                  <!-- Emoji Picker -->
                   <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
                     <div class="emoji-picker">
                       <emoji-mart (click)="letPickerVisible($event)"
                         (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')" class="emoji-picker"
-                        size="18">
-                      </emoji-mart>
+                        size="18"></emoji-mart>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            <!-- Edit-Card -->
             <mat-card *ngIf="showEditOption[message.id] && !editWasClicked" class="edit-messages-card"
               appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
               <mat-card-content class="edit-message-content" (mouseleave)="toggleEditOption(message.id, false)">
-                <span *ngIf="!editWasClicked" (click)="editMessages(message)">Nachricht bearbeiten</span>
+                <span *ngIf="!editWasClicked" (click)="editMessages(message)">
+                  Nachricht bearbeiten
+                </span>
               </mat-card-content>
             </mat-card>
 
-            <div *ngIf="message.senderId=== currentUser.uid" class="cu-message-container">
-
+            <!-- Bubble -->
+            <div *ngIf="message.senderId === currentUser.uid" class="cu-message-container">
               <div class="avatar-container">
                 <img [src]="currentUser.picture" alt="{{ currentUser.name }}" />
-
               </div>
-              <div class="cu-message-column">
 
+              <div class="cu-message-column">
                 <div class="time-name-flex">
                   <h4>{{ currentUser.name }}</h4>
-                  <span class="message-time">{{ message.timestamp | date : "HH:mm" }} Uhr</span>
+                  <span class="message-time">
+                    {{ message.timestamp | date : 'HH:mm' }} Uhr
+                  </span>
                 </div>
 
+                <!-- Text / Anhänge -->
                 <div class="message-holder" [class.hovered]="message.isHovered">
+                  <!-- Falls nicht im Edit-Modus -->
                   <ng-container *ngIf="!(editWasClicked && editMessageId === message.id); else editMode">
                     <div (click)="handleClickOnMention($event)" class="cu-msg-text">
                       <ng-container *ngFor="let mentionName of mentionService.splitMessage(message.text)">
@@ -227,44 +385,40 @@
                           (click)="handleMentionClick(mentionName)">
                           {{ mentionName }}
                         </span>
-                        <div *ngIf="message.editedTextShow" class="text-info-edit">
-                          (Bearbeitet)
-                        </div>
+                 
                         <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">
                           {{ mentionName }}
                         </span>
                       </ng-container>
+
+                      <!-- Datei-Anhänge -->
                       <div class="show-selected-files">
                         <div *ngFor="let file of message.selectedFiles">
                           <div class="mai-file" *ngIf="file.url">
-                            <!-- Für Bilder -->
+                            <!-- Bilder -->
                             <div class="file-info" *ngIf="file.type.startsWith('image/')">
                               <a [href]="file.url" target="_blank">
                                 <img [src]="file.url" alt="Image File" />
                               </a>
                             </div>
-
-                            <!-- Für PDFs -->
+                            <!-- PDFs -->
                             <div class="file-info" *ngIf="file.type === 'application/pdf'">
                               <a [href]="file.url" target="_blank">
                                 <img src="../../assets/img/pdf.png" alt="PDF File" />
                               </a>
                             </div>
-
                           </div>
                         </div>
                       </div>
-
                     </div>
                   </ng-container>
 
-
-
+                  <!-- Edit-Modus -->
                   <ng-template #editMode>
                     <textarea #editableTextarea rows="3" class="edit-input"
                       [(ngModel)]="editableMessageText"></textarea>
-                    <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
 
+                    <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
                       <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
                           width="24" height="24">
@@ -278,256 +432,157 @@
                       </svg>
                     </div>
 
+                    <!-- Emoji Picker für Edit Mode -->
                     <div (click)="closePickerEdit()" *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container">
                       <div class="emoji-picker">
                         <emoji-mart (click)="letPickerEditVisible($event)" (emojiClick)="addEmojiToEdit($event)"
-                          class="emoji-picker" size="18">
-                        </emoji-mart>
+                          class="emoji-picker" size="18"></emoji-mart>
                       </div>
                     </div>
 
+                    <!-- Speichern / Abbrechen -->
                     <div class="option-flex">
                       <img class="save-icon" (click)="saveOrDeleteMessage(message)" src="assets/img/check-mark.svg"
-                        alt="Speichern">
-                      <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen">
+                        alt="Speichern" />
+                      <img class="cancel-icon" (click)="cancelEdit()" src="assets/img/cross.svg" alt="Abbrechen" />
                     </div>
                   </ng-template>
+                </div>
+                <!-- / message-holder -->
 
+                <div *ngIf="message.editedTextShow" class="text-info-edit">
+                  (Bearbeitet)
                 </div>
 
+                <!-- ========================================== -->
+                <!-- Reactions-Sektion direkt UNTER der Bubble -->
+                <!-- ========================================== -->
+                <ng-container *ngIf="areEmojisSame(message.reactions); else separateReactionsCu">
+                  <div class="emoji-position-ct-cu">
+                    <div class="emoji-holder-both" (mouseenter)="toggleBothReactionInfo(message.id, true)"
+                      (mouseleave)="toggleBothReactionInfo(message.id, false)">
+                      <span class="single-emoji">
+                        {{ getEmojiFromFirstUser(message.reactions) }}
+                      </span>
+                      <span class="reaction-counter">
+                        {{ getTotalCounterForSameEmoji(message.reactions) }}
+                      </span>
+                    </div>
 
-              </div>
-            </div>
-          </div>
+                    <!-- Tooltip / Info direkt am Emoji-Holder -->
+                    <div class="both-reaction-info-ct both-reaction-info-ct-cu " [ngClass]="{
+                        'hovered': showReactionPopUpBoth[message.id]
+                      }">
+                      <span class="reaction-info-txt-both" *ngIf="
+                          TwoReactionsTwoEmojis(
+                            message.reactions[message.recipientId],
+                            message.reactions[message.senderId]
+                          )
+                        ">
+                        Du und {{ selectedUser.name }} habt mit
+                        <span class="reaction-emoji">
+                          {{ getEmojiFromFirstUser(message.reactions) }}
+                        </span>
+                        reagiert
+                      </span>
 
-
-          <!-- (1) Reactions for 2 Reactions (2 sides) -->
-          <div class="separated-both-currentUser-reaction-right" [ngClass]="{ 
-       'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
-       'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name && !isSelfThread
-     }">
-
-            <div class="render-reaction-ct-sender"
-              *ngIf="!areEmojisSame(message.reactions) && message.senderName == currentUser.name"
-              [ngClass]="{'render-reaction-first-message-sender': i === 0}">
-
-              <!-- SENDER-Emoji (nicht SelfThread) -->
-              <div *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
-                (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
-
-                <span class="single-emoji">
-                  {{ message.reactions[message.senderId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
-                  {{ message.reactions[message.senderId]?.counter }}
-                </span>
-              </div>
-
-              <!-- SENDER-Emoji (SelfThread) -->
-              <div *ngIf="message.reactions[message.senderId]?.counter > 0 && isSelfThread" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
-                (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
-
-                <span class="single-emoji">
-                  {{ message.reactions[message.senderId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
-                  {{ message.reactions[message.senderId]?.counter }}
-                </span>
-              </div>
-
-              <!-- RECIPIENT-Emoji (not selfThread) -->
-              <div *ngIf="message.reactions[message.recipientId]?.counter > 0 && !isSelfThread" class="emoji-holder"
-                (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
-                (mouseleave)="toggleReactionInfoRecipientAtCurrentUser(message.id, false)">
-
-                <span class="single-emoji">
-                  {{ message.reactions[message.recipientId]?.emoji }}
-                </span>
-                <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
-                  {{ message.reactions[message.recipientId]?.counter }}
-                </span>
-              </div>
-            </div>
-
-
-            <!-- (1a) Reaction-Info: currentUser-View (Sender) -->
-            <!-- anstelle von [hidden], wir nutzen .hovered -->
-            <div class="reaction-name-info-ct-sender" [ngClass]="{
-         'hovered': showReactionPopUpSenderAtCu[message.id],
-         'you-reacted': message.senderId === currentUser.uid && message.reactions[message.senderId]?.counter > 0,
-         'only-you-reacted': (message.senderId === currentUser.uid
-                              && message.reactions[message.senderId]?.counter > 0)
-                             && (!message.reactions[message.recipientId]
-                                 || message.reactions[message.recipientId]?.counter === 0)
-       }">
-              <span class="reaction-info-txt">
-                <ng-container *ngIf="message.senderId === currentUser.uid
-                           && message.reactions[message.senderId]?.counter > 0">
-                  Du hast mit
-                  <span class="react-emoji-value">
-                    {{ message.reactions[message.senderId]?.emoji }}
-                  </span>
-                  reagiert
+                      <span class="reaction-info-txt-both two-single" *ngIf="
+                          !TwoReactionsTwoEmojis(
+                            message.reactions[message.recipientId],
+                            message.reactions[message.senderId]
+                          )
+                        ">
+                        {{ selectedUser.name }} hat mit
+                        <span class="reaction-emoji">
+                          {{ getEmojiFromFirstUser(message.reactions) }}
+                        </span>
+                        reagiert
+                      </span>
+                    </div>
+                  </div>
                 </ng-container>
-              </span>
-            </div>
 
-            <div class="reaction-name-info-ct-sender" [ngClass]="{
-         'hovered': showReactionPopUpRecipientAtCu[message.id],
-         'has-reacted': message.senderId === currentUser.uid
-                       && message.reactions[message.recipientId]?.counter > 0
-       }">
-              <span class="reaction-info-txt">
-                <ng-container *ngIf="
-        message?.recipientId === selectedUser?.uid
-        && message.reactions[message.recipientId]?.counter > 0
-      ">
-                  {{ message.recipientName }} hat mit
-                  <span class="react-emoji-value">
-                    {{ message.reactions[message.recipientId]?.emoji }}
-                  </span>
-                  reagiert
-                </ng-container>
-              </span>
-            </div>
+                <!-- (B) Verschiedene Reactions (CurrentUser) -->
+                <ng-template #separateReactionsCu>
+                  <div class="reaction-container reaction-container-right">
 
+                    <!-- Sender-Emoji (CurrentUser) -->
+                    <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
+                      (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
+                      (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
+                      <span class="single-emoji">
+                        {{ message.reactions[message.senderId]?.emoji }}
+                      </span>
+                      <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
+                        {{ message.reactions[message.senderId]?.counter }}
+                      </span>
 
-            <!-- (2) Reactions for selectedUser-View (recipient) -->
-            <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)
-               && message.senderName == selectedUser.name
-               && !isSelfThread" [ngClass]="{'render-reaction-first-message-recipient': i === 0}">
+                      <!-- Hover-Popup: "Du hast reagiert" -->
+                      <div class="reaction-name-info-ct-sender" [ngClass]="{
+                          'hovered': showReactionPopUpSenderAtCu[message.id]
+                        }">
+                        <span class="reaction-info-txt" *ngIf="
+                          message.senderId === currentUser.uid &&
+                          message.reactions[message.senderId]?.counter > 0
+                        ">
+                          Du hast mit
+                          <span class="react-emoji-value">
+                            {{ message.reactions[message.senderId]?.emoji }}
+                          </span>
+                          reagiert
+                        </span>
+                      </div>
+                    </div>
 
-              <ng-container>
-                <!-- RECIPIENT-Emoji -->
-                <div *ngIf="message.reactions[message.recipientId]?.counter>0 && !isSelfThread" class="emoji-holder"
-                  (mouseenter)="toggleReactionInfoRecipientAtSelectedUser(message.id, true)"
-                  (mouseleave)="toggleReactionInfoRecipientAtSelectedUser(message.id, false)">
-                  <span class="single-emoji">
-                    {{ message.reactions[message.recipientId]?.emoji }}
-                  </span>
-                  <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
-                    {{ message.reactions[message.recipientId]?.counter }}
-                  </span>
-                </div>
+                    <!-- Recipient-Emoji (falls nicht SelfThread) -->
+                    <div *ngIf="!isSelfThread && message.reactions[message.recipientId]?.counter > 0"
+                      class="emoji-holder" (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
+                      (mouseleave)="toggleReactionInfoRecipientAtCurrentUser(message.id, false)">
+                      <span class="single-emoji">
+                        {{ message.reactions[message.recipientId]?.emoji }}
+                      </span>
+                      <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
+                        {{ message.reactions[message.recipientId]?.counter }}
+                      </span>
 
-                <!-- SENDER-Emoji -->
-                <div *ngIf="message.reactions[message.senderId]?.counter>0 && !isSelfThread" class="emoji-holder"
-                  (mouseenter)="toggleReactionInfoSenderAtSelectedUser(message.id, true)"
-                  (mouseleave)="toggleReactionInfoSenderAtSelectedUser(message.id, false)">
-                  <span class="single-emoji">
-                    {{ message.reactions[message.senderId]?.emoji }}
-                  </span>
-                  <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
-                    {{ message.reactions[message.senderId]?.counter }}
-                  </span>
-                </div>
-              </ng-container>
+                      <!-- Hover-Popup: "XYZ hat reagiert" -->
+                      <div class="reaction-name-info-ct-sender" [ngClass]="{
+                          'hovered': showReactionPopUpRecipientAtCu[message.id]
+                        }">
+                        <span class="reaction-info-txt" *ngIf="
+                          message.recipientId === selectedUser?.uid &&
+                          message.reactions[message.recipientId]?.counter > 0
+                        ">
+                          {{ selectedUser.name }} hat mit
+                          <span class="react-emoji-value">
+                            {{ message.reactions[message.recipientId]?.emoji }}
+                          </span>
+                          reagiert
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+                <!-- Ende Reactions CurrentUser -->
 
-              <!-- Reaction-Info for recipient -->
-              <div class="reaction-name-info-ct-recipient" [ngClass]="{
-           'hovered': showReactionPopUpRecipientAtSu[message.id],
-           'reaction-name-info-you-reacted': message.senderId === selectedUser.uid
-         }">
-                <span class="reaction-info-txt">
-                  <ng-container *ngIf="message.recipientId === currentUser.uid
-                 && message.reactions[message.recipientId]?.counter > 0">
-                    Du hast mit
-                    <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji }}</span>
-                    reagiert
-                  </ng-container>
-                </span>
-              </div>
-
-              <div *ngIf="!isSelfThread" class="reaction-name-info-ct-recipient" [ngClass]="{
-           'hovered': showReactionPopUpSenderAtSu[message.id],
-           'reaction-name-info-has-reacted': message.senderId === selectedUser.uid
-                                           && message.reactions[message.senderId]?.counter > 0
-         }">
-                <span class="reaction-info-txt">
-                  <ng-container *ngIf="message.senderId === selectedUser.uid
-                 && message.reactions[message.senderId]?.counter > 0">
-                    {{ message.senderName }} hat mit
-                    <span class="react-emoji-value">
-                      {{ message.reactions[message.senderId]?.emoji }}
-                    </span>
-                    reagiert
-                  </ng-container>
-                </span>
-              </div>
-            </div>
-
+              </div><!-- Ende .cu-message-column -->
+            </div><!-- Ende .cu-message-container -->
           </div>
-
-
-          <!-- (3) Reactions for 2 same Reactions -->
-          <div [ngClass]="{'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name}">
-            <div class="emoji-holder-both" [ngClass]="{'emoji-flex-right': message.senderName === currentUser.name}"
-              *ngIf="areEmojisSame(message.reactions)">
-
-              <div class="emoji-holder" (mouseenter)="toggleBothReactionInfo(message.id, true)"
-                (mouseleave)="toggleBothReactionInfo(message.id, false)">
-                <span class="single-emoji">
-                  {{ getEmojiFromFirstUser(message.reactions) }}
-                </span>
-                <span class="reaction-counter">
-                  {{ getTotalCounterForSameEmoji(message.reactions) }}
-                </span>
-              </div>
-
-              <div class="both-reaction-info-ct" [ngClass]="{
-           'both-reaction-right': message.senderName === currentUser.name,
-           'both-reaction-left': message.recipientName === currentUser.name,
-           'hovered': showReactionPopUpBoth[message.id]
-         }">
-                <span class="reaction-info-txt-both"
-                  *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
-                  Du und {{ selectedUser.name }} habt mit
-                  <span class="reaction-emoji">
-                    {{ getEmojiFromFirstUser(message.reactions) }}
-                  </span>
-                  reagiert
-                </span>
-                <span class="reaction-info-txt-both two-single"
-                  *ngIf="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
-                  {{selectedUser.name}} hat mit
-                  <span class="reaction-emoji">
-                    {{ getEmojiFromFirstUser(message.reactions) }}
-                  </span>
-                  reagiert
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
-            <div class="img-container">
-              <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                class="icon">
-                <mask id="mask0_86084_18390" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="25"
-                  height="24">
-                  <rect x="0.0722656" width="24" height="24" fill="#D9D9D9" />
-                </mask>
-                <g mask="url(#mask0_86084_18390)">
-                  <path
-                    d="M12.0723 22C10.6889 22 9.38893 21.7375 8.17227 21.2125C6.9556 20.6875 5.89727 19.975 4.99727 19.075C4.09727 18.175 3.38477 17.1167 2.85977 15.9C2.33477 14.6833 2.07227 13.3833 2.07227 12C2.07227 10.6167 2.33477 9.31667 2.85977 8.1C3.38477 6.88333 4.09727 5.825 4.99727 4.925C5.89727 4.025 6.9556 3.3125 8.17227 2.7875C9.38893 2.2625 10.6889 2 12.0723 2C12.8223 2 13.5514 2.07917 14.2598 2.2375C14.9681 2.39583 15.6389 2.625 16.2723 2.925C16.2056 3.09167 16.1556 3.26667 16.1223 3.45C16.0889 3.63333 16.0723 3.81667 16.0723 4C16.0723 4.23333 16.0973 4.45417 16.1473 4.6625C16.1973 4.87083 16.2639 5.06667 16.3473 5.25C15.7306 4.86667 15.0639 4.5625 14.3473 4.3375C13.6306 4.1125 12.8723 4 12.0723 4C9.8556 4 7.9681 4.77917 6.40977 6.3375C4.85143 7.89583 4.07227 9.78333 4.07227 12C4.07227 14.2167 4.85143 16.1042 6.40977 17.6625C7.9681 19.2208 9.8556 20 12.0723 20C14.2889 20 16.1764 19.2208 17.7348 17.6625C19.2931 16.1042 20.0723 14.2167 20.0723 12C20.0723 11.3333 19.9931 10.6917 19.8348 10.075C19.6764 9.45833 19.4556 8.875 19.1723 8.325C19.4389 8.54167 19.7306 8.70833 20.0473 8.825C20.3639 8.94167 20.7056 9 21.0723 9C21.1556 9 21.2431 8.99583 21.3348 8.9875C21.4264 8.97917 21.5139 8.96667 21.5973 8.95C21.7473 9.43333 21.8639 9.92917 21.9473 10.4375C22.0306 10.9458 22.0723 11.4667 22.0723 12C22.0723 13.3833 21.8098 14.6833 21.2848 15.9C20.7598 17.1167 20.0473 18.175 19.1473 19.075C18.2473 19.975 17.1889 20.6875 15.9723 21.2125C14.7556 21.7375 13.4556 22 12.0723 22ZM15.5723 11C16.0056 11 16.3639 10.8583 16.6473 10.575C16.9306 10.2917 17.0723 9.93333 17.0723 9.5C17.0723 9.06667 16.9306 8.70833 16.6473 8.425C16.3639 8.14167 16.0056 8 15.5723 8C15.1389 8 14.7806 8.14167 14.4973 8.425C14.2139 8.70833 14.0723 9.06667 14.0723 9.5C14.0723 9.93333 14.2139 10.2917 14.4973 10.575C14.7806 10.8583 15.1389 11 15.5723 11ZM8.57227 11C9.0056 11 9.36393 10.8583 9.64727 10.575C9.9306 10.2917 10.0723 9.93333 10.0723 9.5C10.0723 9.06667 9.9306 8.70833 9.64727 8.425C9.36393 8.14167 9.0056 8 8.57227 8C8.13893 8 7.7806 8.14167 7.49727 8.425C7.21393 8.70833 7.07227 9.06667 7.07227 9.5C7.07227 9.93333 7.21393 10.2917 7.49727 10.575C7.7806 10.8583 8.13893 11 8.57227 11ZM12.0723 17.5C13.2556 17.5 14.3014 17.175 15.2098 16.525C16.1181 15.875 16.7723 15.0333 17.1723 14H6.97227C7.37227 15.0333 8.02643 15.875 8.93477 16.525C9.8431 17.175 10.8889 17.5 12.0723 17.5ZM20.0723 5H19.0723C18.7889 5 18.5514 4.90417 18.3598 4.7125C18.1681 4.52083 18.0723 4.28333 18.0723 4C18.0723 3.71667 18.1681 3.47917 18.3598 3.2875C18.5514 3.09583 18.7889 3 19.0723 3H20.0723V2C20.0723 1.71667 20.1681 1.47917 20.3598 1.2875C20.5514 1.09583 20.7889 1 21.0723 1C21.3556 1 21.5931 1.09583 21.7848 1.2875C21.9764 1.47917 22.0723 1.71667 22.0723 2V3H23.0723C23.3556 3 23.5931 3.09583 23.7848 3.2875C23.9764 3.47917 24.0723 3.71667 24.0723 4C24.0723 4.28333 23.9764 4.52083 23.7848 4.7125C23.5931 4.90417 23.3556 5 23.0723 5H22.0723V6C22.0723 6.28333 21.9764 6.52083 21.7848 6.7125C21.5931 6.90417 21.3556 7 21.0723 7C20.7889 7 20.5514 6.90417 20.3598 6.7125C20.1681 6.52083 20.0723 6.28333 20.0723 6V5Z"
-                    fill="black" />
-                </g>
-              </svg>
-            </div>
-            <div class="img-container">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
-                class="icon">
-                <path
-                  d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-              </svg>
-            </div>
-          </div>
+          <!-- Ende Nachricht Current User -->
         </div>
+        <!-- Ende: "Gibt es überhaupt Inhalt?" -->
+
       </div>
-      <div class="input-holder">
-        <app-input-field [activeComponentId]="'direct-thread'" [selectedUser]="selectedUser"
-          [isDirectThreadOpen]="isDirectThreadOpen"></app-input-field>
-      </div>
+      <!-- Ende ngFor: messagesData -->
+
+    </div><!-- Ende #messageContainer -->
+
+    <!-- Input-Feld unten -->
+    <div class="input-holder">
+      <app-input-field [activeComponentId]="'direct-thread'" [selectedUser]="selectedUser"
+        [isDirectThreadOpen]="isDirectThreadOpen">
+      </app-input-field>
     </div>
+  </div>
+</div>
+<!-- Ende .full-page-content -->

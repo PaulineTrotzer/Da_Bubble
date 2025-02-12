@@ -79,6 +79,7 @@ export class ThreadParentMessageComponent implements OnInit {
     show: boolean;
   }>();
   getAllUsersName: any[] = [];
+  isReadyToShow = false;
 
   async ngOnInit() {
     await this.mentionService.getAllUsersname();
