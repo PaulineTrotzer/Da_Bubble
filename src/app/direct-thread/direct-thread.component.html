@@ -264,6 +264,7 @@
                     <textarea #editableTextarea rows="3" class="edit-input"
                       [(ngModel)]="editableMessageText"></textarea>
                     <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
+
                       <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="8"
                           width="24" height="24">
@@ -300,19 +301,21 @@
           </div>
 
 
-          <!--- Reactions are following for 2 Reactions (2 Sides)-->
+          <!-- (1) Reactions for 2 Reactions (2 sides) -->
           <div class="separated-both-currentUser-reaction-right" [ngClass]="{ 
-          'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
-          'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name && !isSelfThread
-        }">
+       'separated-both-currentUser-reaction-right': message.senderName === currentUser.name,
+       'separated-both-selectedUser-reaction-left': message.recipientName === currentUser.name && !isSelfThread
+     }">
+
             <div class="render-reaction-ct-sender"
-              *ngIf="!areEmojisSame(message.reactions) && message.senderName == currentUser.name" [ngClass]="{'render-reaction-first-message-sender' : i === 0 
-            }">
+              *ngIf="!areEmojisSame(message.reactions) && message.senderName == currentUser.name"
+              [ngClass]="{'render-reaction-first-message-sender': i === 0}">
 
-
+              <!-- SENDER-Emoji (nicht SelfThread) -->
               <div *ngIf="message.reactions[message.senderId]?.counter > 0 && !isSelfThread" class="emoji-holder"
                 (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
                 (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
+
                 <span class="single-emoji">
                   {{ message.reactions[message.senderId]?.emoji }}
                 </span>
@@ -321,9 +324,11 @@
                 </span>
               </div>
 
+              <!-- SENDER-Emoji (SelfThread) -->
               <div *ngIf="message.reactions[message.senderId]?.counter > 0 && isSelfThread" class="emoji-holder"
                 (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
                 (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
+
                 <span class="single-emoji">
                   {{ message.reactions[message.senderId]?.emoji }}
                 </span>
@@ -332,9 +337,11 @@
                 </span>
               </div>
 
-              <div *ngIf=" message.reactions[message.recipientId]?.counter> 0 && !isSelfThread" class="emoji-holder"
+              <!-- RECIPIENT-Emoji (not selfThread) -->
+              <div *ngIf="message.reactions[message.recipientId]?.counter > 0 && !isSelfThread" class="emoji-holder"
                 (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
                 (mouseleave)="toggleReactionInfoRecipientAtCurrentUser(message.id, false)">
+
                 <span class="single-emoji">
                   {{ message.reactions[message.recipientId]?.emoji }}
                 </span>
@@ -345,52 +352,56 @@
             </div>
 
 
-
-            <!--- Reactions are following for currentUser-View Reactions-->
-            <div class="reaction-name-info-ct-sender" [hidden]="!showReactionPopUpSenderAtCu[message.id]" [ngClass]="{
-              'hovered': showReactionPopUpSenderAtCu[message.id],
-              'you-reacted':
-                 message.senderId === currentUser.uid &&
-                 message.reactions[message.senderId]?.counter > 0,
-              'only-you-reacted':
-                 (message.senderId === currentUser.uid &&
-                 message.reactions[message.senderId]?.counter > 0) &&
-                 (
-                   !message.reactions[message.recipientId] ||
-                   message.reactions[message.recipientId]?.counter === 0
-                 )
-            }">
+            <!-- (1a) Reaction-Info: currentUser-View (Sender) -->
+            <!-- anstelle von [hidden], wir nutzen .hovered -->
+            <div class="reaction-name-info-ct-sender" [ngClass]="{
+         'hovered': showReactionPopUpSenderAtCu[message.id],
+         'you-reacted': message.senderId === currentUser.uid && message.reactions[message.senderId]?.counter > 0,
+         'only-you-reacted': (message.senderId === currentUser.uid
+                              && message.reactions[message.senderId]?.counter > 0)
+                             && (!message.reactions[message.recipientId]
+                                 || message.reactions[message.recipientId]?.counter === 0)
+       }">
               <span class="reaction-info-txt">
-                <ng-container
-                  *ngIf="message.senderId === currentUser.uid && message.reactions[message.senderId]?.counter> 0">
+                <ng-container *ngIf="message.senderId === currentUser.uid
+                           && message.reactions[message.senderId]?.counter > 0">
                   Du hast mit
-                  <span class="react-emoji-value">{{ message.reactions[message.senderId]?.emoji }}
-                  </span> reagiert
+                  <span class="react-emoji-value">
+                    {{ message.reactions[message.senderId]?.emoji }}
+                  </span>
+                  reagiert
                 </ng-container>
               </span>
             </div>
 
-            <div class="reaction-name-info-ct-sender" [hidden]="!showReactionPopUpRecipientAtCu[message.id]" [ngClass]="{ 'hovered': showReactionPopUpRecipientAtCu[message.id],
-           'has-reacted':message.senderId === currentUser.uid && message.reactions[message.recipientId]?.counter> 0}">
+            <div class="reaction-name-info-ct-sender" [ngClass]="{
+         'hovered': showReactionPopUpRecipientAtCu[message.id],
+         'has-reacted': message.senderId === currentUser.uid
+                       && message.reactions[message.recipientId]?.counter > 0
+       }">
               <span class="reaction-info-txt">
-                <ng-container
-                  *ngIf="message?.recipientId === selectedUser?.uid && message.reactions[message.recipientId]?.counter> 0 ">
+                <ng-container *ngIf="
+        message?.recipientId === selectedUser?.uid
+        && message.reactions[message.recipientId]?.counter > 0
+      ">
                   {{ message.recipientName }} hat mit
-                  <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji }}</span> reagiert
+                  <span class="react-emoji-value">
+                    {{ message.reactions[message.recipientId]?.emoji }}
+                  </span>
+                  reagiert
                 </ng-container>
               </span>
             </div>
 
 
+            <!-- (2) Reactions for selectedUser-View (recipient) -->
+            <div class="render-reaction-ct-recipient" *ngIf="!areEmojisSame(message.reactions)
+               && message.senderName == selectedUser.name
+               && !isSelfThread" [ngClass]="{'render-reaction-first-message-recipient': i === 0}">
 
-
-
-            <!--- Reactions are following for selectedUser-View Reactions-->
-            <div class="render-reaction-ct-recipient"
-              *ngIf="!areEmojisSame(message.reactions) && message.senderName == selectedUser.name && !isSelfThread"
-              [ngClass]="{'render-reaction-first-message-recipient' : i === 0}">
               <ng-container>
-                <div *ngIf=" message.reactions[message.recipientId]?.counter> 0 && !isSelfThread" class="emoji-holder"
+                <!-- RECIPIENT-Emoji -->
+                <div *ngIf="message.reactions[message.recipientId]?.counter>0 && !isSelfThread" class="emoji-holder"
                   (mouseenter)="toggleReactionInfoRecipientAtSelectedUser(message.id, true)"
                   (mouseleave)="toggleReactionInfoRecipientAtSelectedUser(message.id, false)">
                   <span class="single-emoji">
@@ -401,7 +412,8 @@
                   </span>
                 </div>
 
-                <div *ngIf=" message.reactions[message.senderId]?.counter> 0 && !isSelfThread" class="emoji-holder"
+                <!-- SENDER-Emoji -->
+                <div *ngIf="message.reactions[message.senderId]?.counter>0 && !isSelfThread" class="emoji-holder"
                   (mouseenter)="toggleReactionInfoSenderAtSelectedUser(message.id, true)"
                   (mouseleave)="toggleReactionInfoSenderAtSelectedUser(message.id, false)">
                   <span class="single-emoji">
@@ -413,56 +425,49 @@
                 </div>
               </ng-container>
 
-
-              <div class="reaction-name-info-ct-recipient"
-                [ngStyle]="{ 'opacity': showReactionPopUpRecipientAtSu[message.id] ? 1 : 0 }" [ngClass]="{
-              'hovered': showReactionPopUpRecipientAtSu[message.id],
-              'reaction-name-info-you-reacted': message.senderId === selectedUser.uid
-            }">
+              <!-- Reaction-Info for recipient -->
+              <div class="reaction-name-info-ct-recipient" [ngClass]="{
+           'hovered': showReactionPopUpRecipientAtSu[message.id],
+           'reaction-name-info-you-reacted': message.senderId === selectedUser.uid
+         }">
                 <span class="reaction-info-txt">
-                  <ng-container
-                    *ngIf="message.recipientId === currentUser.uid && message.reactions[message.recipientId]?.counter > 0">
-                    Du hast mit <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji
-                      }}</span>
+                  <ng-container *ngIf="message.recipientId === currentUser.uid
+                 && message.reactions[message.recipientId]?.counter > 0">
+                    Du hast mit
+                    <span class="react-emoji-value">{{ message.reactions[message.recipientId]?.emoji }}</span>
                     reagiert
                   </ng-container>
                 </span>
               </div>
 
-
-              <div *ngIf="!isSelfThread" class="reaction-name-info-ct-recipient"
-                [ngStyle]="{ 'opacity': showReactionPopUpSenderAtSu[message.id] ? 1 : 0 }" [ngClass]="{
-              'hovered': showReactionPopUpSenderAtSu[message.id],
-              'reaction-name-info-has-reacted': message.senderId === selectedUser.uid &&  message.reactions[message.senderId]?.counter > 0,
-              'has-reacted-first': message.senderId === selectedUser.uid && !message.reactions[message.recipientId]?.counter || message.reactions[message.recipientId]?.counter == 0  ,
-            }">
+              <div *ngIf="!isSelfThread" class="reaction-name-info-ct-recipient" [ngClass]="{
+           'hovered': showReactionPopUpSenderAtSu[message.id],
+           'reaction-name-info-has-reacted': message.senderId === selectedUser.uid
+                                           && message.reactions[message.senderId]?.counter > 0
+         }">
                 <span class="reaction-info-txt">
-                  <ng-container
-                    *ngIf="message.senderId === selectedUser.uid && message.reactions[message.senderId]?.counter > 0">
-                    {{ message.senderName }} hat mit <span class="react-emoji-value">{{
-                      message.reactions[message.senderId]?.emoji }}</span> reagiert
+                  <ng-container *ngIf="message.senderId === selectedUser.uid
+                 && message.reactions[message.senderId]?.counter > 0">
+                    {{ message.senderName }} hat mit
+                    <span class="react-emoji-value">
+                      {{ message.reactions[message.senderId]?.emoji }}
+                    </span>
+                    reagiert
                   </ng-container>
                 </span>
               </div>
-
-
-
-
             </div>
+
           </div>
 
 
-          <!--- Reactions are following for 2 Same Reactions View-->
-          <div [ngClass]="{
-          'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name,
-        }">
-            <div class="emoji-holder-both" [ngClass]="{
-            'emoji-flex-right':message.senderName === currentUser.name
-          }" *ngIf="areEmojisSame(message.reactions)">
-              <div class="emoji-holder" (mouseover)="toggleBothReactionInfo(message.id,true)"
-                (mouseout)="toggleBothReactionInfo(message.id,false)"
-                [class.emojis-holder-both-two-single]="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]) && message.reactions.counter > 0"
-                [class.both-reaction-right-emojis-holder]="message.senderName === currentUser.name">
+          <!-- (3) Reactions for 2 same Reactions -->
+          <div [ngClass]="{'two-both-selectedUser-reaction-left': message.recipientName === currentUser.name}">
+            <div class="emoji-holder-both" [ngClass]="{'emoji-flex-right': message.senderName === currentUser.name}"
+              *ngIf="areEmojisSame(message.reactions)">
+
+              <div class="emoji-holder" (mouseenter)="toggleBothReactionInfo(message.id, true)"
+                (mouseleave)="toggleBothReactionInfo(message.id, false)">
                 <span class="single-emoji">
                   {{ getEmojiFromFirstUser(message.reactions) }}
                 </span>
@@ -471,31 +476,30 @@
                 </span>
               </div>
 
-
               <div class="both-reaction-info-ct" [ngClass]="{
-       'both-reaction-right': message.senderName === currentUser.name,
-       'both-reaction-left': message.recipientName === currentUser.name,
-       'both-two-single': !TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId]),
-       'hovered': showReactionPopUpBoth[message.id]
-     }" [style.visibility]="showReactionPopUpBoth[message.id] ? 'visible' : 'hidden'">
+           'both-reaction-right': message.senderName === currentUser.name,
+           'both-reaction-left': message.recipientName === currentUser.name,
+           'hovered': showReactionPopUpBoth[message.id]
+         }">
                 <span class="reaction-info-txt-both"
                   *ngIf="TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
-                  Du und {{
-                  selectedUser.name }} haben mit
-                  <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
-                  reagiert</span>
+                  Du und {{ selectedUser.name }} habt mit
+                  <span class="reaction-emoji">
+                    {{ getEmojiFromFirstUser(message.reactions) }}
+                  </span>
+                  reagiert
+                </span>
                 <span class="reaction-info-txt-both two-single"
                   *ngIf="!TwoReactionsTwoEmojis(message.reactions[message.recipientId], message.reactions[message.senderId])">
                   {{selectedUser.name}} hat mit
-                  <span class="reaction-emoji">{{ getEmojiFromFirstUser(message.reactions) }}</span>
-                  reagiert</span>
+                  <span class="reaction-emoji">
+                    {{ getEmojiFromFirstUser(message.reactions) }}
+                  </span>
+                  reagiert
+                </span>
               </div>
             </div>
-
-
           </div>
-
-
 
           <div class="user-emoji-bubble" *ngIf="showUserBubble" @fadeIn>
             <div class="img-container">

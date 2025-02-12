@@ -637,7 +637,6 @@ app-input-field {
 
 .sticker-info-tooltip {
   position: absolute;
-  /* Oberhalb der Sticker-Box */
   bottom: 100%;
   left: 80%;
   z-index: 999;
@@ -663,7 +662,7 @@ app-input-field {
     pointer-events: auto;
   }
 }
-
+/* 
 .sticker-info-tooltip.tooltip-current-user {
   right: 96px;
   background-color: #f0f;
@@ -680,7 +679,7 @@ app-input-field {
 .sticker-info-tooltip.tooltip-recipient-active {
   left: 242px;
 }
-
+ */
 .sticker-senderName-current {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 0;
