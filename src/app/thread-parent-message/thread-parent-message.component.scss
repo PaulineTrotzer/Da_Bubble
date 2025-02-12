@@ -14,6 +14,17 @@
   transition: opacity 0.3s ease;
 }
 
+.thread-container {
+  opacity: 0;
+  animation: fadeIn 0.95s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
 app-thread-parent-message {
   display: flex;
   flex-direction: column;
