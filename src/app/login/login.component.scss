@@ -21,6 +21,32 @@ header {
   }
 }
 
+@keyframes typeText {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.fly-up {
+  animation: blackFlyUp 0.75s ease-in-out forwards;
+}
+
+@keyframes blackFlyUp {
+  0% {
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    top: 40px; left: 60px;
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
 .neu-ct {
   position: absolute;
   right: 120px;
@@ -33,37 +59,50 @@ header {
 }
 
 .header-logo-ct {
-  position: fixed; 
-  top: 50%; 
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
   gap: 12px;
-  animation: flyUp 0.75s ease-in-out 0.25s forwards;
 }
 
 .black-text{
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  width: 0;
+  animation: typeText 1s steps(8, end) forwards;
 }
 
-@keyframes flyUp {
+
+@keyframes logoShift {
   0% {
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-40px);
+  }
+  50% {
+    transform: translateX(-20px);
+  }
+  80% {
+    transform: translateX(-35px);
   }
   100% {
-    top: 40px; 
-    left: 60px;
-    transform: translate(0, 0);
+    transform: translateX(-30px);
   }
 }
 
-.header-logo {
+.black-logo {
   width: 110px;
+  animation: logoShift 1.5s  forwards;
+  animation-delay: 0.5s;
 }
 
 

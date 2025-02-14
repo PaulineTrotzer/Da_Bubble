@@ -6,9 +6,14 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './intro-animation.component.html',
-  styleUrl: './intro-animation.component.scss'
+  styleUrl: './intro-animation.component.scss',
 })
 export class IntroAnimationComponent {
+  flyUpActive = false;
 
-
+  ngOnInit() {
+    setTimeout(() => {
+      this.flyUpActive = true;
+    }, 1000);
+  }
 }

@@ -28,7 +28,7 @@ import { IntroAnimationComponent } from '../intro-animation/intro-animation.comp
     FormsModule,
     RouterModule,
     MatCardModule,
-    IntroAnimationComponent
+    IntroAnimationComponent,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
     password: '',
   };
   loginFailed = false;
-  loading = false; 
+  loading = false;
   userService = inject(UserService);
   firestore = inject(Firestore);
   auth = inject(AuthService);
@@ -54,20 +54,18 @@ export class LoginComponent implements OnInit {
   googleUserUid: any = '';
   @ViewChild('loginForm', { static: false }) loginForm!: NgForm;
   constructor() {}
+  public flyUpActive = false;
 
-  ngOnInit() {}
-  showIntro = true;
-  headerLogoActive = false;
+  ngOnInit() {
+    // Zeitlicher Ablauf:
+    // 0s => Shift + Type starten
+    // Type nimmt 2s, also Sekunde 3 sind wir fertig
+    // => ab Sekunde 3 => FlyUp
 
-
-  onShowHeader() {
-    // Wird von (startShowingHeader) getriggert
-    this.headerLogoActive = true;
-  }
-
-  onIntroDone() {
-    // Overlay entfernen
-    this.showIntro = false;
+    setTimeout(() => {
+      this.flyUpActive = true;
+      // => Container fliegt 0.75s => Sek 3–3.75
+    }, 1000);
   }
 
   async onSubmit(ngForm: NgForm) {
@@ -143,11 +141,11 @@ export class LoginComponent implements OnInit {
     this.loginForm.reset();
     this.loginForm.setValue({
       email: '',
-      password: ''
+      password: '',
     });
     await this.auth.SignGuestIn();
   }
-  
+
   async googleLogIn() {
     await this.auth.googleLogIn();
   }

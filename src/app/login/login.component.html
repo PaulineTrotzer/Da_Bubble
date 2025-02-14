@@ -1,8 +1,8 @@
 
-<!-- <app-intro-animation *ngIf="showIntro"></app-intro-animation> -->
+<app-intro-animation ></app-intro-animation>
 <div class="full-page-content">
     <header>
-        <div class="header-logo-ct">
+        <div class="header-logo-ct" [class.fly-up]="flyUpActive">
             <img src="assets/img/logo.png" alt="logo" class="black-logo"  />
             <span class="black-text">DABubble</span>
         </div>
