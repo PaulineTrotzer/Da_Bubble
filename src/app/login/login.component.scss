@@ -14,11 +14,6 @@ header {
   justify-content: space-between;
   padding: 22px;
   max-width: 2000px;
-  img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-  }
 }
 
 @keyframes typeText {
@@ -36,13 +31,45 @@ header {
 
 @keyframes blackFlyUp {
   0% {
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     opacity: 1;
   }
   100% {
-    top: 40px; left: 60px;
+    top: 40px;
+    left: 60px;
     transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes blackFlyUpMobile {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes blackFlyUpSmartPhone {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    top: 110px;
+    left: 50%;
+    transform: translate(-50%, 0);
     opacity: 1;
   }
 }
@@ -69,7 +96,7 @@ header {
   gap: 12px;
 }
 
-.black-text{
+.black-text {
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -79,7 +106,6 @@ header {
   width: 0;
   animation: typeText 1s steps(8, end) forwards;
 }
-
 
 @keyframes logoShift {
   0% {
@@ -100,11 +126,11 @@ header {
 }
 
 .black-logo {
+  object-fit: cover;
   width: 110px;
-  animation: logoShift 1.5s  forwards;
+  animation: logoShift 1.5s forwards;
   animation-delay: 0.5s;
 }
-
 
 form {
   display: flex;
@@ -362,14 +388,29 @@ input[type="text"]:focus::placeholder {
 .guest-or-mail {
   margin-left: 6px;
 }
+@media screen and (max-width: 815px) {
+  .fly-up {
+    animation: blackFlyUpMobile 0.75s ease-in-out forwards;
+  }
+  .black-text {
+    font-size: 22px !important;
+  }
+  .header-logo-ct {
+    gap: 0 !important;
+  }
+  .black-logo {
+    width: 55px !important;
+  }
+  .neu-ct {
+    right: 0 !important;
+    top: 28px !important;
+    width: 100px;
+    left: 30px;
+    text-align: center;
+  }
+}
 
 @media (max-width: 640px) {
-  header {
-    img {
-      width: 60px;
-      height: 60px;
-    }
-  }
   form {
     .advice-mail {
       font-size: 16px;
@@ -408,5 +449,15 @@ input[type="text"]:focus::placeholder {
   }
   .error-message {
     top: 55px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .fly-up {
+    animation: blackFlyUpSmartPhone 0.75s ease-in-out forwards;
+  }
+  .neu-ct {
+    width: 100% !important;
+    left: 0 !important;
   }
 }

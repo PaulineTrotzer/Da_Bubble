@@ -1,0 +1,139 @@
+
+@keyframes blackFlyUp {
+    0% {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+    100% {
+      top: 40px;
+      left: 60px;
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes blackFlyUpMobile {
+    0% {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+    100% {
+      top: 50px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes blackFlyUpSmartPhone {
+    0% {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+    100% {
+      top: 110px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes typeText {
+    0% {
+      width: 0;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  
+  .fly-up {
+    animation: blackFlyUp 0.75s ease-in-out forwards;
+  }
+  
+
+
+
+@media screen and (max-width: 815px) {
+    .fly-up {
+      animation: blackFlyUpMobile 0.75s ease-in-out forwards;
+    }
+    .black-text {
+      font-size: 22px !important;
+    }
+    .header-logo-ct {
+      gap: 0 !important;
+    }
+    .black-logo {
+      width: 55px !important;
+    }
+    .neu-ct {
+      right: 0 !important;
+      top: 17px !important;
+      width: 90px;
+      left: 30px;
+      text-align: center;
+    }
+  }
+  
+  @media screen and (max-width: 640px) {
+    form {
+      .advice-mail {
+        font-size: 16px;
+        width: 300px;
+        margin-bottom: 22px;
+      }
+    }
+    h2 {
+      font-size: 38px;
+    }
+    .login-form-headline {
+      padding: 12px;
+      max-width: 320px;
+    }
+    .input-container {
+      width: 280px;
+    }
+    .input-styling {
+      height: 50px;
+    }
+    .google-button {
+      justify-content: center;
+      width: 300px;
+      padding: 0 !important;
+    }
+    .oder-part {
+      .line-img {
+        width: 320px;
+      }
+    }
+    .btn-primary,
+    .btn-primary-disabled,
+    .btn-primary-disabled:not([disabled]) {
+      padding: 8px 16px;
+      font-size: 16px;
+    }
+    .error-message {
+      top: 55px;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .fly-up {
+      animation: blackFlyUpSmartPhone 0.75s ease-in-out forwards;
+    }
+    .neu-ct {
+      width: 100% !important;
+      left: 0 !important;
+    }
+    header{
+        background-color: pink;
+    }
+  }
+  
