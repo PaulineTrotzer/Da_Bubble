@@ -14,22 +14,59 @@ header {
   justify-content: space-between;
   padding: 22px;
   max-width: 2000px;
-  > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    span {
-      font-size: 18px;
-    }
-  }
   img {
     width: 100px;
     height: 100px;
     object-fit: cover;
   }
 }
+
+.neu-ct {
+  position: absolute;
+  right: 120px;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  span {
+    font-size: 18px;
+  }
+}
+
+.header-logo-ct {
+  position: fixed; 
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: flyUp 0.75s ease-in-out 0.25s forwards;
+}
+
+.black-text{
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+@keyframes flyUp {
+  0% {
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    top: 40px; 
+    left: 60px;
+    transform: translate(0, 0);
+  }
+}
+
+.header-logo {
+  width: 110px;
+}
+
+
 form {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,33 @@
+.overlay-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 999;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(140deg, #313ae5 0%, #797ef3 100%);
+  animation: 0.75 ease-in-out;
+}
+
+
+
+.white-logo-text{
+    display: flex;
+    align-items: center; 
+    gap: 22px;
+}
+
+.white-text{
+    font-size: 72px;
+    color: white;
+    font-weight: 700;
+}
+
+.logo {
+  width: 200px;
+  height: auto;
+}

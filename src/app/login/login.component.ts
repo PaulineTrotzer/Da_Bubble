@@ -18,6 +18,7 @@ import { MatCardModule, MatCardContent } from '@angular/material/card';
 import { LoginAuthService } from '../services/login-auth.service';
 import { OverlayStatusService } from '../services/overlay-status.service';
 import { GlobalVariableService } from '../services/global-variable.service';
+import { IntroAnimationComponent } from '../intro-animation/intro-animation.component';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -27,6 +28,7 @@ import { GlobalVariableService } from '../services/global-variable.service';
     FormsModule,
     RouterModule,
     MatCardModule,
+    IntroAnimationComponent
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -37,7 +39,7 @@ export class LoginComponent implements OnInit {
     password: '',
   };
   loginFailed = false;
-  loading = false; // Optional: to show a loading spinner during login
+  loading = false; 
   userService = inject(UserService);
   firestore = inject(Firestore);
   auth = inject(AuthService);
@@ -54,6 +56,19 @@ export class LoginComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+  showIntro = true;
+  headerLogoActive = false;
+
+
+  onShowHeader() {
+    // Wird von (startShowingHeader) getriggert
+    this.headerLogoActive = true;
+  }
+
+  onIntroDone() {
+    // Overlay entfernen
+    this.showIntro = false;
+  }
 
   async onSubmit(ngForm: NgForm) {
     if (ngForm.submitted && ngForm.form.valid) {
