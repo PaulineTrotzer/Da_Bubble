@@ -6,7 +6,6 @@
       <div *ngIf="!afterLoginSheet" class="drop-down-div">
         <button *ngIf="selectedChannel " class="drop-down-button" mat-button (click)="openDialog(selectedChannel)">
           <span class="btn-text-img"># {{ selectedChannel?.name}} </span>
-          <!-- <img src="./assets/img/arrow_drop_down.svg"/></span> -->
         </button>
 
         <div (click)="showMyUserProfile()" class="user-chat-info" *ngIf="selectedUser && !selectedChannel">

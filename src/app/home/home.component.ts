@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   Renderer2,
   ViewChild,
@@ -47,10 +48,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   isThreadOpen = false;
   successfullyLogged = false;
   LogInAuth = inject(LoginAuthService);
-  private loginStatusSub: Subscription | undefined;
+  loginStatusSub: Subscription | undefined;
   global = inject(GlobalVariableService);
   isGuestLogin = false;
-  private guestLoginStatusSub: Subscription | undefined;
+  guestLoginStatusSub: Subscription | undefined;
   onHeaderUser: any;
   onHeaderChannel: any;
   directThreadId: string | null = null;
@@ -78,6 +79,20 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.setDirectThread();
     this.setChannelThread();
     this.authService.initAuthListener();
+    this.checkScreenWidth(window.innerWidth);
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkScreenWidth(event.target.innerWidth);
+  }
+
+  checkScreenWidth(width: number) {
+    if (width < 1380) {
+      this.isWorkspaceOpen = false;
+    } else {
+      this.isWorkspaceOpen = true;
+    }
   }
 
   async loadUserData(userId: string) {

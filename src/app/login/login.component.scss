@@ -388,6 +388,10 @@ input[type="text"]:focus::placeholder {
 .guest-or-mail {
   margin-left: 6px;
 }
+
+
+@import "./mobile-view-styling/login.mobile.scss";
+/* 
 @media screen and (max-width: 815px) {
   .fly-up {
     animation: blackFlyUpMobile 0.75s ease-in-out forwards;
@@ -461,3 +465,4 @@ input[type="text"]:focus::placeholder {
     left: 0 !important;
   }
 }
+ */
