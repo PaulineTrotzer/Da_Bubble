@@ -13,7 +13,6 @@ mat-card {
   z-index: 11;
 }
 
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -52,9 +51,9 @@ mat-card {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%; 
-  min-height: 58px; 
-  padding: 8px 16px; 
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 16px;
   cursor: pointer;
   border-radius: 30px;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -70,18 +69,17 @@ mat-card {
   }
 
   h4 {
-    margin: 0; 
+    margin: 0;
     font-size: 20px;
     font-weight: 700;
     line-height: 24px;
-    color: #000; 
-    white-space: nowrap; 
+    color: #000;
+    white-space: nowrap;
     &:hover {
       color: #444df2;
     }
   }
 }
-
 
 .drop-down-div {
   display: flex;
@@ -169,4 +167,19 @@ mat-card {
   z-index: 2;
 }
 
-
+@media (max-width: 320px) {
+  .big-chat-card{
+    height: auto;
+    max-width: 300px;
+    min-width: auto;
+  }
+  .header {
+    position: absolute;
+    left: -34px;
+    max-width: 300px;
+  }
+  .welcome-sheet{
+    left: -34px;
+    width: 320px;
+  }
+}

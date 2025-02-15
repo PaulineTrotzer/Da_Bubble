@@ -304,7 +304,7 @@ input.radius {
   overflow: auto;
 }
 
-@media (max-width: 1349px) {
+/* @media (max-width: 1349px) {
   .header-content {
     gap: 10px;
   }
@@ -383,6 +383,89 @@ input.radius {
     input {
       background-position: calc(102% - 17px) center;
       background-size: 20px 20px;
+    }
+  }
+}
+ */
+
+@media (max-width: 320px) {
+  .bubble-img {
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    width: 143px;
+    height: 64px;
+  }
+  .user-info {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    svg {
+      width: 9px;
+      height: 5px;
+    }
+    .user-img {
+      object-fit: contain;
+      width: 50px;
+      height: 50px;
+    }
+    h2 {
+      font-size: 20px;
+    }
+  }
+  .arrow-down-btn{
+    width: 40px;
+  }
+  .status-border {
+    bottom: 8px;
+    right: 42px;
+  }
+  .online {
+    height: 7px;
+    width: 7px;
+  }
+  .main-header {
+    height: 165px;
+  }
+  .search-container {
+    position: absolute;
+    top: 120px;
+    left: 0;
+  }
+  input {
+    width: 100%;
+    max-width: 315px;
+    height: 42px;
+    padding: 8px 2px;
+    background-image: none;
+    border-radius: 0;
+    font-size: 13px;
+    border: none;
+    &:focus {
+      border: none;
+      outline: none;
+      font-size: 13px;
+    }
+    /* Placeholder-Styling mit Vendor-Prefixes */
+    &::-webkit-input-placeholder {
+      font-size: 13px;
+      overflow: hidden;
+    }
+    &:-moz-placeholder {
+      font-size: 13px; /* Firefox 4-18 */
+      overflow: hidden;
+    }
+    &::-moz-placeholder {
+      font-size: 13px; /* Firefox 19+ */
+      overflow: hidden;
+    }
+    &:-ms-input-placeholder {
+      font-size: 13px; /* IE 10-11 */
+      overflow: hidden;
+    }
+    &::-ms-input-placeholder {
+      font-size: 13px; /* Microsoft Edge */
+      overflow: hidden;
     }
   }
 }
