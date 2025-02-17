@@ -105,7 +105,7 @@ export class ChannelChatComponent implements OnInit {
   globalService = inject(GlobalVariableService);
   @Output() headerUpdate: EventEmitter<any> = new EventEmitter<any>();
   clicked = false;
-  overlayStatusService = inject(OverlayStatusService);
+  isOverlayOpen = false;
   auth = inject(Auth);
   cdr = inject(ChangeDetectorRef);
   @ViewChild('messageContainer') messageContainer!: ElementRef;
@@ -136,23 +136,17 @@ export class ChannelChatComponent implements OnInit {
     });
   }
 
-
   scrollToBottom(): void {
     if (this.messageContainer) {
-      if(this.shouldScroll){
+      if (this.shouldScroll) {
         this.messageContainer.nativeElement.scrollTop =
-        this.messageContainer.nativeElement.scrollHeight;
+          this.messageContainer.nativeElement.scrollHeight;
       }
     }
   }
 
   async ngOnChanges(changes: SimpleChanges) {
-    /*     if (changes['inputMessagesData'] && this.inputMessagesData.length > 0) {
-      console.log('Input Nachrichten geändert:', this.inputMessagesData);
-      this.messagesData = this.inputMessagesData;
-      this.shouldScroll = true;
-      this.loadUserNames();
-    } */
+  
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.shouldScroll = true;
       await this.loadChannelMessages();
@@ -161,14 +155,15 @@ export class ChannelChatComponent implements OnInit {
   }
 
   closePickerIfClickedOutside(event: MouseEvent) {
-    const emojiPickerContainer = this.elRef.nativeElement.querySelector(
-      '.emoji-picker-container'
-    );
-    if (emojiPickerContainer && !emojiPickerContainer.contains(event.target)) {
-      this.closeEmojiPicker(event);
+    const normalPicker = this.elRef.nativeElement.querySelector('.emoji-picker-container');
+    const editPicker = this.elRef.nativeElement.querySelector('.emoji-picker-container-edit');
+    if (normalPicker && !normalPicker.contains(event.target)) {
+      this.closeEmojiPicker(event); 
+    }
+    if (editPicker && !editPicker.contains(event.target)) {
+      this.closeEmojiPickerEdit();
     }
   }
-
   onCancelMessageBox(): void {
     this.wasClickedInChannelInput = false;
   }
@@ -384,26 +379,42 @@ export class ChannelChatComponent implements OnInit {
     );
   }
 
-  openEmojiPicker(messageId: string) {
+  openEmojiPicker(event: MouseEvent, messageId: string) {
+    event.stopPropagation();
     this.isPickerVisible = messageId;
-    this.overlayStatusService.setOverlayStatus(true);
+    console.log(this.isPickerVisible);
+    this.isOverlayOpen = true;
     this.clicked = true;
     this.editingMessageId = null;
   }
 
-  openEmojiPickerEdit(messageId: string) {
+  EmojiEditclicked = false;
+
+  openEmojiPickerEdit(event: MouseEvent, messageId: string) {
+    event.stopPropagation();
     this.isPickerVisible = messageId;
-    this.overlayStatusService.setOverlayStatus(true);
-    this.clicked = true;
+    this.isOverlayOpen = true;
+    this.EmojiEditclicked = true;
     this.editingMessageId = messageId;
   }
 
   closeEmojiPicker(event: MouseEvent) {
     event.stopPropagation();
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.clicked = false;
     this.editingMessageId = null;
     this.isPickerVisible = null;
+  }
+
+  closeEmojiPickerEdit() {
+    this.isOverlayOpen = false;
+    this.EmojiEditclicked = false;
+  }
+
+  editMessageAdd(event: any) {
+    const emoji = event.emoji.native;
+    this.messageToEdit += emoji;
+    this.closeEmojiPickerEdit();
   }
 
   async addLastUsedEmoji(emoji: any) {
@@ -548,15 +559,10 @@ export class ChannelChatComponent implements OnInit {
     }
 
     this.isPickerVisible = null;
-    this.overlayStatusService.setOverlayStatus(false);
-  }
-
-  closePicker(event: MouseEvent) {
-    event.stopPropagation();
-
-    this.isPickerVisible = null;
     this.clicked = false;
+    this.isOverlayOpen = false;
   }
+
 
   onPickerClick(event: MouseEvent): void {
     event.stopPropagation();
@@ -565,7 +571,7 @@ export class ChannelChatComponent implements OnInit {
   letPickerVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   hasReactions(reactions: { [emoji: string]: string[] }): boolean {

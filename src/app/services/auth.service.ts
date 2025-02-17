@@ -1,5 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInAnonymously } from '@angular/fire/auth';
+import {
+  getAuth,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInAnonymously,
+} from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { User } from '../models/user.class';
 import {
@@ -89,7 +96,9 @@ export class AuthService {
         console.error('Fehler beim Aktualisieren des Benutzerstatus: ', err);
       }
     } else {
-      console.warn(`Dokument für Benutzer ${userId} existiert nicht. Übersprungen.`);
+      console.warn(
+        `Dokument für Benutzer ${userId} existiert nicht. Übersprungen.`
+      );
     }
   }
 
@@ -141,7 +150,10 @@ export class AuthService {
 
       if (user.picture) {
         try {
-          finalPhotoUrl = await this.uploadGooglePhotoToStorage(user.picture, user.uid);
+          finalPhotoUrl = await this.uploadGooglePhotoToStorage(
+            user.picture,
+            user.uid
+          );
         } catch (e) {
           console.warn('Konnte Google-Foto nicht hochladen, nutze leer', e);
         }
@@ -158,16 +170,28 @@ export class AuthService {
       });
       console.log('Google-User erstellt.', slugUsername);
     } else {
-      const existingUserData = userSnapshot.data();
-      if (!existingUserData?.['googleAccount']) {
-        console.log('User bereits vorhanden, kein Überschreiben des Google Accounts.');
-      } else {
-        console.log('User ist bereits ein Google-Account Nutzer.');
+      // Wenn der Benutzer schon existiert, aktualisiere das Bild trotzdem
+      // – nur wenn Du das möchtest!
+      try {
+        const finalPhotoUrl = await this.uploadGooglePhotoToStorage(
+          user.picture,
+          user.uid
+        );
+        await updateDoc(userRef, { picture: finalPhotoUrl });
+        console.log('Google-Profilbild aktualisiert.');
+      } catch (e) {
+        console.warn('Konnte Google-Foto nicht aktualisieren', e);
       }
     }
   }
 
-  private async uploadGooglePhotoToStorage(googlePhotoURL: string, userUid: string): Promise<string> {
+  private async uploadGooglePhotoToStorage(
+    googlePhotoURL: string | undefined,
+    userUid: string
+  ): Promise<string> {
+    if (!googlePhotoURL) {
+      return '';
+    }
     try {
       const storage = getStorage();
       const storageRef = ref(storage, `avatars/${userUid}/googlePhoto.jpg`);
@@ -184,6 +208,7 @@ export class AuthService {
       throw error;
     }
   }
+  
 
   generateUsername(fullName: string): string {
     const parts = fullName.trim().split(/\s+/);

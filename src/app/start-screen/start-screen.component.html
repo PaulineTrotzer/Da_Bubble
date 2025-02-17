@@ -24,7 +24,6 @@
             }}
           </h4>
         </div>
-
       </div>
 
 
@@ -47,13 +46,10 @@
           [selectedChannel]="selectedChannel" 
           (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
       </div>
-<!--       [onHeaderUser]="onHeaderUser" -->
 
       <div *ngIf="global.channelSelected">
         <app-channel-chat [selectedChannel]="selectedChannel"></app-channel-chat>
       </div>
-<!--       [inputMessagesData]="messagesData" -->
-
 
       <div class="members-container" *ngIf="global.channelSelected">
         <div class="member-avatars" (click)="openMemberDialog()">

@@ -1,5 +1,5 @@
 .card {
-  padding: 40px 20px;
+  padding: 17px;
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -94,8 +94,4 @@ form {
   font-size: 15px;
 }
 
-@media (min-width: 768px) {
-  .card {
-    padding: 40px;
-  }
-}
+
