@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -29,7 +28,6 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Auth, getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { OverlayStatusService } from '../services/overlay-status.service';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -82,7 +80,6 @@ interface Message {
 })
 export class ChannelChatComponent implements OnInit {
   isEdited = false;
-  /*   @Input() inputMessagesData: any[] = []; */
   @Input() selectedChannel: any;
   firestore = inject(Firestore);
   global = inject(GlobalVariableService);
@@ -561,6 +558,7 @@ export class ChannelChatComponent implements OnInit {
     this.isPickerVisible = null;
     this.clicked = false;
     this.isOverlayOpen = false;
+    this.shouldScroll = false;
   }
 
 
