@@ -128,36 +128,41 @@
             </div>
 
             <div class="reaction-info">
-              <div *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji" class="reaction-from-container"
-                [ngClass]="{
-                  'reaction-on-user':
-                    message.senderId !== global.currentUserData.id,
-                  'reaction-on-current':
-                    message.senderId === global.currentUserData.id
+              <!-- 
+                A) Info-Box ist immer im DOM, 
+                   togglet per [class.show] die Opacity
+              -->
+              <div class="reaction-from-container"
+                [class.hovered]="hoveredReactionMessageId === message.id && hoveredEmoji" [ngClass]="{
+                  'reaction-on-user': message.senderId !== global.currentUserData.id,
+                  'reaction-on-current': message.senderId === global.currentUserData.id
                 }">
-                <span class="emoji-from">{{hoveredEmoji}}</span> <span class="reaction-text">{{ getReactionText(message,
-                  hoveredEmoji) }}</span>
+                <span class="reaction-text">
+                  {{ getReactionText(message, hoveredEmoji) }}
+                </span>
               </div>
-
             </div>
 
+
+
             <div class="reactions-container" [ngClass]="{
-              'reactions-from-current': message.senderId === global.currentUserData.id,
-              'reactions-from-other': message.senderId !== global.currentUserData.id
+              'reaction-on-user': message.senderId !== global.currentUserData.id,
+              'reaction-on-current': message.senderId === global.currentUserData.id
             }">
               <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
                 (mouseenter)="onReactionHover(message, reaction.key)"
                 (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
                 (click)="addEmojiToMessage(reaction.key, message.id)">
-                {{ reaction.key }} <ng-container *ngIf="reaction.value.length > 1">
+                {{ reaction.key }}
+                <ng-container *ngIf="reaction.value.length > 1">
                   {{ reaction.value.length }}
                 </ng-container>
               </span>
             </div>
 
-            <div class="thread-info-box" *ngIf="showThreadInfo">
+            <!--        <div class="thread-info-box" *ngIf="showThreadInfo">
               answers last answer
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

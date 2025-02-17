@@ -705,29 +705,62 @@ export class ChannelChatComponent implements OnInit {
 
   getReactionText(message: Message, emoji: string | null): string {
     if (!emoji || !message.reactions) return '';
-
+  
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid || '';
     const reactors = message.reactions[emoji] || [];
-
+  
+    // Keine Reaktoren => Leer
     if (reactors.length === 0) return '';
-
+  
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter((userId) => userId !== currentUserId);
-
-    if (currentUserReacted && reactors.length === 1) {
-      return 'Du hast reagiert.';
+  
+    // Am Ende geben wir so etwas zurück wie:
+    // „Du hast mit 😅 reagiert.“ oder „Sophia hat mit 😅 reagiert.“ oder „Sophia und Du habt mit 😅 reagiert.“ etc.
+    // Wir bestimmen zuerst, WER reagiert hat (userString) und wie wir das Verb "hat/haben" konjugieren (verb).
+  
+    let userString = '';
+    let verb = '';
+  
+    if (currentUserReacted) {
+      // Du hast reagiert
+      if (otherReactors.length === 0) {
+        // Nur Du allein
+        userString = 'Du';
+        verb = 'hast';
+      } else if (otherReactors.length === 1) {
+        // Du + 1 andere Person
+        const otherUser = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+        // Reihenfolge je nach Geschmack
+        // z. B. "Du und Anna" oder "Anna und Du"
+        userString = `${otherUser} und Du`;
+        verb = 'habt';
+      } else {
+        // Du + mehrere andere
+        const countOthers = otherReactors.length;
+        userString = `Du und ${countOthers} andere`;
+        verb = 'haben';
+      }
+    } else {
+      // Du hast NICHT reagiert => nur andere
+      if (reactors.length === 1) {
+        // genau 1 anderer
+        const userId = reactors[0];
+        const userName = this.reactionUserNames[userId] || 'Jemand';
+        userString = userName;
+        verb = 'hat';
+      } else {
+        // mehrere andere, aber Du nicht
+        userString = `${reactors.length} Personen`;
+        verb = 'haben';
+      }
     }
-
-    if (currentUserReacted && otherReactors.length > 0) {
-      const otherUserName =
-        this.reactionUserNames[otherReactors[0]] || 'Jemand';
-      return `${otherUserName} und Du haben reagiert.`;
-    }
-
-    const firstReactorName = this.reactionUserNames[reactors[0]] || 'Jemand';
-    return `${firstReactorName} hat reagiert.`;
+  
+    // Jetzt noch das eigentliche Emoji einbauen
+    return `${userString} ${verb} mit ${emoji} reagiert.`;
   }
+  
 
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;

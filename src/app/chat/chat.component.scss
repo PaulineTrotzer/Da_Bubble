@@ -639,6 +639,7 @@ app-input-field {
 .sticker-info-tooltip {
   position: absolute;
   bottom: 100%;
+  font-size: 13px;
   left: 80%;
   z-index: 999;
   border-top-left-radius: 30px;
@@ -663,24 +664,7 @@ app-input-field {
     pointer-events: auto;
   }
 }
-/* 
-.sticker-info-tooltip.tooltip-current-user {
-  right: 96px;
-  background-color: #f0f;
-}
-.sticker-info-tooltip.tooltip-sender-active {
-  right: 117px;
-}
 
-.sticker-info-tooltip.tooltip-other-user {
-  left: 200px;
-  background-color: #0ff;
-}
-
-.sticker-info-tooltip.tooltip-recipient-active {
-  left: 242px;
-}
- */
 .sticker-senderName-current {
   border-top-left-radius: 30px;
   border-bottom-left-radius: 0;
@@ -692,8 +676,6 @@ app-input-field {
   padding: 8px !important;
   position: absolute;
   max-height: 100px;
-  /*   top: -400px;
-  left: -40px; */
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
 }
@@ -735,40 +717,27 @@ app-input-field {
   width: fit-content;
   height: fit-content;
   display: flex;
-  /*   left: 0; */
   opacity: 0;
   padding: 8px !important;
-  /*   top: -400px; */
   transition: opacity 0.4s ease-in-out;
 }
 
 .sticker-senderName-user.hovered {
   opacity: 1;
   z-index: 200;
-  /*   top: -50px; */
-  /*   left: 8px; */
 }
 
-.sticker-senderName-user.hoveredSenderName {
-  /*   position: absolute;
-  bottom: -200px; */
-}
+
 
 .sticker-senderName-user.hoveredName {
   position: absolute;
-  /*  top: -94px;
-  left: -58px; */
 }
 
 .sticker-senderName-current-bothReaction {
   bottom: -220px;
-  /*   left: -30px !important; */
 }
 
 .sticker-senderName-current.seperateName {
-  /*   position: absolute;
-  left: 10px;
-  top: -28px; */
   bottom: -220px !important;
 }
 
