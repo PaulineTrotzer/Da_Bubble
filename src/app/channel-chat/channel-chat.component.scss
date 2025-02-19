@@ -154,13 +154,12 @@
 /* Nachrichten vom 'aktuellen' User */
 .message-from-current {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-start;
   gap: 30px;
   cursor: pointer;
   padding: 10px 45px 15px 0;
   position: relative;
 }
+
 .message-from-current:hover {
   background-color: #eceefe;
 }
@@ -314,11 +313,13 @@
   padding: 5px;
   align-items: center;
   justify-content: center;
-  position: relative;
-  top: 23px;
   height: 24px;
   min-width: 38px;
   font-size: 13px;
+  &:hover {
+    border-color: #444df2;
+    cursor: pointer;
+  }
 }
 
 /* Text-Content, Edit-Container, usw. */
@@ -326,6 +327,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-bottom: 6px;
 }
 
 .message-edit {
@@ -363,19 +365,30 @@
   left: 54px;
   background-color: white;
 }
+
+.first-message {
+  padding-top: 5px;
+}
 .message-container {
   display: flex;
   flex-direction: column;
-  min-height: 180px;
+  max-height: 175px;
 }
 
-.edited-container {
-  position: absolute;
-  bottom: 25px;
+.edited-holder {
+  height: 19px;
 }
 
 .edited-label {
   font-size: 12px;
+}
+
+.label-user {
+  align-self: flex-start;
+}
+
+.label-current {
+  align-self: flex-end;
 }
 
 .new-day-info {
@@ -455,7 +468,6 @@ form {
 /* Reaction-Info-Box (“Reaction from container”) */
 .reaction-from-container {
   pointer-events: none;
-
   width: fit-content;
   max-width: 120px;
   max-height: 120px;
@@ -471,14 +483,15 @@ form {
   visibility: hidden;
   transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
   position: absolute;
-  &.hovered{
-    pointer-events: auto;
-    opacity: 1;
-    visibility: visible;
-  }
+}
+.single-reaction-wrapper:hover .reaction-from-container {
+  opacity: 1;
+  visibility: visible;
 }
 
-
+.single-reaction-wrapper {
+  position: relative;
+}
 
 .reactions-container {
   position: relative;
@@ -497,12 +510,19 @@ form {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
   border-bottom-right-radius: 30px;
+  margin-left: 7px;
+  bottom: 23px;
 }
 .reaction-on-current {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
+  bottom: 25px;
+  right: 7px;
+  padding: 10px;
 }
+
+
 .emoji-from {
   font-size: 24px;
 }

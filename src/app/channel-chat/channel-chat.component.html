@@ -6,6 +6,7 @@
 
   <div class="message-scroll-container" #messageContainer>
     <div class="message-container" [ngClass]="{
+          'first-message': i === 0,
       'message-from-user': message.senderId !== global.currentUserData.id,
       'message-from-current': message.senderId === global.currentUserData.id
     }" *ngFor="let message of messagesData; let i = index" (mouseenter)="hoveredMessageId = message.id"
@@ -82,10 +83,6 @@
               <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
 
-            <div class="edited-container">
-              <span *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
-            </div>
-
             <div class="text-content">
               <div class="text" (click)="handleClickOnMention($event)">
                 <ng-container *ngFor="let mentionName of splitMessage(message.text)">
@@ -121,48 +118,63 @@
               </div>
             </div>
 
+            <div class="edited-holder" [ngClass]="{
+              'lablel-user': message.senderId !== global.currentUserData.id,
+              'label-current': message.senderId === global.currentUserData.id
+            }">
+              <span class="edited-label" *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
+            </div>
+
 
             <div *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
               <emoji-mart size="18" (click)="letPickerVisible($event, message.id)"
                 (emojiClick)="editMessageAdd($event)"></emoji-mart>
             </div>
 
-            <div class="reaction-info">
-              <!-- 
-                A) Info-Box ist immer im DOM, 
-                   togglet per [class.show] die Opacity
-              -->
-              <div class="reaction-from-container"
-                [class.hovered]="hoveredReactionMessageId === message.id && hoveredEmoji" [ngClass]="{
-                  'reaction-on-user': message.senderId !== global.currentUserData.id,
-                  'reaction-on-current': message.senderId === global.currentUserData.id
-                }">
-                <span class="reaction-text">
-                  {{ getReactionText(message, hoveredEmoji) }}
-                </span>
-              </div>
-            </div>
+            <div class="reactions-wrapper">
+              <!-- Reactions-Container, der alle Reactions enthält -->
+              <div class="reactions-container"
+                   [ngClass]="{
+                     'reactions-from-user': message.senderId !== global.currentUserData.id,
+                     'reactions-from-current': message.senderId === global.currentUserData.id
+                   }">
+            
+                <!-- Für jede Reaction wird ein eigener Wrapper angelegt -->
+                <div class="single-reaction-wrapper"
+                     *ngFor="let reaction of message.reactions | keyvalue"
+                     (mouseover)="onReactionHover(message, reaction.key)">
+                  
+                  <!-- Das Icon/Emoji selbst -->
+                  <span class="reaction"
+                        [ngClass]="{
+                          'emoji-current': message.senderId !== global.currentUserData.id,
+                          'emoji-user': message.senderId === global.currentUserData.id
+                        }">
+                    {{ reaction.key }}
+                    <ng-container *ngIf="reaction.value.length > 1">
+                      {{ reaction.value.length }}
+                    </ng-container>
+                  </span>
+            
+                  <!-- Tooltip: Immer im DOM, erscheint bei Hover (per CSS) -->
+                  <div class="reaction-from-container"
+                       [ngClass]="{
+                         'reaction-on-user': message.senderId !== global.currentUserData.id,
+                         'reaction-both-current': message.senderId == global.currentUserData.id && message.senderId !== global.currentUserData.id,
+                         'reaction-on-current': message.senderId === global.currentUserData.id
+                       }">
+                    <span class="reaction-text">
+                      {{ getReactionText(message, reaction.key) }}
+                      <!-- oder einfach "Test Tooltip" -->
+                    </span>
+                  </div>
+            
+                </div> <!-- Ende single-reaction-wrapper -->
+            
+              </div> <!-- Ende reactions-container -->
+            </div> <!-- Ende reactions-wrapper -->
+            
 
-
-
-            <div class="reactions-container" [ngClass]="{
-              'reaction-on-user': message.senderId !== global.currentUserData.id,
-              'reaction-on-current': message.senderId === global.currentUserData.id
-            }">
-              <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
-                (mouseenter)="onReactionHover(message, reaction.key)"
-                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null"
-                (click)="addEmojiToMessage(reaction.key, message.id)">
-                {{ reaction.key }}
-                <ng-container *ngIf="reaction.value.length > 1">
-                  {{ reaction.value.length }}
-                </ng-container>
-              </span>
-            </div>
-
-            <!--        <div class="thread-info-box" *ngIf="showThreadInfo">
-              answers last answer
-            </div> -->
           </div>
         </div>
       </div>
