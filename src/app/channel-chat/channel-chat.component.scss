@@ -332,22 +332,27 @@
 
 .message-edit {
   position: absolute;
-  padding: 10px 20px;
+  padding: 5px;
   box-shadow: 0px 6px 14px 0px #00000033;
   border-top-right-radius: 30px;
   border-bottom-right-radius: 30px;
   border-bottom-left-radius: 30px;
   background-color: white;
-  max-width: 269px;
+  max-width: 270px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
   width: 100%;
   z-index: 5;
-  left: 200px;
+  left: 125px;
   top: 32px;
 }
 .message-edit span {
-  padding: 7px;
+  padding: 8px;
+  font-size: 13px;
 }
+
 .message-edit:hover {
   background-color: white;
 }
@@ -521,7 +526,6 @@ form {
   right: 7px;
   padding: 10px;
 }
-
 
 .emoji-from {
   font-size: 24px;
