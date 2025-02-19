@@ -61,7 +61,7 @@
           </svg>
         </div>
         <div class="img-container" *ngIf="message.senderId === global.currentUserData.id"
-          (click)="toggleEditDialog(message.id)">
+          (mouseover)="toggleEditDialog(message.id)">
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
             class="icon">
             <path
