@@ -4,12 +4,15 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   inject,
   Input,
   OnInit,
   Output,
+  QueryList,
   SimpleChanges,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import {
   collection,
@@ -115,6 +118,7 @@ export class ChannelChatComponent implements OnInit {
   inputFieldService = inject(InputfieldService);
   selectFiles: any[] = [];
   mentionService = inject(MentionThreadService);
+  @ViewChildren('pickerContainer') pickerRefs!: QueryList<ElementRef>;
 
   constructor(private elRef: ElementRef) {}
 
@@ -122,10 +126,6 @@ export class ChannelChatComponent implements OnInit {
     await this.loadCurrentUserEmojis();
     await this.mentionService.getAllUsersname();
     await this.loadUserNames();
-    document.addEventListener(
-      'click',
-      this.closePickerIfClickedOutside.bind(this)
-    );
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
       console.log('selectedChannel (channel):', channel);
       this.selectedChannel = channel;
@@ -152,21 +152,8 @@ export class ChannelChatComponent implements OnInit {
       this.scrollToBottom();
     }
   }
+  
 
-  closePickerIfClickedOutside(event: MouseEvent) {
-    const normalPicker = this.elRef.nativeElement.querySelector(
-      '.emoji-picker-container'
-    );
-    const editPicker = this.elRef.nativeElement.querySelector(
-      '.emoji-picker-container-edit'
-    );
-    if (normalPicker && !normalPicker.contains(event.target)) {
-      this.closeEmojiPicker(event);
-    }
-    if (editPicker && !editPicker.contains(event.target)) {
-      this.closeEmojiPickerEdit();
-    }
-  }
   onCancelMessageBox(): void {
     this.wasClickedInChannelInput = false;
   }
@@ -355,10 +342,6 @@ export class ChannelChatComponent implements OnInit {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-    document.removeEventListener(
-      'click',
-      this.closePickerIfClickedOutside.bind(this)
-    );
   }
 
   openEmojiPicker(event: MouseEvent, messageId: string) {
@@ -380,8 +363,7 @@ export class ChannelChatComponent implements OnInit {
     this.editingMessageId = messageId;
   }
 
-  closeEmojiPicker(event: MouseEvent) {
-    event.stopPropagation();
+  closeEmojiPicker() {
     this.isOverlayOpen = false;
     this.clicked = false;
     this.editingMessageId = null;

@@ -17,11 +17,8 @@
           <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
         </div>
       </div>
-      <div class="emoji-picker-container" *ngIf="isPickerVisible === message.id && clicked" [ngClass]="{
-        'emoji-container-user': message.senderId !== global.currentUserData.id,
-        'emoji-container-current':
-          message.senderId === global.currentUserData.id
-      }">
+      <div (click)="closeEmojiPicker()" class="emoji-picker-container"
+        *ngIf="isPickerVisible === message.id && clicked">
         <emoji-mart size="18" (click)="letPickerVisible($event, message.id)"
           (emojiClick)="addEmojiToMessage($event.emoji.native, message.id)"></emoji-mart>
       </div>
@@ -60,9 +57,8 @@
             </g>
           </svg>
         </div>
-        <div class="edit-wrapper"  (mouseleave)="toggleEditDialog(null)">
-          <div class="img-container-edit" (mouseover)="toggleEditDialog(message.id)"
-           >
+        <div class="edit-wrapper" (mouseleave)="toggleEditDialog(null)">
+          <div class="img-container-edit" (mouseover)="toggleEditDialog(message.id)">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
               class="icon">
               <path
@@ -132,7 +128,7 @@
             </div>
 
 
-            <div *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
+            <div (click)="closeEmojiPickerEdit()" *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
               <emoji-mart size="18" (click)="letPickerVisible($event, message.id)"
                 (emojiClick)="editMessageAdd($event)"></emoji-mart>
             </div>
