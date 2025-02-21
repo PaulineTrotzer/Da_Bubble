@@ -8,6 +8,11 @@
   position: relative;
 }
 
+.edit-wrapper {
+  position: relative;
+  display: inline-block; /* oder flex, wie du magst */
+}
+
 
 .message-from-user .text-container .text,
 .message-from-current .text-container .text {
@@ -64,6 +69,16 @@
 }
 .img-container:hover .icon path {
   fill: #444df2;
+}
+
+.img-container-edit {
+  padding: 4px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  position: relative;
 }
 
 /* Scroll-Container für Nachrichten */
@@ -352,7 +367,7 @@
 
 .message-edit {
   position: absolute;
-  padding: 5px;
+  padding: 8px;
   box-shadow: 0px 6px 14px 0px #00000033;
   border-top-right-radius: 30px;
   border-bottom-right-radius: 30px;
@@ -363,14 +378,13 @@
   display: flex;
   justify-content: center;
   white-space: nowrap;
-  width: 100%;
   z-index: 5;
-  left: 119px;
-  top: 15px;
+  left:0px;
+  top: 8px;
 }
 
 .message-edit span {
-  padding: 8px;
+  padding: 4px;
   font-size: 13px;
 }
 

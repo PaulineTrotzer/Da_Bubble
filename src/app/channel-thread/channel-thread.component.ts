@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentReference,
   Firestore,
@@ -26,7 +27,6 @@ import { InputFieldComponent } from '../input-field/input-field.component';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
-import { OverlayStatusService } from '../services/overlay-status.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -81,7 +81,6 @@ export class ChannelThreadComponent implements OnInit {
   db = inject(Firestore);
   global = inject(GlobalVariableService);
   auth = inject(AuthService);
-  overlayStatusService = inject(OverlayStatusService);
   topicMessage: Message | null = null;
   messages: Message[] = [];
   isChannelThreadOpen: boolean = false;
@@ -108,7 +107,8 @@ export class ChannelThreadComponent implements OnInit {
   threadMessageId: string | null = null;
   cdr = inject(ChangeDetectorRef);
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
-  sanitizer=inject(DomSanitizer);
+  sanitizer = inject(DomSanitizer);
+  isOverlayOpen = false;
 
   constructor() {}
 
@@ -124,6 +124,17 @@ export class ChannelThreadComponent implements OnInit {
         await this.getAllUsersname();
       }
     });
+  }
+
+  getReplyCountText(): string {
+    const replyCount = this.messages.length > 1 ? this.messages.length - 1 : 0;
+    if (replyCount === 1) {
+      return '1 Antwort';
+    } else if (replyCount > 1) {
+      return `${replyCount} Antworten`;
+    } else {
+      return 'Keine Antworten';
+    }
   }
 
   formatMentions(text: string): SafeHtml {
@@ -152,12 +163,6 @@ export class ChannelThreadComponent implements OnInit {
         }
         this.handleMentionClick(mentionName);
       }
-    }
-  }
-
-  focusInputField(): void {
-    if (this.inputFieldComponent) {
-/*       this.inputFieldComponent.focusInputField(); */
     }
   }
 
@@ -193,11 +198,12 @@ export class ChannelThreadComponent implements OnInit {
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
       user.name.trim().toLowerCase()
     );
-    const mentionName = textPart.startsWith('@') ? textPart.substring(1).toLowerCase() : '';
+    const mentionName = textPart.startsWith('@')
+      ? textPart.substring(1).toLowerCase()
+      : '';
     return normalizedUserNames.includes(mentionName);
   }
 
-  
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelThread = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
@@ -460,20 +466,20 @@ export class ChannelThreadComponent implements OnInit {
     this.isPickerVisible = messageId;
     this.visiblePickerValue = true;
     this.isClicked = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
   }
 
   letPickerEditVisible(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isClickedEdit = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
     this.showEditArea = messageId;
   }
 
   letPickerEditVisibleForAnswers(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isClickedEditAnswers = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
     this.showEditArea = messageId;
   }
 
@@ -485,7 +491,7 @@ export class ChannelThreadComponent implements OnInit {
   openEmojiPicker(messageId: string) {
     this.visiblePickerValue = true;
     this.isPickerVisible = messageId;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
     this.isClicked = true;
     this.editingMessageId = null;
   }
@@ -493,14 +499,14 @@ export class ChannelThreadComponent implements OnInit {
   openEmojiPickerEdit(messageId: string) {
     this.isPickerVisible = messageId;
     this.visiblePickerValue = true;
-    this.overlayStatusService.setOverlayStatus(true);
+    this.isOverlayOpen = true;
     this.isClicked = true;
     this.editingMessageId = messageId;
   }
 
   closeEmojiPicker(event: MouseEvent) {
     event.stopPropagation();
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
     this.isClicked = false;
     this.editingMessageId = null;
     this.isPickerVisible = null;
@@ -510,7 +516,7 @@ export class ChannelThreadComponent implements OnInit {
   closePicker() {
     this.isPickerVisible = null;
     this.visiblePickerValue = false;
-    this.overlayStatusService.setOverlayStatus(false);
+    this.isOverlayOpen = false;
   }
 
   async removeReaction(emoji: string, messageId: string) {
@@ -740,16 +746,10 @@ export class ChannelThreadComponent implements OnInit {
 
   async saveEditedMessage(messageId: string) {
     try {
-      const isTopicMessage = messageId === this.topicMessage?.id;
-
+      const isTopicMessage = (messageId === this.topicMessage?.id);
+  
       const messageDocRef = isTopicMessage
-        ? doc(
-            this.db,
-            'channels',
-            this.selectedChannel.id,
-            'messages',
-            messageId
-          )
+        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
         : doc(
             this.db,
             'channels',
@@ -759,23 +759,46 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-
-      await updateDoc(messageDocRef, {
-        text: this.messageToEdit,
-        isEdited: true,
-      });
-
-      // Aktualisiere den lokalen Status der topicMessage
-      if (isTopicMessage) {
-        this.topicMessage!.isEdited = true; // Markiere die topicMessage als bearbeitet
+  
+      // 1) Leer? => Dokument löschen
+      if (!this.messageToEdit || this.messageToEdit.trim() === '') {
+        await deleteDoc(messageDocRef);
+  
+        // Lokal ggf. topicMessage oder das Element aus `messages` entfernen
+        if (isTopicMessage) {
+          this.topicMessage = null; // oder so
+        } else {
+          this.messages = this.messages.filter(m => m.id !== messageId);
+        }
+      } 
+      // 2) Sonst updaten
+      else {
+        await updateDoc(messageDocRef, {
+          text: this.messageToEdit.trim(),
+          isEdited: true,
+        });
+  
+        // Lokal sofort aktualisieren
+        if (isTopicMessage && this.topicMessage) {
+          this.topicMessage.text = this.messageToEdit.trim();
+          this.topicMessage.isEdited = true;
+        } else {
+          const idx = this.messages.findIndex(m => m.id === messageId);
+          if (idx !== -1) {
+            this.messages[idx].text = this.messageToEdit.trim();
+            this.messages[idx].isEdited = true;
+          }
+        }
       }
-
+  
+      // Abschließend Eingabe zurücksetzen
       this.showEditArea = null;
       this.messageToEdit = '';
     } catch (error) {
-      console.error('Error saving edited message:', error);
+      console.error('Error saving/editing message:', error);
     }
   }
+  
 
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {

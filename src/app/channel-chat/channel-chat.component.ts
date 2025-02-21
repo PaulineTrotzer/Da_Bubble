@@ -78,7 +78,6 @@ interface Message {
       ]),
     ]),
   ],
-  
 })
 export class ChannelChatComponent implements OnInit {
   [x: string]: any;
@@ -641,10 +640,15 @@ export class ChannelChatComponent implements OnInit {
     return `${day}.${month}.${year}`;
   }
 
-  toggleEditDialog(messageId: string) {
-    this.showEditDialog = this.showEditDialog === messageId ? null : messageId;
+  toggleEditDialog(messageId: string | null): void {
+    // Falls messageId null => schließe den Dialog
+    if (!messageId) {
+      this.showEditDialog = null;
+      return;
+    }
+    // Andernfalls: Setze showEditDialog auf die ID
+    this.showEditDialog = messageId;
   }
-
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {
       this.showEditArea = null;
@@ -728,9 +732,7 @@ export class ChannelChatComponent implements OnInit {
     return `${userString} ${verb} mit ${emoji} reagiert.`;
   }
 
-
   onReactionHover(message: Message, emoji: string) {
-
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
 

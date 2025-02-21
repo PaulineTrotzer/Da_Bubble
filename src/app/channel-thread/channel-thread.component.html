@@ -1,3 +1,5 @@
+<div *ngIf="isOverlayOpen" class="overlay"></div>
+
 <div class="card">
   <div class="thread">
     <header>
@@ -181,10 +183,9 @@
       </div>
     </div>
     <div class="seperator">
-      <h3 *ngIf="messages.length <= 1">{{ messages.length }} Antworten</h3>
-      <h3 *ngIf="messages.length > 1">{{ messages.length }} Antworten</h3>
-      <div class="line"></div>
-    </div>
+      <h3>{{ getReplyCountText() }}</h3>
+      <div class="line-separator"></div>
+  </div>
 
     <div class="answers-container" (mouseenter)="hoveredMessageId = message.id" (mouseleave)="hoveredMessageId = null"
       *ngFor="let message of messages">
