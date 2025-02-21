@@ -8,6 +8,22 @@
   position: relative;
 }
 
+.message-from-user .text-container .text,
+.message-from-current .text-container .text {
+  max-width: 80%; // oder pixelbasiert: 500px
+  word-wrap: break-word; // wichtig für Zeilenumbruch
+  overflow-wrap: break-word;
+  white-space: pre-wrap; // optional, damit Zeilenumbrüche erhalten bleiben
+}
+
+.text-container .text {
+  // oder Prozentsatz, z.B. 60%
+  word-wrap: break-word; // bzw. 'break-word' bei 'overflow-wrap'
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-y: auto; // falls du Zeilenumbrüche aus dem Text erhalten möchtest
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -19,7 +35,6 @@
 }
 
 .only-name {
-  white-space: nowrap;
   margin: 0 2px;
 }
 
@@ -109,6 +124,7 @@
   border-bottom-right-radius: 30px;
   border-bottom-left-radius: 30px;
   background: #eceefe;
+  margin-bottom: 10px;
 }
 /* Reaction-Bar in .message-from-user */
 .message-from-user .reaction-bar {
@@ -199,6 +215,7 @@
   border-bottom-left-radius: 30px;
   background: #797ef3;
   color: white;
+  margin-bottom: 10px;
 }
 /* Reaction-Bar in .message-from-current */
 .message-from-current .reaction-bar {
@@ -378,11 +395,11 @@
 .message-container {
   display: flex;
   flex-direction: column;
-  max-height: 175px;
 }
 
 .edited-holder {
-  height: 19px;
+  height: 24px;
+  margin-bottom: 6px;
 }
 
 .edited-label {
@@ -500,12 +517,19 @@ form {
 }
 
 .reactions-container {
-  position: relative;
   display: flex;
 }
 
 .reactions-from-current {
   justify-content: flex-end;
+  position: absolute;
+  bottom: 0;
+  right: 130px;
+}
+.reactions-from-user {
+  position: absolute;
+  bottom: -9px;
+  left: 0px;
 }
 
 .reactions-from-other {
@@ -544,8 +568,9 @@ form {
   flex-direction: column;
 }
 .file-info img {
-  width: 100px;
-  height: 100px;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
   border-radius: unset !important;
 }
 .file-info:hover img {

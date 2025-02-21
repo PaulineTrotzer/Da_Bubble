@@ -116,9 +116,10 @@
                   </div>
                 </div>
               </div>
+              
             </div>
 
-            <div class="edited-holder" [ngClass]="{
+            <div class="edited-holder" *ngIf="message.isEdited"  [ngClass]="{
               'lablel-user': message.senderId !== global.currentUserData.id,
               'label-current': message.senderId === global.currentUserData.id
             }">
