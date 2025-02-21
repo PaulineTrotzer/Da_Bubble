@@ -81,9 +81,7 @@ import { MentionThreadService } from '../services/mention-thread.service';
   ],
 })
 export class DirectThreadComponent implements OnInit, OnDestroy {
-toggleReactionInfoRecipient(arg0: any,arg1: boolean) {
-throw new Error('Method not implemented.');
-}
+
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   chatMessage: string = '';
@@ -153,6 +151,10 @@ throw new Error('Method not implemented.');
     this.setCurrentUserId();
     this.checkIfSelfThread();
   }
+
+/*   toggleReactionInfoRecipient(arg0: any,arg1: boolean) {
+    throw new Error('Method not implemented.');
+    } */
 
   toggleReactionInfoForSenderEmoji(messageId: string, show: boolean) {
     this.showTooltipForSenderEmoji[messageId] = show;
@@ -330,7 +332,6 @@ throw new Error('Method not implemented.');
   async handleMentionClick(mention: string) {
     this.wasClickedInDirectThread = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
-    console.log('[handleMentionClick] cleanName:', cleanName);
     const user = await this.mentionService.ensureUserDataLoaded(cleanName);
     if (!user) {
       return;

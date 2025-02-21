@@ -85,12 +85,15 @@
 
             <div class="text-content">
               <div class="text" (click)="handleClickOnMention($event)">
-                <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                  <span *ngIf="isMention(mentionName)" class="mention-message"
+                <!-- Hier ersetzen wir das bisherige div.text-flex durch zwei Span-Fälle -->
+                <ng-container *ngFor="let mentionName of mentionService.splitMessage(message.text)">
+                  <!-- Mentions -->
+                  <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
                     (click)="handleMentionClick(mentionName)">
                     {{ mentionName }}
                   </span>
-                  <span class="only-name" *ngIf="!isMention(mentionName)">
+                  <!-- Normaler Text -->
+                  <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
                     {{ mentionName }}
                   </span>
                 </ng-container>
@@ -111,15 +114,14 @@
                           <img src="../../assets/img/pdf.png" alt="PDF File" />
                         </a>
                       </div>
-
                     </div>
                   </div>
                 </div>
               </div>
-              
             </div>
 
-            <div class="edited-holder" *ngIf="message.isEdited"  [ngClass]="{
+
+            <div class="edited-holder" *ngIf="message.isEdited" [ngClass]="{
               'lablel-user': message.senderId !== global.currentUserData.id,
               'label-current': message.senderId === global.currentUserData.id
             }">
@@ -134,20 +136,17 @@
 
             <div class="reactions-wrapper">
               <!-- Reactions-Container, der alle Reactions enthält -->
-              <div class="reactions-container"
-                   [ngClass]="{
+              <div class="reactions-container" [ngClass]="{
                      'reactions-from-user': message.senderId !== global.currentUserData.id,
                      'reactions-from-current': message.senderId === global.currentUserData.id
                    }">
-            
+
                 <!-- Für jede Reaction wird ein eigener Wrapper angelegt -->
-                <div class="single-reaction-wrapper"
-                     *ngFor="let reaction of message.reactions | keyvalue"
-                     (mouseover)="onReactionHover(message, reaction.key)">
-                  
+                <div class="single-reaction-wrapper" *ngFor="let reaction of message.reactions | keyvalue"
+                  (mouseover)="onReactionHover(message, reaction.key)">
+
                   <!-- Das Icon/Emoji selbst -->
-                  <span class="reaction"
-                        [ngClass]="{
+                  <span class="reaction" [ngClass]="{
                           'emoji-current': message.senderId !== global.currentUserData.id,
                           'emoji-user': message.senderId === global.currentUserData.id
                         }">
@@ -156,10 +155,9 @@
                       {{ reaction.value.length }}
                     </ng-container>
                   </span>
-            
+
                   <!-- Tooltip: Immer im DOM, erscheint bei Hover (per CSS) -->
-                  <div class="reaction-from-container"
-                       [ngClass]="{
+                  <div class="reaction-from-container" [ngClass]="{
                          'reaction-on-user': message.senderId !== global.currentUserData.id,
                          'reaction-both-current': message.senderId == global.currentUserData.id && message.senderId !== global.currentUserData.id,
                          'reaction-on-current': message.senderId === global.currentUserData.id
@@ -169,12 +167,12 @@
                       <!-- oder einfach "Test Tooltip" -->
                     </span>
                   </div>
-            
+
                 </div> <!-- Ende single-reaction-wrapper -->
-            
+
               </div> <!-- Ende reactions-container -->
             </div> <!-- Ende reactions-wrapper -->
-            
+
 
           </div>
         </div>

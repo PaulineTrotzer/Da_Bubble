@@ -33,6 +33,7 @@ import { UserChannelSelectService } from '../services/user-channel-select.servic
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { InputfieldService } from '../services/inputfield.service';
+import { MentionThreadService } from '../services/mention-thread.service';
 
 interface Message {
   formattedText: any;
@@ -114,12 +115,13 @@ export class ChannelChatComponent implements OnInit {
   currentComponentId = 'channels';
   inputFieldService = inject(InputfieldService);
   selectFiles: any[] = [];
+  mentionService = inject(MentionThreadService);
 
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadCurrentUserEmojis();
-    await this.getAllUsersname();
+    await this.mentionService.getAllUsersname();
     await this.loadUserNames();
     document.addEventListener(
       'click',
@@ -180,7 +182,6 @@ export class ChannelChatComponent implements OnInit {
       const mentionName = target.textContent?.trim();
       if (mentionName) {
         if (this.getAllUsersName.length === 0) {
-          console.warn('Mentions-Daten sind noch nicht geladen.');
           return;
         }
         this.handleMentionClick(mentionName);
@@ -188,30 +189,10 @@ export class ChannelChatComponent implements OnInit {
     }
   }
 
-  async getAllUsersname(): Promise<void> {
-    const userRef = collection(this.firestore, 'users');
-    return new Promise((resolve) => {
-      onSnapshot(userRef, (querySnapshot) => {
-        this.getAllUsersName = [];
-        querySnapshot.forEach((doc) => {
-          const dataUser = doc.data();
-          this.getAllUsersName.push({
-            name: dataUser['name'],
-            email: dataUser['email'],
-            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
-            id: doc.id,
-          });
-        });
-        resolve();
-      });
-    });
-  }
-
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelInput = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
-    const user = await this.ensureUserDataLoaded(cleanName);
-
+    const user = await this.mentionService.ensureUserDataLoaded(cleanName);
     if (!user) {
       return;
     }

@@ -8,6 +8,7 @@
   position: relative;
 }
 
+
 .message-from-user .text-container .text,
 .message-from-current .text-container .text {
   max-width: 80%; // oder pixelbasiert: 500px
@@ -42,6 +43,7 @@
   color: blue !important;
   cursor: pointer;
   margin-right: 4px;
+  white-space: nowrap;
   margin-left: 2px;
 }
 .mention-message:hover {
@@ -117,8 +119,9 @@
   color: #686868;
 }
 .message-from-user .text-container .text {
+  display: block;
+  padding: 12px 20px;
   width: fit-content;
-  padding: 15px;
   border-top-left-radius: 0;
   border-top-right-radius: 30px;
   border-bottom-right-radius: 30px;
@@ -205,10 +208,10 @@
   color: #686868;
 }
 .message-from-current .text-container .text {
-  display: flex;
+  display: block;
   align-self: end;
   width: fit-content;
-  padding: 15px;
+  padding: 12px 20px;
   border-top-left-radius: 30px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 30px;
