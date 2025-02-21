@@ -806,6 +806,59 @@ export class InputFieldComponent implements OnInit, OnChanges {
     }
   }
 
+  onFileSelectedChannelThread(event: Event, componentId: string): void {
+    console.log('wurde aufgerufen');
+    if (componentId !== 'channel-thread') {
+      console.error(
+        'onFileSelectedThread called with wrong componentId: in channel',
+        componentId
+      );
+      return;
+    }
+    this.inputFieldService.setActiveComponent(componentId);
+    const input = event.target as HTMLInputElement;
+
+    const existingFiles = this.inputFieldService.getFiles(componentId);
+    if (existingFiles.length > 0) {
+      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
+      this.multipleFilesErrorMessage =
+        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
+      this.fileTooLargeMessage = null;
+      return;
+    }
+
+    if (input.files && input.files.length > 0) {
+      const selectedFile = input.files[0];
+      const allowedTypes = ['image/', 'application/pdf'];
+      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
+        console.error('Unsupported file type:', selectedFile.type);
+        this.fileTooLargeMessage =
+          'Nur Bilder und PDFs können hochgeladen werden.';
+        this.multipleFilesErrorMessage = null;
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: reader.result as string,
+        };
+
+        this.inputFieldService.updateFiles(componentId, [fileData]);
+        const chatDiv = this.editableDivRef.nativeElement;
+        if (chatDiv) {
+          chatDiv.style.height = '250px';
+        }
+        console.log('File added in channel:', fileData);
+      };
+
+      reader.readAsDataURL(selectedFile);
+      input.value = '';
+    }
+  }
+
   handlePreviewUpdated(hasFiles: boolean) {
     if (!hasFiles) {
       const chatDiv = this.editableDivRef.nativeElement;

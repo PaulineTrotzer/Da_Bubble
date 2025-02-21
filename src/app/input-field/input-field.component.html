@@ -52,61 +52,87 @@
       <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
         [currentComponentId]="activeComponentId"></app-files-preview>
     </div>
-  </div>
 
-
-
-  <div class="interactions-send-msg-ct">
-    <div class="only-interactions-bottom-ct">
-      <div class="plus-separator-flex">
-
-        <div>
-          <div *ngIf="activeComponentId === 'direct-thread'">
-
-            <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, activeComponentId)" hidden />
-
-
-            <label for="upload-thread">
-              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Direct Thread" />
-            </label>
-          </div>
-
-          <div *ngIf="activeComponentId === 'chat'">
-
-            <input type="file" id="upload-chat" (change)="onFileSelected($event, activeComponentId)" hidden />
-
-            <label for="upload-chat">
-              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
-            </label>
-          </div>
-
-          <div *ngIf="activeComponentId === 'channel'">
-
-            <input type="file" id="upload-chat" (change)="onFileSelectedChannel($event, activeComponentId)" hidden />
-
-            <label for="upload-chat">
-              <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
-            </label>
-          </div>
-
-
-        </div>
-
-        <img class="vector" src="./assets/img/vector_4.svg">
+    <div class="flex-preview" *ngIf="activeComponentId === 'channel-thread'">
+      <div class="error-message" *ngIf="multipleFilesErrorMessage">
+        {{ multipleFilesErrorMessage }}
       </div>
 
-      <div class="emoji-at-ct">
-        <div class="emoji-picker-container">
-          <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
-            size="18"></emoji-mart>
-          <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
-        </div>
-        <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
+      <!-- Feedback für zu große Datei -->
+      <div class="error-message" *ngIf="fileTooLargeMessage">
+        {{ fileTooLargeMessage }}
       </div>
-      <app-people-mention (cardClosed)="handleCardClosed()" class="people-mention-card"
-        *ngIf="isMentionPeopleCardVisible" (mentionUser)="handleMentionUser($event)"></app-people-mention>
+      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+        [currentComponentId]="activeComponentId"></app-files-preview>
+    </div>
 
-      <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
+
+
+    <div class="interactions-send-msg-ct">
+      <div class="only-interactions-bottom-ct">
+        <div class="plus-separator-flex">
+
+          <div>
+            <div *ngIf="activeComponentId === 'direct-thread'">
+
+              <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, activeComponentId)" hidden />
+
+
+              <label for="upload-thread">
+                <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Direct Thread" />
+              </label>
+            </div>
+
+            <div *ngIf="activeComponentId === 'chat'">
+
+              <input type="file" id="upload-chat" (change)="onFileSelected($event, activeComponentId)" hidden />
+
+              <label for="upload-chat">
+                <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
+              </label>
+            </div>
+
+            <div *ngIf="activeComponentId === 'channel'">
+
+              <input type="file" id="upload-channel" (change)="onFileSelectedChannel($event, activeComponentId)"
+                hidden />
+
+              <label for="upload-channel">
+                <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
+              </label>
+            </div>
+
+            <div *ngIf="activeComponentId === 'channel-thread'">
+
+              <input type="file" id="upload-channel-thread"
+                (change)="onFileSelectedChannelThread($event, activeComponentId)" hidden />
+
+              <label for="upload-channel-thread">
+                <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
+              </label>
+            </div>
+
+
+          </div>
+
+          <img class="vector" src="./assets/img/vector_4.svg">
+        </div>
+
+        <div class="emoji-at-ct">
+          <div class="emoji-picker-container">
+            <emoji-mart *ngIf="isEmojiPickerVisible" (emojiClick)="addEmoji($event)" class="emoji-picker"
+              size="18"></emoji-mart>
+            <div> <img (click)="toggleEmojiPicker()" src="./assets/img/emoji.svg"></div>
+          </div>
+          <div (click)="openMentionPeople()"> <img src="./assets/img/at_react.svg"></div>
+        </div>
+        <app-people-mention (cardClosed)="handleCardClosed()" class="people-mention-card"
+          *ngIf="isMentionPeopleCardVisible" (mentionUser)="handleMentionUser($event)"></app-people-mention>
+
+        <img class="msg-send" src="./assets/img/msg_send.svg" (click)="sendMessageClick()">
+      </div>
     </div>
   </div>
+
+
 </div>

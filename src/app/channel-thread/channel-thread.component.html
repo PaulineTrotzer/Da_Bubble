@@ -146,8 +146,7 @@
 
             <ng-container (click)="handleClickOnMention($event)"
               *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
-              <span *ngIf="isMention(mentionName)" class="mention-message"
-                (click)="handleMentionClick(mentionName)">
+              <span *ngIf="isMention(mentionName)" class="mention-message" (click)="handleMentionClick(mentionName)">
                 {{ mentionName }}
               </span>
               <span class="only-name" *ngIf="!isMention(mentionName)">
@@ -329,5 +328,5 @@
       </div>
     </div>
   </div>
-  <app-input-field [isChannelThreadOpen]="isChannelThreadOpen"></app-input-field>
+  <app-input-field [activeComponentId]="'channel-thread'" [isChannelThreadOpen]="isChannelThreadOpen"></app-input-field>
 </div>

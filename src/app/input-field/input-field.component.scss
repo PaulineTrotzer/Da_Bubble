@@ -10,6 +10,7 @@
   padding: 10px;
   font-size: 14px;
   margin-bottom: 15px;
+  z-index: 2;
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -29,11 +30,11 @@
 .interactions-send-msg-ct {
   display: flex;
   align-items: center;
-  position: absolute;
+/*   position: absolute;
   bottom: 33px;
-  left: 35px;
+  left: 35px; */
   justify-content: space-between;
-  width: calc(99% - 65px);
+/*   width: calc(99% - 65px); */
   border-radius: 20px;
   background-color: #ffffff;
   height: 39px;
