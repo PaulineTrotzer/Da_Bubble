@@ -66,16 +66,17 @@
 
 .img-container {
   border-radius: 100%;
-  padding: 8px;
+  padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: white;
   z-index: 2;
-  position: relative;
-  left: 6px;
-  bottom: 2px;
   cursor: pointer;
+  svg{
+    height: 21px;
+    margin-top: 2px;
+  }
   &:hover {
     background-color: #eceefe;
   }
@@ -305,8 +306,6 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 35px;
-  height: 35px;
   padding: 4px;
   border-radius: 100%;
   line-height: 1;
