@@ -150,7 +150,7 @@
 }
 
 .chat-editable {
-  min-height: 130px;
+  min-height: 95px;
   max-height: 200px;
   overflow-y: auto;
   outline: none;
@@ -178,6 +178,7 @@ position: relative;
 .main-input-area {
   position: relative;
   width: 100%;
+  height: 140px;
   background-color: #ffffff;
   scrollbar-width: thin;
   border: 1px solid #adb0d9;

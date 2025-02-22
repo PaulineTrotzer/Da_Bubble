@@ -99,14 +99,21 @@ app-input-field {
 
 .self-chat-txt,
 .two-chat-txt {
-  color: rgba(0, 0, 0, 0.7);
   font-size: 20px;
-  line-height: 1.5;
   font-weight: 400;
-  letter-spacing: 0.01em;
   font-family: "Nunito", "Helvetica Neue", Arial, sans-serif;
-  padding: 0 42px;
-  transition: color 0.2s ease;
+  /* Der eigentliche Trick: Verlauf + clipping */
+  background: linear-gradient(
+    to bottom,        /* Verlauf von oben nach unten */
+    #2c2c2c 0%,       /* dunkles Grau / fast schwarz oben */
+    #777 50%,         /* mittelgrau in der Mitte */
+    #2c2c2c 100%      /* wieder dunkles Grau unten */
+  );
+  -webkit-background-clip: text;   /* klippt den Hintergrund am Text */
+  -webkit-text-fill-color: transparent; /* Text selbst transparent, damit der Verlauf durchscheint */
+
+  /* Optional: leichter „Highlight“-Schimmer */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .you {
@@ -139,11 +146,12 @@ app-input-field {
 }
 
 .name-chat-partner {
-  color: #535af1;
-  font-size: 20px;
-  font-weight: 400;
-  pointer-events: auto;
-  z-index: 1;
+  background: none !important; /* Falls vererbt, ausschalten */
+  -webkit-background-clip: border-box; /* oder none */
+  -webkit-text-fill-color: #535af1 !important; /* Blau wie gewünscht */
+  text-shadow: none; /* Wenn du keinen metallic Schatten beim Namen willst */
+  /* Weitere Styles wie font-weight, pointer-events etc. */
+  pointer-events: auto;  
   cursor: pointer;
 }
 

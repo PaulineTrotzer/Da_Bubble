@@ -8,17 +8,30 @@
   z-index: 11;
 }
 
-.edited-holder {
-  height: 24px;
-  margin-bottom: 6px;
+.message-scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  height: 750px;
+  overflow: auto;
+  scroll-behavior: smooth;
+  position: relative;
+}
+.edit-reaction-flex {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; // Falls du sie linksbündig möchtest
+  gap: 6px;               // Oder was du an Abstand willst
 }
 
 .label-user {
   align-self: flex-start;
+  font-size: 11px;
 }
 
 .label-current {
   align-self: flex-end;
+  font-size: 11px;
 }
 
 .card {
@@ -33,8 +46,7 @@
 }
 
 .thread {
-  max-height: 730px;
-  overflow: auto;
+  max-height: 750px;
 }
 
 .edited-indicator {
@@ -90,6 +102,7 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 32px 40px;
+  height: 110px;
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
 }
 
@@ -129,6 +142,7 @@ header {
 
 .answers-container {
   position: relative;
+  min-height: 150px;
   cursor: pointer;
   &:hover {
     background-color: #eceefe;
@@ -203,12 +217,13 @@ header {
 .answer-from-current {
   flex-direction: row-reverse;
   padding: 10px 30px 22px 30px;
+  margin-top: 22px;
+  min-height: 130px;
 }
 
 .topic-from-user,
 .answer-from-user {
   padding: 10px 30px 22px 30px;
-  margin: 16px 0;
 }
 
 .message,
@@ -255,11 +270,12 @@ header {
   display: flex;
   align-items: center;
   gap: 5px;
+  height: 40px;
   border: 1px solid #adb0d9;
 }
 
 .reaction-bar-current {
-  top: -38px;
+  top: -16px;
   left: 12px;
   border-top-right-radius: 25px;
   border-top-left-radius: 25px;
@@ -428,6 +444,8 @@ header {
   position: relative;
 }
 
+
+
 .message-edit-dialog {
   background-color: white;
   position: absolute;
@@ -438,7 +456,7 @@ header {
   border-bottom-left-radius: 35px;
   padding: 9px 4px;
   left: 25px;
-  top: 25px;
+  top: 22px;
   white-space: nowrap;
   span {
     font-size: 12px;
@@ -509,10 +527,9 @@ header {
   z-index: 2;
   height: fit-content;
   background-color: white;
-  position: relative;
+  position: absolute;
   left: 5px;
-  bottom: 3px;
-  height: 42px;
+  bottom: -9px;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   border-top-left-radius: 30px;
@@ -526,6 +543,8 @@ header {
 .textarea-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 textarea {
@@ -542,7 +561,7 @@ textarea {
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
   width: 100%;
-  height: 128px;
+  min-height: 125px;
   font-size: 16px;
   position: relative;
   z-index: 2;

@@ -386,12 +386,12 @@ export class ChannelThreadComponent implements OnInit {
     this.global.openChannelorUserBox = true;
   }
 
-  async addEmoji(event: any, messageId: string) {
+/*   async addEmoji(event: any, messageId: string) {
     const emoji = event.emoji;
     this.isPickerVisible = null;
     await this.addLastUsedEmoji(emoji);
     await this.addToReactionInfo(emoji, messageId);
-  }
+  } */
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();
@@ -590,19 +590,17 @@ export class ChannelThreadComponent implements OnInit {
   async addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
+  
+    // A) Ist man gerade in "Nachricht Bearbeiten"-Modus?
     if (this.editingMessageId === messageId) {
+      // Füge das Emoji einfach dem zu bearbeitenden Text an
       this.messageToEdit += emoji;
-    } else if (currentUserId) {
+    } 
+    // B) Reaktions-Logik
+    else if (currentUserId) {
       const isInThread = messageId === this.threadMessageId;
       const messageDocRef = isInThread
-        ? doc(
-            this.db,
-            'channels',
-            this.selectedChannel.id,
-            'messages',
-            messageId
-          )
+        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
         : doc(
             this.db,
             'channels',
@@ -612,12 +610,15 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
+  
+      // Dokument holen und Reaction-Update durchführen
       const messageSnapshot = await getDoc(messageDocRef);
       if (messageSnapshot.exists()) {
         const messageData = messageSnapshot.data();
         console.log('Nachricht Daten:', messageData);
         const reactions = messageData?.['reactions'] || {};
-
+  
+        // Prüfen, ob man bereits mit einem anderen Emoji reagiert hat
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
           if ((userIds as string[]).includes(currentUserId)) {
@@ -625,8 +626,10 @@ export class ChannelThreadComponent implements OnInit {
             break;
           }
         }
-
+  
+        // Gleicher Emoji -> Reaction entfernen, sonst Reaction setzen
         if (oldReaction === emoji) {
+          // Entfernen
           reactions[emoji] = reactions[emoji].filter(
             (userId: string) => userId !== currentUserId
           );
@@ -634,6 +637,7 @@ export class ChannelThreadComponent implements OnInit {
             delete reactions[emoji];
           }
         } else {
+          // Alte Reaction löschen (falls vorhanden)
           if (oldReaction) {
             reactions[oldReaction] = reactions[oldReaction].filter(
               (userId: string) => userId !== currentUserId
@@ -642,22 +646,23 @@ export class ChannelThreadComponent implements OnInit {
               delete reactions[oldReaction];
             }
           }
+          // Neue Reaction hinzufügen
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
-
-        // Aktualisiere nur, wenn das Dokument existiert
+  
         await updateDoc(messageDocRef, { reactions });
       } else {
         console.error('Dokument existiert nicht!');
       }
+      this.addLastUsedEmoji({ native: emoji });
     }
-
     this.isPickerVisible = null;
     this.closePicker();
   }
+  
 
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
