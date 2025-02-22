@@ -102,17 +102,9 @@ app-input-field {
   font-size: 20px;
   font-weight: 400;
   font-family: "Nunito", "Helvetica Neue", Arial, sans-serif;
-  /* Der eigentliche Trick: Verlauf + clipping */
-  background: linear-gradient(
-    to bottom,        /* Verlauf von oben nach unten */
-    #2c2c2c 0%,       /* dunkles Grau / fast schwarz oben */
-    #777 50%,         /* mittelgrau in der Mitte */
-    #2c2c2c 100%      /* wieder dunkles Grau unten */
-  );
-  -webkit-background-clip: text;   /* klippt den Hintergrund am Text */
-  -webkit-text-fill-color: transparent; /* Text selbst transparent, damit der Verlauf durchscheint */
-
-  /* Optional: leichter „Highlight“-Schimmer */
+  background: linear-gradient(to bottom, #2c2c2c 0%, #777 50%, #2c2c2c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -146,12 +138,11 @@ app-input-field {
 }
 
 .name-chat-partner {
-  background: none !important; /* Falls vererbt, ausschalten */
-  -webkit-background-clip: border-box; /* oder none */
-  -webkit-text-fill-color: #535af1 !important; /* Blau wie gewünscht */
-  text-shadow: none; /* Wenn du keinen metallic Schatten beim Namen willst */
-  /* Weitere Styles wie font-weight, pointer-events etc. */
-  pointer-events: auto;  
+  background: none !important;
+  -webkit-background-clip: border-box;
+  -webkit-text-fill-color: #535af1 !important;
+  text-shadow: none;
+  pointer-events: auto;
   cursor: pointer;
 }
 
@@ -191,7 +182,6 @@ app-input-field {
   position: absolute;
   top: 93px;
   width: 100%;
-  /*   max-height: 750px; */
   overflow-y: auto;
   scroll-behavior: smooth;
 }
@@ -262,7 +252,6 @@ app-input-field {
   align-items: center;
   width: 35px;
   height: 35px;
-  padding: 4px;
   border-radius: 100%;
   line-height: 1;
   text-align: center;
@@ -406,6 +395,8 @@ app-input-field {
 .comment-box-current {
   position: absolute;
   left: 40px;
+  height: 50px;
+  width: 170px;
   opacity: 0;
   border: 1px solid #adb0d9;
   border-top-right-radius: 30px;
@@ -444,13 +435,20 @@ app-input-field {
 .comment-content {
   display: flex;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
 }
 
 .add-reaction {
-  width: 40px;
-  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 35px;
+    height: 35px;
+  }
   &:hover {
+    width: 35px;
+    height: 35px;
     background-color: #eceefe;
     border-radius: 100%;
     svg {
@@ -466,9 +464,16 @@ app-input-field {
 }
 
 .open-thread {
-  width: 40px;
-  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 35px;
+    height: 35px;
+  }
   &:hover {
+    width: 35px;
+    height: 35px;
     background-color: #eceefe;
     border-radius: 100%;
     svg {
@@ -488,12 +493,19 @@ app-input-field {
 }
 
 .edit-icon {
-  width: 40px;
-  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 35px;
+    height: 35px;
+  }
   position: relative;
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
+    width: 35px;
+    height: 35px;
     svg {
       path {
         fill: #444df2;
@@ -505,6 +517,7 @@ app-input-field {
 .edit-messages-card {
   position: absolute;
   left: 25px;
+  font-size: 13px;
   top: 22px;
   max-width: max-content;
   background-color: #ffffff;
@@ -514,7 +527,8 @@ app-input-field {
   border-top-right-radius: 30px;
   opacity: 1;
   max-width: max-content;
-  width: 250px;
+  white-space: nowrap;
+  width: fit-content;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.0784313725);
 }
 
@@ -525,9 +539,9 @@ app-input-field {
 .edit-message-content {
   color: #000000;
   width: 100%;
-  padding: 16px 16px !important;
+  padding: 10px !important;
   span {
-    padding: 7px;
+    padding: 6px;
   }
   &:hover {
     span {
@@ -582,16 +596,15 @@ app-input-field {
 
 .sticker-info-wrapper {
   position: absolute;
-  /*   top: 186px; */
   display: flex;
   flex-direction: column;
-  align-items: center; /* Zentriert die Inhalte horizontal */
+  align-items: center;
 }
 
 .sticker-container {
   display: flex;
-  justify-content: center; /* Zentriert die Sticker horizontal */
-  gap: 10px; /* Abstand zwischen den Stickern */
+  justify-content: center;
+  gap: 10px;
   position: relative;
 }
 
@@ -625,11 +638,11 @@ app-input-field {
   justify-content: center;
   align-items: center;
   border: 1px solid #adb0d9;
-  border-radius: 13px;
+  border-radius: 12px;
   padding: 5px;
   gap: 1px;
-  height: 31px;
-  width: 35px;
+  height: 25px;
+  width: 32px;
   font-size: 14px;
   &:hover {
     border-color: #444df2;
@@ -733,8 +746,6 @@ app-input-field {
   opacity: 1;
   z-index: 200;
 }
-
-
 
 .sticker-senderName-user.hoveredName {
   position: absolute;

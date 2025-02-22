@@ -761,14 +761,12 @@ export class ChannelThreadComponent implements OnInit {
 
   getEditedClassTopicMessage(topicMessage: any) {
     if (!topicMessage?.isEdited) {
-      return ''; // Keine Klasse, wenn die topicMessage nicht bearbeitet wurde
+      return ''; 
     }
-
-    // Wenn die topicMessage bearbeitet wurde
     if (topicMessage.senderId === this.global.currentUserData?.id) {
-      return 'edited-indicator-topic'; // Bearbeitet vom aktuellen Benutzer
+      return 'edited-indicator-topic'; 
     } else {
-      return 'edited-indicator-topic-user-display'; // Bearbeitet von einem anderen Benutzer
+      return 'edited-indicator-topic-user-display';
     }
   }
 
@@ -787,26 +785,23 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-  
-      // 1) Leer? => Dokument löschen
       if (!this.messageToEdit || this.messageToEdit.trim() === '') {
         await deleteDoc(messageDocRef);
   
-        // Lokal ggf. topicMessage oder das Element aus `messages` entfernen
+    
         if (isTopicMessage) {
-          this.topicMessage = null; // oder so
+          this.topicMessage = null;
         } else {
           this.messages = this.messages.filter(m => m.id !== messageId);
         }
       } 
-      // 2) Sonst updaten
+
       else {
         await updateDoc(messageDocRef, {
           text: this.messageToEdit.trim(),
           isEdited: true,
         });
   
-        // Lokal sofort aktualisieren
         if (isTopicMessage && this.topicMessage) {
           this.topicMessage.text = this.messageToEdit.trim();
           this.topicMessage.isEdited = true;
@@ -819,7 +814,6 @@ export class ChannelThreadComponent implements OnInit {
         }
       }
   
-      // Abschließend Eingabe zurücksetzen
       this.showEditArea = null;
       this.messageToEdit = '';
     } catch (error) {
