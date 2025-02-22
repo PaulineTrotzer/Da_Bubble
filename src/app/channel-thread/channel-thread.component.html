@@ -74,17 +74,14 @@
         </div>
       </div>
 
-      <div (click)="toggleEditArea(topicMessage?.id!, topicMessage?.text!)" class="message-edit-dialog"
-        *ngIf="showEditDialog === topicMessage?.id!">
-        <span>Nachricht bearbeiten</span>
-      </div>
-
       <div (click)="closeEmojiPicker($event)" class="emoji-picker-container"
         *ngIf="isPickerVisible === topicMessage?.id && visiblePickerValue">
         <emoji-mart (click)="letPickerVisible($event, topicMessage!.id!)" size="18" (emojiClick)="
             addEmojiToMessage($event.emoji.native, topicMessage?.id!)
           "></emoji-mart>
       </div>
+
+
       <div @slideIn class="reaction-bar" *ngIf="hoveredTopic && !showEditArea" [ngClass]="{
           'reaction-bar-current':
             topicMessage?.senderId === global.currentUserData.id,
@@ -110,14 +107,22 @@
             </g>
           </svg>
         </div>
-        <div (click)="toggleEditDialog(topicMessage?.id!)" class="img-container"
-          *ngIf="topicMessage?.senderId === global.currentUserData.id">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
-            class="icon">
-            <path
-              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-          </svg>
+        <div class="edit-wrapper" (mouseleave)="toggleEditDialog(null)">
+          <div (mouseover)="toggleEditDialog(topicMessage?.id!)" class="img-container"
+            *ngIf="topicMessage?.senderId === global.currentUserData.id">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
+              class="icon">
+              <path
+                d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+            </svg>
+          </div>
+
+          <div (click)="toggleEditArea(topicMessage?.id!, topicMessage?.text!)" class="message-edit-dialog"
+            *ngIf="showEditDialog === topicMessage?.id!">
+            <span>Nachricht bearbeiten</span>
+          </div>
         </div>
+        
       </div>
       <div *ngIf="topicMessage?.text && topicMessage!.text.length > 0" class="topic" [ngClass]="{
           'topic-from-current':
@@ -185,7 +190,7 @@
     <div class="seperator">
       <h3>{{ getReplyCountText() }}</h3>
       <div class="line-separator"></div>
-  </div>
+    </div>
 
     <div class="answers-container" (mouseenter)="hoveredMessageId = message.id" (mouseleave)="hoveredMessageId = null"
       *ngFor="let message of messages">

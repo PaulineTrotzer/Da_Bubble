@@ -127,7 +127,8 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   getReplyCountText(): string {
-    const replyCount = this.messages.length > 1 ? this.messages.length - 1 : 0;
+    const replyCount = this.messages.length;
+  
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {
@@ -707,8 +708,15 @@ export class ChannelThreadComponent implements OnInit {
     return `${firstReactorName} hat reagiert.`;
   }
 
-  toggleEditDialog(messageId: string) {
-    this.showEditDialog = this.showEditDialog === messageId ? null : messageId;
+ 
+  toggleEditDialog(messageId: string | null): void {
+    // Falls messageId null => schließe den Dialog
+    if (!messageId) {
+      this.showEditDialog = null;
+      return;
+    }
+    // Andernfalls: Setze showEditDialog auf die ID
+    this.showEditDialog = messageId;
   }
 
   cancelEdit() {

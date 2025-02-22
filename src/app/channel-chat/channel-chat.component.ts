@@ -4,15 +4,12 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostListener,
   inject,
   Input,
   OnInit,
   Output,
-  QueryList,
   SimpleChanges,
   ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import {
   collection,
@@ -118,7 +115,6 @@ export class ChannelChatComponent implements OnInit {
   inputFieldService = inject(InputfieldService);
   selectFiles: any[] = [];
   mentionService = inject(MentionThreadService);
-  @ViewChildren('pickerContainer') pickerRefs!: QueryList<ElementRef>;
 
   constructor(private elRef: ElementRef) {}
 
@@ -276,8 +272,6 @@ export class ChannelChatComponent implements OnInit {
         data.formattedText = this.formatMentions(data.text);
         return { id: doc.id, ...data };
       });
-
-      // Jetzt: Zeit fürs Rendern geben und erst danach scrollen
       setTimeout(() => {
         this.scrollToBottom();
       }, 0);
