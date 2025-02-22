@@ -688,25 +688,40 @@ export class ChannelThreadComponent implements OnInit {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid || '';
     const reactors = message.reactions[emoji] || [];
-
     if (reactors.length === 0) return '';
 
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter((userId) => userId !== currentUserId);
+    let userString = '';
+    let verb = '';
 
-    if (currentUserReacted && reactors.length === 1) {
-      return 'Du hast reagiert.';
+    if (currentUserReacted) {
+      if (otherReactors.length === 0) {
+        userString = 'Du';
+        verb = 'hast';
+      } else if (otherReactors.length === 1) {
+        const otherUser = this.reactionUserNames[otherReactors[0]] || 'Jemand';
+        userString = `${otherUser} und Du`;
+        verb = 'habt';
+      } else {
+        const countOthers = otherReactors.length;
+        userString = `Du und ${countOthers} andere`;
+        verb = 'haben';
+      }
+    } else {
+      if (reactors.length === 1) {
+        const userId = reactors[0];
+        const userName = this.reactionUserNames[userId] || 'Jemand';
+        userString = userName;
+        verb = 'hat';
+      } else {
+        userString = `${reactors.length} Personen`;
+        verb = 'haben';
+      }
     }
-
-    if (currentUserReacted && otherReactors.length > 0) {
-      const otherUserName =
-        this.reactionUserNames[otherReactors[0]] || 'Jemand';
-      return `${otherUserName} und Du haben reagiert.`;
-    }
-
-    const firstReactorName = this.reactionUserNames[reactors[0]] || 'Jemand';
-    return `${firstReactorName} hat reagiert.`;
+    return `${userString} ${verb} mit ${emoji} reagiert.`;
   }
+
 
  
   toggleEditDialog(messageId: string | null): void {

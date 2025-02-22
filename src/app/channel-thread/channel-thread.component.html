@@ -131,8 +131,6 @@
             topicMessage?.senderId !== global.currentUserData.id
         }">
 
-
-
         <div class="avatar-container">
           <img [src]="topicMessage?.senderPicture" />
         </div>
@@ -162,28 +160,59 @@
             </ng-container>
 
           </p>
-          <div *ngIf="topicMessage?.isEdited" [ngClass]="getEditedClassTopicMessage(topicMessage)">
-            <span>(Bearbeitet)</span>
+          <div class="edited-holder" *ngIf="topicMessage?.isEdited" [ngClass]="{
+            'label-user': topicMessage?.senderId !== global.currentUserData.id,
+            'label-current': topicMessage?.senderId === global.currentUserData.id
+          }">
+            <div *ngIf="topicMessage?.isEdited" [ngClass]="getEditedClassTopicMessage(topicMessage)">
+              <span>(Bearbeitet)</span>
+            </div>
           </div>
 
-          <div class="reaction-info" [ngClass]="{
-              'flex-end': topicMessage?.senderId === global.currentUserData.id
+          <!-- Beispiel: "Topic" Reactions -->
+          <div class="reactions-wrapper" [ngClass]="{
+            'reactions-from-user': topicMessage?.senderId !== global.currentUserData.id,
+            'reactions-from-current': topicMessage?.senderId === global.currentUserData.id
+          }">
+            <div class="reactions-container">
+
+              <div class="single-reaction-wrapper" *ngFor="let reaction of topicMessage?.reactions | keyvalue"
+                (mouseover)="onReactionHover(topicMessage!, reaction.key)"
+                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null">
+
+                <!-- Reaction-Icon + Count -->
+                <span class="reaction" [ngClass]="{
+              'emoji-current': topicMessage?.senderId !== global.currentUserData.id,
+              'emoji-user': topicMessage?.senderId === global.currentUserData.id
             }">
-            <div class="reaction-from-container" *ngIf="
-                hoveredReactionMessageId === topicMessage?.id && hoveredEmoji
-              ">
-              <span class="emoji-from"> {{ hoveredEmoji }} </span>
-              <p class="reaction-text">
-                {{ getReactionText(topicMessage!, hoveredEmoji) }}
-              </p>
-            </div>
-            <span *ngFor="let reaction of topicMessage?.reactions | keyvalue" class="reaction"
-              (mouseenter)="onReactionHover(topicMessage!, reaction.key)" (mouseleave)="
-                hoveredReactionMessageId = null; hoveredEmoji = null
-              " (click)="addEmojiToMessage(reaction.key, topicMessage?.id!)">
-              {{ reaction.key }} {{ reaction.value.length }}
-            </span>
-          </div>
+                  {{ reaction.key }}
+                  <ng-container *ngIf="reaction.value.length > 1">
+                    {{ reaction.value.length }}
+                  </ng-container>
+                </span>
+
+                <!-- Tooltip-Container: nur sichtbar, wenn hovered -->
+                <div class="reaction-from-container" *ngIf="
+             hoveredReactionMessageId === topicMessage?.id
+             && hoveredEmoji === reaction.key
+           " [ngClass]="{
+             'reaction-on-user': topicMessage?.senderId !== global.currentUserData.id,
+             'reaction-both-current':
+               topicMessage?.senderId == global.currentUserData.id
+               && topicMessage?.senderId !== global.currentUserData.id,
+             'reaction-on-current':
+               topicMessage?.senderId === global.currentUserData.id
+           }">
+                  <span class="reaction-text">
+                    {{ getReactionText(topicMessage!, reaction.key) }}
+                  </span>
+                </div>
+
+              </div> <!-- Ende single-reaction-wrapper -->
+            </div> <!-- Ende reactions-container -->
+          </div> <!-- Ende reactions-wrapper -->
+
+
         </div>
       </div>
     </div>
@@ -192,11 +221,10 @@
       <div class="line-separator"></div>
     </div>
 
+
     <div class="answers-container" (mouseenter)="hoveredMessageId = message.id" (mouseleave)="hoveredMessageId = null"
       *ngFor="let message of messages">
       <div class="edit-message-container" *ngIf="showEditArea === message.id">
-
-
         <div class="message-wrapper">
           <img [src]="message.senderPicture" />
 
@@ -282,6 +310,8 @@
           </div>
         </div>
       </div>
+
+
       <div *ngIf="message?.text && message.text.length > 0" class="answer" [ngClass]="{
           'answer-from-current': message.senderId === global.currentUserData.id,
           'answer-from-user': message.senderId !== global.currentUserData.id
@@ -312,25 +342,59 @@
             </ng-container>
           </div>
 
-          <div *ngIf="message.isEdited" [ngClass]="getEditedClass(message)">
-            <span>(Bearbeitet)</span>
-          </div>
-          <div class="reaction-info" [ngClass]="{
-              'flex-end': message.senderId === global.currentUserData.id
-            }">
-            <div class="reaction-from-container" *ngIf="hoveredReactionMessageId === message.id && hoveredEmoji">
-              <span class="emoji-from"> {{ hoveredEmoji }} </span>
-              <p class="reaction-text">
-                {{ getReactionText(message, hoveredEmoji) }}
-              </p>
+          <div class="edited-holder" *ngIf="message.isEdited" [ngClass]="{
+            'label-user': message.senderId !== global.currentUserData.id,
+            'label-current': message.senderId === global.currentUserData.id
+          }">
+            <div *ngIf="message.isEdited" [ngClass]="getEditedClass(message)">
+              <span>(Bearbeitet)</span>
             </div>
-            <span *ngFor="let reaction of message.reactions | keyvalue" class="reaction"
-              (mouseenter)="onReactionHover(message, reaction.key)" (mouseleave)="
-                hoveredReactionMessageId = null; hoveredEmoji = null
-              " (click)="addEmojiToMessage(reaction.key, message.id!)">
-              {{ reaction.key }} {{ reaction.value.length }}
-            </span>
           </div>
+
+
+          <!-- Beispiel: "Message" Reactions -->
+          <div class="reactions-wrapper" [ngClass]="{
+            'reactions-from-user': message?.senderId !== global.currentUserData.id,
+            'reactions-from-current': message?.senderId === global.currentUserData.id
+          }">
+            <div class="reactions-container">
+
+              <div class="single-reaction-wrapper" *ngFor="let reaction of message?.reactions | keyvalue"
+                (mouseover)="onReactionHover(message!, reaction.key)"
+                (mouseleave)="hoveredReactionMessageId = null; hoveredEmoji = null">
+
+                <!-- Reaction-Icon + Count -->
+                <span class="reaction" [ngClass]="{
+              'emoji-current': message?.senderId !== global.currentUserData.id,
+              'emoji-user': message?.senderId === global.currentUserData.id
+            }">
+                  {{ reaction.key }}
+                  <ng-container *ngIf="reaction.value.length > 1">
+                    {{ reaction.value.length }}
+                  </ng-container>
+                </span>
+
+                <!-- Tooltip-Container: nur sichtbar, wenn hovered -->
+                <div class="reaction-from-container" *ngIf="
+             hoveredReactionMessageId === message?.id
+             && hoveredEmoji === reaction.key
+           " [ngClass]="{
+             'reaction-on-user': message?.senderId !== global.currentUserData.id,
+             'reaction-both-current':
+             message?.senderId == global.currentUserData.id
+               && topicMessage?.senderId !== global.currentUserData.id,
+             'reaction-on-current':
+             message?.senderId === global.currentUserData.id
+           }">
+                  <span class="reaction-text">
+                    {{ getReactionText(message!, reaction.key) }}
+                  </span>
+                </div>
+
+              </div> <!-- Ende single-reaction-wrapper -->
+            </div> <!-- Ende reactions-container -->
+          </div> <!-- Ende reactions-wrapper -->
+
         </div>
       </div>
     </div>
