@@ -122,7 +122,7 @@
             <span>Nachricht bearbeiten</span>
           </div>
         </div>
-        
+
       </div>
       <div *ngIf="topicMessage?.text && topicMessage!.text.length > 0" class="topic" [ngClass]="{
           'topic-from-current':
@@ -235,13 +235,8 @@
             </div>
           </div>
         </div>
-
-
       </div>
-      <div (click)="toggleEditArea(message.id, message.text)" class="message-edit-dialog"
-        *ngIf="showEditDialog === message.id">
-        <span>Nachricht bearbeiten</span>
-      </div>
+
 
       <div (click)="closeEmojiPicker($event)" class="emoji-container"
         *ngIf="isPickerVisible === message.id && visiblePickerValue && isClicked">
@@ -272,13 +267,19 @@
             </g>
           </svg>
         </div>
-        <div (click)="toggleEditDialog(message.id)" class="img-container"
-          *ngIf="message.senderId === global.currentUserData.id">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
-            class="icon">
-            <path
-              d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
-          </svg>
+        <div class="edit-wrapper" (mouseleave)="toggleEditDialog(null)">
+          <div (mouseover)="toggleEditDialog(message.id)" class="img-container"
+            *ngIf="message.senderId === global.currentUserData.id">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"
+              class="icon">
+              <path
+                d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+            </svg>
+          </div>
+          <div (click)="toggleEditArea(message.id, message.text)" class="message-edit-dialog"
+            *ngIf="showEditDialog === message.id">
+            <span>Nachricht bearbeiten</span>
+          </div>
         </div>
       </div>
       <div *ngIf="message?.text && message.text.length > 0" class="answer" [ngClass]="{
