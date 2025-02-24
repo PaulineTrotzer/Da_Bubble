@@ -43,7 +43,7 @@
   left: 100px;
   top: 34px;
   width: fit-content;
-  white-space: normal; 
+  white-space: normal;
   word-wrap: break-word;
   font-size: 14px;
   transition: opacity 0.3s ease;
@@ -53,7 +53,7 @@
   box-shadow: 0px 6px 14px 0px #00000033;
   color: #000000;
   width: 100%;
-  padding: 8px 12px;
+  padding: 2px 5px;
   overflow-wrap: break-word;
   border-top-right-radius: 30px;
   border-top-left-radius: 0;
@@ -62,6 +62,7 @@
   &:hover {
     background-color: white;
     span {
+      font-size: 12px !important;
       color: #444df2;
       background-color: #eceefe;
     }
@@ -79,8 +80,9 @@
 .edit-messages-card {
   position: absolute;
   z-index: 2;
-  left: 125px;
-  margin-top: 4px;
+  font-size: 12px !important;
+  top: 0 !important;
+  left: 75px !important;
 }
 
 .edit-message {
@@ -149,7 +151,6 @@
   scroll-behavior: smooth !important;
 }
 
-
 .show-set {
   position: absolute;
   border: 1px solid #adb0d9;
@@ -213,13 +214,24 @@
   }
 }
 
+.full-bottom-flex {
+  display: flex;
+  width: 97%;
+  position: absolute;
+  bottom: 20px;
+  justify-content: space-around;
+  background-color: white;
+  height: 29px;
+  align-items: center;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  left: 3px;
+}
+
 .edit-input {
-  position: relative;
-  left: 34px;
-  z-index: 2;
-  bottom: 39px;
-  width: 280px;
-  height: 152px;
+  width: 100%;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -229,6 +241,8 @@
   border-radius: 20px;
   font-family: Nunito, "Helvetica Neue";
   font-size: 18px;
+  max-height: 320px;
+  height: auto;
   overflow-y: auto;
   &:focus {
     border-color: #444df2;
@@ -302,7 +316,6 @@
   flex-direction: column;
 }
 
-
 .emoji-holder {
   position: relative;
   height: 24px;
@@ -339,13 +352,13 @@
   }
 }
 
-.emoji-position-ct{
+.emoji-position-ct {
   display: flex;
   align-items: end;
   margin-top: 4px;
 }
 
-.emoji-position-ct-cu{
+.emoji-position-ct-cu {
   display: flex;
   align-items: end;
   margin-top: 4px;
@@ -358,7 +371,6 @@
 .emoji-holder-both-right {
   justify-content: flex-end;
 }
-
 
 .show-set-reverse {
   position: absolute;
@@ -482,16 +494,20 @@ h3 {
   padding: 16px;
 }
 
+.edit-wrapper {
+  position: relative;
+  display: inline-block; /* oder flex, wie du magst */
+}
+
 .reaction-icon-container-editMode {
-  position: absolute;
-  bottom: 58px;
-  left: 42px;
   z-index: 3;
   background-color: white;
+  height: 32px;
+  width: 33px;
   svg {
     display: block;
-    width: 36px;
-    height: 36px;
+    height: 32px;
+    width: 33px;
     object-fit: contain;
     background-color: transparent;
     border-radius: 50%;
@@ -689,7 +705,7 @@ h3 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.both-reaction-info-ct-cu{
+.both-reaction-info-ct-cu {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
   border-bottom-left-radius: 30px;
@@ -764,9 +780,6 @@ h3 {
 
 .option-flex {
   display: flex;
-  position: absolute;
-  right: -14px;
-  bottom: 61px;
   gap: 10px;
   z-index: 3;
   background-color: white;
@@ -948,7 +961,6 @@ h3 {
   top: -24px;
   display: flex;
 }
-
 
 .input-holder {
   position: absolute;
