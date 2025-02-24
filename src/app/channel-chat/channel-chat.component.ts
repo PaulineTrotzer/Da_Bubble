@@ -148,7 +148,6 @@ export class ChannelChatComponent implements OnInit {
       this.scrollToBottom();
     }
   }
-  
 
   onCancelMessageBox(): void {
     this.wasClickedInChannelInput = false;
@@ -263,7 +262,7 @@ export class ChannelChatComponent implements OnInit {
       'messages'
     );
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, (querySnapshot: any) => {
+    onSnapshot(q, async (querySnapshot: any) => {
       this.messagesData = querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         if (data.timestamp && data.timestamp.seconds) {
@@ -275,6 +274,7 @@ export class ChannelChatComponent implements OnInit {
       setTimeout(() => {
         this.scrollToBottom();
       }, 0);
+      await this.updateMessagesWithNewPhoto();
     });
   }
 
@@ -294,22 +294,33 @@ export class ChannelChatComponent implements OnInit {
   }
 
   async updateMessagesWithNewPhoto() {
+    console.log('cu-data', this.global.currentUserData);
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (!newPhotoUrl) {
         return;
       }
+      console.log('aufgerufen');
       const messagesToUpdate = this.messagesData.filter(
         (message) =>
           message.senderId === this.global.currentUserData.id &&
           message.senderPicture !== newPhotoUrl
       );
+      console.log('messagesToUpdate:', messagesToUpdate);
       if (messagesToUpdate.length === 0) {
         return;
       }
-      messagesToUpdate.forEach((message) => {
-        message.senderPicture = newPhotoUrl;
+      console.log(
+        'Trying to update photo. CurrentUserID:',
+        this.global.currentUserData.id,
+        'NewPhotoUrl:',
+        newPhotoUrl
+      );
+
+      this.messagesData.forEach((msg) => {
+        console.log('Msg:', msg.id, msg.senderId, msg.senderPicture);
       });
+
       this.messagesData = [...this.messagesData];
       this.cdr.detectChanges();
       const updatePromises = messagesToUpdate.map((message) => {
@@ -320,7 +331,9 @@ export class ChannelChatComponent implements OnInit {
           'messages',
           message.id
         );
-        return updateDoc(messageRef, { photoUrl: newPhotoUrl });
+        return updateDoc(messageRef, {
+          senderPicture: newPhotoUrl, // statt photoUrl
+        });
       });
       await Promise.all(updatePromises);
       console.log('Firestore-Updates abgeschlossen');

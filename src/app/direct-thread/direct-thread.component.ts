@@ -81,7 +81,6 @@ import { MentionThreadService } from '../services/mention-thread.service';
   ],
 })
 export class DirectThreadComponent implements OnInit, OnDestroy {
-
   @Output() closeDirectThread = new EventEmitter<void>();
   @Input() selectedUser: any;
   chatMessage: string = '';
@@ -152,10 +151,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.checkIfSelfThread();
   }
 
-/*   toggleReactionInfoRecipient(arg0: any,arg1: boolean) {
-    throw new Error('Method not implemented.');
-    } */
-
   toggleReactionInfoForSenderEmoji(messageId: string, show: boolean) {
     this.showTooltipForSenderEmoji[messageId] = show;
   }
@@ -193,20 +188,49 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   private subscribeToParentDoc(parentId: string) {
     const parentRef = doc(this.firestore, 'messages', parentId);
-    onSnapshot(parentRef, (docSnap) => {
-      if (docSnap.exists()) {
-        let data = docSnap.data() as any;
-
-        if (data.timestamp && data.timestamp.toDate) {
-          data.timestamp = data.timestamp.toDate();
-        }
-        this.parentMessage = { id: docSnap.id, ...data };
-        this.scrollAutoDown();
-        this.cdr.detectChanges();
-      } else {
-        console.warn('Parent-Dokument existiert nicht mehr:', parentId);
+    onSnapshot(parentRef, async (docSnap) => {
+      if (!docSnap.exists()) {
+        console.warn('Kein Doc mehr:', parentId);
+        return;
       }
+      const data = docSnap.data();
+
+      // Zeitstempel parsen, etc.
+      if (data['timestamp']?.toDate) {
+        data['timestamp'] = data['timestamp'].toDate();
+      }
+
+      // Jetzt unser local Object anlegen
+      const tempParentMsg = { id: docSnap.id, ...data };
+
+      // Hier checkst du: gehört diese Nachricht dem aktuellen User,
+      // hat sie noch den alten Avatar? => Dann updaten.
+      await this.updateSingleParentMessagePhoto(tempParentMsg);
+
+      // Danach weisdt du "tempParentMsg" hat ggf. schon das neue senderPicture
+      // - oder das Firestore-Dokument ist geupdated.
+      this.parentMessage = tempParentMsg;
     });
+  }
+
+  async updateSingleParentMessagePhoto(message: any) {
+    if (!message) return;
+
+    const newPhotoUrl = this.global.currentUserData?.picture;
+    if (!newPhotoUrl) return;
+
+    // Prüfe, ob dieselbe ID + altes Bild
+    if (
+      message.senderId === this.global.currentUserData.id &&
+      message.senderPicture !== newPhotoUrl
+    ) {
+      // Lokal aktualisieren (damit es sofort sichtbar ist)
+      message.senderPicture = newPhotoUrl;
+
+      // Firestore-Dokument aktualisieren
+      const docRef = doc(this.firestore, 'messages', message.id);
+      await updateDoc(docRef, { senderPicture: newPhotoUrl });
+    }
   }
 
   private subscribeToThreadReplies(parentId: string) {
@@ -215,7 +239,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       `messages/${parentId}/threadMessages`
     );
     const q = query(repliesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, (snapshot) => {
+    onSnapshot(q, async (snapshot) => {
       this.messagesData = snapshot.docs.map((doc) => {
         const data = doc.data();
         if (data['timestamp']?.toDate) {
@@ -225,6 +249,7 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       });
       this.scrollAutoDown();
       this.cdr.detectChanges();
+      await this.updateMessagesWithNewPhoto(parentId);
     });
   }
 

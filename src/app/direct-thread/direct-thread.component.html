@@ -314,6 +314,16 @@
                       </g>
                     </svg>
                   </div>
+                  <div class="edit-wrapper">
+                    <mat-card *ngIf="showEditOption[message.id] && !editWasClicked" class="edit-messages-card"
+                      appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
+                      <mat-card-content class="edit-message-content" (mouseleave)="toggleEditOption(message.id, false)">
+                        <span *ngIf="!editWasClicked" (click)="editMessages(message)">
+                          Nachricht bearbeiten
+                        </span>
+                      </mat-card-content>
+                    </mat-card>
+                  </div>
 
                   <!-- Emoji-Picker öffnen -->
                   <div class="add-reaction-ct" (mouseenter)="toggleEditOption(message.id, false)"
@@ -351,16 +361,7 @@
               </div>
             </div>
 
-            <div class="edit-wrapper">
-              <mat-card *ngIf="showEditOption[message.id] && !editWasClicked" class="edit-messages-card"
-                appearance="outlined" (mouseleave)="toggleEditOption(message.id, false)">
-                <mat-card-content class="edit-message-content" (mouseleave)="toggleEditOption(message.id, false)">
-                  <span *ngIf="!editWasClicked" (click)="editMessages(message)">
-                    Nachricht bearbeiten
-                  </span>
-                </mat-card-content>
-              </mat-card>
-            </div>
+
             <!-- Bubble -->
             <div *ngIf="message.senderId === currentUser.uid" class="cu-message-container">
               <div class="avatar-container">

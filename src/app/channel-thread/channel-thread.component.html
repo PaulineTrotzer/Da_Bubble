@@ -30,17 +30,15 @@
 
     <div class="message-scroll-container" #messageContainer>
       <div class="topic-container" (mouseenter)="hoveredTopic = true" (mouseleave)="hoveredTopic = false">
-        <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
 
+        <div class="message-wrapper">
+          <img [src]="topicMessage?.senderPicture" />
 
-
-          <div class="message-wrapper">
-            <img [src]="topicMessage?.senderPicture" />
-
+          <div class="edit-message-container" *ngIf="showEditArea === topicMessage?.id!">
             <div class="textarea-wrapper-topic">
               <ng-container *ngIf="topicMessage?.text && topicMessage!.text!.length > 0">
                 <textarea name="message" id="message" [(ngModel)]="messageToEdit">
-            {{ topicMessage?.text! }} </textarea>
+</textarea>
               </ng-container>
 
 
@@ -65,13 +63,16 @@
                     </g>
                   </svg>
                 </div>
-                <div (click)="closeEmojiPicker($event)" class="emoji-container" *ngIf="isClickedEdit">
-                  <emoji-mart (click)="letPickerEditVisible($event, topicMessage!.id)" size="18"
-                    (emojiClick)="addEmojiToMessage($event.emoji.native, topicMessage!.id)"></emoji-mart>
-                </div>
               </div>
+
             </div>
           </div>
+        </div>
+
+
+        <div (click)="closeEmojiPicker($event)" class="emoji-container" *ngIf="isClickedEdit">
+          <emoji-mart (click)="letPickerEditVisible($event, topicMessage!.id)" size="18"
+            (emojiClick)="addEmojiToMessage($event.emoji.native, topicMessage!.id)"></emoji-mart>
         </div>
 
         <div (click)="closeEmojiPicker($event)" class="emoji-picker-container"
