@@ -194,21 +194,11 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         return;
       }
       const data = docSnap.data();
-
-      // Zeitstempel parsen, etc.
       if (data['timestamp']?.toDate) {
         data['timestamp'] = data['timestamp'].toDate();
       }
-
-      // Jetzt unser local Object anlegen
       const tempParentMsg = { id: docSnap.id, ...data };
-
-      // Hier checkst du: gehört diese Nachricht dem aktuellen User,
-      // hat sie noch den alten Avatar? => Dann updaten.
       await this.updateSingleParentMessagePhoto(tempParentMsg);
-
-      // Danach weisdt du "tempParentMsg" hat ggf. schon das neue senderPicture
-      // - oder das Firestore-Dokument ist geupdated.
       this.parentMessage = tempParentMsg;
     });
   }
@@ -218,16 +208,11 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
     const newPhotoUrl = this.global.currentUserData?.picture;
     if (!newPhotoUrl) return;
-
-    // Prüfe, ob dieselbe ID + altes Bild
     if (
       message.senderId === this.global.currentUserData.id &&
       message.senderPicture !== newPhotoUrl
     ) {
-      // Lokal aktualisieren (damit es sofort sichtbar ist)
       message.senderPicture = newPhotoUrl;
-
-      // Firestore-Dokument aktualisieren
       const docRef = doc(this.firestore, 'messages', message.id);
       await updateDoc(docRef, { senderPicture: newPhotoUrl });
     }
