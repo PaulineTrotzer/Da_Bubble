@@ -138,6 +138,7 @@ export class ChatComponent implements OnInit, OnChanges {
   hasNoMessages?: boolean;
   isOverlayOpen = false;
   showReactionPopUpSenderAtCu: { [messageId: string]: boolean } = {};
+  editWasClicked = false;
 
   constructor() {}
 
@@ -348,6 +349,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   editMessages(message: any) {
+   this.editWasClicked = true;
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
     this.shouldScroll = false;

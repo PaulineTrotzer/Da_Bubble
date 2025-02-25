@@ -554,28 +554,32 @@ app-input-field {
 }
 
 .edit-mesage-box {
-  position: absolute;
+  position: relative;
   z-index: 10;
   width: 100%;
   display: flex;
-  height: 100%;
+  max-width: 450px;
+  min-width: 350px;
 }
 
 .full-bottom-options {
-  position: absolute;
-  bottom: 1px;
   display: flex;
-  width: 97%;
   justify-content: space-around;
   background-color: white;
-  height: 36px;
-  left: 9px;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 40px;
+  border-bottom-left-radius: 79px;
+  width: 97%;
+  height: 40px;
+  background-color: white;
+  align-items: center;
+  position: absolute;
+  bottom: 1px;
+  border-top-left-radius: 40px;
+  left: 2px;
 }
 
 .edit-input {
-  width: 99%;
+  width: 100%;
   padding-bottom: 60px;
   padding-left: 20px;
   padding-right: 20px;
@@ -586,6 +590,8 @@ app-input-field {
   font-family: Nunito, "Helvetica Neue";
   font-size: 18px;
   overflow-y: auto;
+  max-height: 410px;
+  min-height: 260px;
   &:focus {
     border-color: #444df2;
     outline: none;
@@ -930,17 +936,15 @@ app-mention-message-box {
 }
 
 .edit-emoji-main {
-  width: 35px;
-  height: 35px;
+  height: 40px;
   padding: 4px;
   border-radius: 100%;
+  background-color: white;
+  position: absolute;
+  left: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
-  align-self: end;
-  position: absolute;
-  left: 5px;
   svg {
     width: 35px;
   }

@@ -241,9 +241,7 @@ header {
   color: white;
   min-width: fit-content;
   word-break: break-word;
-  /* Alternativ oder zusätzlich: overflow-wrap: break-word; */
-
-  /* Wenn du \n im Text hast, diese Zeilenumbrüche behalten */
+  margin-bottom: 4px;
   white-space: pre-wrap;
 }
 
@@ -258,6 +256,7 @@ header {
   min-width: fit-content;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  margin-bottom: 4px;
 }
 
 ::-webkit-scrollbar {
@@ -473,13 +472,11 @@ header {
 }
 
 .edit-message-container {
+  position: relative;
   display: flex;
+  min-width: 325px;
   gap: 20px;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  background-color: white;
-  padding: 0 45px;
+  z-index: 10;
 }
 
 .edit-message-container img {
@@ -524,19 +521,18 @@ header {
   flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
-  width: 97%;
+  width: 96%;
   z-index: 2;
   height: fit-content;
   background-color: white;
   position: absolute;
   left: 5px;
-  bottom: 3px;
+  bottom: 1px;
   border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 2px;
+  border-bottom-right-radius: 43px;
   border-top-left-radius: 30px;
-  border-top-right-radius: 23px;
+  border-top-right-radius: 40px;
 }
-
 
 .textarea-wrapper-topic {
   position: relative;
@@ -552,23 +548,20 @@ header {
 }
 
 textarea {
-  padding: 10px;
-  border-radius: 20px;
-  border: 1px solid #adb0d9;
-  font-family: "Nunito";
-  resize: none;
-  outline: none;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 24.55px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
   width: 100%;
-  min-height: 75px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  resize: none;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+  font-family: Nunito, "Helvetica Neue";
   font-size: 16px;
-  z-index: 2;
-  max-height: 205px;
+  min-height: 190px;
+  min-width: 300px;
+  height: 100%;
+  overflow-y: auto;
   &:focus {
     border-color: #444df2;
     outline: none;
