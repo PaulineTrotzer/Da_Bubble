@@ -377,8 +377,11 @@ header {
   border-top-right-radius: 30px;
   position: absolute;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.4s ease-in-out;
+  &.hovered {
+    opacity: 1;
+    /* optional: pointer-events: auto; */
+  }
 }
 
 .reactions-wrapper {
@@ -410,10 +413,7 @@ header {
   border-bottom-right-radius: 0;
 }
 
-.single-reaction-wrapper:hover .reaction-from-container {
-  opacity: 1;
-  visibility: visible;
-}
+
 
 .single-reaction-wrapper {
   position: relative;

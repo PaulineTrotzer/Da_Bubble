@@ -117,10 +117,9 @@
                     </ng-container>
                   </span>
 
-                  <div class="reaction-from-container" *ngIf="
-               hoveredReactionMessageId === topicMessage?.id
-               && hoveredEmoji === reaction.key
-             " [ngClass]="{
+                  <div class="reaction-from-container"
+                    [class.hovered]="hoveredReactionMessageId === topicMessage?.id && hoveredEmoji === reaction.key"
+                    [ngClass]="{
                'reaction-on-user': topicMessage?.senderId !== global.currentUserData.id,
                'reaction-both-current':
                topicMessage?.senderId == global.currentUserData.id
@@ -304,10 +303,9 @@
                     </ng-container>
                   </span>
 
-                  <div class="reaction-from-container" *ngIf="
-               hoveredReactionMessageId === message?.id
-               && hoveredEmoji === reaction.key
-             " [ngClass]="{
+                  <div class="reaction-from-container"
+                    [class.hovered]="hoveredReactionMessageId === message?.id && hoveredEmoji === reaction.key"
+                    [ngClass]="{
                'reaction-on-user': message?.senderId !== global.currentUserData.id,
                'reaction-both-current':
                message?.senderId == global.currentUserData.id
