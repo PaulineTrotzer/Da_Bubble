@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -109,7 +110,7 @@ export class ChannelThreadComponent implements OnInit {
   @ViewChild(InputFieldComponent) inputFieldComponent!: InputFieldComponent;
   sanitizer = inject(DomSanitizer);
   isOverlayOpen = false;
-
+  @ViewChild('messageContainer') messageContainer!: ElementRef;
   constructor() {}
 
   async ngOnInit(): Promise<void> {
@@ -124,11 +125,19 @@ export class ChannelThreadComponent implements OnInit {
         await this.getAllUsersname();
       }
     });
+    this.scrollOrNot('yes');
+  }
+
+  scrollToBottom(): void {
+    if (this.messageContainer) {
+      this.messageContainer.nativeElement.scrollTop =
+        this.messageContainer.nativeElement.scrollHeight;
+    }
   }
 
   getReplyCountText(): string {
     const replyCount = this.messages.length;
-  
+
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {
@@ -280,13 +289,11 @@ export class ChannelThreadComponent implements OnInit {
 
   async loadThreadMessages() {
     if (!this.channelMessageId) {
-      console.log('No message selected!');
       return;
     }
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-
     const messagesRef = collection(
       this.db,
       'channels',
@@ -295,12 +302,17 @@ export class ChannelThreadComponent implements OnInit {
       this.channelMessageId,
       'thread'
     );
-
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, async (querySnapshot: any) => {
-      this.messages = querySnapshot.docs.map((doc: any) => {
+    onSnapshot(q, async (snapshot) => {
+      let newMessageArrived = false;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          newMessageArrived = true;
+        }
+      });
+      this.messages = snapshot.docs.map((doc: any) => {
         const data = doc.data();
-        if (data.timestamp && data.timestamp.seconds) {
+        if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
         data.formattedText = this.formatMentions(data.text);
@@ -309,8 +321,21 @@ export class ChannelThreadComponent implements OnInit {
         }
         return { id: doc.id, ...data };
       });
+      if (newMessageArrived) {
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 50);
+      }
       await this.updateMessagesWithNewPhoto();
     });
+  }
+
+  scrollOrNot(command: string) {
+    if (command === 'yes') {
+      setTimeout(() => this.scrollToBottom(), 50);
+    } else {
+      return;
+    }
   }
 
   async updateMessagesWithNewPhoto() {
@@ -386,7 +411,7 @@ export class ChannelThreadComponent implements OnInit {
     this.global.openChannelorUserBox = true;
   }
 
-/*   async addEmoji(event: any, messageId: string) {
+  /*   async addEmoji(event: any, messageId: string) {
     const emoji = event.emoji;
     this.isPickerVisible = null;
     await this.addLastUsedEmoji(emoji);
@@ -590,17 +615,23 @@ export class ChannelThreadComponent implements OnInit {
   async addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-  
+
     // A) Ist man gerade in "Nachricht Bearbeiten"-Modus?
     if (this.editingMessageId === messageId) {
       // Füge das Emoji einfach dem zu bearbeitenden Text an
       this.messageToEdit += emoji;
-    } 
+    }
     // B) Reaktions-Logik
     else if (currentUserId) {
       const isInThread = messageId === this.threadMessageId;
       const messageDocRef = isInThread
-        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
         : doc(
             this.db,
             'channels',
@@ -610,14 +641,14 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-  
+
       // Dokument holen und Reaction-Update durchführen
       const messageSnapshot = await getDoc(messageDocRef);
       if (messageSnapshot.exists()) {
         const messageData = messageSnapshot.data();
         console.log('Nachricht Daten:', messageData);
         const reactions = messageData?.['reactions'] || {};
-  
+
         // Prüfen, ob man bereits mit einem anderen Emoji reagiert hat
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
@@ -626,7 +657,7 @@ export class ChannelThreadComponent implements OnInit {
             break;
           }
         }
-  
+
         // Gleicher Emoji -> Reaction entfernen, sonst Reaction setzen
         if (oldReaction === emoji) {
           // Entfernen
@@ -652,7 +683,7 @@ export class ChannelThreadComponent implements OnInit {
           }
           reactions[emoji].push(currentUserId);
         }
-  
+
         await updateDoc(messageDocRef, { reactions });
       } else {
         console.error('Dokument existiert nicht!');
@@ -662,7 +693,6 @@ export class ChannelThreadComponent implements OnInit {
     this.isPickerVisible = null;
     this.closePicker();
   }
-  
 
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
@@ -727,8 +757,6 @@ export class ChannelThreadComponent implements OnInit {
     return `${userString} ${verb} mit ${emoji} reagiert.`;
   }
 
-
- 
   toggleEditDialog(messageId: string | null): void {
     // Falls messageId null => schließe den Dialog
     if (!messageId) {
@@ -761,10 +789,10 @@ export class ChannelThreadComponent implements OnInit {
 
   getEditedClassTopicMessage(topicMessage: any) {
     if (!topicMessage?.isEdited) {
-      return ''; 
+      return '';
     }
     if (topicMessage.senderId === this.global.currentUserData?.id) {
-      return 'edited-indicator-topic'; 
+      return 'edited-indicator-topic';
     } else {
       return 'edited-indicator-topic-user-display';
     }
@@ -772,10 +800,16 @@ export class ChannelThreadComponent implements OnInit {
 
   async saveEditedMessage(messageId: string) {
     try {
-      const isTopicMessage = (messageId === this.topicMessage?.id);
-  
+      const isTopicMessage = messageId === this.topicMessage?.id;
+
       const messageDocRef = isTopicMessage
-        ? doc(this.db, 'channels', this.selectedChannel.id, 'messages', messageId)
+        ? doc(
+            this.db,
+            'channels',
+            this.selectedChannel.id,
+            'messages',
+            messageId
+          )
         : doc(
             this.db,
             'channels',
@@ -787,40 +821,35 @@ export class ChannelThreadComponent implements OnInit {
           );
       if (!this.messageToEdit || this.messageToEdit.trim() === '') {
         await deleteDoc(messageDocRef);
-  
-    
+
         if (isTopicMessage) {
           this.topicMessage = null;
         } else {
-          this.messages = this.messages.filter(m => m.id !== messageId);
+          this.messages = this.messages.filter((m) => m.id !== messageId);
         }
-      } 
-
-      else {
+      } else {
         await updateDoc(messageDocRef, {
           text: this.messageToEdit.trim(),
           isEdited: true,
         });
-  
+
         if (isTopicMessage && this.topicMessage) {
           this.topicMessage.text = this.messageToEdit.trim();
           this.topicMessage.isEdited = true;
         } else {
-          const idx = this.messages.findIndex(m => m.id === messageId);
+          const idx = this.messages.findIndex((m) => m.id === messageId);
           if (idx !== -1) {
             this.messages[idx].text = this.messageToEdit.trim();
             this.messages[idx].isEdited = true;
           }
         }
       }
-  
       this.showEditArea = null;
       this.messageToEdit = '';
     } catch (error) {
       console.error('Error saving/editing message:', error);
     }
   }
-  
 
   toggleEditArea(messageId: string, messageText: string) {
     if (this.showEditArea === messageId) {

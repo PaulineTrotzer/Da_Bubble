@@ -219,10 +219,10 @@
   display: flex;
   width: 97%;
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   justify-content: space-around;
   background-color: white;
-  height: 29px;
+  height: 31px;
   align-items: center;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
@@ -241,9 +241,10 @@
   border: 1px solid #adb0d9;
   border-radius: 20px;
   font-family: Nunito, "Helvetica Neue";
-  font-size: 18px;
-  max-height: 320px;
-  height: auto;
+  font-size: 16px;
+  min-height: 190px;
+  min-width: 345px;
+  height: 100%;
   overflow-y: auto;
   &:focus {
     border-color: #444df2;
@@ -497,17 +498,17 @@ h3 {
 
 .edit-wrapper {
   position: relative;
-  display: inline-block; /* oder flex, wie du magst */
+  display: inline-block; 
 }
 
 .reaction-icon-container-editMode {
   z-index: 3;
   background-color: white;
-  height: 32px;
+  height: 28px;
   width: 33px;
   svg {
     display: block;
-    height: 32px;
+    height: 30px;
     width: 33px;
     object-fit: contain;
     background-color: transparent;

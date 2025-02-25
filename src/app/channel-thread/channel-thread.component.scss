@@ -565,11 +565,13 @@ textarea {
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
   width: 100%;
-  min-height: 125px;
+  min-height: 75px;
   font-size: 16px;
   z-index: 2;
+  max-height: 205px;
   &:focus {
-    font-size: 16px;
+    border-color: #444df2;
+    outline: none;
   }
 }
 

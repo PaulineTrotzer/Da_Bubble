@@ -115,6 +115,7 @@ export class ChannelChatComponent implements OnInit {
   inputFieldService = inject(InputfieldService);
   selectFiles: any[] = [];
   mentionService = inject(MentionThreadService);
+  editWasClicked = false;
 
   constructor(private elRef: ElementRef) {}
 
@@ -130,22 +131,28 @@ export class ChannelChatComponent implements OnInit {
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
+    this.scrollOrNot('yes');
   }
 
   scrollToBottom(): void {
     if (this.messageContainer) {
-      if (this.shouldScroll) {
-        this.messageContainer.nativeElement.scrollTop =
-          this.messageContainer.nativeElement.scrollHeight;
-      }
+      this.messageContainer.nativeElement.scrollTop =
+        this.messageContainer.nativeElement.scrollHeight;
+    }
+  }
+
+  scrollOrNot(command: string) {
+    if (command === 'yes') {
+      setTimeout(() => this.scrollToBottom(), 50);
+    } else {
+      return;
     }
   }
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedChannel'] && this.selectedChannel) {
-      this.shouldScroll = true;
+      this.shouldScroll = false;
       await this.loadChannelMessages();
-      this.scrollToBottom();
     }
   }
 
@@ -189,7 +196,6 @@ export class ChannelChatComponent implements OnInit {
       (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
     );
     if (!foundUser) {
-      console.warn('Benutzer nicht gefunden:', name);
       return null;
     }
     return foundUser;
@@ -224,7 +230,6 @@ export class ChannelChatComponent implements OnInit {
       const userDocs = await Promise.all(
         this.messagesData
           .flatMap((message) => {
-            console.log('Message Reactions:', message.reactions);
             return Object.values(message.reactions || {})
               .flat()
               .filter((userId) => userId !== auth.currentUser?.uid);
@@ -262,7 +267,17 @@ export class ChannelChatComponent implements OnInit {
       'messages'
     );
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-    onSnapshot(q, async (querySnapshot: any) => {
+
+    onSnapshot(q, async (querySnapshot) => {
+      // 1) Prüfen, ob in diesem Snapshot mindestens eine neue Nachricht kam
+      let newMessageArrived = false;
+      querySnapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          newMessageArrived = true;
+        }
+      });
+
+      // 2) Deine messagesData befüllen
       this.messagesData = querySnapshot.docs.map((doc: any) => {
         const data = doc.data();
         if (data.timestamp && data.timestamp.seconds) {
@@ -271,9 +286,15 @@ export class ChannelChatComponent implements OnInit {
         data.formattedText = this.formatMentions(data.text);
         return { id: doc.id, ...data };
       });
-      setTimeout(() => {
-        this.scrollToBottom();
-      }, 0);
+
+      // 3) Nur scrollen, wenn mindestens eine 'added'‐Änderung dabei war
+      if (newMessageArrived) {
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, 50);
+      }
+
+      // 4) Optional: Avatar-Update
       await this.updateMessagesWithNewPhoto();
     });
   }
@@ -294,33 +315,19 @@ export class ChannelChatComponent implements OnInit {
   }
 
   async updateMessagesWithNewPhoto() {
-    console.log('cu-data', this.global.currentUserData);
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (!newPhotoUrl) {
         return;
       }
-      console.log('aufgerufen');
       const messagesToUpdate = this.messagesData.filter(
         (message) =>
           message.senderId === this.global.currentUserData.id &&
           message.senderPicture !== newPhotoUrl
       );
-      console.log('messagesToUpdate:', messagesToUpdate);
       if (messagesToUpdate.length === 0) {
         return;
       }
-      console.log(
-        'Trying to update photo. CurrentUserID:',
-        this.global.currentUserData.id,
-        'NewPhotoUrl:',
-        newPhotoUrl
-      );
-
-      this.messagesData.forEach((msg) => {
-        console.log('Msg:', msg.id, msg.senderId, msg.senderPicture);
-      });
-
       this.messagesData = [...this.messagesData];
       this.cdr.detectChanges();
       const updatePromises = messagesToUpdate.map((message) => {
@@ -332,11 +339,10 @@ export class ChannelChatComponent implements OnInit {
           message.id
         );
         return updateDoc(messageRef, {
-          senderPicture: newPhotoUrl, // statt photoUrl
+          senderPicture: newPhotoUrl,
         });
       });
       await Promise.all(updatePromises);
-      console.log('Firestore-Updates abgeschlossen');
     } catch (error) {
       console.error(
         'Fehler beim Aktualisieren der Nachrichten mit neuem Foto:',
@@ -354,7 +360,6 @@ export class ChannelChatComponent implements OnInit {
   openEmojiPicker(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
-    console.log(this.isPickerVisible);
     this.isOverlayOpen = true;
     this.clicked = true;
     this.editingMessageId = null;
@@ -630,19 +635,19 @@ export class ChannelChatComponent implements OnInit {
   }
 
   toggleEditDialog(messageId: string | null): void {
-    // Falls messageId null => schließe den Dialog
     if (!messageId) {
       this.showEditDialog = null;
       return;
     }
-    // Andernfalls: Setze showEditDialog auf die ID
     this.showEditDialog = messageId;
   }
   toggleEditArea(messageId: string, messageText: string) {
+    this.editWasClicked = false;
     if (this.showEditArea === messageId) {
       this.showEditArea = null;
       this.messageToEdit = '';
     } else {
+      this.editWasClicked = true;
       this.showEditArea = messageId;
       this.messageToEdit = messageText;
       this.isEdited = true;
