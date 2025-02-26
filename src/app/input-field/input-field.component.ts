@@ -226,7 +226,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       const file = selectedFiles[0];
       const fileBlob = this.dataURLToBlob(file.data);
 
-      const MAX_FILE_SIZE = 500 * 1024; // 500KB
+      const MAX_FILE_SIZE = 500 * 1024; 
       if (fileBlob.size > MAX_FILE_SIZE) {
         this.fileTooLargeMessage =
           'Bitte konvertiere deine Datei (max. 500 KB):';
@@ -305,11 +305,41 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   async sendChannelThreadMessage() {
-    if (!this.currentChannelThreadId || this.chatMessage.trim() === '') {
+    if (!this.currentChannelThreadId || (this.chatMessage.trim() === '' &&
+    this.inputFieldService.getFiles(this.activeComponentId).length === 0)
+) {
       console.warn('Thread is not open or message is empty');
       return;
     }
+    const selectedFiles = this.inputFieldService.getFiles(this.activeComponentId);
     try {
+      const localTempId = `temp_${Date.now()}_${Math.random()}`;
+      const localMessage = {
+        id: localTempId,
+        text: this.chatMessage,
+        sending: true,
+        timestamp: new Date(),
+        selectedFiles: selectedFiles.map((file) => ({
+          url: file.data,  
+          type: file.type,
+          name: file.name
+        }))
+      };
+      this.messageCreated.emit(localMessage); 
+      const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
+      const finalMessageData = {
+        text: this.chatMessage,
+        senderId: this.global.currentUserData.id,
+        senderName: this.global.currentUserData.name,
+        senderPicture: this.global.currentUserData.picture || '',
+        timestamp: new Date(),
+        editedTextShow: false,
+        selectedFiles: fileData.map((file) => ({
+          url: file.url,  
+          type: file.type,
+          name: file.name
+        })),
+      };
       const threadRef = collection(
         this.firestore,
         'channels',
@@ -318,20 +348,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
         this.currentChannelThreadId,
         'thread'
       );
-      const messageData = {
-        text: this.chatMessage,
-        senderId: this.global.currentUserData.id,
-        senderName: this.global.currentUserData.name,
-        senderPicture: this.global.currentUserData.picture || '',
-        timestamp: new Date(),
-        selectedFiles: this.selectFiles,
-      };
-      await addDoc(threadRef, messageData);
+      const docRef = await addDoc(threadRef, finalMessageData);
+      const messageWithId = { ...finalMessageData, id: docRef.id };
+      this.messageSent.emit();
+      this.resetInputdata();
     } catch (err) {
-      console.error(err);
+      console.error('Fehler beim Senden der Thread-Nachricht:', err);
+    } finally {
+      if (this.editableDivRef?.nativeElement) {
+        this.editableDivRef.nativeElement.style.height = '130px';
+      }
+      this.inputFieldService.updateFiles(this.activeComponentId, []);
+      this.sendingStatus = null;
+      this.handleResetErrors();
     }
-    this.resetInputdata();
   }
+  
 
   async sendDirectThreadMessage() {
     if (
@@ -395,9 +427,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
         recipientName: this.selectedUser.name ?? '',
         reactions: '',
       };
-      console.log('messageData:', messageData);
       await addDoc(threadMessagesRef, messageData);
-      console.log('Message successfully sent to Firestore!');
       this.resetInputdata();
       this.messageSent.emit();
     } catch (error) {

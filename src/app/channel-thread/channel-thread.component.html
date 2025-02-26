@@ -30,7 +30,8 @@
 
     <div class="message-scroll-container" #messageContainer>
 
-      <div class="topic-container" (mouseenter)="hoveredTopic = true" (mouseleave)="hoveredTopic = false">
+      <div class="topic-container" (mouseenter)="hoveredMessageId = topicMessage?.id"
+        (mouseleave)="hoveredMessageId = null">
 
         <div class="topic" [ngClass]="{
           'topic-from-current': topicMessage?.senderId === global.currentUserData.id,
@@ -78,23 +79,52 @@
                 </div>
               </div>
             </ng-container>
-
             <ng-template #normalMode>
-              <p class="message" [ngClass]="{
-                'from-current': topicMessage?.senderId === global.currentUserData.id,
-                'from-user': topicMessage?.senderId !== global.currentUserData.id
-              }">
-                <ng-container *ngFor="let mentionName of mentionService.splitMessage(topicMessage!.text)">
-                  <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
-                    (click)="handleMentionClick(mentionName)">
-                    {{ mentionName }}
-                  </span>
-                  <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
-                    {{ mentionName }}
-                  </span>
-                </ng-container>
-              </p>
+              <div class="message-bubble"
+                   [ngClass]="{
+                     'from-current': topicMessage?.senderId === global.currentUserData.id,
+                     'from-user': topicMessage?.senderId !== global.currentUserData.id
+                   }">
+                
+                <!-- Zuerst der Text mit Mentions -->
+                <div class="text-content">
+                  <ng-container *ngFor="let mentionName of mentionService.splitMessage(topicMessage!.text)">
+                    <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
+                      (click)="handleMentionClick(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                    <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
+                      {{ mentionName }}
+                    </span>
+                  </ng-container>
+                </div>
+            
+                <!-- Dann die Dateien: -->
+                <div class="show-selected-files">
+                  <div *ngFor="let file of topicMessage?.selectedFiles">
+                    <div class="mai-file" *ngIf="file.url">
+                      <!-- Für Bilder -->
+                      <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                        <a [href]="file.url" target="_blank">
+                          <img [src]="file.url" alt="Image File" />
+                        </a>
+                      </div>
+            
+                      <!-- Für PDFs -->
+                      <div class="file-info" *ngIf="file.type === 'application/pdf'">
+                        <a [href]="file.url" target="_blank">
+                          <img src="../../assets/img/pdf.png" alt="PDF File" />
+                        </a>
+                      </div>
+            
+                      <!-- evtl. weitere Dateitypen -->
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
             </ng-template>
+            
 
             <div class="reactions-wrapper" [ngClass]="{
               'reactions-from-user': topicMessage?.senderId !== global.currentUserData.id,
@@ -143,7 +173,7 @@
             </div>
 
 
-            <div @slideIn class="reaction-bar" [ngClass]="{
+            <div @slideIn class="reaction-bar" *ngIf="hoveredMessageId === topicMessage?.id && !showEditArea" [ngClass]="{
               'reaction-bar-current': topicMessage?.senderId === global.currentUserData.id,
               'reaction-bar-user': topicMessage?.senderId !== global.currentUserData.id
             }">
@@ -265,21 +295,50 @@
             </div>
 
             <ng-template #normalMode>
-              <p class="message" [ngClass]="{
-              'from-current': message.senderId === global.currentUserData.id,
-              'from-user': message.senderId !== global.currentUserData.id
-            }">
-                <ng-container *ngFor="let mentionName of mentionService.splitMessage(message!.text)">
-                  <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
-                    (click)="handleMentionClick(mentionName)">
-                    {{ mentionName }}
-                  </span>
-                  <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
-                    {{ mentionName }}
-                  </span>
-                </ng-container>
-              </p>
+              <div class="message-bubble" [ngClass]="{
+                     'from-current': message.senderId === global.currentUserData.id,
+                     'from-user': message.senderId !== global.currentUserData.id
+                   }">
+
+                <!-- Zuerst der Text mit Mentions -->
+                <div class="text-content">
+                  <ng-container *ngFor="let mentionName of mentionService.splitMessage(message!.text)">
+                    <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
+                      (click)="handleMentionClick(mentionName)">
+                      {{ mentionName }}
+                    </span>
+                    <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
+                      {{ mentionName }}
+                    </span>
+                  </ng-container>
+                </div>
+
+                <!-- Dann die Dateien: -->
+                <div class="show-selected-files">
+                  <div *ngFor="let file of message?.selectedFiles">
+                    <div class="mai-file" *ngIf="file.url">
+                      <!-- Für Bilder -->
+                      <div class="file-info" *ngIf="file.type.startsWith('image/')">
+                        <a [href]="file.url" target="_blank">
+                          <img [src]="file.url" alt="Image File" />
+                        </a>
+                      </div>
+
+                      <!-- Für PDFs -->
+                      <div class="file-info" *ngIf="file.type === 'application/pdf'">
+                        <a [href]="file.url" target="_blank">
+                          <img src="../../assets/img/pdf.png" alt="PDF File" />
+                        </a>
+                      </div>
+
+                      <!-- evtl. weitere Dateitypen -->
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </ng-template>
+
 
             <div class="reactions-wrapper" [ngClass]="{
               'reactions-from-user': message?.senderId !== global.currentUserData.id,

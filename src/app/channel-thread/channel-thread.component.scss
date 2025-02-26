@@ -414,8 +414,6 @@ header {
   border-bottom-right-radius: 0;
 }
 
-
-
 .single-reaction-wrapper {
   position: relative;
 }
@@ -603,4 +601,45 @@ form {
 .edit-button {
   font-size: 12px;
   padding: 6px 12px !important;
+}
+
+.show-selected-files {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.file-info img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: unset !important;
+}
+.file-info:hover img {
+  transform: scale(1.2);
+}
+
+:host ::ng-deep app-input-field {
+  position: relative;
+}
+
+:host ::ng-deep app-input-field .sending-status-box {
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 100%;
+}
+
+:host ::ng-deep app-input-field .error-message {
+  font-size: 11px;
+  padding: 4px;
+  max-width: 250px;
+  max-height: 100px;
+}
+
+:host ::ng-deep app-files-preview .file-info {
+  margin-top: 4;
+  padding: 0 12px;
+  max-width: 230px;
 }

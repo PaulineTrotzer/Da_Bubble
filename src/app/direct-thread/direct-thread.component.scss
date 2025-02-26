@@ -927,6 +927,20 @@ svg {
   cursor: pointer;
 }
 
+:host ::ng-deep app-input-field .error-message {
+  font-size: 11px;
+  padding: 4px;
+  max-width: 250px;
+  max-height: 100px;
+}
+
+:host ::ng-deep app-files-preview .file-info {
+  margin-top: 4px;
+  padding: 0 12px;
+  max-width: 230px;
+}
+
+
 @media (max-width: 1349px) {
   .full-page-content.hidden-width {
     width: unset;

@@ -40,6 +40,7 @@ interface Message {
   timestamp: Date;
   senderName: string;
   senderPicture: string;
+  selectedFiles?: any[];
   reactions: { [emoji: string]: string[] };
   isEdited: boolean;
 }
@@ -89,7 +90,7 @@ export class ChannelThreadComponent implements OnInit {
   isPickerVisible: string | null = null;
   showEditDialog: string | null = null;
   showEditArea: string | null = null;
-  hoveredMessageId: string | null = null;
+  hoveredMessageId: string | null | undefined;
   hoveredTopic: boolean = false;
   currentUserLastEmojis: string[] = [];
   hoveredReactionMessageId: string | null = null;
