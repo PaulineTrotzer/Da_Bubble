@@ -34,6 +34,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { InputFieldComponent } from '../input-field/input-field.component';
 import { InputfieldService } from '../services/inputfield.service';
 import { MentionThreadService } from '../services/mention-thread.service';
+import { ThreadControlService } from '../services/thread-control.service';
 
 interface Message {
   formattedText: any;
@@ -116,6 +117,9 @@ export class ChannelChatComponent implements OnInit {
   selectFiles: any[] = [];
   mentionService = inject(MentionThreadService);
   editWasClicked = false;
+  replyCounts: Map<string, number> = new Map();
+  replyCountValue: number = 0;
+  threadControlService = inject(ThreadControlService);
 
   constructor(private elRef: ElementRef) {}
 
@@ -133,6 +137,12 @@ export class ChannelChatComponent implements OnInit {
     });
     this.scrollOrNot('yes');
   }
+
+  getReplyCountValue(messageId: string): number {
+    return this.replyCounts.get(messageId) ?? 0;
+  }
+
+
 
   scrollToBottom(): void {
     if (this.messageContainer) {
@@ -259,7 +269,7 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No channel selected');
       return;
     }
-
+  
     const messagesRef = collection(
       this.firestore,
       'channels',
@@ -267,35 +277,41 @@ export class ChannelChatComponent implements OnInit {
       'messages'
     );
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-
+  
     onSnapshot(q, async (querySnapshot) => {
-      // 1) Prüfen, ob in diesem Snapshot mindestens eine neue Nachricht kam
       let newMessageArrived = false;
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           newMessageArrived = true;
         }
       });
-
-      // 2) Deine messagesData befüllen
-      this.messagesData = querySnapshot.docs.map((doc: any) => {
-        const data = doc.data();
-        if (data.timestamp && data.timestamp.seconds) {
+  
+      this.messagesData = querySnapshot.docs.map((docSnap: any) => {
+        const data = docSnap.data();
+        if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
         data.formattedText = this.formatMentions(data.text);
-        return { id: doc.id, ...data };
+        return { id: docSnap.id, ...data };
       });
-
-      // 3) Nur scrollen, wenn mindestens eine 'added'‐Änderung dabei war
+      this.subscribeToThreadAnswers();
       if (newMessageArrived) {
         setTimeout(() => {
           this.scrollToBottom();
         }, 50);
       }
-
-      // 4) Optional: Avatar-Update
       await this.updateMessagesWithNewPhoto();
+    });
+  }
+  subscribeToThreadAnswers() {
+    this.messagesData.forEach((message) => {
+      this.threadControlService
+        .getReplyCountChannel(this.selectedChannel.id, message.id)
+        .subscribe((count) => {
+          // count liefert uns, wie viele Unter-Nachrichten (Replies) 
+          // das Feld "parentId = message.id" haben
+          this.replyCounts.set(message.id, count);
+        });
     });
   }
 

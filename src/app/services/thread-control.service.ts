@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { collection } from '@firebase/firestore';
-import { Firestore, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, onSnapshot, query, where } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +52,6 @@ export class ThreadControlService {
     this.editedMessageSubject.next(message);
   }
 
-
   setFirstThreadMessageId(id: string | null) {
     this.firstThreadMessageIdSubject.next(id);
   }
@@ -82,6 +81,23 @@ export class ThreadControlService {
       return () => {
         unsubscribe();
       };
+    });
+  }
+
+  getReplyCountChannel(channelId: string, messageId: string): Observable<number> {
+    return new Observable<number>((observer) => {
+      const repliesRef = collection(
+        this.firestore,
+        'channels',
+        channelId,
+        'messages',
+        messageId,
+        'thread'  
+      );
+      const unsubscribe = onSnapshot(repliesRef, (snapshot) => {
+        observer.next(snapshot.size);
+      });
+      return () => unsubscribe();
     });
   }
 }

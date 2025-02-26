@@ -125,6 +125,16 @@
               <span class="edited-label" *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
             </div>
 
+            <div class="placeholder-thread-answer">
+              <div (click)="openThread(message.id)"
+                  [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
+                  <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
+                  <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' :
+                      'Antworten'
+                      }}</span>
+              </div>
+          </div>
+
 
             <div (click)="closeEmojiPickerEdit()" *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
               <emoji-mart size="18" (click)="letPickerVisible($event, message.id)"

@@ -375,6 +375,40 @@
   text-align: center;
 }
 
+.placeholder-thread-answer {
+  height: 10px;
+  width: 45px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  width: 100%;
+}
+
+.thread-answer-display {
+  display: flex;
+  gap: 5px;
+  color: #444df2;
+  font-weight: 500;
+  font-size: 13px;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.answer-counter {
+  font-weight: 700;
+  pointer-events: all;
+}
+
+.thread-answer-display.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.thread-answer-display:hover {
+  transform: scale(1.05);
+}
+
 .message-edit {
   position: absolute;
   padding: 5px;
