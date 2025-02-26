@@ -303,13 +303,13 @@ export class ChannelChatComponent implements OnInit {
       await this.updateMessagesWithNewPhoto();
     });
   }
+
+  
   subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
       this.threadControlService
         .getReplyCountChannel(this.selectedChannel.id, message.id)
         .subscribe((count) => {
-          // count liefert uns, wie viele Unter-Nachrichten (Replies) 
-          // das Feld "parentId = message.id" haben
           this.replyCounts.set(message.id, count);
         });
     });

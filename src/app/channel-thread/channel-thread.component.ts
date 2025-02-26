@@ -31,6 +31,7 @@ import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { MentionThreadService } from '../services/mention-thread.service';
 
 interface Message {
   id: string;
@@ -111,9 +112,11 @@ export class ChannelThreadComponent implements OnInit {
   sanitizer = inject(DomSanitizer);
   isOverlayOpen = false;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
+  mentionService = inject(MentionThreadService);
   constructor() {}
 
   async ngOnInit(): Promise<void> {
+    await this.mentionService.getAllUsersname();
     this.global.channelThread$.subscribe(async (threadId) => {
       if (threadId) {
         this.channelMessageId = threadId;
@@ -122,7 +125,6 @@ export class ChannelThreadComponent implements OnInit {
         await this.loadThreadMessages();
         this.toggleChannelThread(true);
         await this.loadCurrentUserEmojis();
-        await this.getAllUsersname();
       }
     });
     this.scrollOrNot('yes');
@@ -168,31 +170,11 @@ export class ChannelThreadComponent implements OnInit {
       const mentionName = target.textContent?.trim();
       if (mentionName) {
         if (this.getAllUsersName.length === 0) {
-          console.warn('Mentions-Daten sind noch nicht geladen.');
           return;
         }
         this.handleMentionClick(mentionName);
       }
     }
-  }
-
-  async getAllUsersname(): Promise<void> {
-    const userRef = collection(this.firestore, 'users');
-    return new Promise((resolve) => {
-      onSnapshot(userRef, (querySnapshot) => {
-        this.getAllUsersName = [];
-        querySnapshot.forEach((doc) => {
-          const dataUser = doc.data();
-          this.getAllUsersName.push({
-            name: dataUser['name'],
-            email: dataUser['email'],
-            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
-            id: doc.id,
-          });
-        });
-        resolve();
-      });
-    });
   }
 
   splitMessage(text: string): string[] {
@@ -217,27 +199,12 @@ export class ChannelThreadComponent implements OnInit {
   async handleMentionClick(mention: string) {
     this.wasClickedInChannelThread = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
-    const user = await this.ensureUserDataLoaded(cleanName);
-
+    const user = await this.mentionService.ensureUserDataLoaded(cleanName);
     if (!user) {
       return;
     }
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
-  }
-
-  async ensureUserDataLoaded(name: string): Promise<any> {
-    while (this.getAllUsersName.length === 0) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    const foundUser = this.getAllUsersName.find(
-      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
-    );
-    if (!foundUser) {
-      console.warn('Benutzer nicht gefunden:', name);
-      return null;
-    }
-    return foundUser;
   }
 
   closeMentionBoxHandler() {

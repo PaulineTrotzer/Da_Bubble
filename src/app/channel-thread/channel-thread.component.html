@@ -84,13 +84,12 @@
                 'from-current': topicMessage?.senderId === global.currentUserData.id,
                 'from-user': topicMessage?.senderId !== global.currentUserData.id
               }">
-                <ng-container (click)="handleClickOnMention($event)"
-                  *ngFor="let mentionName of splitMessage(topicMessage?.text || '')">
-                  <span *ngIf="isMention(mentionName)" class="mention-message"
+                <ng-container *ngFor="let mentionName of mentionService.splitMessage(topicMessage!.text)">
+                  <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
                     (click)="handleMentionClick(mentionName)">
                     {{ mentionName }}
                   </span>
-                  <span class="only-name" *ngIf="!isMention(mentionName)">
+                  <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
                     {{ mentionName }}
                   </span>
                 </ng-container>
@@ -270,13 +269,12 @@
               'from-current': message.senderId === global.currentUserData.id,
               'from-user': message.senderId !== global.currentUserData.id
             }">
-                <ng-container (click)="handleClickOnMention($event)"
-                  *ngFor="let mentionName of splitMessage(message.text || '')">
-                  <span *ngIf="isMention(mentionName)" class="mention-message"
+                <ng-container *ngFor="let mentionName of mentionService.splitMessage(message!.text)">
+                  <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
                     (click)="handleMentionClick(mentionName)">
                     {{ mentionName }}
                   </span>
-                  <span class="only-name" *ngIf="!isMention(mentionName)">
+                  <span *ngIf="!mentionService.isMention(mentionName)" class="only-name">
                     {{ mentionName }}
                   </span>
                 </ng-container>

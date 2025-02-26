@@ -330,9 +330,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     } catch (err) {
       console.error(err);
     }
-    this.chatMessage = '';
-    this.formattedChatMessage = '';
-    this.selectFiles = [];
+    this.resetInputdata();
   }
 
   async sendDirectThreadMessage() {
