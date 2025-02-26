@@ -40,8 +40,8 @@
       </div>
     </mat-card-header>
 
-    <div *ngIf="!afterLoginSheet">
-      <div *ngIf="!global.channelSelected">
+    <div class="header-chat-holder" *ngIf="!afterLoginSheet">
+      <div  *ngIf="!global.channelSelected">
         <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
           [selectedChannel]="selectedChannel" 
           (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>

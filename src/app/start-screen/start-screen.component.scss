@@ -26,6 +26,12 @@ mat-card {
   top: 0;
 }
 
+.header-chat-holder {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 107px);
+}
+
 .big-chat-card {
   position: relative;
   min-width: 990px;
@@ -168,7 +174,7 @@ mat-card {
 }
 
 @media (max-width: 320px) {
-  .big-chat-card{
+  .big-chat-card {
     height: auto;
     max-width: 300px;
     min-width: auto;
@@ -178,7 +184,7 @@ mat-card {
     left: -34px;
     max-width: 300px;
   }
-  .welcome-sheet{
+  .welcome-sheet {
     left: -34px;
     width: 320px;
   }
