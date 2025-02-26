@@ -127,6 +127,13 @@ header {
   text-decoration-skip-ink: none;
 }
 
+.text-content {
+  min-width: fit-content;
+  min-height: 40px;
+  text-align: center;
+  padding: 8px;
+}
+
 .topic-container {
   position: relative;
   cursor: pointer;
@@ -299,9 +306,9 @@ header {
   padding: 5px;
   align-items: center;
   position: relative;
-  height: 25px;
-  min-width: 34px;
-  font-size: 13px;
+  height: 22px;
+  min-width: 32px;
+  font-size: 11px;
   justify-content: center;
   &:hover {
     border-color: #444df2;
@@ -639,7 +646,7 @@ form {
 }
 
 :host ::ng-deep app-files-preview .file-info {
-  margin-top: 4;
+  margin-top: 4px;
   padding: 0 12px;
   max-width: 230px;
 }
