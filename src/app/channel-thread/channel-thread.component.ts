@@ -131,6 +131,47 @@ export class ChannelThreadComponent implements OnInit {
     this.scrollOrNot('yes');
   }
 
+  displayDayInfo(index: number): boolean {
+    if (index === 0) return true;
+    const currentMessage = this.messages[index];
+    const previousMessage = this.messages[index - 1];
+    return !this.isSameDay(
+      new Date(currentMessage.timestamp),
+      new Date(previousMessage.timestamp)
+    );
+  }
+
+  isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  }
+
+  getDayInfoForMessage(index: number): string {
+    const messageDate = new Date(this.messages[index].timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (this.isSameDay(messageDate, today)) {
+      return 'Heute';
+    } else if (this.isSameDay(messageDate, yesterday)) {
+      return 'Gestern';
+    } else {
+      return this.formatDate(messageDate);
+    }
+  }
+
+  formatDate(date: Date): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+
+
   scrollToBottom(): void {
     if (this.messageContainer) {
       this.messageContainer.nativeElement.scrollTop =

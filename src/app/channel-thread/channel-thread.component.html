@@ -32,7 +32,6 @@
 
       <div class="topic-container" (mouseenter)="hoveredMessageId = topicMessage?.id"
         (mouseleave)="hoveredMessageId = null">
-
         <div class="topic" [ngClass]="{
           'topic-from-current': topicMessage?.senderId === global.currentUserData.id,
           'topic-from-user': topicMessage?.senderId !== global.currentUserData.id
@@ -234,9 +233,14 @@
 
 
 
-      <div class="answers-container" *ngFor="let message of messages" (mouseenter)="hoveredMessageId = message.id"
+      <div class="answers-container" *ngFor="let message of messages; let i = index" (mouseenter)="hoveredMessageId = message.id"
         (mouseleave)="hoveredMessageId = null">
-
+        <div *ngIf="displayDayInfo(i)" class="new-day-info">
+          <div class="day-info">
+            <div class="line"></div>
+            <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
+          </div>
+        </div>
         <div class="answer" [ngClass]="{
           'answer-from-current': message.senderId === global.currentUserData.id,
           'answer-from-user': message.senderId !== global.currentUserData.id

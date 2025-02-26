@@ -3,8 +3,9 @@
   flex-direction: column;
   gap: 32px;
   margin-top: 2px;
-  height: 952px;
+  max-height: 950px;
   position: relative;
+  overflow: hidden;
 }
 
 .edit-wrapper {
@@ -668,4 +669,30 @@ form {
 }
 .file-info:hover img {
   transform: scale(1.2);
+}
+
+.channel-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: #444df2; /* z. B. in Anlehnung an dein Projekt */
+
+  .welcome-illustration {
+    width: 120px;
+    margin-bottom: 1rem;
+    opacity: 0.85;
+  }
+
+  .channel-name {
+    color: #444df2;
+  }
+
+  .welcome-text {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    max-width: 35rem; /* Begrenzte Zeilenbreite */
+    color: #666;
+  }
 }

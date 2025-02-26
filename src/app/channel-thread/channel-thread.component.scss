@@ -18,6 +18,40 @@
   position: relative;
 }
 
+.new-day-info {
+  position: relative;
+  top: -12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(173, 176, 217, 0.4);
+    z-index: 0;
+    transform: translateY(-50%);
+  }
+}
+
+.line {
+  width: 100%;
+  border: 1px solid #adb0d9;
+}
+.day-span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -16px;
+  border-radius: 30px;
+  border: 1px solid #adb0d9;
+  padding: 5px 15px;
+  background-color: #ffffff;
+}
+
 .label-user {
   align-self: flex-start;
   font-size: 11px;
@@ -128,8 +162,8 @@ header {
 }
 
 .text-content {
-  min-width: fit-content;
-  min-height: 40px;
+  min-width: 100px;
+  min-height: fit-content;
   text-align: center;
   padding: 8px;
 }
