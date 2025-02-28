@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0; 
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
 }
@@ -179,8 +179,6 @@ app-input-field {
 }
 
 .main-current-messagebox {
-  position: absolute;
-  top: 93px;
   width: 100%;
   overflow-y: auto;
   scroll-behavior: smooth;
@@ -996,4 +994,10 @@ app-mention-message-box {
   position: absolute;
   right: 15px;
   bottom: 4px;
+}
+
+:host ::ng-deep app-input-field {
+  position: absolute;
+  bottom: -17px;
+  width: 100%;
 }

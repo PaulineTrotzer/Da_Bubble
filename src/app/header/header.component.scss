@@ -6,6 +6,15 @@
   position: relative;
 }
 
+.main-messages {
+  max-height: 640px;
+  overflow-y: scroll;
+  h3{
+    color:#444df2;
+  }
+}
+
+
 .bubble-img {
   width: 245px;
   height: 70px;
@@ -112,16 +121,18 @@ input.radius {
 .online {
   display: block;
   background-color: #92c83e;
-  height: 14px;
-  width: 14px;
+  height: 11px;
+  width: 11px;
+  object-fit: cover;
   border-radius: 100%;
 }
 
 .offline {
   display: block;
   background-color: #757575;
-  height: 14px;
-  width: 14px;
+  height: 11px;
+  width: 11px;
+  object-fit: cover;
   border-radius: 100%;
 }
 
@@ -191,9 +202,10 @@ input.radius {
 .user-image-box {
   position: relative;
   img {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     border-radius: 40px;
+    object-fit: contain;
   }
 }
 
@@ -214,12 +226,18 @@ input.radius {
 
 .user-name {
   color: #686868;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .enter-chat-text {
   color: #686868;
-  font-size: 18px;
+  font-size: 16px;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.enter-chat-text:hover {
+  font-weight: 700;
+  color: #444df2;
 }
 
 .channel-list {
@@ -236,11 +254,11 @@ input.radius {
   max-width: max-content;
   gap: 10px;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 15px;
+  transition: background-color 0.2s ease, border-radius 0.2s ease;
   &:hover {
     background-color: #eceefe;
     border-radius: 40px;
-    padding-left: 15px;
     .channel-name {
       color: #444df2;
     }
@@ -252,17 +270,28 @@ input.radius {
 
 .channel-name {
   color: #686868;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .enter-channel-text {
   color: #686868;
-  font-size: 18px;
+  font-size: 16px;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.enter-channel-text:hover {
+  font-weight: 700;
+  color: #444df2;
 }
 
 .noChannel-info {
   text-align: center;
   color: #686868;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  font-weight: 700;
+  font-size: 17px;
 }
 
 .main-result-user {
@@ -290,10 +319,18 @@ input.radius {
   }
 }
 
+.current-search-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .main-result-channel {
   display: flex;
   align-items: center;
+  justify-content: stretch;
   gap: 10px;
+  min-height: 50px;
 }
 
 .main-result-box {
@@ -302,6 +339,7 @@ input.radius {
   gap: 10px;
   max-height: 300px;
   overflow: auto;
+  margin-top: 15px;
 }
 
 /* @media (max-width: 1349px) {
@@ -413,7 +451,7 @@ input.radius {
       font-size: 20px;
     }
   }
-  .arrow-down-btn{
+  .arrow-down-btn {
     width: 40px;
   }
   .status-border {
