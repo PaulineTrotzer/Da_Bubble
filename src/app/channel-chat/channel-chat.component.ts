@@ -120,6 +120,7 @@ export class ChannelChatComponent implements OnInit {
   replyCounts: Map<string, number> = new Map();
   replyCountValue: number = 0;
   threadControlService = inject(ThreadControlService);
+  channelWasLoaded = false;
 
   constructor(private elRef: ElementRef) {}
 
@@ -301,6 +302,7 @@ export class ChannelChatComponent implements OnInit {
         }, 50);
       }
       await this.updateMessagesWithNewPhoto();
+      this.channelWasLoaded = true;
     });
   }
 

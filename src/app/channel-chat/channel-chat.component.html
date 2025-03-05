@@ -4,15 +4,11 @@
     (enterChatUser)="enterChatByUserName($event)" (closeMentionBox)="closeMentionBoxHandler()">
   </app-mention-message-box>
   <div class="message-scroll-container" #messageContainer>
-    <div class="channel-welcome" *ngIf="messagesData?.length === 0">
-      <img
-        src="./../../assets/img/connection.png"
-        alt="Kanal Illustration"
-        class="welcome-illustration"
-      />
+    <div class="channel-welcome" *ngIf="messagesData?.length === 0 && channelWasLoaded">
+      <img src="./../../assets/img/connection.png" alt="Kanal Illustration" class="welcome-illustration" />
       <h2>Willkommen im Kanal <span class="channel-name">#{{ selectedChannel?.name }}</span></h2>
       <p class="welcome-text">
-        Dies ist der Beginn eures Gesprächs in <b>{{ selectedChannel?.name }}</b>. 
+        Dies ist der Beginn eures Gesprächs in <b>{{ selectedChannel?.name }}</b>.
         Teile hier Nachrichten, Dateien und Ideen, oder nutze den Thread‐Bereich für Diskussionen.
       </p>
     </div>
@@ -138,13 +134,13 @@
 
             <div class="placeholder-thread-answer">
               <div (click)="openThread(message.id)"
-                  [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
-                  <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
-                  <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' :
-                      'Antworten'
-                      }}</span>
+                [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
+                <span class="answer-counter">{{ getReplyCountValue(message.id) }}</span>
+                <span class="answers">{{ getReplyCountValue(message.id) === 1 ? 'Antwort' :
+                  'Antworten'
+                  }}</span>
               </div>
-          </div>
+            </div>
 
 
             <div (click)="closeEmojiPickerEdit()" *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
@@ -178,8 +174,8 @@
                       {{ getReactionText(message, reaction.key) }}
                     </span>
                   </div>
-                </div> 
-              </div> 
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -189,11 +185,7 @@
         <div class="edit-message-container" *ngIf="showEditArea === message.id">
 
           <div class="textarea-wrapper">
-            <textarea 
-            #myTextarea 
-            name="message" 
-            [(ngModel)]="messageToEdit"
-          ></textarea>
+            <textarea #myTextarea name="message" [(ngModel)]="messageToEdit"></textarea>
             <div class="button-row edit-message-button-row">
 
               <div class="img-container-textarea" (click)="openEmojiPickerEdit($event, message.id)">
