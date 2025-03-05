@@ -26,7 +26,6 @@
         </div>
       </div>
 
-
       <div>
         <div *ngIf="openMyProfile">
           <div *ngIf="currentUserwasSelected">
@@ -41,10 +40,10 @@
     </mat-card-header>
 
     <div class="header-chat-holder" *ngIf="!afterLoginSheet">
-      <div  *ngIf="!global.channelSelected">
+      <div *ngIf="!global.channelSelected">
         <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
-          [selectedChannel]="selectedChannel" 
-          (messageForwarded)="onMessageForwarded($event)" [selectedUser]="selectedUser"></app-chat-component>
+          [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
+          [selectedUser]="selectedUser"></app-chat-component>
       </div>
 
       <div *ngIf="global.channelSelected">
@@ -76,4 +75,6 @@
         </div>
       </div>
     </div>
-    <div class="overlay" *ngIf="openMyProfile && contactWasSelected || openMyProfile && currentUserwasSelected"></div>
+  </mat-card>
+</div>
+<div class="overlay" *ngIf="openMyProfile && contactWasSelected || openMyProfile && currentUserwasSelected"></div>

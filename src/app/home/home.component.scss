@@ -3,6 +3,7 @@ mat-card {
   z-index: 110;
 }
 
+
 .main-content {
   display: flex;
   justify-content: center;
@@ -19,6 +20,7 @@ mat-card {
   display: flex;
   max-width: 2000px;
   gap: 32px;
+  margin-top: 32px;
   width: 98%;
 }
 

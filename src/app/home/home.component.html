@@ -10,8 +10,7 @@
             'close-box':global.openChannelorUserBox || global.openChannelOrUserThread ,
             'open-box':!global.openChannelorUserBox && !global.openChannelOrUserThread,
 
-        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"
-                [selectedUserHome]="selectedUser" [selectedChannelHome]="selectedChannel"></app-workspace>
+        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
 
             <app-start-screen (enterChat)="handleEnterChat($event)" [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
             'hiddenFullWidth':global.checkWideChannelOrUserThreadBox,
@@ -68,6 +67,6 @@
     (mouseleave)="isHovered = false">
     <p>{{!global.openChannelorUserBox && isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p>
 
-    <img  class="workspace-drawer" [src]="getImageSource()"
+    <img class="workspace-drawer" [src]="getImageSource()"
         [alt]="!global.openChannelorUserBox && isWorkspaceOpen  ? 'Hide workspace' : 'Show workspace'">
 </div>

@@ -2,6 +2,14 @@
   border-style: none;
 }
 
+.full-app-content {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  margin-bottom: 20px;
+  border-radius: 30px;
+}
+
 .mat-mdc-card[hidden] {
   display: none !important;
 }
@@ -48,7 +56,7 @@
   flex-direction: column;
   gap: 20px;
   overflow: auto;
-  height: 730px;
+  height: 737px;
   scroll-behavior: smooth !important;
   position: relative;
   top: 17px;
@@ -996,8 +1004,8 @@ app-mention-message-box {
   bottom: 4px;
 }
 
-:host ::ng-deep app-input-field {
+/* :host ::ng-deep app-input-field {
   position: absolute;
   bottom: -17px;
   width: 100%;
-}
+} */

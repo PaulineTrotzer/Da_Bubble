@@ -190,7 +190,6 @@
                               'card-content-user':
                                 message.senderId !== global.currentUserData.id
                             }">
-
                                             <div (click)="handleClickOnMention($event)" class="text-container">
                                                 <ng-container *ngFor="let mentionName of splitMessage(message.text)">
                                                     <span *ngIf="isMention(mentionName)" class="mention-message"
@@ -201,7 +200,6 @@
                                                         mentionName
                                                         }}</span>
                                                 </ng-container>
-
                                             </div>
                                         </mat-card-content>
 
@@ -253,18 +251,15 @@
                                         }}</span>
                                 </div>
                             </div>
-                            <!-- A) Falls senderSticker und recipientSticker gleich sind (count=2) -->
                             <ng-container *ngIf="
   message.senderSticker &&
   message.recipientSticker &&
   message.senderSticker === message.recipientSticker;
   else differentStickers
 ">
-                                <!-- Nur anzeigen, wenn Nachricht selbst Text hat -->
                                 <div class="comment-sticker-holder" *ngIf="message.text?.trim() !== ''" [ngClass]="{
     'comment-sticker-holder-partner': message.senderName === selectedUser?.name
   }">
-                                    <!-- STICKER-ITEM für "beideSticker" -->
                                     <div class="sticker-item" (mouseenter)="toggleReactionInfoSender(message.id, true)"
                                         (mouseleave)="toggleReactionInfoSender(message.id, false)">
                                         <div class="sticker-content">
@@ -272,7 +267,6 @@
                                             <span class="count-span">2</span>
                                         </div>
 
-                                        <!-- Tooltip => kein [hidden], nur .hovered -->
                                         <mat-card class="sticker-info-tooltip"
                                             [ngClass]="{ 'hovered': showReactionPopUpSenderAtCu[message.id] }">
                                             <mat-card-content>
@@ -284,12 +278,8 @@
                                             </mat-card-content>
                                         </mat-card>
                                     </div>
-                                    <!-- /sticker-item -->
                                 </div>
-                                <!-- /comment-sticker-holder -->
                             </ng-container>
-
-                            <!-- B) Unterschiedliche Sticker oder nur einer -->
                             <ng-template #differentStickers>
                                 <div class="comment-sticker-holder" [ngClass]="{
     'comment-sticker-holder-partner': message.senderName === selectedUser?.name
@@ -312,7 +302,6 @@
                                             </span>
                                         </div>
 
-                                        <!-- Tooltip => nur .hovered -->
                                         <mat-card class="sticker-info-tooltip"
                                             [ngClass]="{ 'hovered': showReactionPopUpSenderAtCu[message.id] }">
                                             <mat-card-content>
@@ -329,7 +318,6 @@
                                             </mat-card-content>
                                         </mat-card>
                                     </div>
-                                    <!-- /sticker-item (Sender) -->
 
                                     <!-- EMPFÄNGER-STICKER -->
                                     <div class="sticker-item" *ngIf="message.recipientSticker !== ''" (mouseenter)="
@@ -350,8 +338,6 @@
                                                 {{ message.recipientStickerCount }}
                                             </span>
                                         </div>
-
-                                        <!-- Empfänger-Tooltip => nur .hovered -->
                                         <mat-card class="sticker-info-tooltip"
                                             [ngClass]="{ 'hovered': showReactionPopUpRecipientAtCu[message.id] }">
                                             <mat-card-content>
@@ -370,12 +356,8 @@
                                             </mat-card-content>
                                         </mat-card>
                                     </div>
-                                    <!-- /sticker-item (Empfänger) -->
                                 </div>
-                                <!-- /comment-sticker-holder -->
                             </ng-template>
-
-
                         </div>
                     </div>
                 </div>
@@ -406,7 +388,6 @@
                     statt
                 </div>
             </div>
-
         </div>
     </div>
     <app-input-field (messageCreated)="onMessageCreated($event)" [activeComponentId]="'chat'"

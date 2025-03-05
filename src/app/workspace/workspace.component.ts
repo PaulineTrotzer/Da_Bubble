@@ -9,16 +9,7 @@ import {
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DialogCreateChannelComponent } from '../dialog-create-channel/dialog-create-channel.component';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  OnInit,
-  inject,
-  Output,
-  EventEmitter,
-  Input,
-  ChangeDetectorRef,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { UserService } from '../services/user.service';
@@ -48,13 +39,10 @@ export class WorkspaceComponent implements OnInit {
   allUsers: any = [];
   allChannels: Channel[] = [];
   user: User = new User();
-  unsub?: () => void;
   checkUsersExsists: boolean = false;
   userService = inject(UserService);
   @Output() userSelected = new EventEmitter<any>();
   @Output() channelSelected = new EventEmitter<Channel>();
-  @Input() selectedUserHome: any;
-  @Input() selectedChannelHome: any;
   readonly dialog = inject(MatDialog);
   channelsUnsubscribe: Unsubscribe | undefined;
   logInAuth = inject(LoginAuthService);
@@ -72,7 +60,6 @@ export class WorkspaceComponent implements OnInit {
   userChannels: string[] = [];
   currentUserData: any;
   channelService = inject(UserChannelSelectService);
-  cdr = inject(ChangeDetectorRef);
 
   constructor(public global: GlobalVariableService) {
     this.authService.initAuthListener();
@@ -92,6 +79,19 @@ export class WorkspaceComponent implements OnInit {
     this.subscribeToWorkspaceChanges();
   }
 
+  async initializeChannelsAndUsers() {
+    await this.getAllChannels();
+    await this.getAllUsers();
+  }
+
+  ngOnDestroy(): void {
+    if (this.channelsUnsubscribe) {
+      this.channelsUnsubscribe();
+    }
+    if (this.guestLoginStatusSub) {
+      this.guestLoginStatusSub.unsubscribe();
+    }
+  }
 
   filterChannels(channels: any) {
     if (!this.userId) {
@@ -101,7 +101,6 @@ export class WorkspaceComponent implements OnInit {
     const willkommenChannel = channels.find(
       (channel: { name: string }) => channel.name === 'Willkommen'
     );
-
     this.filteredChannels = channels.filter(
       (channel: { userIds: string | any[] }) =>
         channel.userIds && channel.userIds.includes(this.userId)
@@ -112,11 +111,6 @@ export class WorkspaceComponent implements OnInit {
     ) {
       this.filteredChannels.unshift(willkommenChannel);
     }
-  }
-
-  async initializeChannelsAndUsers() {
-    await this.getAllChannels();
-    await this.getAllUsers();
   }
 
   observeUserChanges() {
@@ -141,19 +135,12 @@ export class WorkspaceComponent implements OnInit {
         this.selectUser(user);
       }
     });
-
     this.workspaceService.selectedChannel$.subscribe((channel) => {
       if (channel) {
         this.selectedChannel = channel;
         this.selectChannel(channel);
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.channelsUnsubscribe) {
-      this.channelsUnsubscribe();
-    }
   }
 
   async subscribeToGuestLoginStatus(): Promise<void> {
@@ -174,32 +161,48 @@ export class WorkspaceComponent implements OnInit {
     this.userService.setSelectedUser(user);
     this.selectedChannel = null;
     setTimeout(() => {
-      this.selectedUser = user;
-      this.userSelected.emit(user);
-      this.id = user.id;
-      this.global.currentThreadMessageSubject.next('');
-      this.global.channelThreadSubject.next(null);
-      const actuallyId = this.id;
-      if (
-        this.userId &&
-        this.messageCountsArr?.messageCount &&
-        this.messageCountsArr.messageCount[actuallyId] > 0
-      ) {
-        const docRef = doc(this.firestore, 'messageCounts', this.userId);
-        const resetMessageCount: any = {};
-        resetMessageCount[`messageCount.${actuallyId}`] = 0;
-        updateDoc(docRef, resetMessageCount);
-      }
-      this.global.statusCheck = false;
+      this.updateSelectedUser(user);
+      this.resetGlobalStates();
+      this.resetMessageCountIfNeeded();
       this.channelService.setSelectedUser(user);
-      this.openvollWidtChannelOrUserBox();
-      this.hiddenVoolThreadBox();
-      this.checkWidtSize();
-      this.cheackChatOpen();
+      this.handleUIChanges();
     });
   }
 
-  openvollWidtChannelOrUserBox() {
+  updateSelectedUser(user: any) {
+    this.selectedUser = user;
+    this.userSelected.emit(user);
+    this.id = user.id;
+  }
+
+  resetGlobalStates() {
+    this.global.currentThreadMessageSubject.next('');
+    this.global.channelThreadSubject.next(null);
+    this.global.statusCheck = false;
+  }
+
+  resetMessageCountIfNeeded() {
+    const actuallyId = this.id;
+    if (
+      this.userId &&
+      this.messageCountsArr?.messageCount &&
+      this.messageCountsArr.messageCount[actuallyId] > 0
+    ) {
+      const docRef = doc(this.firestore, 'messageCounts', this.userId);
+      const resetMessageCount: any = {};
+      resetMessageCount[`messageCount.${actuallyId}`] = 0;
+      updateDoc(docRef, resetMessageCount);
+    }
+  }
+
+  handleUIChanges() {
+    // this.openvollWidtChannelOrUserBox();
+    // this.hiddenVoolThreadBox();
+    /*   this.checkWidtSize(); */
+    //this.cheackChatOpen();
+  }
+
+  /*   openvollWidtChannelOrUserBox() {
     if (window.innerWidth <= 1349 && window.innerWidth > 720) {
       return (this.global.checkWideChannelorUserBox = true);
     } else {
@@ -215,22 +218,21 @@ export class WorkspaceComponent implements OnInit {
     ) {
       this.global.checkWideChannelOrUserThreadBox = false;
     }
-  }
-
+  } */
+  /* 
   cheackChatOpen() {
     if (window.innerWidth <= 720 && this.global.openChannelOrUserThread) {
       this.global.openChannelOrUserThread = false;
     }
   }
-
-  checkWidtSize() {
+ */
+  /*  checkWidtSize() {
     if (window.innerWidth <= 720) {
       return (this.global.openChannelorUserBox = true);
     } else {
       return (this.global.openChannelorUserBox = false);
     }
-  }
-
+  } */
 
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
@@ -243,7 +245,6 @@ export class WorkspaceComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) {
-        console.warn('Kein Ergebnis vom Dialog zurückgegeben');
         return;
       }
       this.getAllChannels();
@@ -264,7 +265,7 @@ export class WorkspaceComponent implements OnInit {
         this.selectChannel(willkommenChannel);
       }
     } else {
-      console.warn('Kein Willkommen-Channel gefunden!');
+      return;
     }
   }
 
@@ -273,15 +274,15 @@ export class WorkspaceComponent implements OnInit {
       const colRef = collection(this.firestore, 'channels');
       this.channelsUnsubscribe = onSnapshot(colRef, (snapshot) => {
         const newChannels = snapshot.docs.map((doc) => doc.data() as Channel);
-        if (newChannels.length > 0) {
+        if (newChannels.length) {
           this.allChannels = newChannels;
           this.sortChannels();
           this.findWelcomeChannel();
-          if (this.logInAuth.getIsGuestLogin()) {
-            this.filteredChannels = [...this.allChannels];
-          } else {
-            this.filterChannels(this.allChannels);
-          }
+          this.filterChannels(
+            this.logInAuth.getIsGuestLogin()
+              ? [...this.allChannels]
+              : this.allChannels
+          );
         } else {
           console.warn('Keine Kanäle gefunden!');
         }
@@ -343,25 +344,25 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectChannel(channel: any) {
-    this.selectedUser = null;
-    this.selectedChannel = null;
+    this.resetUserAndChannel();
+    this.global.setCurrentChannel(channel);
     setTimeout(() => {
       this.selectedChannel = channel;
       this.channelSelected.emit(channel);
+      this.resetGlobalStates();
       this.global.channelSelected = true;
-      this.global.currentThreadMessageSubject.next('');
-      this.global.channelThreadSubject.next(null);
-      this.global.setCurrentChannel(channel);
-      this.openvollWidtChannelOrUserBox();
-      this.hiddenVoolThreadBox();
-      this.checkWidtSize();
-      this.cheackChatOpen();
     });
+  }
+
+  resetUserAndChannel() {
+    this.selectedUser = null;
+    this.selectedChannel = null;
   }
 
   toggleChannelDrawer() {
     this.channelDrawerOpen = !this.channelDrawerOpen;
   }
+
   toggleMessageDrawer() {
     this.messageDrawerOpen = !this.messageDrawerOpen;
   }
@@ -384,7 +385,7 @@ export class WorkspaceComponent implements OnInit {
         this.selectedUser = foundUser;
       }
     } else {
-      console.error('selectedUser is null or undefined:', this.selectedUser);
+      console.error('selectedUser is null or undefined:');
     }
   }
 
@@ -395,7 +396,6 @@ export class WorkspaceComponent implements OnInit {
 
   enterByUsername(userOrChannel: any, isChannel: boolean = false) {
     if (isChannel && (!userOrChannel || !userOrChannel.name)) {
-      console.warn('Invalid channel passed to enterByUsername. Aborting.');
       return;
     }
     this.selectedChannel = isChannel ? userOrChannel : null;

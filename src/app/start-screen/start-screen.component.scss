@@ -17,25 +17,26 @@ mat-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 110px;
-  border-top-left-radius: 100px;
-  border-top-right-radius: 100px;
+  min-height: 102px;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
   width: 100%;
   position: absolute;
   top: 0;
+  z-index: 100;
+  background-color: white;
 }
 
 .header-chat-holder {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 107px);
+  height: calc(880px - 107px);
 }
 
 .big-chat-card {
   position: relative;
   min-width: 990px;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -103,6 +104,7 @@ mat-card {
   position: absolute;
   top: 50px;
   right: 25px;
+  z-index: 300;
 }
 
 .member-avatars {

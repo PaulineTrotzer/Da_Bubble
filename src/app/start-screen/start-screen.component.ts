@@ -33,7 +33,6 @@ import { LoginAuthService } from '../services/login-auth.service';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { MemberDataService } from '../services/member-data.service';
 import { AuthService } from '../services/auth.service';
-import { User } from '../models/user.class';
 import { WorkspaceService } from '../services/workspace.service';
 import { Channel } from '../models/channel.class';
 import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
@@ -41,6 +40,7 @@ import { ChannelChatComponent } from '../channel-chat/channel-chat.component';
 interface ChannelData {
   userIds: string[];
 }
+
 @Component({
   selector: 'app-start-screen',
   standalone: true,
@@ -78,35 +78,14 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selectedChannel: any;
   @Input() mentionUser: string = '';
   @Input() onHeaderUser: any;
-  @Output() enterChat = new EventEmitter<any>();
+  @Input() onHeaderChannel: any;
   channelMembers: any[] = [];
   messagesData: any = [];
-  commentImages: string[] = [
-    '../../assets/img/comment/hand.png',
-    '../../assets/img/comment/celebration.png',
-  ];
-  commentStricker: string[] = [
-    '../../assets/img/comment/face.png',
-    '../../assets/img/comment/rocket.png',
-  ];
-  concatStickerArray: string[] = [
-    ...this.commentImages,
-    ...this.commentStricker,
-  ];
-  isHovered: any = false;
   hoveredName: any;
-  hoveredSenderName: any;
-  hoveredCurrentUser: any;
-  hoveredRecipienUser: any;
   userservice = inject(UserService);
   dialog = inject(MatDialog);
-  showStickerDiv: any;
-  checkUpdateBackcolor: any;
-  isiconShow: any;
-  selectFiles: any[] = [];
   cdr = inject(ChangeDetectorRef);
   LogInAuth = inject(LoginAuthService);
-  @Output() threadOpened = new EventEmitter<void>();
   private loginStatusSub: Subscription | undefined;
   private guestLoginStatusSub: Subscription | undefined;
   loginAuthService = inject(LoginAuthService);
@@ -117,6 +96,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   statusCheck = false;
   workspaceService = inject(WorkspaceService);
   workspaceSubscription: Subscription | undefined;
+  @Output() userSelectedFromStartscreen = new EventEmitter<any>();
+  @Output() channelSelectedFromStartscreen = new EventEmitter<any>();
+  @Output() enterChat = new EventEmitter<any>();
+  @Output() threadOpened = new EventEmitter<void>();
 
   constructor(public global: GlobalVariableService) {}
 
@@ -124,34 +107,8 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  /*   chatByUserName: any;
-  @Output() enterChatUser = new EventEmitter<any>();
-
-  enterChatByUserName(user: any) {
-    this.chatByUserName = user;
-    this.enterChatUser.emit(this.chatByUserName);
-    this.selectUser(user);
-    this.wasClickedChatInput = false;
-  } */
-
   async ngOnInit(): Promise<void> {
-    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
-      async (user) => {
-        if (user) {
-          this.selectedUser = user;
-          console.log('user chat comp', user);
-        }
-      }
-    );
-
-    this.workspaceSubscription.add(
-      this.workspaceService.selectedChannel$.subscribe((channel) => {
-        if (channel) {
-          this.selectedChannel = channel;
-        }
-      })
-    );
-    this.checkStatus();
+    this.subscribeToWorkspaceChanges();
     this.initializeGlobalState();
     await this.loadUserData();
     this.resetUserSelection();
@@ -164,9 +121,25 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.authService.initAuthListener();
   }
 
+  subscribeToWorkspaceChanges(): void {
+    this.workspaceSubscription = this.workspaceService.selectedUser$.subscribe(
+      async (user) => {
+        if (user) {
+          this.selectedUser = user;
+        }
+      }
+    );
+    this.workspaceSubscription.add(
+      this.workspaceService.selectedChannel$.subscribe((channel) => {
+        if (channel) {
+          this.selectedChannel = channel;
+        }
+      })
+    );
+  }
+
   checkStatus(): void {
     if (!this.global.currentUserData || !this.selectedUser) {
-      console.log('Daten noch nicht geladen oder unvollständig');
       this.statusCheck = false;
       return;
     }
@@ -229,15 +202,10 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.loginStatusSub) {
-      this.loginStatusSub.unsubscribe();
-    }
-    if (this.guestLoginStatusSub) {
-      this.guestLoginStatusSub.unsubscribe();
-    }
-    if (this.welcomeChannelSubscription) {
-      this.welcomeChannelSubscription.unsubscribe();
-    }
+    this.workspaceSubscription?.unsubscribe();
+    this.welcomeChannelSubscription?.unsubscribe();
+    this.loginStatusSub?.unsubscribe();
+    this.guestLoginStatusSub?.unsubscribe();
   }
 
   private subscribeToProfileSelection(): void {
@@ -276,32 +244,13 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  @Input() onHeaderChannel: any;
   ngOnChanges(changes: SimpleChanges) {
-    /*     if (changes['onHeaderUser'] && this.onHeaderUser) {
-      this.selectedChannel = null;
-      this.onHeaderChannel = null;
-      this.global.channelSelected = false;
-      this.selectedUser = this.onHeaderUser;
-      this.checkProfileType();
-      this.global.clearCurrentChannel();
-      this.afterLoginSheet = false;
-    }
-    if (changes['onHeaderChannel'] && this.onHeaderChannel) {
-      this.selectedUser = null;
-      this.onHeaderUser = null;
-      this.selectedChannel = this.onHeaderChannel;
-      this.fetchChannelMembers();
-      this.global.setCurrentChannel(this.onHeaderChannel);
-
-    } */
     if (changes['selectedChannel']) {
       this.workspaceService.setSelectedChannel(this.selectedChannel);
     }
   }
 
   resetChannelMessages() {
-    console.log(this.onHeaderChannel.messages);
     return (this.onHeaderChannel.messages = []);
   }
 
@@ -345,51 +294,49 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       maxHeight: '320px',
     });
   }
+
   async fetchChannelMembers() {
     if (!this.selectedChannel?.id) {
       this.channelMembers = [];
       return;
     }
-
     try {
       const channelRef = doc(
         this.firestore,
         'channels',
         this.selectedChannel.id
       );
-
       onSnapshot(channelRef, async (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as ChannelData;
           const userIds = data['userIds'];
           if (!userIds || userIds.length === 0) {
-            console.log('Keine Benutzer im Kanal vorhanden.');
             this.channelMembers = [];
             return;
           }
-          const membersPromises = userIds.map(async (userId: string) => {
-            const userRef = doc(this.firestore, 'users', userId);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              return {
-                id: userSnap.id,
-                ...userSnap.data(),
-              };
-            }
-            return null;
-          });
-
-          const members = await Promise.all(membersPromises);
-          this.channelMembers = members.filter(
-            (member: any) => member !== null
-          );
-          this.memberDataService.setMembers(members);
+          this.channelMembers = await this.fetchMembers(userIds);
+          this.memberDataService.setMembers(this.channelMembers);
           this.cdr.detectChanges();
         }
       });
     } catch (error) {
       console.error('Fehler beim Abrufen der Kanalmitglieder:', error);
     }
+  }
+
+  async fetchMembers(userIds: string[]): Promise<any[]> {
+    const membersPromises = userIds.map((userId) => this.fetchUserData(userId));
+    const members = await Promise.all(membersPromises);
+    return members.filter((member) => member !== null);
+  }
+
+  private async fetchUserData(userId: string): Promise<any | null> {
+    const userRef = doc(this.firestore, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      return { id: userSnap.id, ...userSnap.data() };
+    }
+    return null;
   }
 
   async getcurrentUserById(userId: string) {
@@ -401,12 +348,9 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
           id: userSnapshot.id,
           ...userSnapshot.data(),
         };
-        /*         this.userservice.observingUserChanges(userId, (updatedUser: User) => {
-          this.selectedUser = updatedUser;
-        }); */
       }
     } catch (error) {
-      console.error('Fehler beim Abruf s Benutzers:', error);
+      console.error('Fehler beim Abruf des Benutzers:', error);
     }
   }
 
@@ -439,8 +383,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
   onThreadOpened() {
     this.threadOpened.emit();
   }
-  @Output() userSelectedFromStartscreen = new EventEmitter<any>();
-  @Output() channelSelectedFromStartscreen = new EventEmitter<any>();
 
   enterByUsername(user: any, isChannel: boolean = false) {
     this.enterChatByUser = user;
@@ -452,7 +394,6 @@ export class StartScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.userSelectedFromStartscreen.emit(user);
       this.global.clearCurrentChannel();
     }
-
     this.checkProfileType();
   }
 }

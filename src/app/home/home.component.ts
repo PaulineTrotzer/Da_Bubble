@@ -66,6 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   firestore = inject(Firestore);
   authService = inject(AuthService);
   isOverlayOpen = false;
+  private subscriptions: Subscription[] = [];
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
@@ -79,10 +80,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.setDirectThread();
     this.setChannelThread();
     this.authService.initAuthListener();
-    this.checkScreenWidth(window.innerWidth);
+    //this.checkScreenWidth(window.innerWidth);
   }
 
-  @HostListener('window:resize', ['$event'])
+/*   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.checkScreenWidth(event.target.innerWidth);
   }
@@ -93,6 +94,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
     } else {
       this.isWorkspaceOpen = true;
     }
+  } */
+
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   async loadUserData(userId: string) {
@@ -160,32 +166,34 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   setDirectThread() {
-    this.global.currentThreadMessage$.subscribe((messageId) => {
+    const directThreadSub = this.global.currentThreadMessage$.subscribe((messageId) => {
       this.directThreadId = messageId;
     });
+    this.subscriptions.push(directThreadSub);
   }
 
+  
   setChannelThread() {
-    this.global.channelThread$.subscribe((messageId) => {
+    const channelThreadSub = this.global.channelThread$.subscribe((messageId) => {
       this.channelThreadId = messageId;
     });
+    this.subscriptions.push(channelThreadSub);
   }
 
-  subscribeToLoginStatus(): void {
-    this.loginStatusSub = this.LogInAuth.loginSuccessful$.subscribe(
-      (status) => {
-        this.successfullyLogged = status;
-      }
-    );
+  subscribeToLoginStatus() {
+    const loginStatusSub = this.LogInAuth.loginSuccessful$.subscribe((status) => {
+      this.successfullyLogged = status;
+    });
+    this.subscriptions.push(loginStatusSub);
   }
 
-  subscribeToGuestLoginStatus(): void {
-    this.guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe(
-      (status) => {
-        this.isGuestLogin = status;
-      }
-    );
+  subscribeToGuestLoginStatus() {
+    const guestLoginStatusSub = this.LogInAuth.isGuestLogin$.subscribe((status) => {
+      this.isGuestLogin = status;
+    });
+    this.subscriptions.push(guestLoginStatusSub);
   }
+
 
   onHeaderUserSelected(user: any) {
     this.onHeaderUser = user;
