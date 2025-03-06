@@ -82,7 +82,7 @@ size="18"></emoji-mart>
           <div>
             <div *ngIf="activeComponentId === 'direct-thread'">
 
-              <input type="file" id="upload-thread" (change)="onFileSelectedThread($event, activeComponentId)" hidden />
+              <input type="file" id="upload-thread" (change)="onFileSelected($event, activeComponentId)" hidden />
 
 
               <label for="upload-thread">
@@ -101,7 +101,7 @@ size="18"></emoji-mart>
 
             <div *ngIf="activeComponentId === 'channel'">
 
-              <input type="file" id="upload-channel" (change)="onFileSelectedChannel($event, activeComponentId)"
+              <input type="file" id="upload-channel" (change)="onFileSelected($event, activeComponentId)"
                 hidden />
 
               <label for="upload-channel">
@@ -112,7 +112,7 @@ size="18"></emoji-mart>
             <div *ngIf="activeComponentId === 'channel-thread'">
 
               <input type="file" id="upload-channel-thread"
-                (change)="onFileSelectedChannelThread($event, activeComponentId)" hidden />
+                (change)="onFileSelected($event, activeComponentId)" hidden />
 
               <label for="upload-channel-thread">
                 <img class="plus" src="./assets/img/add.svg" alt="Upload Icon for Chat" />
