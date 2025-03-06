@@ -116,6 +116,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
       this.resetInputdata();
       this.handleResetErrors();
     }
+    this.editableDivRef.nativeElement.focus();
   }
 
   ngAfterViewInit() {
@@ -126,15 +127,11 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId && this.selectedUser?.id) {
+      this.getByUserName();
     }
-    this.getByUserName();
     this.subscription.add(
-      this.threadControlService.firstThreadMessageId$.subscribe({
-        next: (messageId) => {
-          this.currentThreadMessageId = messageId;
-        },
-        error: (err) => console.error('Fehler im Subscription-Stream:', err),
-        complete: () => console.log('Observable wurde beendet.'),
+      this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
+        this.currentThreadMessageId = messageId;
       })
     );
     this.global.currentThreadMessage$.subscribe((messageId) => {
@@ -223,7 +220,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     return true;
   }
 
-   async sendStandardMessage(): Promise<void> {
+  async sendStandardMessage(): Promise<void> {
     const selectedFiles = this.inputFieldService.getFiles(
       this.activeComponentId
     );
@@ -676,62 +673,53 @@ export class InputFieldComponent implements OnInit, OnChanges {
     );
   }
 
-  
+  isValidComponent(componentId: string): boolean {
+    const validComponentIds = [
+      'chat',
+      'channel',
+      'channel-thread',
+      'direct-thread',
+    ];
+    return validComponentIds.includes(componentId);
+  }
+
+  handleFileError(message: string): void {
+    console.error(message);
+    this.multipleFilesErrorMessage = message;
+    this.fileTooLargeMessage = null;
+  }
+
+  isValidFileType(file: File): boolean {
+    const allowedTypes = ['image/', 'application/pdf'];
+    return allowedTypes.some((type) => file.type.startsWith(type));
+  }
+
+  processFile(componentId: string, file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const fileData = {
+        name: file.name,
+        type: file.type,
+        data: reader.result as string,
+      };
+
+      this.inputFieldService.updateFiles(componentId, [fileData]);
+      this.adjustChatHeight();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  adjustChatHeight(): void {
+    const chatDiv = this.editableDivRef?.nativeElement;
+    if (chatDiv) {
+      chatDiv.style.height = '250px';
+    }
+  }
+
   onFileSelected(event: Event, componentId: string): void {
-    const validComponentIds = ['chat', 'channel', 'channel-thread', 'direct-thread'];
-    if (!validComponentIds.includes(componentId)) {
-        console.error('onFileSelected called with wrong componentId:', componentId);
-        return;
-    }
-    
-    this.inputFieldService.setActiveComponent(componentId);
-    const input = event.target as HTMLInputElement;
-    const existingFiles = this.inputFieldService.getFiles(componentId);
-    
-    if (existingFiles.length > 0) {
-        console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
-        this.multipleFilesErrorMessage = 'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
-        this.fileTooLargeMessage = null;
-        return;
-    }
-    
-    if (input.files && input.files.length > 0) {
-        const selectedFile = input.files[0];
-        const allowedTypes = ['image/', 'application/pdf'];
-        
-        if (!allowedTypes.some(type => selectedFile.type.startsWith(type))) {
-            console.error('Unsupported file type:', selectedFile.type);
-            this.fileTooLargeMessage = 'Nur Bilder und PDFs können hochgeladen werden.';
-            this.multipleFilesErrorMessage = null;
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = () => {
-            const fileData = {
-                name: selectedFile.name,
-                type: selectedFile.type,
-                data: reader.result as string,
-            };
-            
-            this.inputFieldService.updateFiles(componentId, [fileData]);
-            
-            const chatDiv = this.editableDivRef?.nativeElement;
-            if (chatDiv) {
-                chatDiv.style.height = '250px';
-            }
-        };
-        
-        reader.readAsDataURL(selectedFile);
-        input.value = '';
-    }
-}
-
-
-/*   onFileSelectedChannel(event: Event, componentId: string): void {
-    if (componentId !== 'channel') {
+    if (!this.isValidComponent(componentId)) {
       console.error(
-        'onFileSelectedThread called with wrong componentId: in channel',
+        'onFileSelected called with wrong componentId:',
         componentId
       );
       return;
@@ -740,87 +728,22 @@ export class InputFieldComponent implements OnInit, OnChanges {
     const input = event.target as HTMLInputElement;
     const existingFiles = this.inputFieldService.getFiles(componentId);
     if (existingFiles.length > 0) {
-      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
-      this.multipleFilesErrorMessage =
-        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
-      this.fileTooLargeMessage = null;
-      return;
-    }
-    if (input.files && input.files.length > 0) {
-      const selectedFile = input.files[0];
-      const allowedTypes = ['image/', 'application/pdf'];
-      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
-        console.error('Unsupported file type:', selectedFile.type);
-        this.fileTooLargeMessage =
-          'Nur Bilder und PDFs können hochgeladen werden.';
-        this.multipleFilesErrorMessage = null;
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = {
-          name: selectedFile.name,
-          type: selectedFile.type,
-          data: reader.result as string,
-        };
-        this.inputFieldService.updateFiles(componentId, [fileData]);
-        const chatDiv = this.editableDivRef.nativeElement;
-        if (chatDiv) {
-          chatDiv.style.height = '250px';
-        }
-      };
-      reader.readAsDataURL(selectedFile);
-      input.value = '';
-    }
-  } */
-/* 
-  onFileSelectedChannelThread(event: Event, componentId: string): void {
-    console.log('wurde aufgerufen');
-    if (componentId !== 'channel-thread') {
-      console.error(
-        'onFileSelectedThread called with wrong componentId: in channel',
-        componentId
+      this.handleFileError(
+        'Es kann nur eine Datei pro Nachricht hochgeladen werden.'
       );
       return;
     }
-    this.inputFieldService.setActiveComponent(componentId);
-    const input = event.target as HTMLInputElement;
-    const existingFiles = this.inputFieldService.getFiles(componentId);
-    if (existingFiles.length > 0) {
-      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
-      this.multipleFilesErrorMessage =
-        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
-      this.fileTooLargeMessage = null;
-      return;
-    }
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0];
-      const allowedTypes = ['image/', 'application/pdf'];
-      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
-        console.error('Unsupported file type:', selectedFile.type);
-        this.fileTooLargeMessage =
-          'Nur Bilder und PDFs können hochgeladen werden.';
-        this.multipleFilesErrorMessage = null;
+      if (!this.isValidFileType(selectedFile)) {
+        this.handleFileError('Nur Bilder und PDFs können hochgeladen werden.');
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = {
-          name: selectedFile.name,
-          type: selectedFile.type,
-          data: reader.result as string,
-        };
-        this.inputFieldService.updateFiles(componentId, [fileData]);
-        const chatDiv = this.editableDivRef.nativeElement;
-        if (chatDiv) {
-          chatDiv.style.height = '250px';
-        }
-      };
-      reader.readAsDataURL(selectedFile);
+      this.processFile(componentId, selectedFile);
       input.value = '';
     }
   }
- */
+
   handlePreviewUpdated(hasFiles: boolean) {
     if (!hasFiles) {
       const chatDiv = this.editableDivRef.nativeElement;
@@ -829,53 +752,4 @@ export class InputFieldComponent implements OnInit, OnChanges {
       }
     }
   }
-
- /*  onFileSelectedThread(event: Event, componentId: string): void {
-    if (componentId !== 'direct-thread') {
-      console.error(
-        'onFileSelectedThread called with wrong componentId: in Thread',
-        componentId
-      );
-      return;
-    }
-    this.inputFieldService.setActiveComponent(componentId);
-    const input = event.target as HTMLInputElement;
-    const existingFiles = this.inputFieldService.getFiles(componentId);
-    if (existingFiles.length > 0) {
-      console.error('Es kann nur eine Datei pro Nachricht hochgeladen werden.');
-      this.multipleFilesErrorMessage =
-        'Es kann nur eine Datei pro Nachricht hochgeladen werden.';
-      this.fileTooLargeMessage = null;
-      return;
-    }
-    if (input.files && input.files.length > 0) {
-      const selectedFile = input.files[0];
-      const allowedTypes = ['image/', 'application/pdf'];
-      if (!allowedTypes.some((type) => selectedFile.type.startsWith(type))) {
-        console.error('Unsupported file type:', selectedFile.type);
-        this.fileTooLargeMessage =
-          'Nur Bilder und PDFs können hochgeladen werden.';
-        this.multipleFilesErrorMessage = null;
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = {
-          name: selectedFile.name,
-          type: selectedFile.type,
-          data: reader.result as string,
-        };
-        this.inputFieldService.updateFiles(componentId, [fileData]);
-        const chatDiv = this.editableDivRef.nativeElement;
-        if (chatDiv) {
-          chatDiv.style.height = '250px';
-        }
-      };
-
-      reader.readAsDataURL(selectedFile);
-      input.value = '';
-    }
-  }
-}
- */
 }

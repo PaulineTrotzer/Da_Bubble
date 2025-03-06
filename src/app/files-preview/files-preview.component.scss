@@ -10,16 +10,15 @@
   height: fit-content;
   padding: 12px;
   align-items: center;
-  border-radius: 8px; /* Runde Ecken für ein weicheres Design */
-  background-color: #f4f5ff; /* Helleres Blau für weniger Kontrast */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+  border-radius: 8px; 
+  background-color: #f4f5ff; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 42px;
   &:hover {
     border: 1px solid #444df2;
-    background-color: #e2e6ff; /* Etwas dunkler beim Hover */
-    box-shadow: 0 4px 10px rgba(68, 77, 242, 0.2); /* Intensiverer Schatten beim Hover */
+    background-color: #e2e6ff;
+    box-shadow: 0 4px 10px rgba(68, 77, 242, 0.2);
     span {
       color: white;
     }
@@ -44,12 +43,12 @@
   position: absolute;
   top: -10px;
   right: -10px;
-  opacity: 0; /* Unsichtbar */
-  transform: scale(0.8); /* Leicht verkleinern */
+  opacity: 0; 
+  transform: scale(0.8);
   transition: opacity 0.3s ease, transform 0.3s ease;
-  background-color: #444df2; /* Akzentfarbe passend zum Design */
+  background-color: #444df2;
   color: #fff;
-  border-radius: 50%; /* Runde Form */
+  border-radius: 50%;
   width: 24px;
   height: 24px;
   text-align: center;
@@ -63,15 +62,15 @@
   justify-content: center;
 
   &:hover {
-    background-color: #3038a6; /* Etwas dunkleres Blau beim Hover */
+    background-color: #3038a6; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: scale(1); /* Etwas vergrößern beim Hover */
+    transform: scale(1); 
   }
 }
 
 .file-box:hover .delet-box {
-  opacity: 1; /* Sichtbar beim Hover */
-  transform: scale(1); /* Vergrößerung zurücksetzen */
+  opacity: 1; 
+  transform: scale(1); 
 }
 
 .delete-span {
@@ -95,12 +94,6 @@
   cursor: pointer;
   position: relative;
   top: 100px;
-  /*   &:hover {
-    background-color: #eceefe;
-    .delete-span {
-      color: #444df2;
-    }
-  } */
   img {
     width: 50px;
     height: 50px;
