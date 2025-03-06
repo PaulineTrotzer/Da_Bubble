@@ -24,7 +24,7 @@ mat-card {
   width: 100%;
   position: absolute;
   top: 0;
-  z-index: 100;
+  z-index: 10;
   background-color: white;
 }
 
@@ -104,7 +104,7 @@ mat-card {
   position: absolute;
   top: 50px;
   right: 25px;
-  z-index: 300;
+  z-index: 10;
 }
 
 .member-avatars {
