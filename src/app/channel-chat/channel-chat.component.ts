@@ -121,6 +121,7 @@ export class ChannelChatComponent implements OnInit {
   replyCountValue: number = 0;
   threadControlService = inject(ThreadControlService);
   channelWasLoaded = false;
+  EmojiEditclicked = false;
 
   constructor(private elRef: ElementRef) {}
 
@@ -129,7 +130,6 @@ export class ChannelChatComponent implements OnInit {
     await this.mentionService.getAllUsersname();
     await this.loadUserNames();
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
-      console.log('selectedChannel (channel):', channel);
       this.selectedChannel = channel;
       this.loadChannelMessages();
     });
@@ -142,8 +142,6 @@ export class ChannelChatComponent implements OnInit {
   getReplyCountValue(messageId: string): number {
     return this.replyCounts.get(messageId) ?? 0;
   }
-
-
 
   scrollToBottom(): void {
     if (this.messageContainer) {
@@ -383,8 +381,6 @@ export class ChannelChatComponent implements OnInit {
     this.editingMessageId = null;
   }
 
-  EmojiEditclicked = false;
-
   openEmojiPickerEdit(event: MouseEvent, messageId: string) {
     event.stopPropagation();
     this.isPickerVisible = messageId;
@@ -434,10 +430,8 @@ export class ChannelChatComponent implements OnInit {
   async loadCurrentUserEmojis() {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
     if (currentUserId) {
       const userDocRef = doc(this.firestore, 'users', currentUserId);
-
       onSnapshot(userDocRef, (docSnapshot) => {
         const userData = docSnapshot.data();
         if (userData?.['lastEmojis']) {
@@ -452,12 +446,10 @@ export class ChannelChatComponent implements OnInit {
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
     if (!currentUserId) {
       console.warn('No current user logged in');
       return;
     }
-
     const messageDocRef = doc(
       this.firestore,
       'channels',
@@ -465,24 +457,18 @@ export class ChannelChatComponent implements OnInit {
       'messages',
       messageId
     );
-
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
-
       if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
         reactions[emoji] = reactions[emoji].filter(
           (userId: string) => userId !== currentUserId
         );
-
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
         }
-
         await updateDoc(messageDocRef, { reactions });
-
-        console.log(`Updated reactions for message ${messageId}:`, reactions);
       }
     } catch (error) {
       console.error('Error removing reaction:', error);
@@ -491,10 +477,8 @@ export class ChannelChatComponent implements OnInit {
 
   addEmojiToMessage(emoji: string, messageId: string) {
     if (this.editingMessageId === messageId) {
-      // Append emoji to the message being edited
       this.messageToEdit += emoji;
     } else {
-      // Existing reaction logic
       const auth = getAuth();
       const currentUserId = auth.currentUser?.uid;
 

@@ -115,12 +115,21 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (changes['selectedUser'] && this.selectedUser?.id) {
       this.resetInputdata();
       this.handleResetErrors();
+      this.focusInputField();
     }
-    this.editableDivRef.nativeElement.focus();
+    if (changes['selectedChannel'] && this.selectedChannel?.id) {
+      this.focusInputField();
+    }
   }
 
   ngAfterViewInit() {
-    this.editableDivRef.nativeElement.focus();
+    this.focusInputField();
+  }
+
+  private focusInputField() {
+    if (this.editableDivRef) {
+      this.editableDivRef.nativeElement.focus();
+    }
   }
 
   ngOnInit(): void {
@@ -285,7 +294,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       (this.chatMessage.trim() === '' &&
         this.inputFieldService.getFiles(this.activeComponentId).length === 0)
     ) {
-      console.warn('Thread is not open or message is empty');
       return;
     }
     const selectedFiles = this.inputFieldService.getFiles(
@@ -349,18 +357,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       (this.chatMessage.trim() === '' &&
         this.inputFieldService.getFiles(this.activeComponentId).length === 0)
     ) {
-      return;
-    }
-    if (!this.currentThreadMessageId) {
-      return;
-    }
-    if (!this.selectedUser) {
-      return;
-    }
-    if (!this.selectedUser.name) {
-      return;
-    }
-    if (!this.selectedUser.id) {
       return;
     }
     try {
@@ -663,14 +659,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     if (!isEmojiButtonClicked && !isPickerClicked) {
       this.isEmojiPickerVisible = false;
     }
-  }
-
-  isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
   }
 
   isValidComponent(componentId: string): boolean {
