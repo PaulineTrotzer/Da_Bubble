@@ -479,55 +479,72 @@ export class InputFieldComponent implements OnInit, OnChanges {
     const selectedFiles = this.inputFieldService.getFiles(
       this.activeComponentId
     );
+    const localTempId = `temp_${Date.now()}_${Math.random()}`;
+    const localMessage = this.createLocalMessage(localTempId, selectedFiles);
+    this.messageCreated.emit(localMessage);
     try {
-      const localTempId = `temp_${Date.now()}_${Math.random()}`;
-      const localMessage = {
-        id: localTempId,
-        text: this.chatMessage,
-        sending: true,
-        timestamp: new Date(),
-        selectedFiles: selectedFiles.map((file) => ({
-          url: file.data,
-          type: file.type,
-          name: file.name,
-        })),
-      };
-      this.messageCreated.emit(localMessage);
       const fileData = await this.uploadFilesToFirebaseStorage(selectedFiles);
-      const messageData = {
-        text: this.chatMessage,
-        senderId: this.global.currentUserData.id,
-        senderName: this.global.currentUserData.name,
-        senderPicture: this.global.currentUserData.picture || '',
-        timestamp: new Date(),
-        editedTextShow: false,
-        selectedFiles: fileData.map((file) => ({
-          url: file.url,
-          type: file.type,
-          name: file.name,
-        })),
-      };
-      const channelMessagesRef = collection(
-        this.firestore,
-        'channels',
-        this.selectedChannel.id,
-        'messages'
+      const messageData = this.createMessageData(fileData);
+      const docRef = await addDoc(
+        collection(
+          this.firestore,
+          'channels',
+          this.selectedChannel.id,
+          'messages'
+        ),
+        messageData
       );
-      const docRef = await addDoc(channelMessagesRef, messageData);
-      const messageWithId = { ...messageData, id: docRef.id };
-      this.messagesData.push(messageWithId);
-      this.messageSent.emit();
-      this.resetInputdata();
+      this.handleSuccessfulSend(docRef.id, messageData);
     } catch (error) {
       console.error('Fehler beim Senden der Channel-Nachricht:', error);
     } finally {
-      if (this.editableDivRef?.nativeElement) {
-        this.editableDivRef.nativeElement.style.height = '130px';
-      }
-      this.inputFieldService.updateFiles(this.activeComponentId, []);
-      this.sendingStatus = null;
-      this.handleResetErrors();
+      this.cleanup();
     }
+  }
+
+  private createLocalMessage(localTempId: string, selectedFiles: any[]) {
+    return {
+      id: localTempId,
+      text: this.chatMessage,
+      sending: true,
+      timestamp: new Date(),
+      selectedFiles: selectedFiles.map((file) => ({
+        url: file.data,
+        type: file.type,
+        name: file.name,
+      })),
+    };
+  }
+
+  private createMessageData(fileData: any[]) {
+    return {
+      text: this.chatMessage,
+      senderId: this.global.currentUserData.id,
+      senderName: this.global.currentUserData.name,
+      senderPicture: this.global.currentUserData.picture || '',
+      timestamp: new Date(),
+      editedTextShow: false,
+      selectedFiles: fileData.map((file) => ({
+        url: file.url,
+        type: file.type,
+        name: file.name,
+      })),
+    };
+  }
+
+  private handleSuccessfulSend(docId: string, messageData: any) {
+    this.messagesData.push({ ...messageData, id: docId });
+    this.messageSent.emit();
+    this.resetInputdata();
+  }
+
+  private cleanup() {
+    if (this.editableDivRef?.nativeElement) {
+      this.editableDivRef.nativeElement.style.height = '130px';
+    }
+    this.inputFieldService.updateFiles(this.activeComponentId, []);
+    this.sendingStatus = null;
+    this.handleResetErrors();
   }
 
   messageData(

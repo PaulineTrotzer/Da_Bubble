@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  height: 570px;
+  height: 578px;
   overflow: auto;
   scroll-behavior: smooth;
   position: relative;
@@ -65,11 +65,13 @@
 }
 
 .card {
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
+  background-color: white;
+  max-height: 880px;
+  border-radius: 30px;
 }
 
 .only-name {
@@ -682,4 +684,55 @@ form {
   margin-top: 4px;
   padding: 0 12px;
   max-width: 230px;
+}
+
+@media (max-width: 1510px) {
+  .day-span {
+    font-size: 13px;
+    padding: 3px 13px;
+  }
+  .edit-message-container{
+    min-width: auto;
+    max-width: 280px;
+    justify-content: end;
+  }
+  .message-edit-dialog {
+    display: block;
+    font-size: 11px;
+    white-space: pre-wrap;
+  }
+  textarea{
+    min-width: auto;
+    max-width: 280px;
+    font-size: 14px;
+  }
+  .reaction-bar {
+    height: 33px;
+    padding: 3px 4px;
+  }
+  .reaction-bar-user {
+    top: 0;
+  }
+  .reaction-bar-current {
+    top: -2px;
+  }
+  .emoji {
+    font-size: 13px;
+  }
+  .img-container {
+    svg {
+      height: 16px;
+      width: 17px;
+      object-fit: cover;
+    }
+  }
+  .used-emojis .emoji:nth-child(1) {
+    display: none;
+  }
+  .textarea {
+    svg {
+      width: 20px !important;
+      height: 22px !important;
+    }
+  }
 }

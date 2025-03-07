@@ -3,7 +3,6 @@ mat-card {
   z-index: 110;
 }
 
-
 .main-content {
   display: flex;
   justify-content: center;
@@ -205,89 +204,84 @@ app-start-screen {
   }
 }
 
-/* @media(max-width:1349px){ 
-  .full-page-content.reset-gap{
-  gap: 16px;
-  } 
+@media (max-width: 1349px) {
+  .full-page-content.reset-gap {
+    gap: 16px;
+  }
 
-   
-
-  app-start-screen.hiddenFullWidth{
+  app-start-screen.hiddenFullWidth {
     width: 0;
     overflow-x: hidden;
     transition: all 175ms ease-in-out;
-     gap: unset;
-  } 
-  
-  app-start-screen.display-show{
+    gap: unset;
+  }
+
+  app-start-screen.display-show {
     display: unset;
     width: 100%;
     transition: all 175ms ease-in-out;
   }
 
-  app-thread.hiddenMax-Width{
+  app-thread.hiddenMax-Width {
     max-width: unset;
   }
-  app-thread.display-hidden{
+  app-thread.display-hidden {
     display: none;
   }
 }
-  
 
-@media(max-width:720px){
-  app-start-screen{
+@media (max-width: 720px) {
+  app-start-screen {
     display: none;
-  } 
+  }
 
-  .full-page-content{
-    gap:0;
+  .full-page-content {
+    gap: 0;
   }
 
   .workspace-open {
     width: 100%;
     transition: all 175ms ease-in-out;
-  } 
+  }
 
-  .workspace-open.close-box{
+  .workspace-open.close-box {
     width: 0;
     transition: all 175ms ease-in-out;
     overflow-x: hidden;
-    margin-left:0;
-   }
-   
-   .workspace-open.open-box{
-     width: 100%;
-     transition: all 175ms ease-in-out;
-   }  
+    margin-left: 0;
+  }
 
-   app-thread {
+  .workspace-open.open-box {
+    width: 100%;
+    transition: all 175ms ease-in-out;
+  }
+
+  app-thread {
     display: none;
-   }
+  }
 
-   .openThread{
+  .openThread {
     display: unset;
     max-width: unset;
-   } 
+  }
 
-   .startScreen-open.hidden{
-     display: none;
-   } 
-
-   .thread-hidden{
+  .startScreen-open.hidden {
     display: none;
-   }
- 
-} */
+  }
 
+  .thread-hidden {
+    display: none;
+  }
+}
 @media (max-width: 320px) {
-  .sended-text{
+  .sended-text {
     font-size: 14px;
     white-space: nowrap;
   }
-  .guest-or-mail{
+  .guest-or-mail {
     white-space: nowrap;
   }
-  .login-sended-info{
+  .login-sended-info {
     padding: 2px 4px;
   }
   .full-page-content {
@@ -310,5 +304,4 @@ app-start-screen {
     width: 28px;
     object-fit: cover;
   }
-
 }

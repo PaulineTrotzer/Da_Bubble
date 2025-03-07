@@ -175,6 +175,13 @@ mat-card {
   z-index: 2;
 }
 
+@media(max-width: 1800px){
+  .big-chat-card{
+    min-width: auto;
+  }
+}
+
+
 @media (max-width: 320px) {
   .big-chat-card {
     height: auto;

@@ -682,7 +682,7 @@ form {
   align-items: center;
   text-align: center;
   padding: 2rem;
-  color: #444df2; /* z. B. in Anlehnung an dein Projekt */
+  color: #444df2;
 
   .welcome-illustration {
     width: 120px;
@@ -697,7 +697,73 @@ form {
   .welcome-text {
     margin-top: 0.5rem;
     font-size: 1rem;
-    max-width: 35rem; /* Begrenzte Zeilenbreite */
+    max-width: 35rem;
     color: #666;
+  }
+}
+
+
+@media (max-width: 1510px) {
+  .new-day-info {
+    top: -40px;
+  }
+  .message-from-user {
+    padding: 40px 0 10px 45px;
+  }
+  .message-from-current {
+    padding: 40px 0 10px 45px;
+  }
+  .message-from-user .reaction-bar {
+    top: 20px;
+    padding: 3px 9px 3px 5px;
+  }
+  .message-from-current .reaction-bar {
+    top: 20px;
+    padding: 3px 9px 3px 5px;
+  }
+  .used-emojis .emoji:nth-child(1) {
+    display: none;
+  }
+  .emoji {
+    font-size: 13px;
+  }
+  .img-container {
+    svg {
+      width: 19px;
+    }
+  }
+  .message-edit {
+    font-size: 11px;
+    white-space: pre-wrap;
+  }
+  .day-span {
+    font-size: 13px;
+    padding: 3px 13px;
+  }
+  .img-container-textarea {
+    svg {
+      width: 20px;
+    }
+  }
+  .channel {
+    padding: 5px 19px !important;
+    font-size: 12px !important;
+  }
+  textarea {
+    font-size: 15px;
+  }
+  .textarea-wrapper {
+    max-width: 280px;
+  }
+  .edit-message-button-row {
+    left: 1px;
+  }
+  .edit-mode-active {
+    justify-content: center;
+    max-width: 400px;
+    gap: 0 !important;
+  }
+  .message-from-current .message .message-content{
+    margin-right: 35px;
   }
 }

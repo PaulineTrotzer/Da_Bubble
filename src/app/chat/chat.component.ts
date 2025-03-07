@@ -40,7 +40,6 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
 import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { WorkspaceService } from '../services/workspace.service';
-import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { InputfieldService } from '../services/inputfield.service';
@@ -79,8 +78,6 @@ import { InputfieldService } from '../services/inputfield.service';
 })
 export class ChatComponent implements OnInit, OnChanges {
   threadControlService = inject(ThreadControlService);
-  afterLoginSheet = false;
-  welcomeChannelSubscription: Subscription | undefined;
   shouldScroll = true;
   global = inject(GlobalVariableService);
   chatMessage: string = '';
@@ -93,11 +90,9 @@ export class ChatComponent implements OnInit, OnChanges {
   elementRef = inject(ElementRef);
   firestore = inject(Firestore);
   userservice = inject(UserService);
-  userId: any | null = null;
   route = inject(ActivatedRoute);
   isiconShow: any;
   messageIdHovered: any;
-  hoveredName: any;
   hoveredSenderName: any;
   wasRemoved = false;
   hoveredCurrentUser: any;
@@ -117,20 +112,16 @@ export class ChatComponent implements OnInit, OnChanges {
   isFirstClick: boolean = true;
   replyCounts: Map<string, number> = new Map();
   replyCountValue: number = 0;
-  checkEmojiId: any;
   isEmojiPickerVisible: boolean = false;
   isEmojiPickerVisibleEdit: boolean = false;
   @Output() userMention = new EventEmitter<any>();
   getAllUsersName: any[] = [];
   isMentionCardOpenInChat: boolean = false;
-  isMentionCardOpen: boolean = false;
   wasClickedChatInput = false;
   workspaceService = inject(WorkspaceService);
   workspaceSubscription: Subscription | undefined;
   dataLoaded: boolean = false;
   cdr = inject(ChangeDetectorRef);
-  userChannelService = inject(UserChannelSelectService);
-  isStickerVisible = false;
   stickerHoverStates: { [messageId: string]: boolean } = {};
   sanitizer = inject(DomSanitizer);
   inputFieldService = inject(InputfieldService);
@@ -139,6 +130,12 @@ export class ChatComponent implements OnInit, OnChanges {
   isOverlayOpen = false;
   showReactionPopUpSenderAtCu: { [messageId: string]: boolean } = {};
   editWasClicked = false;
+  chatByUserName: any;
+  @Output() enterChatUser = new EventEmitter<any>();
+  showReactionPopUpRecipientAtCu: { [messageId: string]: boolean } = {};
+  scrollHeightInput: any;
+  currentThreadMessage: any;
+  currentComponentId = 'chat';
 
   constructor() {}
 
@@ -153,9 +150,6 @@ export class ChatComponent implements OnInit, OnChanges {
       this.stickerHoverStates[message.id] = false;
     }, 10);
   }
-
-  currentThreadMessage: any;
-  currentComponentId = 'chat';
 
   async ngOnInit(): Promise<void> {
     this.inputFieldService.files$.subscribe((filesByComponent) => {
@@ -172,8 +166,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.showReactionPopUpSenderAtCu[messageId] = status;
   }
 
-  showReactionPopUpRecipientAtCu: { [messageId: string]: boolean } = {};
-  // Neu: Aufgerufen vom EMPFÄNGER-Hover
   toggleReactionInfoRecipient(messageId: string, status: boolean) {
     this.showReactionPopUpRecipientAtCu[messageId] = status;
   }
@@ -190,11 +182,9 @@ export class ChatComponent implements OnInit, OnChanges {
       this.updateSubscriptionText();
       return;
     }
-
     const index = this.messagesData.findIndex(
       (msg: any) => msg.id === updatedMessage.id
     );
-
     if (index !== -1) {
       await this.updateExistingMessage(index, updatedMessage);
     } else {
@@ -217,35 +207,26 @@ export class ChatComponent implements OnInit, OnChanges {
     updatedMessage: any
   ): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
-
     this.messagesData[index] = {
       ...this.messagesData[index],
       ...updatedMessage,
     };
-    console.log('Nachricht lokal aktualisiert:', this.messagesData[index]);
-
     try {
       await updateDoc(messageRef, updatedMessage);
-      console.log('Nachricht in Firebase aktualisiert:', updatedMessage.id);
     } catch (error) {
       console.error(
         'Fehler beim Aktualisieren der Nachricht in Firebase:',
         error
       );
     }
-
     return;
   }
 
   async addNewMessage(updatedMessage: any): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
-
-    console.warn('Nachricht nicht gefunden, füge hinzu:', updatedMessage.id);
     this.messagesData.push(updatedMessage);
-
     try {
       await setDoc(messageRef, updatedMessage);
-      console.log('Neue Nachricht in Firebase hinzugefügt:', updatedMessage.id);
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Nachricht in Firebase:', error);
     }
@@ -253,15 +234,11 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async handleDeletedMessage(updatedMessage: any): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
-    console.log('Gelöschte Nachricht ignoriert:', updatedMessage.id);
-
     try {
       await deleteDoc(messageRef);
-      console.log('Nachricht aus Firebase gelöscht:', updatedMessage.id);
     } catch (error) {
       console.error('Fehler beim Löschen der Nachricht in Firebase:', error);
     }
-
     this.messagesData = this.messagesData.filter(
       (msg: any) => msg.id !== updatedMessage.id
     );
@@ -269,7 +246,6 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
-      console.log('Lade Nachrichten...');
       const snapshot = await getDocs(collection(this.firestore, 'messages'));
       const loadedMessages = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -283,8 +259,6 @@ export class ChatComponent implements OnInit, OnChanges {
           ? { ...loadedMessage, ...localMessage }
           : loadedMessage;
       });
-
-      console.log('Nachrichten geladen:', this.messagesData);
     }
   }
 
@@ -399,7 +373,6 @@ export class ChatComponent implements OnInit, OnChanges {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-
     if (this.isSameDay(messageDate, today)) {
       return 'Heute';
     } else if (this.isSameDay(messageDate, yesterday)) {
@@ -418,15 +391,12 @@ export class ChatComponent implements OnInit, OnChanges {
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
-      console.log('this Suser from onChanges', this.selectedUser);
       await this.getMessages();
-      console.log('Selected Files:', this.selectFiles);
       this.chatMessage = '';
       this.global.clearCurrentChannel();
     }
     if (changes['selectedChannel'] && this.selectedChannel) {
       this.clearInput();
-      console.log('selectedChannel changes');
     }
     if (changes['onHeaderChannel'] && this.onHeaderChannel) {
       this.clearInput();
@@ -438,39 +408,23 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-  // Zum Beispiel in deiner formatMentions(...):
   formatMentions(text: string): SafeHtml {
-    // Einfaches Regex: Bis zum nächsten Leerzeichen
-    // (Optional kannst du STILL 2 Wörter erlauben,
-    //  aber wir wollen ja nur 1 Wort in der DB.)
-    const regex = /@(\S+)/g; // @ + beliebige Nicht-Leerzeichen
-
+    const regex = /@(\S+)/g; 
     const normalizedUserNames = this.getAllUsersName.map(
       (user: any) => user.name?.trim().toLowerCase() || ''
     );
-
     const formattedText = text.replace(regex, (match) => {
-      // match = z. B. "@pauline ws"
       let mentionName = match
-        .substring(1) // "pauline ws"
+        .substring(1)
         .toLowerCase()
         .trim();
-
-      // Nur das erste Wort nehmen => "pauline"
       mentionName = mentionName.split(' ')[0];
-
-      // Check DB
       if (normalizedUserNames.includes(mentionName)) {
-        // => => Markiere
-        // Der sichtbare Text (im Chat) kann aber weiterhin "@pauline ws" sein:
         return `<span class="mention">@${mentionName}</span>`;
-        // oder wenn du den vollen Original-String beibehalten willst
-        // => `<span class="mention">${match}</span>`;
       } else {
-        return match; // Keine Markierung
+        return match;
       }
     });
-
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
 
@@ -481,7 +435,6 @@ export class ChatComponent implements OnInit, OnChanges {
   async saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
     if (!message.id) {
-      console.error('Ungültige Nachricht-ID:', message);
       return;
     }
     const messageRef = doc(this.firestore, 'messages', message.id);
@@ -489,7 +442,6 @@ export class ChatComponent implements OnInit, OnChanges {
       try {
         const docSnapshot = await getDoc(messageRef);
         if (!docSnapshot.exists()) {
-          console.warn(`Nachricht existiert nicht (ID: ${message.id}).`);
           return;
         }
         await deleteDoc(messageRef);
@@ -512,9 +464,6 @@ export class ChatComponent implements OnInit, OnChanges {
       try {
         const docSnapshot = await getDoc(messageRef);
         if (!docSnapshot.exists()) {
-          console.warn(
-            `Nachricht kann nicht bearbeitet werden, da sie nicht existiert: ${message.id}`
-          );
           return;
         }
         const editMessage = {
@@ -532,7 +481,6 @@ export class ChatComponent implements OnInit, OnChanges {
             ...editMessage,
           };
         } else {
-          console.warn('Nachricht nicht gefunden, füge sie hinzu:', message.id);
           this.messagesData.push({ id: message.id, ...editMessage });
         }
         this.threadControlService.setEditedMessage({
@@ -821,27 +769,19 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   splitMessage(text: string): string[] {
-    // Captured: @ + alle Zeichen bis zum nächsten Leerzeichen
     const mentionRegex = /(@[\w\-\*_!$]+)/g;
     const parts = text.split(mentionRegex);
-
     return parts.map((p) => p.trim()).filter((p) => p.length > 0);
   }
 
   isMention(textPart: string): boolean {
-    // Muss mit '@' anfangen
     if (!textPart.startsWith('@')) {
       return false;
     }
-  
-    // "Alles" nach dem '@'
     const mentionName = textPart.substring(1).toLowerCase().trim();
-  
-    // Vergleiche mit dem Feld `username` (nicht `name`)
     const normalizedUserNames = this.getAllUsersName.map((user: any) =>
       (user.username ?? '').toLowerCase().trim()
     );
-  
     return normalizedUserNames.includes(mentionName);
   }
   
@@ -859,7 +799,6 @@ export class ChatComponent implements OnInit, OnChanges {
       const mentionName = target.textContent?.trim();
       if (mentionName) {
         if (this.getAllUsersName.length === 0) {
-          console.warn('Mentions-Daten sind noch nicht geladen.');
           return;
         }
         this.handleMentionClick(mentionName);
@@ -871,7 +810,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.wasClickedChatInput = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
     const user = await this.ensureUserDataLoaded(cleanName);
-
     if (!user) {
       return;
     }
@@ -886,7 +824,6 @@ export class ChatComponent implements OnInit, OnChanges {
     const foundUser = this.getAllUsersName.find(
       (user) => (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
     );
-    
     if (!foundUser) {
       console.warn('Benutzer nicht gefunden:', name);
       return null;
@@ -913,9 +850,6 @@ export class ChatComponent implements OnInit, OnChanges {
       });
     });
   }
-  
-
-  scrollHeightInput: any;
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
@@ -1034,9 +968,6 @@ export class ChatComponent implements OnInit, OnChanges {
       this.isEmojiPickerVisibleEdit = false;
     }
   }
-
-  chatByUserName: any;
-  @Output() enterChatUser = new EventEmitter<any>();
 
   enterChatByUserName(user: any) {
     this.chatByUserName = user;
