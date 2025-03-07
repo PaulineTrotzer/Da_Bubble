@@ -4,6 +4,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   inject,
   Input,
   OnInit,
@@ -268,7 +269,7 @@ export class ChannelChatComponent implements OnInit {
       console.warn('No channel selected');
       return;
     }
-  
+
     const messagesRef = collection(
       this.firestore,
       'channels',
@@ -276,7 +277,7 @@ export class ChannelChatComponent implements OnInit {
       'messages'
     );
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-  
+
     onSnapshot(q, async (querySnapshot) => {
       let newMessageArrived = false;
       querySnapshot.docChanges().forEach((change) => {
@@ -284,7 +285,7 @@ export class ChannelChatComponent implements OnInit {
           newMessageArrived = true;
         }
       });
-  
+
       this.messagesData = querySnapshot.docs.map((docSnap: any) => {
         const data = docSnap.data();
         if (data.timestamp?.seconds) {
@@ -304,7 +305,6 @@ export class ChannelChatComponent implements OnInit {
     });
   }
 
-  
   subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
       this.threadControlService
@@ -556,12 +556,24 @@ export class ChannelChatComponent implements OnInit {
     return reactions && Object.keys(reactions).length > 0;
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.closeChannelOnSmallScreen();
+  }
+
+  closeChannelOnSmallScreen() {
+    if (window.innerWidth <= 950 && this.global.openChannelorUserBox && this.global.openChannelOrUserThread) {
+      this.global.openChannelorUserBox = false;
+    }
+  }
+
   openThread(messageId: string) {
     this.global.setChannelThread(messageId);
-    this.openvollThreadBox();
+    //this.openvollThreadBox();
     this.hiddenFullChannelOrUserThreadBox();
     this.checkWidthSize();
     this.checkThreadOpen();
+    this.closeChannelOnSmallScreen();
   }
 
   checkThreadOpen() {
@@ -578,20 +590,16 @@ export class ChannelChatComponent implements OnInit {
     }
   }
 
-  openvollThreadBox() {
+  /*   openvollThreadBox() {
     if (window.innerWidth <= 1349 && window.innerWidth > 720) {
       return (this.global.checkWideChannelOrUserThreadBox = true);
     } else {
       return (this.global.checkWideChannelOrUserThreadBox = false);
     }
   }
-
+ */
   hiddenFullChannelOrUserThreadBox() {
-    if (
-      window.innerWidth <= 1349 &&
-      window.innerWidth > 720 &&
-      this.global.checkWideChannelorUserBox
-    ) {
+    if (window.innerWidth <= 950 && this.global.checkWideChannelorUserBox) {
       this.global.checkWideChannelorUserBox = false;
     }
   }

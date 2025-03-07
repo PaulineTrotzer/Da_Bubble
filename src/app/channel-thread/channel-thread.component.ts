@@ -415,9 +415,12 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
   checkResponsiveWidtSize() {
-    if (window.innerWidth <= 720 && this.global.openChannelOrUserThread)
-      this.global.openChannelOrUserThread = false;
-    this.global.openChannelorUserBox = true;
+    if (window.innerWidth <= 950) {
+      // Prüfe, ob sowohl der Channel als auch der Thread geöffnet sind
+      if (this.global.openChannelOrUserThread && this.global.checkWideChannelOrUserThreadBox) {
+        this.global.openChannelOrUserThread = false; // Channel schließen
+      }
+    }
   }
 
   /*   async addEmoji(event: any, messageId: string) {
