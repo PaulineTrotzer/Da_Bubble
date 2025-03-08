@@ -8,7 +8,8 @@
   margin: 0;
 }
 
-.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface{
+.mdc-dialog--open .mat-mdc-dialog-surface,
+.mdc-dialog--closing .mat-mdc-dialog-surface {
   height: 500px;
   width: 390px;
   padding-top: 15px;
@@ -28,7 +29,6 @@ body {
     color: red;
   }
 }
-
 
 body {
   margin: 0;
@@ -96,3 +96,18 @@ img {
   white-space: pre-wrap;
 }
 
+@media (min-width: 320px) {
+  .mdc-dialog--open .mat-mdc-dialog-surface {
+    height: 100vh;
+    border-radius: 0;
+  }
+  .mat-mdc-dialog-inner-container {
+    height: auto !important;
+  }
+  .cdk-overlay-container {
+    position: inherit;
+  }
+  .cdk-global-overlay-wrapper {
+    justify-content: unset !important;
+  }
+}

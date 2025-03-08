@@ -94,4 +94,22 @@ form {
   font-size: 15px;
 }
 
-
+@media (min-width: 320px) {
+  .top-bar {
+    font-size: 20px;
+  }
+  form {
+    gap: 32px;
+  }
+  .card {
+    gap: 36px;
+  }
+  .btn-primary-disabled {
+    margin-top: 22px;
+    padding: 8px 21px;
+  }
+  .btn-primary {
+    margin-top: 22px;
+    padding: 8px 21px;
+  }
+}

@@ -143,3 +143,31 @@
     align-items: center;
   }
 }
+
+@media (min-width: 320px) {
+  .profile-card-ct {
+    border-radius: 0;
+    width: 100vw;
+  }
+
+  .name-status-flex {
+    font-size: 27px;
+  }
+  .edit-option-title {
+    span {
+      font-size: 14px;
+    }
+  }
+  .name-escape-flex {
+    font-size: 21px;
+  }
+  .user-mail {
+    font-size: 16px;
+  }
+  .mail-flex-column {
+    gap: 7px;
+  }
+  .email-title {
+    font-size: 18px;
+  }
+}

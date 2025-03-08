@@ -67,10 +67,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
   authService = inject(AuthService);
   isOverlayOpen = false;
   private subscriptions: Subscription[] = [];
+  isMobileView = false;
+
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit(): void {
+    this.isMobileView = window.innerWidth <= 720;
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
     });

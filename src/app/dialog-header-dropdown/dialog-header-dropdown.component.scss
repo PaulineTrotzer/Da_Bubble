@@ -14,17 +14,17 @@
   align-items: center;
 }
 
-.profile{
+.profile {
   &:hover {
     background-color: #eceefe;
-    color: #444DF2;
+    color: #444df2;
   }
 }
 
 .log-out {
   &:hover {
     background-color: #eceefe;
-    color: #444DF2;
+    color: #444df2;
   }
 }
 
@@ -42,5 +42,19 @@ button {
     font-size: 25px;
     font-weight: 600;
     font-family: "Nunito";
+  }
+}
+
+@media (min-width: 320px) {
+  .dialog-ct {
+    height: 135px;
+    width: 180px;
+    top: 65px;
+    gap: 5px;
+  }
+  button {
+    p {
+      font-size: 22px;
+    }
   }
 }

@@ -5,12 +5,12 @@
   gap: 20px;
 }
 
-
 .top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  font-family: "Nunito";
 }
 
 form {
@@ -24,6 +24,7 @@ form {
   align-items: center;
   gap: 16px;
   position: relative;
+  font-family: "Nunito";
   label > span {
     color: #535af1;
   }
@@ -55,17 +56,15 @@ form {
   width: 100%;
 }
 
-
 .selected-users {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px; 
+  gap: 8px;
   margin-top: 8px;
 }
 
-
 .selected-contact {
-  display: inline-flex; 
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 5px 10px;
@@ -74,7 +73,6 @@ form {
   max-width: 100%;
 }
 
-
 .selected-contact img {
   width: 32px;
   height: 32px;
@@ -82,10 +80,9 @@ form {
   object-fit: cover;
 }
 
-
 .selected-contact p {
   margin: 0;
-  word-wrap: break-word; 
+  word-wrap: break-word;
 }
 
 .user-list {
@@ -110,22 +107,21 @@ form {
 }
 
 .user-list::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: -8px; 
-  left: 20px; 
+  top: -8px;
+  left: 20px;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid #fff; 
+  border-bottom: 8px solid #fff;
 }
-
 
 .contact {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 8px; 
-  border-radius: 8px; 
+  padding: 8px;
+  border-radius: 8px;
   transition: background-color 0.2s ease;
   img {
     height: 50px;
@@ -140,5 +136,17 @@ form {
 }
 
 .contact:hover {
-  background-color: #f2f3ff; 
+  background-color: #f2f3ff;
+}
+
+@media (min-width: 320px) {
+  p {
+    margin-left: 8px;
+  }
+  .btn-primary-disabled {
+    margin-top: 28px;
+  }
+  .btn-primary {
+    margin-top: 28px;
+  }
 }

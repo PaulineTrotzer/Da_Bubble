@@ -182,7 +182,7 @@ mat-card {
 }
 
 
-@media (max-width: 320px) {
+@media (min-width: 320px) {
   .big-chat-card {
     height: auto;
     max-width: 300px;

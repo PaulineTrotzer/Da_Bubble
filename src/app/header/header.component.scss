@@ -10,11 +10,10 @@
 .main-messages {
   max-height: 640px;
   overflow-y: scroll;
-  h3{
-    color:#444df2;
+  h3 {
+    color: #444df2;
   }
 }
-
 
 .bubble-img {
   width: 245px;
@@ -343,10 +342,10 @@ input.radius {
   margin-top: 15px;
 }
 
-@media(max-width: 1380px){
-  input{
+@media (max-width: 1380px) {
+  input {
     font-size: 18px;
-    &:focus{
+    &:focus {
       font-size: 18px;
     }
   }
@@ -436,13 +435,31 @@ input.radius {
 }
  */
 
-@media (max-width: 320px) {
+@media (min-width: 320px) {
   .bubble-img {
     position: absolute;
     top: 30px;
     left: 10px;
-    width: 143px;
+    width: 153px;
     height: 64px;
+  }
+  input.radius {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+  .message-channel-name{
+    font-size: 15px;
+  }
+  .main-messages{
+    font-size: 1px;
+    margin-bottom: 12px;
+
+  }
+  .mainSearch-box {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 0;
+    top: 45px;
   }
   .user-info {
     position: absolute;
@@ -482,7 +499,6 @@ input.radius {
   }
   input {
     width: 100%;
-    max-width: 315px;
     height: 42px;
     padding: 8px 2px;
     background-image: none;
@@ -490,6 +506,7 @@ input.radius {
     font-size: 13px;
     border: none;
     &:focus {
+      padding: 0;
       border: none;
       outline: none;
       font-size: 13px;
@@ -516,4 +533,13 @@ input.radius {
       overflow: hidden;
     }
   }
+}
+
+@media(min-width: 405px){
+input{
+  padding-left: 28px;
+  &:focus{
+    padding-left: 28px;
+  }
+}
 }

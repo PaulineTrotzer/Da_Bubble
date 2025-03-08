@@ -331,3 +331,68 @@ label {
     margin-bottom: 0;
   }
 }
+
+@media (min-width: 320px) {
+  .profile-card-ct {
+    top: 0;
+    border-radius: 0;
+    width: 100vw;
+    padding: 15px 0;
+  }
+  .img-frame {
+    img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+  }
+  h3 {
+    font-size: 16px;
+  }
+  .mail-flex-column {
+    div {
+      gap: 7px;
+      img {
+        width: 25px;
+      }
+    }
+  }
+  .description-input {
+    gap: 7px;
+    img {
+      width: 25px;
+    }
+  }
+  input {
+    font-size: 15px;
+  }
+  .button-flex {
+    margin-top: 22px;
+  }
+  .btn-secondary {
+    padding: 8px 19px !important;
+    font-size: 15px;
+  }
+  .btn-primary {
+    padding: 8px 19px !important;
+    font-size: 15px;
+  }
+  .name-escape-flex {
+    span {
+      font-size: 18px;
+      margin-left: 6px;
+    }
+  }
+  .added-avatar {
+    display: none;
+  }
+  .avatar-box {
+    padding: 10px 0px 0px 12px;
+    gap: 12px;
+    img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+    }
+  }
+}

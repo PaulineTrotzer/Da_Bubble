@@ -12,7 +12,7 @@
 
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
 
-            <app-start-screen (enterChat)="handleEnterChat($event)" [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
+            <app-start-screen *ngIf="!isMobileView" (enterChat)="handleEnterChat($event)" [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
             'hiddenFullWidth':global.checkWideChannelOrUserThreadBox,
              'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
               'hidden':global.openChannelOrUserThread}"

@@ -273,7 +273,10 @@ app-start-screen {
     display: none;
   }
 }
-@media (max-width: 320px) {
+@media (min-width: 320px) {
+  .full-page-content{
+    display: inline;
+  }
   .sended-text {
     font-size: 14px;
     white-space: nowrap;
@@ -286,7 +289,7 @@ app-start-screen {
   }
   .full-page-content {
     width: 100%;
-    max-width: 320px;
+
   }
 
   .workspace-opener {
