@@ -24,7 +24,7 @@
 }
 
 .chat-input:focus {
-  outline: none; 
+  outline: none;
 }
 
 .interactions-send-msg-ct {
@@ -136,7 +136,6 @@
   transition: transform 0.2s ease;
 }
 
-
 .msg-send {
   width: 34px;
   align-self: center;
@@ -164,7 +163,7 @@
   overflow-y: auto;
   outline: none;
   border: none;
-  caret-color: black; 
+  caret-color: black;
   cursor: text;
   resize: none;
   color: black;
@@ -173,8 +172,8 @@
   font-family: "Nunito";
   white-space: pre-wrap;
   word-wrap: break-word;
-z-index: 2;
-position: relative;
+  z-index: 2;
+  position: relative;
   &:empty:before {
     content: attr(data-placeholder);
     color: grey;
@@ -274,4 +273,15 @@ position: relative;
   top: -6px;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 320px) and (max-width: 400px) {
+  .main-input-area {
+    border: none;                  /* Bisherigen Rand entfernen */
+    border-top: 1px solid #adb0d9; /* Nur oben einen Rand setzen */
+    border-radius: 0; 
+  }
+  .msg-input-ct {
+    padding: 4px;
+  }
 }

@@ -175,26 +175,62 @@ mat-card {
   z-index: 2;
 }
 
-@media(max-width: 1800px){
-  .big-chat-card{
+@media (max-width: 1800px) {
+  .big-chat-card {
     min-width: auto;
   }
 }
 
-
-@media (min-width: 320px) {
+@media (min-width: 320px) and (max-width: 400px) {
+  .header-chat-holder {
+    height: auto;
+  }
   .big-chat-card {
     height: auto;
-    max-width: 300px;
+    max-width: max-content;
     min-width: auto;
   }
   .header {
     position: absolute;
-    left: -34px;
-    max-width: 300px;
+    left: 0;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    min-height: 66px;
+    box-shadow:
+    0 2px 5px rgba(68, 77, 242, 0.41),
+    0 2px 2px rgba(255, 255, 255, 0.5) inset;
+
   }
   .welcome-sheet {
-    left: -34px;
-    width: 320px;
+    left: 0;
+    width: 100vw;
+  }
+  .drop-down-div {
+    left: 0;
+  }
+  .btn-text-img {
+    font-size: 18px;
+  }
+  .avatar {
+    height: 30px;
+    width: 30px;
+  }
+  .member-count {
+    font-size: 15px;
+  }
+  .members-container {
+    top: 18px;
+  }
+  .img-container {
+    height: 30px;
+    width: 30px;
+  }
+  .mat-mdc-button {
+    margin-top: -14px;
+  }
+  app-channel-chat {
+    display: flex;
+    width: 100vw;
   }
 }

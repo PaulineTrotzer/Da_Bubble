@@ -132,7 +132,7 @@ app-thread {
 }
 
 .startScreen-open {
-  display: unset;
+  display: flex;
   width: 100%;
 }
 
@@ -273,9 +273,12 @@ app-start-screen {
     display: none;
   }
 }
-@media (min-width: 320px) {
+@media (min-width: 320px) and (max-width: 400px) {
   .full-page-content{
-    display: inline;
+    width: 100%;
+  }
+  .main-content{
+    max-height: calc(100vh - 165px);
   }
   .sended-text {
     font-size: 14px;
@@ -287,14 +290,10 @@ app-start-screen {
   .login-sended-info {
     padding: 2px 4px;
   }
-  .full-page-content {
-    width: 100%;
-
-  }
 
   .workspace-opener {
     position: fixed;
-    top: 93%;
+    top: 78%;
     left: -3px;
     padding: 3px;
     width: 36px;
@@ -306,5 +305,47 @@ app-start-screen {
   .workspace-drawer {
     width: 28px;
     object-fit: cover;
+  }
+
+
+  app-start-screen {
+    display: none;
+  }
+
+  .full-page-content {
+    gap: 0;
+  }
+
+  .workspace-open {
+    width: 100%;
+    transition: all 175ms ease-in-out;
+  }
+
+  .workspace-open.close-box {
+    width: 0;
+    overflow-x: hidden;
+    margin-left: 0;
+  }
+
+  .workspace-open.open-box {
+    width: 100%;
+    transition: all 175ms ease-in-out;
+  }
+
+  app-thread {
+    display: none;
+  }
+
+  .openThread {
+    display: unset;
+    max-width: unset;
+  }
+
+  .startScreen-open.hidden {
+    display: none;
+  }
+
+  .thread-hidden {
+    display: none;
   }
 }

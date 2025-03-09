@@ -73,7 +73,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit(): void {
-    this.isMobileView = window.innerWidth <= 720;
+
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
     });
@@ -279,19 +279,37 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   toggleWorkspace() {
-    if (window.innerWidth <= 720 && this.global.openChannelorUserBox) {
-      this.global.openChannelorUserBox = false;
-    } else if (
-      window.innerWidth <= 720 &&
-      this.global.openChannelOrUserThread
-    ) {
-      this.global.openChannelOrUserThread = false;
-      this.isWorkspaceOpen = true;
+    const width = window.innerWidth;
+  
+    if (width <= 400) {
+      // 1) Schmale Screens (320–400 px)
+      if (this.global.openChannelorUserBox) {
+        this.global.openChannelorUserBox = false;
+      } else if (this.global.openChannelOrUserThread) {
+        this.global.openChannelOrUserThread = false;
+        this.isWorkspaceOpen = true;
+      } else {
+        this.isWorkspaceOpen = !this.isWorkspaceOpen;
+      }
+  
+    } else if (width <= 720) {
+      // 2) Screen 401–720 px
+      if (this.global.openChannelorUserBox) {
+        this.global.openChannelorUserBox = false;
+      } else if (this.global.openChannelOrUserThread) {
+        this.global.openChannelOrUserThread = false;
+        this.isWorkspaceOpen = true;
+      } else {
+        this.isWorkspaceOpen = !this.isWorkspaceOpen;
+      }
+  
     } else {
+      // 3) Breiter als 720 px
       this.isWorkspaceOpen = !this.isWorkspaceOpen;
     }
   }
-
+  
+  
   getImageSource(): string {
     const state =
       this.isWorkspaceOpen && !this.global.openChannelorUserBox

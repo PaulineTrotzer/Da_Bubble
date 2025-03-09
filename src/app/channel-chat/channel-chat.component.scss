@@ -702,24 +702,91 @@ form {
   }
 }
 
-
-@media (max-width: 1510px) {
+@media (max-width: 400px) {
+  .chat-box {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+    max-height: calc(100vh - 165px);
+  }
+  .file-info {
+    img {
+      width: 35px !important;
+      height: 35px !important;
+    }
+  }
+  .message-scroll-container {
+    gap: 18px;
+    padding-top: 82px;
+  }
+  .thread-answer-display {
+    font-size: 12px;
+    margin-bottom: 52px;
+    margin-right: 3px;
+  }
+  app-input-field {
+    width: 100vw;
+    position: fixed;
+    bottom: -4px;
+  }
+  .edited-label {
+    font-size: 10px;
+  }
+  .message-from-user .message .message-content {
+    padding-top: 0;
+  }
+  .only-name {
+    font-size: 13px;
+  }
+  .mention-message {
+    font-size: 13px;
+  }
+  h3 {
+    font-size: 16px;
+  }
+  .mat-mdc-card {
+    border-radius: 0;
+  }
   .new-day-info {
     top: -40px;
   }
   .message-from-user {
     padding: 40px 0 10px 45px;
+    img {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  .message-from-user .text-container .heading {
+    span {
+      font-size: 11px;
+    }
+  }
+  .message-from-current .text-container .heading {
+    span {
+      font-size: 11px;
+    }
   }
   .message-from-current {
     padding: 40px 0 10px 45px;
+    img {
+      width: 50px;
+      height: 50px;
+    }
   }
   .message-from-user .reaction-bar {
-    top: 20px;
+    top: 9px;
     padding: 3px 9px 3px 5px;
+    z-index: 2;
+    height: 35px;
   }
   .message-from-current .reaction-bar {
-    top: 20px;
+    top: 9px;
     padding: 3px 9px 3px 5px;
+    z-index: 2;
+    height: 35px;
   }
   .used-emojis .emoji:nth-child(1) {
     display: none;
@@ -737,7 +804,7 @@ form {
     white-space: pre-wrap;
   }
   .day-span {
-    font-size: 13px;
+    font-size: 12px;
     padding: 3px 13px;
   }
   .img-container-textarea {
@@ -763,7 +830,7 @@ form {
     max-width: 400px;
     gap: 0 !important;
   }
-  .message-from-current .message .message-content{
+  .message-from-current .message .message-content {
     margin-right: 35px;
   }
 }

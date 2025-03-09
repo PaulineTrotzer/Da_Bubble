@@ -94,7 +94,7 @@ form {
   font-size: 15px;
 }
 
-@media (min-width: 320px) {
+@media (min-width: 320px )  and (max-width: 400px) {
   .top-bar {
     font-size: 20px;
   }

@@ -10,7 +10,7 @@
   border-radius: 30px;
   padding: 36px 28px;
   max-height: 880px;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .text-flex {
@@ -70,19 +70,19 @@ h2 {
   margin-top: 20px;
 }
 
-@media (min-width: 320px) {
+@media (min-width: 320px) and (max-width: 400px) {
   h1 {
     font-size: 25px;
     text-align: center;
   }
   .full-page-content {
+    border-radius: 0;
     padding: 12px;
-    max-width: 320px;
     height: auto;
     border: 0;
   }
   .only-first-functions-ct {
-    margin-top: 38px;
+    margin-top: 26px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -118,8 +118,8 @@ h2 {
   }
   .text-flex {
     position: relative;
-    bottom: 42px;
+    bottom: 12px;
+    gap: 5px;
     text-align: center;
   }
 }
- 

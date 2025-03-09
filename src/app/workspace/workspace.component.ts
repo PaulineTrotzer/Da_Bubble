@@ -352,7 +352,20 @@ export class WorkspaceComponent implements OnInit {
       this.resetGlobalStates();
       this.global.channelSelected = true;
     });
+  
+    // Zusätzliche Logik für sehr kleine Bildschirme:
+    if (window.innerWidth <= 400) {
+ 
+      // TODO: Hier deine Logik bei schmalen Screens
+      // z.B. den Workspace schließen, ein anderes Panel öffnen, etc.
+      console.log('Channel selected on a screen <= 400px!');
+      
+      // Beispiel: Du möchtest den Workspace schließen:
+      this.global.openChannelorUserBox = true;
+      // Oder den Startscreen öffnen usw. – ganz nach deinem Bedarf.
+    }
   }
+  
 
   resetUserAndChannel() {
     this.selectedUser = null;
