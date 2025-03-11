@@ -702,14 +702,20 @@ form {
   }
 }
 
-@media (max-width: 400px) {
-  .chat-box {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-bottom: 0;
-    max-height: calc(100vh - 165px);
+.cancel-icon {
+  object-fit: contain;
+  width: 22px;
+  padding: 3px;
+  cursor: pointer;
+  &:hover {
+    background-color: #eceefe;
+    border-radius: 50px;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 600px) {
+  .placeholder-thread-answer {
+    height: 21px;
   }
   .file-info {
     img {
@@ -720,16 +726,12 @@ form {
   .message-scroll-container {
     gap: 18px;
     padding-top: 82px;
+    height: 560px;
   }
   .thread-answer-display {
     font-size: 12px;
     margin-bottom: 52px;
     margin-right: 3px;
-  }
-  app-input-field {
-    width: 100vw;
-    position: fixed;
-    bottom: -4px;
   }
   .edited-label {
     font-size: 10px;
@@ -753,7 +755,7 @@ form {
     top: -40px;
   }
   .message-from-user {
-    padding: 40px 0 10px 45px;
+    padding: 20px 0 10px 45px;
     img {
       width: 50px;
       height: 50px;
@@ -770,7 +772,7 @@ form {
     }
   }
   .message-from-current {
-    padding: 40px 0 10px 45px;
+    padding: 20px 0 10px 45px;
     img {
       width: 50px;
       height: 50px;
@@ -814,7 +816,17 @@ form {
   }
   .channel {
     padding: 5px 19px !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
+    height: 25px;
+    width: 31px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .edit-icon {
+    width: 15px !important;
+    height: 17px !important;
   }
   textarea {
     font-size: 15px;
@@ -832,5 +844,58 @@ form {
   }
   .message-from-current .message .message-content {
     margin-right: 35px;
+  }
+
+  .img-container-textarea {
+    width: 50%;
+    height: 32px;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 450px) {
+  .edit-message-container {
+    min-width: fit-content;
+  }
+  .chat-box {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+    max-height: calc(100vh - 165px);
+    width: 100vw;
+  }
+  .first-message {
+    margin-top: 20px !important;
+  }
+  app-input-field {
+    width: 100vw;
+    position: fixed;
+    bottom: -3px;
+  }
+}
+
+@media (min-width: 450px) and (max-width: 600px) {
+  .edit-message-container {
+    min-width: 300px;
+  }
+  textarea {
+    min-height: 200px;
+  }
+  .first-message {
+    margin-top: 40px !important;
+  }
+  .chat-box {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0;
+    width: 95vw;
+  }
+  app-input-field {
+    width: 96.5vw;
+    position: fixed;
+    bottom: -9px;
+    right: 11px;
   }
 }

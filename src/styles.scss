@@ -96,10 +96,12 @@ img {
   white-space: pre-wrap;
 }
 
-@media (min-width: 320px) {
+@media (min-width: 320px) and (max-width: 500px) {
   .mdc-dialog--open .mat-mdc-dialog-surface {
     height: 100vh;
     border-radius: 0;
+    padding-top: 0;
+    width: 100vw;
   }
   .mat-mdc-dialog-inner-container {
     height: auto !important;
@@ -109,5 +111,31 @@ img {
   }
   .cdk-global-overlay-wrapper {
     justify-content: unset !important;
+  }
+  .add-member-dialog {
+    .mat-mdc-dialog-surface {
+      width: 100vw !important;
+    }
+  }
+  .emoji-mart-dark {
+    width: 100% !important;
+  }
+  .emoji-mart-dark .emoji-mart-category-label span {
+    font-size: 13px !important;
+  }
+  .emoji-mart .emoji-mart-emoji {
+    padding: 4px !important;
+  }
+  .emoji-mart-emoji {
+    span {
+      width: 22px !important;
+      height: 22px !important;
+    }
+  }
+}
+
+@media(min-width: 450px) and (max-width: 600px){
+  .mat-mdc-card-header{
+    padding: 0 !important;
   }
 }

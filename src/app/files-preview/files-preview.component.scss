@@ -10,9 +10,9 @@
   height: fit-content;
   padding: 12px;
   align-items: center;
-  border-radius: 8px; 
-  background-color: #f4f5ff; 
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  border-radius: 8px;
+  background-color: #f4f5ff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   &:hover {
@@ -27,7 +27,7 @@
   img {
     width: 50px;
     height: 50px;
-    border-radius: 5px; 
+    border-radius: 5px;
     object-fit: cover;
   }
 }
@@ -43,7 +43,7 @@
   position: absolute;
   top: -10px;
   right: -10px;
-  opacity: 0; 
+  opacity: 0;
   transform: scale(0.8);
   transition: opacity 0.3s ease, transform 0.3s ease;
   background-color: #444df2;
@@ -62,15 +62,15 @@
   justify-content: center;
 
   &:hover {
-    background-color: #3038a6; 
+    background-color: #3038a6;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: scale(1); 
+    transform: scale(1);
   }
 }
 
 .file-box:hover .delet-box {
-  opacity: 1; 
-  transform: scale(1); 
+  opacity: 1;
+  transform: scale(1);
 }
 
 .delete-span {
@@ -105,4 +105,16 @@
   top: -6px;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 320px) and (max-width:600px){
+  .file-name{
+    font-size: 11px;
+  }
+  .file-info{
+    img{
+      width: 33px;
+      height: 43px;
+    }
+  }
 }

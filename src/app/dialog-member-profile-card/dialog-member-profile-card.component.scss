@@ -123,3 +123,54 @@ h3 {
     }
   }
 }
+
+@media(min-width: 320px) and (max-width: 600px){
+  .heading{
+    padding-top: 40px;
+  }
+  h3{
+    font-size: 19px;
+  }
+  .status-container{
+    gap: 5px;
+  }
+  .status-row{
+    gap: 4px;
+  }
+  .email-title{
+    font-size: 14px;
+  }
+  .email-data{
+    font-size: 14px;
+  }
+  .email-logo{
+    img{
+      width: 22px;
+      height: 27px;
+      object-fit: contain;
+    }
+
+  }
+  .contact-container{
+    gap: 2px;
+  }
+  .btn-primary{
+    font-size: 14px;
+    padding: 8px 20px;
+  }
+  .btn-primay:hover{
+    font-size: 14px;
+    padding: 8px 20px;
+  }
+  .button-row{
+    button{
+      margin-top: 40px;
+      gap: 5px;
+    }
+    img{
+      width: 16px;
+      height: 24px;
+      object-fit: contain;
+    }
+  }
+}

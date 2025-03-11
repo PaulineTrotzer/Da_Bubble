@@ -204,10 +204,13 @@
               </div>
               <div class="two-btns-flex">
                 <button class="btn-secondary channel" (click)="cancelEdit()">
-                  Abbrechen
+                  <img class="edit-icon" *ngIf="isNarrowScreen" src="assets/img/cross.svg" alt="Abbrechen" />
+                  <span *ngIf="!isNarrowScreen">Abbrechen</span>
                 </button>
                 <button class="btn-primary channel" (click)="saveEditedMessage(message.id)">
-                  Speichern
+                  <img class="edit-icon" *ngIf="isNarrowScreen" src="assets/img/check-mark.svg" alt="Speichern" />
+                  <span *ngIf="!isNarrowScreen">Speichern</span>
+
                 </button>
               </div>
             </div>

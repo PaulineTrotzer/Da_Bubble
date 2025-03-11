@@ -181,15 +181,24 @@ mat-card {
   }
 }
 
-@media (min-width: 320px) and (max-width: 400px) {
+@media (min-width: 320px) and (max-width: 600px) {
   .header-chat-holder {
     height: auto;
   }
-  .big-chat-card {
-    height: auto;
-    max-width: max-content;
-    min-width: auto;
+  .welcome-sheet {
+    left: -1px;
+    width: 100vw;
   }
+  .member-count {
+    font-size: 15px;
+  }
+  .img-container {
+    height: 30px;
+    width: 30px;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 450px) {
   .header {
     position: absolute;
     left: 0;
@@ -197,40 +206,68 @@ mat-card {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
     min-height: 66px;
-    box-shadow:
-    0 2px 5px rgba(68, 77, 242, 0.41),
-    0 2px 2px rgba(255, 255, 255, 0.5) inset;
-
+    box-shadow: 0 2px 5px rgba(68, 77, 242, 0.41),
+      0 2px 2px rgba(255, 255, 255, 0.5) inset;
   }
-  .welcome-sheet {
-    left: 0;
-    width: 100vw;
+  .big-chat-card {
+    height: auto;
+    max-width: max-content;
+    min-width: auto;
+  }
+  .btn-text-img {
+    font-size: 18px;
   }
   .drop-down-div {
     left: 0;
   }
-  .btn-text-img {
-    font-size: 18px;
+  .members-container {
+    top: 18px;
   }
   .avatar {
     height: 30px;
     width: 30px;
   }
-  .member-count {
-    font-size: 15px;
+  app-channel-chat {
+    display: flex;
+    width: 100vw;
   }
-  .members-container {
-    top: 18px;
-  }
-  .img-container {
-    height: 30px;
-    width: 30px;
+
+  app-welcome-sheet {
+    display: flex;
+    width: 100vw;
   }
   .mat-mdc-button {
     margin-top: -14px;
   }
+}
+
+@media (min-width: 450px) and (max-width: 600px) {
+  .header {
+    min-height: 85px;
+  }
+  .btn-text-img {
+    font-size: 21px;
+  }
+  .drop-down-div {
+    left: 40px;
+  }
+  .members-container {
+    top: 28px;
+  }
+  .avatar {
+    height: 35px;
+    width: 35px;
+  }
   app-channel-chat {
     display: flex;
-    width: 100vw;
+    width: 95vw;
+  }
+
+  app-welcome-sheet {
+    display: flex;
+    width: 95vw;
+  }
+  .mat-mdc-button {
+    margin-top: 11px;
   }
 }

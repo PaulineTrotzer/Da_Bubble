@@ -273,7 +273,7 @@ app-start-screen {
     display: none;
   }
 }
-@media (min-width: 320px) and (max-width: 400px) {
+@media (min-width: 320px) and (max-width: 600px) {
   .full-page-content{
     width: 100%;
   }
@@ -347,5 +347,13 @@ app-start-screen {
 
   .thread-hidden {
     display: none;
+  }
+}
+
+@media(min-width: 450px) and (max-width: 600px){
+  .startScreen-open {
+    display: flex;
+    width: 100%;
+    margin-left: 12px;
   }
 }

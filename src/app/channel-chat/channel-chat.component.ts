@@ -123,11 +123,13 @@ export class ChannelChatComponent implements OnInit {
   threadControlService = inject(ThreadControlService);
   channelWasLoaded = false;
   EmojiEditclicked = false;
+  isNarrowScreen = false;
 
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadCurrentUserEmojis();
+    this.checkEditScreenSize();
     await this.mentionService.getAllUsersname();
     await this.loadUserNames();
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
@@ -138,6 +140,10 @@ export class ChannelChatComponent implements OnInit {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
     this.scrollOrNot('yes');
+  }
+
+  checkEditScreenSize(){
+    this.isNarrowScreen = window.innerWidth < 600; 
   }
 
   getReplyCountValue(messageId: string): number {

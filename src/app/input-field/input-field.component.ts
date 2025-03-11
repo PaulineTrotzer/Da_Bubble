@@ -110,6 +110,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   fileTooLargeMessage: string | null = null;
   multipleFilesErrorMessage: string | null = null;
   sendingStatus: string | null = null;
+  emojiSize = 32;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser?.id) {
@@ -126,6 +127,18 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.focusInputField();
   }
 
+
+  onResize(): void {
+    const width = window.innerWidth;
+    if (width <= 600) {
+      this.emojiSize = 22;
+    } else if (width <= 720) {
+      this.emojiSize = 28;
+    } else {
+      this.emojiSize = 32;
+    }
+  }
+
   private focusInputField() {
     if (this.editableDivRef) {
       this.editableDivRef.nativeElement.focus();
@@ -133,6 +146,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.onResize();
     this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId && this.selectedUser?.id) {

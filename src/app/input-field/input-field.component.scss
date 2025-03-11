@@ -275,13 +275,21 @@
   flex-direction: column;
 }
 
-@media (min-width: 320px) and (max-width: 400px) {
+@media (min-width: 320px) and (max-width: 600px) {
   .main-input-area {
-    border: none;                  /* Bisherigen Rand entfernen */
-    border-top: 1px solid #adb0d9; /* Nur oben einen Rand setzen */
-    border-radius: 0; 
+    border: none;
+    border-top: 1px solid #adb0d9;
+    border-radius: 0;
   }
   .msg-input-ct {
     padding: 4px;
+  }
+
+  .error-message {
+    font-size: 11px;
+  }
+  .emoji-picker {
+    width: 95%;
+    left: 0;
   }
 }

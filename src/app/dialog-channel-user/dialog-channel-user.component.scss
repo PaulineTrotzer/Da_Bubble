@@ -39,11 +39,11 @@
 }
 
 .member {
-  display: flex;           
+  display: flex;
   align-items: center;
-  justify-content: flex-start; 
-  padding: 8px 16px;   
-  border-radius: 35px;        
+  justify-content: flex-start;
+  padding: 8px 16px;
+  border-radius: 35px;
   cursor: pointer;
   &:hover {
     background-color: #eceefe;
@@ -54,7 +54,7 @@
     width: 50px;
     border-radius: 100%;
     object-fit: cover;
-    margin-right: 8px; 
+    margin-right: 8px;
   }
   span {
     display: flex;
@@ -110,4 +110,42 @@
   height: 14px;
   width: 14px;
   border-radius: 100%;
+}
+
+@media (min-width: 320px) and (max-width: 600px) {
+  .member {
+    padding: 2px 0;
+    font-size: 14px;
+    img {
+      width: 40px;
+      height: 40px;
+      margin-right: 0;
+    }
+  }
+  .online {
+    width: 10px;
+    height: 10px;
+  }
+  .offline {
+    width: 10px;
+    height: 10px;
+  }
+  .status-border{
+    left: 0;
+    top: 30px;
+  }
+  .add-user-container{
+    padding: 1px 9px;
+    margin-top: 28px;
+    p{
+      font-size: 15px;
+    }
+  }
+  .img-container{
+    width: 30px;
+  }
+  .heading{
+    position: relative;
+    bottom: 20px;
+  }
 }

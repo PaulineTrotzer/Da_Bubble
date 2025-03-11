@@ -162,14 +162,13 @@ header {
   transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
 
   &:hover {
-    color: #3949ab; 
-    transform: scale(1.05); 
+    color: #3949ab;
+    transform: scale(1.05);
   }
   &:active {
-    transform: scale(1); 
+    transform: scale(1);
   }
 }
-
 
 hr {
   border: 1px solid #adb0d9;
@@ -178,4 +177,80 @@ hr {
 .button-row {
   display: flex;
   justify-content: flex-end;
+}
+
+@media (min-width: 320px) and (max-width: 600px) {
+  .card {
+    gap: 26px;
+  }
+  .edit-name-container {
+    gap: 2px;
+    h4 {
+      font-size: 15px;
+    }
+    span {
+      font-size: 15px;
+    }
+  }
+  .edit-description-container {
+    gap: 5px;
+    span{
+      font-size: 15px;
+    }
+    h4 {
+      font-size: 15px;
+    }
+  }
+  .created-by-container {
+    gap: 0;
+    p {
+      font-size: 15px;
+    }
+    h4 {
+      font-size: 14px;
+    }
+  }
+  .edit-button {
+    font-size: 10px;
+  }
+  .channel-name {
+    gap: 0;
+    h2 {
+      font-size: 19px;
+    }
+  }
+  .name-container {
+    gap: 0;
+    svg {
+      width: 20px;
+    }
+  }
+  .img-container {
+    width: 30px;
+    height: 30px;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .input-description{
+    font-size: 15px;
+    padding:9px 8px 7px 40px;
+  }
+  .input-name{
+    font-size: 15px;
+    padding:9px 8px 7px 40px;
+  }
+  .button-row{
+    justify-content: center;
+    margin-top: 70px;;
+  }
+  .btn-primary {
+    font-size: 14px;
+    padding: 9px 17px;
+  }
+  .btn-primary-disabled {
+    font-size: 14px;
+    padding: 9px 17px;
+  }
 }

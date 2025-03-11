@@ -73,7 +73,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit(): void {
-
+    this.isMobileView = window.innerWidth <= 720;
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
     });
@@ -281,8 +281,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   toggleWorkspace() {
     const width = window.innerWidth;
   
-    if (width <= 400) {
-      // 1) Schmale Screens (320–400 px)
+    if (width <= 600) {
+      // 1) Schmale Screens (320–600 px)
       if (this.global.openChannelorUserBox) {
         this.global.openChannelorUserBox = false;
       } else if (this.global.openChannelOrUserThread) {
