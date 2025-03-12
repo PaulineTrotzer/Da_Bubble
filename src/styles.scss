@@ -8,12 +8,18 @@
   margin: 0;
 }
 
+.cdk-overlay-dark-backdrop {
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
 .mdc-dialog--open .mat-mdc-dialog-surface,
 .mdc-dialog--closing .mat-mdc-dialog-surface {
   height: 500px;
   width: 390px;
   padding-top: 15px;
-}
+} 
 
 html,
 body {
@@ -44,44 +50,35 @@ img {
   cursor: pointer;
 }
 
-.edit-dialog {
+.edit-dialog.mat-mdc-dialog-surface {
   height: 500px;
   width: 390px;
-
-  .mat-mdc-dialog-surface {
-    border-top-left-radius: 0;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
-    border-bottom-left-radius: 30px;
-    box-shadow: 0px 6px 10px 0px #00000033;
-  }
+  border-top-left-radius: 0;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  box-shadow: 0px 6px 10px 0px #00000033;
 }
 
-.member-dialog {
+.member-dialog.mat-mdc-dialog-surface {
   height: 500px;
   width: 390px;
-  .mat-mdc-dialog-surface {
-    height: 500px;
-    width: 390px;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 30px;
-    border-bottom-left-radius: 30px;
-    box-shadow: 0px 6px 10px 0px #00000033;
-  }
+  border-top-left-radius: 30px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  box-shadow: 0px 6px 10px 0px #00000033;
 }
 
-.add-member-dialog {
+.add-member-dialog.mat-mdc-dialog-surface {
   height: 500px;
   width: 390px;
 
-  .mat-mdc-dialog-surface {
-    border-top-left-radius: 30px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 30px;
-    border-bottom-left-radius: 30px;
-    box-shadow: 0px 6px 10px 0px #00000033;
-  }
+  border-top-left-radius: 30px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  box-shadow: 0px 6px 10px 0px #00000033;
 }
 
 .member-profile-card {
@@ -95,11 +92,9 @@ img {
   word-wrap: break-word;
   white-space: pre-wrap;
 }
-
-@media (min-width: 320px) and (max-width: 500px) {
+@media (min-width: 320px) and (max-width: 600px) {
   .mdc-dialog--open .mat-mdc-dialog-surface {
-    height: 100vh;
-    border-radius: 0;
+    height: 555px;
     padding-top: 0;
     width: 100vw;
   }
@@ -109,13 +104,8 @@ img {
   .cdk-overlay-container {
     position: inherit;
   }
-  .cdk-global-overlay-wrapper {
-    justify-content: unset !important;
-  }
-  .add-member-dialog {
-    .mat-mdc-dialog-surface {
+  .add-member-dialog.mat-mdc-dialog-surface {
       width: 100vw !important;
-    }
   }
   .emoji-mart-dark {
     width: 100% !important;
@@ -133,9 +123,15 @@ img {
     }
   }
 }
+ 
+@media (min-width: 320px) and (max-width: 500px) {
+  .member-profile-card {
+    height: 540px !important;
+  }
+}
 
-@media(min-width: 450px) and (max-width: 600px){
-  .mat-mdc-card-header{
+@media (min-width: 450px) and (max-width: 600px) {
+  .mat-mdc-card-header {
     padding: 0 !important;
   }
 }

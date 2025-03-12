@@ -726,7 +726,7 @@ form {
   .message-scroll-container {
     gap: 18px;
     padding-top: 82px;
-    height: 560px;
+    height: 550px;
   }
   .thread-answer-display {
     font-size: 12px;
@@ -752,7 +752,10 @@ form {
     border-radius: 0;
   }
   .new-day-info {
-    top: -40px;
+    top: -16px;
+  }
+  .first-indicated-time {
+    top: -33px !important;
   }
   .message-from-user {
     padding: 20px 0 10px 45px;
@@ -862,11 +865,11 @@ form {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     margin-bottom: 0;
-    max-height: calc(100vh - 165px);
+    height: 850px;
     width: 100vw;
   }
   .first-message {
-    margin-top: 20px !important;
+    margin-top: 40px !important;
   }
   app-input-field {
     width: 100vw;
@@ -891,11 +894,11 @@ form {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0;
     width: 95vw;
+    height: 852px;
   }
   app-input-field {
-    width: 96.5vw;
+    width: 95vw;
     position: fixed;
-    bottom: -9px;
-    right: 11px;
+    bottom: 0;
   }
 }

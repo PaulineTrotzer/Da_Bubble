@@ -136,6 +136,7 @@ export class ChatComponent implements OnInit, OnChanges {
   scrollHeightInput: any;
   currentThreadMessage: any;
   currentComponentId = 'chat';
+  isNarrowScreen = false;
 
   constructor() {}
 
@@ -157,9 +158,14 @@ export class ChatComponent implements OnInit, OnChanges {
     });
     this.updateSubscriptionText();
     await this.getAllUsersname();
-    this.messagesData.forEach(msg => {
+    this.messagesData.forEach((msg) => {
       this.showReactionPopUpSenderAtCu[msg.id] = false;
     });
+    this.checkEditScreenSize();
+  }
+
+  checkEditScreenSize() {
+    this.isNarrowScreen = window.innerWidth < 600;
   }
 
   toggleReactionInfoSender(messageId: string, status: boolean) {
@@ -282,16 +288,21 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   closePicker() {
+    console.log('close picker ausgeführt');
     this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
   }
 
-  openEmojiPicker() {
+  openEmojiPicker(event: MouseEvent) {
+    debugger;
+    event.stopPropagation();
+    this.isEmojiPickerVisibleEdit = false;
     this.isEmojiPickerVisible = true;
     this.isOverlayOpen = true;
   }
 
-  openEmojiPickerEdit() {
+  openEmojiPickerEdit(event: MouseEvent) {
+    event.stopPropagation();
     this.isEmojiPickerVisible = false;
     this.isEmojiPickerVisibleEdit = true;
     this.isOverlayOpen = true;
@@ -323,7 +334,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   editMessages(message: any) {
-   this.editWasClicked = true;
+    this.editWasClicked = true;
     this.editMessageId = message.id;
     this.editableMessageText = message.text;
     this.shouldScroll = false;
@@ -409,15 +420,12 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   formatMentions(text: string): SafeHtml {
-    const regex = /@(\S+)/g; 
+    const regex = /@(\S+)/g;
     const normalizedUserNames = this.getAllUsersName.map(
       (user: any) => user.name?.trim().toLowerCase() || ''
     );
     const formattedText = text.replace(regex, (match) => {
-      let mentionName = match
-        .substring(1)
-        .toLowerCase()
-        .trim();
+      let mentionName = match.substring(1).toLowerCase().trim();
       mentionName = mentionName.split(' ')[0];
       if (normalizedUserNames.includes(mentionName)) {
         return `<span class="mention">@${mentionName}</span>`;
@@ -784,7 +792,7 @@ export class ChatComponent implements OnInit, OnChanges {
     );
     return normalizedUserNames.includes(mentionName);
   }
-  
+
   closeMentionBoxHandler() {
     this.wasClickedChatInput = false;
   }
@@ -822,7 +830,8 @@ export class ChatComponent implements OnInit, OnChanges {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     const foundUser = this.getAllUsersName.find(
-      (user) => (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
+      (user) =>
+        (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
     );
     if (!foundUser) {
       console.warn('Benutzer nicht gefunden:', name);
@@ -859,18 +868,20 @@ export class ChatComponent implements OnInit, OnChanges {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
-    const targetElement = this.elementRef.nativeElement;
-    const emojiButton = targetElement.querySelector(
-      '.emoji-picker-container div'
-    );
-    const emojiPicker = targetElement.querySelector(
-      '.emoji-picker-container .emoji-picker'
-    );
-    const isEmojiButtonClicked =
-      emojiButton && emojiButton.contains(event.target);
-    const isPickerClicked = emojiPicker && emojiPicker.contains(event.target);
-    if (!isEmojiButtonClicked && !isPickerClicked) {
+    const target = event.target as HTMLElement;
+    // Suche beide Container
+    const reactPicker =
+      this.elementRef.nativeElement.querySelector('.react-picker');
+    const editPicker =
+      this.elementRef.nativeElement.querySelector('.edit-picker');
+
+    const isReactPickerClicked = reactPicker && reactPicker.contains(target);
+    const isEditPickerClicked = editPicker && editPicker.contains(target);
+
+    // Schließe beide Picker, wenn außerhalb von beiden geklickt wird
+    if (!isReactPickerClicked && !isEditPickerClicked) {
       this.isEmojiPickerVisible = false;
+      this.isEmojiPickerVisibleEdit = false;
     }
   }
 

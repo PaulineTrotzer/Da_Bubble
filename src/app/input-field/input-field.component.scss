@@ -282,7 +282,7 @@
     border-radius: 0;
   }
   .msg-input-ct {
-    padding: 4px;
+    padding: 4px 0;
   }
 
   .error-message {
@@ -291,5 +291,12 @@
   .emoji-picker {
     width: 95%;
     left: 0;
+  }
+  .interactions-send-msg-ct{
+    bottom: -6px;
+  }
+  .chat-editable{
+    font-size: 14px;
+    max-height: 140px;
   }
 }

@@ -124,11 +124,13 @@ export class ChannelChatComponent implements OnInit {
   channelWasLoaded = false;
   EmojiEditclicked = false;
   isNarrowScreen = false;
+  firstDayInfoIndex: number | null = null;
 
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadCurrentUserEmojis();
+
     this.checkEditScreenSize();
     await this.mentionService.getAllUsersname();
     await this.loadUserNames();
@@ -140,7 +142,19 @@ export class ChannelChatComponent implements OnInit {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
     this.scrollOrNot('yes');
+
   }
+
+
+  findFirstDayInfoIndex() {
+    for (let i = 0; i < this.messagesData.length; i++) {
+      if (this.displayDayInfo(i)) {
+        this.firstDayInfoIndex = i;
+        break;  // Abbrechen, sobald der erste Treffer gefunden ist
+      }
+    }
+  }
+
 
   checkEditScreenSize(){
     this.isNarrowScreen = window.innerWidth < 600; 
@@ -306,9 +320,11 @@ export class ChannelChatComponent implements OnInit {
           this.scrollToBottom();
         }, 50);
       }
+      this.findFirstDayInfoIndex();
       await this.updateMessagesWithNewPhoto();
       this.channelWasLoaded = true;
     });
+
   }
 
   subscribeToThreadAnswers() {

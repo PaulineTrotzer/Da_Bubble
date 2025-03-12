@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="header-chat-holder" *ngIf="!afterLoginSheet">
+    <div *ngIf="!afterLoginSheet">
       <div *ngIf="!global.channelSelected">
         <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
           [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"

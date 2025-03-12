@@ -691,7 +691,7 @@ form {
     font-size: 13px;
     padding: 3px 13px;
   }
-  .edit-message-container{
+  .edit-message-container {
     min-width: auto;
     max-width: 280px;
     justify-content: end;
@@ -701,7 +701,7 @@ form {
     font-size: 11px;
     white-space: pre-wrap;
   }
-  textarea{
+  textarea {
     min-width: auto;
     max-width: 280px;
     font-size: 14px;
@@ -733,6 +733,63 @@ form {
     svg {
       width: 20px !important;
       height: 22px !important;
+    }
+  }
+}
+
+@media(min-width: 320px) and (max-width: 450px){
+  .card {
+    border-radius: 0;
+  }
+  header {
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0;
+  }
+}
+
+@media(min-width: 450px) and (max-width: 600px){
+  .card{
+    border-radius: 30px;
+  }
+  header {
+    border-top-right-radius: 30px;
+    border-top-left-radius: 30px;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 600px) {
+
+  .left {
+    gap: 21px;
+  }
+
+  h2 {
+    font-size: 21px;
+  }
+  .avatar-container {
+    img {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  .edited-indicator{
+    font-size: 10px;
+  }
+  .edited-indicator-topic{
+    font-size: 10px;
+  }
+  .time{
+    font-size: 12px;
+  }
+  .only-name{
+    font-size: 14px;
+  }
+  .mention-message{
+    font-size: 14px;
+  }
+  .seperator{
+    h3{
+      font-size: 14px;
     }
   }
 }

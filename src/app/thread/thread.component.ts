@@ -25,6 +25,7 @@ export class ThreadComponent {
   @Input() directThreadId: any;
   @Input() channelThreadId: any;
   @Input() selectedChannel: any;
+  @Output() threadClosedToHome = new EventEmitter<void>();
   @Output() userSelectedFromThread = new EventEmitter<any>();
   @Output() userSelectedFromChannelThread = new EventEmitter<any>();
   @ViewChild(DirectThreadComponent) directThreadComp!: DirectThreadComponent;
@@ -40,5 +41,9 @@ export class ThreadComponent {
 
   onDirectThreadClosed() {
     this.closeThread.emit();
+  }
+
+  onChannelThreadClosed() {
+    this.threadClosedToHome.emit();
   }
 }

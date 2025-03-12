@@ -3,6 +3,20 @@ mat-card {
   z-index: 110;
 }
 
+app-workspace {
+  position: relative;
+
+  &.workspace-open {
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &.workspace-closed {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+}
+
 .main-content {
   display: flex;
   justify-content: center;
@@ -274,10 +288,10 @@ app-start-screen {
   }
 }
 @media (min-width: 320px) and (max-width: 600px) {
-  .full-page-content{
+  .full-page-content {
     width: 100%;
   }
-  .main-content{
+  .main-content {
     max-height: calc(100vh - 165px);
   }
   .sended-text {
@@ -303,13 +317,17 @@ app-start-screen {
     }
   }
   .workspace-drawer {
-    width: 28px;
+    width: 32px;
     object-fit: cover;
   }
 
-
   app-start-screen {
     display: none;
+  }
+
+  app-thread{
+    width: 95vw;
+    margin-left: 12px;
   }
 
   .full-page-content {
@@ -350,7 +368,7 @@ app-start-screen {
   }
 }
 
-@media(min-width: 450px) and (max-width: 600px){
+@media (min-width: 450px) and (max-width: 600px) {
   .startScreen-open {
     display: flex;
     width: 100%;

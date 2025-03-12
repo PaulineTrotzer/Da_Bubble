@@ -275,7 +275,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   onThreadClosed() {
+    debugger;
     this.isThreadOpen = false;
+    this.global.openChannelOrUserThread = false;
+    this.isWorkspaceOpen = true;
   }
 
   toggleWorkspace() {

@@ -15,12 +15,20 @@
                             <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
                         </div>
                     </div>
+
+                    <div (click)="closePicker()" *ngIf="isEmojiPickerVisible"
+                        class="emoji-picker-container react-picker">
+                        <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
+                            (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
+                    </div>
+
+
                     <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
               'main-message-info-user':message.senderId !== global.currentUserData.id, 
               'backiColor':checkUpdateBackcolor===message.id,
               'backColorHover':checkUpdateBackcolor===message.id
-                }" (mouseleave)="resetIcon(message); isEmojiPickerVisible=false ">
-                        <div (click)="closePickerEdit()" class="emoji-picker-container"
+                }" (mouseleave)="resetIcon(message)">
+                        <div (click)="closePickerEdit()" class="emoji-picker-container edit-picker"
                             *ngIf="isEmojiPickerVisibleEdit">
                             <emoji-mart (click)="letEditPickerVisible($event)" (emojiClick)="editMessageAdd($event)"
                                 size="18" class="emoji-picker"></emoji-mart>
@@ -43,7 +51,7 @@
                                 </div>
 
 
-                                <div class="add-reaction" (click)="openEmojiPicker()">
+                                <div class="add-reaction" (click)="openEmojiPicker($event)">
                                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse"
@@ -58,13 +66,6 @@
                                     </svg>
                                 </div>
 
-                                <div (click)="closePicker()" *ngIf="isEmojiPickerVisible"
-                                    class="emoji-picker-container">
-                                    <div class="emoji-picker">
-                                        <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
-                                            (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
-                                    </div>
-                                </div>
 
                                 <div (click)="openThread(message.id)" class="open-thread">
                                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
@@ -151,7 +152,7 @@
                                         [(ngModel)]="editableMessageText"></textarea>
                                     <div class="full-bottom-options">
                                         <div class="edit-emoji-main">
-                                            <div class="add-reaction" (click)="openEmojiPickerEdit()">
+                                            <div class="add-reaction" (click)="openEmojiPickerEdit($event)">
                                                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <mask id="mask0_489_4318" style="mask-type:alpha"
@@ -168,12 +169,24 @@
                                         </div>
                                         <div class="button-box">
                                             <div class="edit-button">
-                                                <button class="btn-secondary chat"
-                                                    (click)="cancelEdit()">Abbrechen</button>
-                                                <button class="btn-primary chat"
-                                                    (click)="saveOrDeleteMessage(message)">{{editableMessageText.trim()===''?'Löschen':'Speichern'}}</button>
+                                              <button class="btn-secondary chat" (click)="cancelEdit()">
+                                                <ng-container *ngIf="isNarrowScreen; else cancelText">
+                                                  <img class="edit-icon-textarea" src="assets/img/cross.svg" alt="Abbrechen" />
+                                                </ng-container>
+                                                <ng-template #cancelText>
+                                                  Abbrechen
+                                                </ng-template>
+                                              </button>
+                                              <button class="btn-primary chat" (click)="saveOrDeleteMessage(message)">
+                                                <ng-container *ngIf="isNarrowScreen; else saveText">
+                                                  <img class="edit-icon-textarea" src="assets/img/check-mark.svg" alt="Speichern" />
+                                                </ng-container>
+                                                <ng-template #saveText>
+                                                  {{ editableMessageText.trim() === '' ? 'Löschen' : 'Speichern' }}
+                                                </ng-template>
+                                              </button>
                                             </div>
-                                        </div>
+                                          </div>
                                     </div>
                                 </div>
                                 <ng-template #normalMode>

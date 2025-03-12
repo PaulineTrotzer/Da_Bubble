@@ -22,6 +22,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
+  backdrop-filter: blur(5px);
 }
 
 .mat-mdc-card-content {
@@ -30,7 +31,7 @@
 
 .text-container {
   display: flex;
-  flex-wrap: wrap;
+  word-break: break-all;
   justify-content: flex-start;
   align-items: center;
   padding: 5px 12px;
@@ -55,7 +56,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow: auto;
+  overflow-y: auto;
   height: 737px;
   scroll-behavior: smooth !important;
   position: relative;
@@ -198,6 +199,8 @@ app-input-field {
 }
 
 .main-mesage-info-current {
+  display: flex;
+  flex-direction: row-reverse;
   width: 100%;
   position: relative;
   padding-top: 16px;
@@ -226,6 +229,7 @@ app-input-field {
 }
 
 .main-message-info-user {
+  display: flex;
   width: 100%;
   position: relative;
   padding-top: 16px;
@@ -268,7 +272,6 @@ app-input-field {
 }
 
 .message-content-current {
-  margin: 16px auto 16px auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -278,7 +281,6 @@ app-input-field {
 }
 
 .message-content-user {
-  margin: 16px auto 16px auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -388,14 +390,13 @@ app-input-field {
 }
 
 .picture-box-current {
-  position: absolute;
-  right: 60px;
+  margin-right: 40px;
+  margin-left: 14px;
   padding-top: 16px;
 }
 
 .picture-box-user {
-  position: absolute;
-  left: 60px;
+  margin-left: 40px;
   padding-top: 16px;
 }
 
@@ -413,6 +414,7 @@ app-input-field {
   top: -22px;
   transition: left 0.3s ease, opacity 0.3s ease;
   background-color: #ffffff;
+  z-index: 2;
 }
 
 .comment-box-current.position {
@@ -434,6 +436,7 @@ app-input-field {
   top: -22px;
   transition: right 0.3s ease, opacity 0.3s ease;
   background-color: #ffffff;
+  z-index: 2;
 }
 
 .comment-box-user.position-user {
@@ -1005,8 +1008,179 @@ app-mention-message-box {
   bottom: 4px;
 }
 
-/* :host ::ng-deep app-input-field {
-  position: absolute;
-  bottom: -17px;
-  width: 100%;
-} */
+@media (min-width: 320px) and (max-width: 600px) {
+  .thread-answer-display {
+    font-size: 11px;
+  }
+  .file-info {
+    gap: 0;
+    img {
+      width: 35px !important;
+      height: 35px !important;
+    }
+  }
+  .file-name {
+    font-size: 10px;
+  }
+  .picture-box-current {
+    margin-right: 1px !important;
+  }
+  .picture-box-user {
+    margin-left: 14px;
+  }
+  .sender-name {
+    font-size: 16px;
+  }
+  .full-app-content {
+    width: 100vw;
+  }
+  app-input-field {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+  }
+  .day-span {
+    font-size: 12px;
+  }
+  .message-time {
+    font-size: 11px;
+  }
+  .only-name {
+    font-size: 13px;
+  }
+  .mention-message {
+    font-size: 13px;
+  }
+  .sender-picture {
+    width: 50px;
+    height: 50px;
+  }
+  .message-card-current {
+    padding: 7px 0;
+    width: 100%;
+    left: 7px;
+  }
+  .message-card-user {
+    padding: 7px 0;
+    width: 100%;
+  }
+  .self-chat-txt,
+  .two-chat-txt {
+    font-size: 17px;
+  }
+  .self-chat-img {
+    width: 55px;
+    height: 55px;
+  }
+  .img-and-name {
+    gap: 8px;
+  }
+  p {
+    font-size: 20px;
+  }
+  .first-day-info {
+    margin-top: 14px;
+  }
+  .main-current-messagebox {
+    height: 852px;
+  }
+  .main-mesage-info-current:hover .comment-box-current {
+    left: 15px;
+  }
+  .last-used-emoji {
+    width: 20px;
+    height: 20px;
+    margin-left: 0;
+    font-size: 14px;
+    margin-top: 3px;
+  }
+  .add-reaction {
+    width: 29px;
+    height: 28px;
+    svg {
+      width: 29px;
+      height: 33px;
+    }
+  }
+  .open-thread {
+    width: 30px;
+    height: 32px;
+    svg {
+      width: 30px;
+      height: 32px;
+    }
+  }
+  .edit-icon {
+    svg {
+      width: 30px;
+      height: 33px;
+    }
+    &:hover{
+      width: 30px;
+      height: 33px;
+    }
+  }
+  .text-container {
+    font-size: 10px;
+  }
+  .comment-box-current {
+    height: 40px;
+    top: 15px;
+  }
+  .comment-content {
+    height: 33px;
+  }
+  .text-info-edit {
+    font-size: 10px;
+  }
+  .sticker-content {
+    font-size: 11px !important;
+  }
+  .edit-message:hover .edit-messages-card {
+    white-space: pre-wrap;
+  }
+  .edit-message-content:hover {
+    span {
+      font-size: 11px;
+      padding: 2px;
+    }
+  }
+  .edit-message-content {
+    span {
+      font-size: 11px;
+      padding: 2px;
+    }
+  }
+  .edit-mesage-box {
+    min-width: auto;
+    width: 100%;
+    left: 10px;
+  }
+  .edit-input {
+    font-size: 15px;
+  }
+  .edit-icon-textarea {
+    width: 15px !important;
+    height: 17px !important;
+  }
+  .chat {
+    padding: 2px 15px !important;
+    display: flex;
+    justify-content: center;
+    .edit-emoji-main {
+      width: 38px !important;
+      height: 30px !important;
+      margin-top: 6px;
+    }
+  }
+}
+
+@media (min-width: 320px) and (max-width: 450px) {
+  .scroll-container {
+    height: 640px;
+  }
+}
+@media (min-width: 450px) and (max-width: 600px) {
+  .scroll-container {
+  }
+}

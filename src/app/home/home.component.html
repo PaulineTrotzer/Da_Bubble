@@ -28,7 +28,7 @@
                 [ngClass]="{'display-hidden':global.checkWideChannelorUserBox,'hiddenMax-Width':global.checkWideChannelOrUserThreadBox,'openThread':global.openChannelOrUserThread}"
                 [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
                 [selectedChannel]="selectedChannel" (userSelectedFromThread)="handleUserSelectionFromThread($event)"
-                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
+                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)"   (threadClosedToHome)="onThreadClosed()"  >
             </app-thread>
         </div>
     </div>

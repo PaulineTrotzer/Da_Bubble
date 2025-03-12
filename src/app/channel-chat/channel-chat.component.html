@@ -18,7 +18,8 @@
       'message-from-current': message.senderId === global.currentUserData.id
     }" *ngFor="let message of messagesData; let i = index" (mouseenter)="hoveredMessageId = message.id"
       (mouseleave)="hoveredMessageId = null; showEditDialog = null">
-      <div *ngIf="displayDayInfo(i)" class="new-day-info">
+      <div *ngIf="displayDayInfo(i)" class="new-day-info"
+        [ngClass]="{ 'first-indicated-time': i === firstDayInfoIndex }">
         <div class="day-info">
           <div class="line"></div>
           <span class="day-span">{{ getDayInfoForMessage(i) }}</span>

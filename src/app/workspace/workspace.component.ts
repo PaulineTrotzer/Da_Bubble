@@ -167,6 +167,16 @@ export class WorkspaceComponent implements OnInit {
       this.channelService.setSelectedUser(user);
       this.handleUIChanges();
     });
+    if (window.innerWidth <= 600) {
+ 
+      // TODO: Hier deine Logik bei schmalen Screens
+      // z.B. den Workspace schließen, ein anderes Panel öffnen, etc.
+      console.log('Channel selected on a screen <= 600px!');
+      
+      // Beispiel: Du möchtest den Workspace schließen:
+      this.global.openChannelorUserBox = true;
+      // Oder den Startscreen öffnen usw. – ganz nach deinem Bedarf.
+    }
   }
 
   updateSelectedUser(user: any) {

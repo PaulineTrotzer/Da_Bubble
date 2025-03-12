@@ -114,6 +114,8 @@ export class ChannelThreadComponent implements OnInit {
   isOverlayOpen = false;
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   mentionService = inject(MentionThreadService);
+  @Output() closeThreadChannel = new EventEmitter<void>();
+
   constructor() {}
 
   async ngOnInit(): Promise<void> {
@@ -401,7 +403,8 @@ export class ChannelThreadComponent implements OnInit {
   closeThread() {
     this.global.channelThreadSubject.next(null);
     this.hiddenThreadFullBox();
-    this.checkResponsiveWidtSize();
+    this.closeThreadChannel.emit();
+/*     this.checkResponsiveWidtSize(); */
   }
 
   hiddenThreadFullBox() {
