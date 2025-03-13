@@ -191,6 +191,7 @@
   scrollbar-width: thin;
   border: 1px solid #adb0d9;
   border-radius: 20px;
+  z-index: 4;
   overflow: hidden;
   &:focus-within {
     border-color: blue;
@@ -292,11 +293,25 @@
     width: 95%;
     left: 0;
   }
-  .interactions-send-msg-ct{
+  .interactions-send-msg-ct {
     bottom: -6px;
+    padding-bottom: 5px;
   }
-  .chat-editable{
+  .chat-editable {
     font-size: 14px;
     max-height: 140px;
+  }
+  .plus {
+    width: 20px;
+  }
+  .emoji-at-ct {
+    div {
+      img {
+        width: 32px;
+      }
+    }
+  }
+  .msg-send{
+    width: 28px;
   }
 }

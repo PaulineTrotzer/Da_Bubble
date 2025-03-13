@@ -204,6 +204,7 @@ app-input-field {
   width: 100%;
   position: relative;
   padding-top: 16px;
+  padding-bottom: 1px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -233,6 +234,7 @@ app-input-field {
   width: 100%;
   position: relative;
   padding-top: 16px;
+  padding-bottom: 1px;
   &:hover {
     background-color: #eceefe;
     cursor: pointer;
@@ -454,15 +456,20 @@ app-input-field {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 35px;
+  height: 35px;
+  background-color: transparent; /* Ausgangszustand */
+  transition: background-color 0.2s ease, border-radius 0.2s ease;
+
   svg {
     width: 35px;
     height: 35px;
   }
+
   &:hover {
-    width: 35px;
-    height: 35px;
     background-color: #eceefe;
     border-radius: 100%;
+
     svg {
       path {
         fill: #444df2;
@@ -479,13 +486,17 @@ app-input-field {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 35px;
+  height: 35px;
   svg {
     width: 35px;
     height: 35px;
   }
+  background-color: transparent; // definiere Ausgangszustand
+  transition: background-color 0.2s ease, border-radius 0.2s ease,
+    fill 0.2s ease;
+
   &:hover {
-    width: 35px;
-    height: 35px;
     background-color: #eceefe;
     border-radius: 100%;
     svg {
@@ -508,16 +519,22 @@ app-input-field {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  width: 35px;
+  height: 35px;
+  background-color: transparent; // Ausgangszustand
+  transition: background-color 0.2s ease, border-radius 0.2s ease;
+
   svg {
     width: 35px;
     height: 35px;
+    transition: fill 0.2s ease; // optional, falls fill animiert werden soll
   }
-  position: relative;
+
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-    width: 35px;
-    height: 35px;
+    // width und height nicht neu setzen, da sie schon fix sind
     svg {
       path {
         fill: #444df2;
@@ -946,7 +963,8 @@ app-mention-message-box {
 }
 
 .edit-emoji-main {
-  height: 40px;
+  height: 35px;
+  width: 35px;
   padding: 4px;
   border-radius: 100%;
   background-color: white;
@@ -1009,6 +1027,10 @@ app-mention-message-box {
 }
 
 @media (min-width: 320px) and (max-width: 600px) {
+  .full-bottom-options {
+    bottom: 5px;
+    height: 27px;
+  }
   .thread-answer-display {
     font-size: 11px;
   }
@@ -1036,7 +1058,8 @@ app-mention-message-box {
   }
   app-input-field {
     position: fixed;
-    bottom: 0;
+    bottom: -4px;
+    z-index: 2;
     width: 100vw;
   }
   .day-span {
@@ -1090,40 +1113,36 @@ app-mention-message-box {
   .last-used-emoji {
     width: 20px;
     height: 20px;
-    margin-left: 0;
+    margin-left: 7px;
     font-size: 14px;
     margin-top: 3px;
+    margin: 3px 3px 0 7px;
   }
   .add-reaction {
-    width: 29px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     svg {
-      width: 29px;
-      height: 33px;
+      width: 30px;
+      height: 30px;
     }
   }
   .open-thread {
     width: 30px;
-    height: 32px;
-    svg {
-      width: 30px;
-      height: 32px;
-    }
+    height: 30px;
   }
   .edit-icon {
-    svg {
-      width: 30px;
-      height: 33px;
-    }
-    &:hover{
-      width: 30px;
-      height: 33px;
-    }
+    width: 30px;
+    height: 30px;
   }
+
   .text-container {
     font-size: 10px;
   }
   .comment-box-current {
+    height: 40px;
+    top: 15px;
+  }
+  .comment-box-user {
     height: 40px;
     top: 15px;
   }
@@ -1142,13 +1161,14 @@ app-mention-message-box {
   .edit-message-content:hover {
     span {
       font-size: 11px;
-      padding: 2px;
+      padding: 0px;
+      background-color: white;
     }
   }
   .edit-message-content {
     span {
       font-size: 11px;
-      padding: 2px;
+      padding: 0px;
     }
   }
   .edit-mesage-box {
@@ -1173,14 +1193,20 @@ app-mention-message-box {
       margin-top: 6px;
     }
   }
-}
-
-@media (min-width: 320px) and (max-width: 450px) {
   .scroll-container {
     height: 640px;
   }
 }
+
+@media (min-width: 320px) and (max-width: 450px) {
+
+}
+
 @media (min-width: 450px) and (max-width: 600px) {
-  .scroll-container {
+  app-input-field {
+    width: 95vw;
+  }
+  .full-app-content{
+    width: 95vw;
   }
 }

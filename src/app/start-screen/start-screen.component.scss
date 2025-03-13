@@ -186,26 +186,12 @@ mat-card {
   .header-chat-holder {
     height: 880px;
   }
-  .welcome-sheet {
-    left: -1px;
-    width: 100vw;
-  }
   .member-count {
     font-size: 15px;
   }
   .img-container {
     height: 30px;
     width: 30px;
-  }
-  .user-chat-info{
-    margin-bottom: 14px;
-    img{
-      width: 50px;
-      height: 50px
-    }
-    h4{
-      font-size: 16px;
-    }
   }
 }
 
@@ -221,10 +207,20 @@ mat-card {
       0 2px 2px rgba(255, 255, 255, 0.5) inset;
   }
   .big-chat-card {
-    position: fixed;
+/*     position: fixed; */
     height: 855px;
     max-width: max-content;
     min-width: auto;
+  }
+  .user-chat-info{
+    margin-bottom: 14px;
+    img{
+      width: 50px;
+      height: 50px
+    }
+    h4{
+      font-size: 16px;
+    }
   }
   .btn-text-img {
     font-size: 22px;
@@ -251,6 +247,10 @@ mat-card {
   .mat-mdc-button {
     margin-top: -14px;
   }
+  .welcome-sheet {
+    left: -1px;
+    width: 100vw;
+  }
 }
 
 @media (min-width: 450px) and (max-width: 600px) {
@@ -272,6 +272,9 @@ mat-card {
   }
   app-channel-chat {
     display: flex;
+    width: 95vw;
+  }
+  .welcome-sheet{
     width: 95vw;
   }
 

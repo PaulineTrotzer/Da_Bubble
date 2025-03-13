@@ -35,8 +35,8 @@
   </app-mention-message-box>
 
   <!-- 1) .overflow-container -->
-  <div class="overflow-container" #scrollContainer>
-    <div #messageContainer class="all-thread-message-container">
+  <div class="overflow-container" >
+    <div #messageContainer class="all-thread-message-container" #scrollContainer>
 
       <!-- Parent-Message (Thread-Übersicht) -->
       <app-thread-parent-message (mentionClicked)="onMentionClicked($event)" *ngIf="parentMessage" [pm]="parentMessage"

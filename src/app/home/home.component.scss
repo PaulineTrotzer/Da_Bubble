@@ -18,9 +18,9 @@ app-workspace {
 }
 
 .main-content {
-  display: flex;
+/*   display: flex;
   justify-content: center;
-  overflow-y: auto;
+  overflow-y: auto; */
 }
 
 .page-content-plus-header {
@@ -219,10 +219,6 @@ app-start-screen {
 }
 
 @media (max-width: 1349px) {
-  .full-page-content.reset-gap {
-    gap: 16px;
-  }
-
   app-start-screen.hiddenFullWidth {
     width: 0;
     overflow-x: hidden;
@@ -288,9 +284,6 @@ app-start-screen {
   }
 }
 @media (min-width: 320px) and (max-width: 600px) {
-  .full-page-content {
-    width: 100%;
-  }
   .main-content {
     max-height: calc(100vh - 165px);
   }
@@ -323,11 +316,6 @@ app-start-screen {
 
   app-start-screen {
     display: none;
-  }
-
-  app-thread{
-    width: 95vw;
-    margin-left: 12px;
   }
 
   .full-page-content {
@@ -368,10 +356,23 @@ app-start-screen {
   }
 }
 
+@media(min-width: 320px) and (max-width: 450px){
+  .full-page-content{
+    width: 100%;
+  }
+}
+
 @media (min-width: 450px) and (max-width: 600px) {
   .startScreen-open {
     display: flex;
     width: 100%;
+  }
+  app-thread {
+    width: 95vw;
+    margin-left: 12px;
+  }
+  .full-page-content{
+    width: 95vw;
     margin-left: 12px;
   }
 }

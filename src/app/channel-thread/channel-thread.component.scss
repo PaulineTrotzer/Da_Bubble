@@ -6,6 +6,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
+  backdrop-filter: blur(8px); 
 }
 
 .message-scroll-container {
