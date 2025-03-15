@@ -6,7 +6,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
-  backdrop-filter: blur(8px); 
+  backdrop-filter: blur(8px);
 }
 
 .message-scroll-container {
@@ -260,14 +260,14 @@ header {
 .topic-from-current,
 .answer-from-current {
   flex-direction: row-reverse;
-  padding: 10px 30px 22px 30px;
-  margin-top: 22px;
+  padding: 30px 30px 30px 30px;
   min-height: 130px;
 }
 
 .topic-from-user,
 .answer-from-user {
-  padding: 10px 30px 22px 30px;
+  padding: 30px 30px 30px 30px;
+  min-height: 130px;
 }
 
 .message,
@@ -495,24 +495,30 @@ header {
   border-top-right-radius: 35px;
   border-bottom-right-radius: 35px;
   border-bottom-left-radius: 35px;
-  padding: 9px 4px;
+  padding: 7px; // Effektives Padding
   left: 15px;
   top: 22px;
-  padding: 7px;
   white-space: nowrap;
-  span {
-    font-size: 12px;
-    padding: 7px;
-  }
   cursor: pointer;
+
+  span {
+    display: inline-block; // Wichtig: explizite Box-Darstellung
+    font-size: 12px;
+    padding: 7px; // Normalzustand: 7px
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
   &:hover span {
+    /* Setze exakt die gleichen Layout-Werte */
+    display: inline-block;
+    padding: 7px; // Gleich wie normal
+    font-size: 12px; // Gleich wie normal
+    background-color: #eceefe; // Nur die Farben ändern
     color: #444df2;
-    background-color: #eceefe;
-    border: 0 solid;
+    border: 0;
     border-radius: 30px;
   }
 }
-
 .edit-message-container {
   position: relative;
   display: flex;
@@ -698,9 +704,9 @@ form {
     justify-content: end;
   }
   .message-edit-dialog {
-    display: block;
+    /*     display: block;
     font-size: 11px;
-    white-space: pre-wrap;
+    white-space: pre-wrap; */
   }
   textarea {
     min-width: auto;
@@ -719,11 +725,17 @@ form {
   }
   .emoji {
     font-size: 13px;
+    width: 26px;
+    height: 26px;
   }
   .img-container {
+    width: 24px;
+    height: 20px;
+    padding: 2px;
+    margin-bottom: 1px;
     svg {
-      height: 16px;
-      width: 17px;
+      height: 26px;
+      width: 26px;
       object-fit: cover;
     }
   }
@@ -738,7 +750,7 @@ form {
   }
 }
 
-@media(min-width: 320px) and (max-width: 450px){
+@media (min-width: 320px) and (max-width: 450px) {
   .card {
     border-radius: 0;
   }
@@ -748,8 +760,8 @@ form {
   }
 }
 
-@media(min-width: 450px) and (max-width: 600px){
-  .card{
+@media (min-width: 450px) and (max-width: 600px) {
+  .card {
     border-radius: 30px;
   }
   header {
@@ -759,6 +771,26 @@ form {
 }
 
 @media (min-width: 320px) and (max-width: 600px) {
+  .message-scroll-container {
+    padding-bottom: 10px;
+  }
+  .new-day-info {
+    top: 2px;
+  }
+  .reaction-from-container {
+    font-size: 11px;
+    padding: 3px 4px !important;
+    max-width: 125px;
+    max-height: 50px;
+    white-space: nowrap;
+  }
+  .message-edit-dialog {
+    padding: 0px;
+    line-height: 1.1;
+    font-size: 11px !important;
+    white-space: pre-wrap;
+    display: inline;
+  }
 
   .left {
     gap: 21px;
@@ -773,23 +805,23 @@ form {
       height: 50px;
     }
   }
-  .edited-indicator{
+  .edited-indicator {
     font-size: 10px;
   }
-  .edited-indicator-topic{
+  .edited-indicator-topic {
     font-size: 10px;
   }
-  .time{
+  .time {
     font-size: 12px;
   }
-  .only-name{
+  .only-name {
     font-size: 14px;
   }
-  .mention-message{
+  .mention-message {
     font-size: 14px;
   }
-  .seperator{
-    h3{
+  .seperator {
+    h3 {
       font-size: 14px;
     }
   }

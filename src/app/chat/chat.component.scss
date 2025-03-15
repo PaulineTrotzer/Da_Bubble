@@ -725,7 +725,6 @@ app-input-field {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s ease-in-out;
-
   &.hovered {
     opacity: 1;
     visibility: visible;
@@ -854,7 +853,7 @@ app-input-field {
 .text-info-edit {
   font-size: 12px;
   position: absolute;
-  bottom: -25px;
+  bottom: -21px;
   color: black;
 }
 
@@ -1195,6 +1194,21 @@ app-mention-message-box {
   }
   .scroll-container {
     height: 640px;
+  }
+  .sticker-info-tooltip{
+    font-size: 10px;
+    left: 2%;
+    max-height: 50px;
+    max-width: 114px;
+    white-space: nowrap;
+    padding: 3px 0;
+  }
+  .comment-sticker-holder{
+    min-width: unset;
+  }
+  .sticker-item{
+    width: 27px;
+    height: 21px;
   }
 }
 

@@ -726,7 +726,7 @@ form {
   .message-scroll-container {
     gap: 18px;
     padding-top: 82px;
-    height: 550px;
+    height: 745px;
   }
   .thread-answer-display {
     font-size: 12px;
@@ -850,8 +850,29 @@ form {
   }
 
   .img-container-textarea {
-    width: 50%;
     height: 32px;
+  }
+  .reaction-from-container{
+    font-size: 11px;
+    padding: 3px 4px !important;
+    max-width: 125px;
+    max-height: 50px;
+    white-space: nowrap;
+  }
+  .emoji{
+    width: 26px;
+    height: 26px;
+  }
+  .img-container {
+    width: 26px;
+    height: 26px;
+  }
+  .message-edit{
+    span{
+      padding: 2px;
+      font-size: 11px;
+    }
+
   }
 }
 

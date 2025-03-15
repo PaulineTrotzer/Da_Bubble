@@ -134,7 +134,7 @@
                     </div>
 
                     <!-- ============ NORMALER MODUS vs. EDIT-MODUS ============ -->
-                    <div (click)="handleClickOnMention($event)">
+                    <div class="flex-box-text" (click)="handleClickOnMention($event)">
                         <ng-container *ngIf="!(editWasClicked && editMessageId === pm.id); else editMode">
                             <!-- =========== NORMALER MODUS =========== -->
                             <div class="message-bubble"

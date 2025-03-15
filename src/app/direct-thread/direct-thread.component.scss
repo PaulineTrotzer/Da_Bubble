@@ -16,7 +16,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
-  backdrop-filter: blur(8px); 
+  backdrop-filter: blur(8px);
 }
 
 .message-bubble {
@@ -53,28 +53,37 @@
   box-shadow: 0px 6px 14px 0px #00000033;
   color: #000000;
   width: 100%;
-  padding: 2px 5px;
+  padding: 3px;
   overflow-wrap: break-word;
   border-top-right-radius: 30px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
+  background-color: white;
+  font-size: 11px;
+  line-height: 1.1;
   &:hover {
     background-color: white;
     span {
-      font-size: 12px !important;
-      color: #444df2;
       background-color: #eceefe;
+      color: #444df2;
+      padding: 3px;
+      font-size: 11px;
+      line-height: 1.1;
     }
   }
 }
 
 .edit-message-content span {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 3px;
+  font-size: 11px;
+  line-height: 1.1;
   border-radius: 15px;
+  white-space: pre-wrap;
   transition: background-color 0.2s ease, color 0.2s ease;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .edit-messages-card {
@@ -84,14 +93,6 @@
   top: 12px !important;
   left: 18px;
   white-space: nowrap;
-}
-
-.edit-message {
-  &:hover {
-    .edit-messages-card {
-      opacity: 1;
-    }
-  }
 }
 
 .separated-both-currentUser-reaction-right {
@@ -976,7 +977,7 @@ svg {
     }
   }
   .only-name {
-    font-size: 12px;
+    font-size: 13px;
   }
   .mention-message {
     font-size: 14px;
@@ -984,20 +985,58 @@ svg {
   .edit-icon-holder {
     width: 30px;
     height: 30px;
-    svg{
+    svg {
       width: 30px;
       height: 30px;
     }
   }
   .edit-message-content {
+    font-size: 11px !important;
+    padding: 3px !important;
     span {
-      font-size: 11px;
+      padding: 3px;
+      line-height: 1.1;
+      font-size: 11px !important;
       white-space: pre-wrap;
+      &:hover {
+        line-height: 1.1;
+        padding: 3px;
+        font-size: 11px !important;
+      }
     }
   }
+  .last-emoji-holder {
+    height: 25px;
+    width: 25px;
+    span{
+      font-size: 14px;
+    }
+  }
+  .reaction-info-txt {
+    font-size: 10px;
+    white-space: nowrap;
+    max-height: 15px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1.1;
+  }
+  .reaction-info-txt-both {
+    font-size: 10px;
+    white-space: nowrap;
+    max-height: 15px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1.1;
+  }
   .single-emoji {
-    font-size: 13px;
-    margin-bottom: 2px;
+    font-size: 11px;
+  }
+  .emoji-holder {
+    min-width: 30px;
+    height: 21px;
+  }
+  .reaction-container {
+    gap: 2px;
   }
   .reaction-counter {
     font-size: 11px;
@@ -1006,19 +1045,50 @@ svg {
     min-width: auto;
     width: 35px;
   }
-  .img-flex-bar-options{
+  .file-info {
+    justify-content: start;
+  }
+  .full-bottom-flex {
+    bottom: 18px;
+    left: 10px;
+  }
+  .img-flex-bar-options {
     height: 33px;
     gap: 0;
-    padding: 3px
+    padding: 3px;
   }
-  .cu-message-container{
+  .cu-message-container {
     width: 100%;
     overflow-x: hidden;
   }
-  .chatpartner-message-container{
+  .cu-message-column {
+    right: 73px;
+  }
+  .message-holder {
+    max-width: 70%;
+    right: 0;
+  }
+  .static-bubble {
+    max-width: 70%;
+  }
+  .message-content-bubble {
+    max-width: 70%;
+  }
+  .partner-message-column {
+    left: 80px;
+  }
+  .avatar-container {
+    right: 15px;
+  }
+  .avatar-container-partner {
+    left: 15px;
+  }
+  .chatpartner-message-container {
     width: 100%;
     overflow-x: hidden;
   }
-
-
+  .edit-input {
+    min-width: 225px;
+    font-size: 13px;
+  }
 }
