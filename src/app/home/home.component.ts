@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
@@ -68,12 +69,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   isOverlayOpen = false;
   private subscriptions: Subscription[] = [];
   isMobileView = false;
-
+  reduceStartScreen = false;
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit(): void {
-    this.isMobileView = window.innerWidth <= 720;
     this.loginAuthService.googleAccountLogIn$.subscribe((status) => {
       this.googleAccountLogIn = status;
     });
@@ -83,14 +83,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.setDirectThread();
     this.setChannelThread();
     this.authService.initAuthListener();
-    this.checkScreenWidth(window.innerWidth);
+    this.global.threadOpened$.subscribe((isOpened) => {
+      Promise.resolve().then(() => {
+        this.reduceStartScreen = isOpened;
+      });
+    });
+    this.onResize({ target: window } as any);
   }
-
   @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.checkScreenWidth(event.target.innerWidth);
+  onResize(event: Event) {
+    // Hier rufst du einfach detectChanges auf, damit die Binding-Funktion (calculateStartScreenWidth)
+    // neu ausgewertet wird.
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
   }
-
+  
   checkScreenWidth(width: number) {
     if (width < 1380) {
       this.isWorkspaceOpen = false;
@@ -148,6 +156,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.selectedUser = user;
       this.userChannelService.setSelectedUser(user);
     }); */
+    // Starte die Prüfung nach der initialen Change Detection
+    setTimeout(() => {
+/*       this.onResize({ target: window } as any); */
+      // Damit Angular den neuen Zustand übernimmt:
+      this.cdr.detectChanges();
+    }, 0);
     this.workspaceComponent.channelSelected.subscribe((channel: any) => {
       this.selectedChannel = channel;
       this.global.channelSelected = true;
@@ -281,10 +295,47 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.isWorkspaceOpen = true;
   }
 
+  cdr = inject(ChangeDetectorRef);
+
+/*   @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    const width = (event.target as Window).innerWidth;
+    setTimeout(() => {
+      if (width > 770) {
+        this.isWorkspaceOpen = true;
+        console.log(this.global.threadOpened)
+        // Wenn der Thread offen ist, setze reduceStartScreen auf true, sonst false.
+        this.reduceStartScreen = this.global.threadOpened;
+      } else {
+        this.reduceStartScreen = false;
+      }
+      this.cdr.detectChanges(); // Falls nötig, um den Change Detection Zyklus anzustoßen
+    }, 0);
+  } */
+
+
+  calculateStartScreenWidth(): string {
+    const width = window.innerWidth;
+    if (!this.global.threadOpened) {
+      return '100%';
+    }
+    if (width >= 2090) {
+      return '80%';
+    } else if (width <= 1600) {
+      return '60%';
+    } else {
+      // Lineare Interpolation zwischen 2090 (80%) und 1600 (60%)
+      const slope = (60 - 80) / (1600 - 2090); // ( -20 ) / (-490) = 20/490 ≈ 0.0408
+      const percentage = 80 + slope * (width - 2090);
+      return percentage + '%';
+    }
+  }
+  
+
   toggleWorkspace() {
     const width = window.innerWidth;
-  
-    if (width <= 600) {
+
+    if (width <= 770) {
       // 1) Schmale Screens (320–600 px)
       if (this.global.openChannelorUserBox) {
         this.global.openChannelorUserBox = false;
@@ -294,8 +345,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       } else {
         this.isWorkspaceOpen = !this.isWorkspaceOpen;
       }
-  
-    } else if (width <= 720) {
+    } /* else if (width <= 720) {
       // 2) Screen 401–720 px
       if (this.global.openChannelorUserBox) {
         this.global.openChannelorUserBox = false;
@@ -306,13 +356,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.isWorkspaceOpen = !this.isWorkspaceOpen;
       }
   
-    } else {
+    } */ else {
       // 3) Breiter als 720 px
       this.isWorkspaceOpen = !this.isWorkspaceOpen;
     }
   }
-  
-  
+
   getImageSource(): string {
     const state =
       this.isWorkspaceOpen && !this.global.openChannelorUserBox

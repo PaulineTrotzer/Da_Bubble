@@ -16,10 +16,14 @@
 
 .mdc-dialog--open .mat-mdc-dialog-surface,
 .mdc-dialog--closing .mat-mdc-dialog-surface {
-  height: 500px;
-  width: 390px;
+  height: 510px;
+  width: 530px;
   padding-top: 15px;
-} 
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8) !important;
+}
 
 html,
 body {
@@ -105,7 +109,7 @@ img {
     position: inherit;
   }
   .add-member-dialog.mat-mdc-dialog-surface {
-      width: 100vw !important;
+    width: 100vw !important;
   }
   .emoji-mart-dark {
     width: 100% !important;
@@ -123,7 +127,7 @@ img {
     }
   }
 }
- 
+
 @media (min-width: 320px) and (max-width: 500px) {
   .member-profile-card {
     height: 540px !important;

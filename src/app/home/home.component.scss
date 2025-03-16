@@ -1,3 +1,5 @@
+
+
 mat-card {
   position: absolute;
   z-index: 110;
@@ -18,9 +20,13 @@ app-workspace {
 }
 
 .main-content {
-/*   display: flex;
+  /*   display: flex;
   justify-content: center;
   overflow-y: auto; */
+}
+
+.full-flex {
+  max-width: 2200px;
 }
 
 .page-content-plus-header {
@@ -96,13 +102,20 @@ app-workspace {
   margin-left: 6px;
 }
 
+.startScreen-reduced {
+  width: 60% !important;
+}
+
 app-thread {
-  max-width: 485px;
+  max-width: 435px;
   width: 100%;
-  max-height: 880px;
+  height: 97vh;
   border-radius: 30px;
   box-shadow: 0px 2px 10px 0px #00000014;
   background-color: white;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .workspace-opener {
@@ -137,7 +150,7 @@ app-thread {
 }
 
 .workspace-open {
-  width: 366px;
+  width: 385px;
   transition: all 175ms ease-in-out;
 }
 
@@ -146,7 +159,6 @@ app-thread {
 }
 
 .startScreen-open {
-  display: flex;
   width: 100%;
 }
 
@@ -218,6 +230,15 @@ app-start-screen {
   }
 }
 
+.start-screen-full {
+  width: 100%;
+}
+
+.start-screen-reduced {
+  width: 60% ;
+}
+
+/* 
 @media (max-width: 1349px) {
   app-start-screen.hiddenFullWidth {
     width: 0;
@@ -238,13 +259,15 @@ app-start-screen {
   app-thread.display-hidden {
     display: none;
   }
+} */
+
+app-thread.display-hidden {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
 }
 
-@media (max-width: 720px) {
-  app-start-screen {
-    display: none;
-  }
-
+@media (max-width: 770px) {
   .full-page-content {
     gap: 0;
   }
@@ -271,8 +294,9 @@ app-start-screen {
   }
 
   .openThread {
-    display: unset;
-    max-width: unset;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
   }
 
   .startScreen-open.hidden {
@@ -283,7 +307,7 @@ app-start-screen {
     display: none;
   }
 }
-@media (min-width: 320px) and (max-width: 600px) {
+@media (min-width: 320px) and (max-width: 770px) {
   .main-content {
     max-height: calc(100vh - 165px);
   }
@@ -296,18 +320,6 @@ app-start-screen {
   }
   .login-sended-info {
     padding: 2px 4px;
-  }
-
-  .workspace-opener {
-    position: fixed;
-    top: 78%;
-    left: -3px;
-    padding: 3px;
-    width: 36px;
-    background-color: #e0e0ff;
-    p {
-      display: none;
-    }
   }
   .workspace-drawer {
     width: 32px;
@@ -356,13 +368,24 @@ app-start-screen {
   }
 }
 
-@media(min-width: 320px) and (max-width: 450px){
-  .full-page-content{
+@media (min-width: 320px) and (max-width: 450px) {
+  .full-page-content {
     width: 100%;
+  }
+  .workspace-opener {
+    position: fixed;
+    top: 78%;
+    left: -3px;
+    padding: 3px;
+    width: 36px;
+    background-color: #e0e0ff;
+    p {
+      display: none;
+    }
   }
 }
 
-@media (min-width: 450px) and (max-width: 600px) {
+@media (min-width: 450px) and (max-width: 770px) {
   .startScreen-open {
     display: flex;
     width: 100%;
@@ -371,8 +394,35 @@ app-start-screen {
     width: 95vw;
     margin-left: 12px;
   }
-  .full-page-content{
+
+  .full-page-content {
     width: 95vw;
     margin-left: 12px;
+  }
+}
+
+@media (min-width: 450px) and (max-width: 1024px) {
+  .workspace-opener {
+    left: -118px;
+    padding: 2px;
+    top: 80%;
+  }
+  .workspace-open {
+    width: 500px;
+  }
+}
+
+@media (min-width: 770px) and (max-width: 1024px) {
+  .full-page-content {
+    gap: 18px;
+  }
+}
+
+
+@media(min-width: 2200px){
+  :host {
+    display: flex;
+    width: 100vw;
+    justify-content: center;
   }
 }

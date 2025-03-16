@@ -6,7 +6,6 @@
   overflow: hidden;
   background-color: white;
   margin-bottom: 20px;
-  max-height: 880px;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
   border-bottom-left-radius: 30px;
@@ -115,8 +114,8 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  height: 737px;
-  padding-top: 120px;
+  height: 66vh;
+  padding-top: 20px;
   overflow: auto;
   scroll-behavior: smooth;
   position: relative;

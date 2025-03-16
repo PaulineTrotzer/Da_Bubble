@@ -13,7 +13,7 @@
   max-width: 366px;
   position: fixed;
   z-index: 2;
-  max-height: 880px;
+  height: 97vh;
   overflow-y: auto;
 }
 
@@ -96,9 +96,16 @@
   gap: 16px;
   padding-left: 24px;
   margin: 24px 0;
-  max-height: 140px;
+  max-height: 230px;
   overflow-y: auto;
   scroll-behavior: smooth;
+  font-size: 19px;
+}
+
+.add-channel-span {
+  font-size: 18px;
+  padding: 4px 7px !important;
+  margin-top: 24px;
 }
 
 .channel-row,
@@ -166,9 +173,15 @@
   transition: max-height 175ms ease-in-out;
 }
 
+.direct-message-container {
+  margin-top: 36px;
+  position: relative;
+  right: 12px;
+}
+
 .contacts {
   margin-top: 24px;
-  max-height: 468px;
+  height: 55vh;
   overflow-y: auto;
   margin-left: 24px;
   scroll-behavior: smooth;
@@ -385,7 +398,7 @@
   }
 }
 
-@media (min-width: 450px) and (max-width: 600px) {
+@media (min-width: 450px) and (max-width: 770px) {
   .card {
     border-radius: 30px;
     padding: 32px 30px;
@@ -403,8 +416,8 @@
       font-size: 24px;
     }
   }
-  .channel-row{
-    span{
+  .channel-row {
+    span {
       font-size: 15px;
     }
   }

@@ -7,7 +7,6 @@
   flex-direction: column;
   background-color: white;
   border-radius: 30px;
-  max-height: 880px;
 }
 
 .mat-mdc-card[hidden] {
@@ -57,7 +56,7 @@
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
-  height: 737px;
+  height: 71vh;
   scroll-behavior: smooth !important;
   position: relative;
   top: 17px;
@@ -1205,6 +1204,8 @@ app-mention-message-box {
   }
   .comment-sticker-holder{
     min-width: unset;
+    position: relative;
+    right: 10px;
   }
   .sticker-item{
     width: 27px;
@@ -1216,7 +1217,7 @@ app-mention-message-box {
 
 }
 
-@media (min-width: 450px) and (max-width: 600px) {
+@media (min-width: 450px) and (max-width: 770px) {
   app-input-field {
     width: 95vw;
   }

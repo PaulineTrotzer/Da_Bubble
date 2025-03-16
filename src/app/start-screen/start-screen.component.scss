@@ -38,6 +38,8 @@ mat-card {
 .big-chat-card {
   position: relative;
   min-width: 990px;
+/*   max-width: 1050px; */
+  height: 97vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -176,11 +178,6 @@ mat-card {
   z-index: 2;
 }
 
-@media (max-width: 1800px) {
-  .big-chat-card {
-    min-width: auto;
-  }
-}
 
 @media (min-width: 320px) and (max-width: 600px) {
   .header-chat-holder {
@@ -253,7 +250,7 @@ mat-card {
   }
 }
 
-@media (min-width: 450px) and (max-width: 600px) {
+@media (min-width: 450px) and (max-width: 770px) {
   .header {
     min-height: 85px;
   }

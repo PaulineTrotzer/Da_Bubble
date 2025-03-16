@@ -4,10 +4,13 @@ import {
   EventEmitter,
   Input,
   ViewChild,
+  inject,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DirectThreadComponent } from '../direct-thread/direct-thread.component';
 import { ChannelThreadComponent } from '../channel-thread/channel-thread.component';
+import { GlobalVariableService } from '../services/global-variable.service';
 
 @Component({
   selector: 'app-thread',
@@ -16,10 +19,17 @@ import { ChannelThreadComponent } from '../channel-thread/channel-thread.compone
   templateUrl: './thread.component.html',
   styleUrl: './thread.component.scss',
 })
-export class ThreadComponent {
+export class ThreadComponent implements OnDestroy {
   @Output() closeThread = new EventEmitter<void>();
+  global = inject(GlobalVariableService);
 
-  constructor() {}
+  constructor() {
+    this.global.setThreadOpened(true);
+  }
+
+  ngOnDestroy(): void {
+    this.global.setThreadOpened(false);
+  }
 
   @Input() selectedUser: any;
   @Input() directThreadId: any;
@@ -41,6 +51,7 @@ export class ThreadComponent {
 
   onDirectThreadClosed() {
     this.closeThread.emit();
+    this.global.setThreadOpened(false);
   }
 
   onChannelThreadClosed() {

@@ -239,6 +239,7 @@ app-thread-parent-message {
   padding: 16px;
   word-break: break-all;
   position: relative;
+  text-align: center;
   &.is-partner {
     background-color: #f3f4f6;
     margin-top: 15px;
@@ -637,7 +638,7 @@ app-thread-parent-message {
   width: 100%;
   border: 1px solid rgba(173, 176, 217, 0.4);
 }
-@media (min-width: 320px) and (max-width: 600px) {
+@media (min-width: 320px) and (max-width: 770px) {
   .only-name {
     font-size: 13px;
   }

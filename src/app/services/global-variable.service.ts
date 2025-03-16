@@ -27,6 +27,18 @@ export class GlobalVariableService {
   checkWideChannelorUserBox:boolean=false;
   checkWideChannelOrUserThreadBox:boolean=false;
 
+
+  private _threadOpened = new BehaviorSubject<boolean>(false);
+  public threadOpened$ = this._threadOpened.asObservable();
+
+  setThreadOpened(value: boolean) {
+    this._threadOpened.next(value);
+  }
+
+  get threadOpened(): boolean {
+    return this._threadOpened.value;
+  }
+
   private welcomeChannelSubject = new BehaviorSubject<boolean>(false);
   welcomeChannel$ = this.welcomeChannelSubject.asObservable();
 
