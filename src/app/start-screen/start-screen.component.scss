@@ -37,9 +37,6 @@ mat-card {
 
 .big-chat-card {
   position: relative;
-  min-width: 990px;
-/*   max-width: 1050px; */
-  height: 97vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -224,6 +221,9 @@ mat-card {
   }
   .drop-down-div {
     left: 0;
+    max-width: 145px;
+    white-space: pre-line;
+    height: auto;
   }
   .members-container {
     top: 30px;
@@ -233,8 +233,9 @@ mat-card {
     width: 33px;
   }
   app-channel-chat {
-    display: flex;
+    display: block;
     width: 100vw;
+    height: 97vh;
   }
 
   app-welcome-sheet {
@@ -276,10 +277,16 @@ mat-card {
   }
 
   app-welcome-sheet {
-    display: flex;
-    width: 95vw;
+    display: block;
+    width: 100vw;
   }
   .mat-mdc-button {
     margin-top: 11px;
+  }
+}
+
+@media(min-width: 2100px){
+  .big-chat-card{
+    min-width: 990px;
   }
 }

@@ -3,7 +3,7 @@
   box-shadow: 0px 2px 10px 0px #00000014;
   border-radius: 30px;
   position: relative;
-  width: 510px;
+  min-width: 510px;
   display: flex;
   flex-direction: column;
 }
@@ -961,9 +961,11 @@ svg {
 }
 
 @media (min-width: 320px) and (max-width: 770px) {
+
   .full-page-content {
     width: 100vw;
     border-radius: 0;
+    min-width: auto;
   }
   .text-info-edit {
     font-size: 10px;

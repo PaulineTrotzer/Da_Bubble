@@ -114,8 +114,8 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  height: 66vh;
-  padding-top: 20px;
+  height: 76vh;
+  padding-top: 135px;
   overflow: auto;
   scroll-behavior: smooth;
   position: relative;
@@ -725,13 +725,9 @@ form {
   .message-scroll-container {
     gap: 18px;
     padding-top: 82px;
-    height: 745px;
+    height: 79vh;
   }
-  .thread-answer-display {
-    font-size: 12px;
-    margin-bottom: 52px;
-    margin-right: 3px;
-  }
+
   .edited-label {
     font-size: 10px;
   }
@@ -885,7 +881,6 @@ form {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     margin-bottom: 0;
-    height: 850px;
     width: 100vw;
   }
   .first-message {
@@ -896,9 +891,17 @@ form {
     position: fixed;
     bottom: -3px;
   }
+  .thread-answer-display {
+    font-size: 12px;
+    margin-bottom: 15px;
+    margin-right: 3px;
+  }
 }
 
 @media (min-width: 450px) and (max-width: 600px) {
+  .thread-answer-display {
+    margin-bottom: 52px;
+  }
   .edit-message-container {
     min-width: 300px;
   }
@@ -914,7 +917,6 @@ form {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0;
     width: 95vw;
-    height: 852px;
   }
   app-input-field {
     width: 95vw;

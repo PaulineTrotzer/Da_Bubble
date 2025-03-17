@@ -38,7 +38,7 @@ app-workspace {
   display: flex;
   max-width: 2000px;
   gap: 32px;
-  width: 98%;
+  width: calc(100vw - 100px);
 }
 
 .overlay {
@@ -76,6 +76,10 @@ app-workspace {
   border-bottom-right-radius: unset;
 }
 
+.hidden{
+  display: none;
+}
+
 .login-sended-info.visible {
   transform: translateX(0);
 }
@@ -107,8 +111,6 @@ app-workspace {
 }
 
 app-thread {
-  max-width: 435px;
-  width: 100%;
   height: 97vh;
   border-radius: 30px;
   box-shadow: 0px 2px 10px 0px #00000014;
@@ -150,7 +152,7 @@ app-thread {
 }
 
 .workspace-open {
-  width: 385px;
+  min-width: 385px;
   transition: all 175ms ease-in-out;
 }
 
@@ -238,28 +240,6 @@ app-start-screen {
   width: 60% ;
 }
 
-/* 
-@media (max-width: 1349px) {
-  app-start-screen.hiddenFullWidth {
-    width: 0;
-    overflow-x: hidden;
-    transition: all 175ms ease-in-out;
-    gap: unset;
-  }
-
-  app-start-screen.display-show {
-    display: unset;
-    width: 100%;
-    transition: all 175ms ease-in-out;
-  }
-
-  app-thread.hiddenMax-Width {
-    max-width: unset;
-  }
-  app-thread.display-hidden {
-    display: none;
-  }
-} */
 
 app-thread.display-hidden {
   opacity: 0;
@@ -267,7 +247,11 @@ app-thread.display-hidden {
   pointer-events: none;
 }
 
-@media (max-width: 770px) {
+::ng-deep app-thread.full-thread-width {
+  width: 100vw !important;
+}
+
+@media (max-width: 950px) {
   .full-page-content {
     gap: 0;
   }
@@ -289,9 +273,6 @@ app-thread.display-hidden {
     transition: all 175ms ease-in-out;
   }
 
-  app-thread {
-    display: none;
-  }
 
   .openThread {
     opacity: 1;
@@ -303,9 +284,6 @@ app-thread.display-hidden {
     display: none;
   }
 
-  .thread-hidden {
-    display: none;
-  }
 }
 @media (min-width: 320px) and (max-width: 770px) {
   .main-content {
@@ -326,9 +304,6 @@ app-thread.display-hidden {
     object-fit: cover;
   }
 
-  app-start-screen {
-    display: none;
-  }
 
   .full-page-content {
     gap: 0;
@@ -350,9 +325,7 @@ app-thread.display-hidden {
     transition: all 175ms ease-in-out;
   }
 
-  app-thread {
-    display: none;
-  }
+
 
   .openThread {
     display: unset;
@@ -370,7 +343,7 @@ app-thread.display-hidden {
 
 @media (min-width: 320px) and (max-width: 450px) {
   .full-page-content {
-    width: 100%;
+    width: 100% !important;
   }
   .workspace-opener {
     position: fixed;
@@ -387,23 +360,20 @@ app-thread.display-hidden {
 
 @media (min-width: 450px) and (max-width: 770px) {
   .startScreen-open {
-    display: flex;
     width: 100%;
   }
   app-thread {
-    width: 95vw;
-    margin-left: 12px;
+    width: 100vw;
   }
 
   .full-page-content {
-    width: 95vw;
-    margin-left: 12px;
+    width: 100% !important;
   }
 }
 
 @media (min-width: 450px) and (max-width: 1024px) {
   .workspace-opener {
-    left: -118px;
+    left: -134px;
     padding: 2px;
     top: 80%;
   }
@@ -426,3 +396,16 @@ app-thread.display-hidden {
     justify-content: center;
   }
 }
+
+@media(max-width: 1630px){
+  .full-page-content{
+    width: calc(100vw - 30px);
+  }
+}
+
+@media(min-width: 450px) and (max-width: 1350px){
+  .full-page-content{
+    width: calc(100vw - 10px);
+  }
+}
+

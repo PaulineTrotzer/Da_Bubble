@@ -288,13 +288,15 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   closePicker() {
-    console.log('close picker ausgeführt');
     this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
   }
 
+  trackByMessageId(index: number, message: any): string {
+    return message.id;
+  }
+  
   openEmojiPicker(event: MouseEvent) {
-    debugger;
     event.stopPropagation();
     this.isEmojiPickerVisibleEdit = false;
     this.isEmojiPickerVisible = true;
@@ -722,6 +724,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.chosenThreadMessage = null;
     try {
       this.threadOpened.emit();
+      this.global.setThreadOpened(true);
       this.global.setCurrentThreadMessage(messageId);
       this.chosenThreadMessage = messageId;
       this.threadControlService.setFirstThreadMessageId(messageId);
@@ -738,43 +741,12 @@ export class ChatComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
-    this.openvollThreadBox();
-    this.hiddenFullChannelOrUserThreadBox();
-    this.checkWidthSize();
-    this.checkThreadOpen();
-  }
-
-  checkThreadOpen() {
-    if (window.innerWidth <= 750 && this.global.openChannelorUserBox) {
+    if (window.innerWidth < 1350) {
       this.global.openChannelorUserBox = false;
     }
   }
 
-  checkWidthSize() {
-    if (window.innerWidth <= 750) {
-      return (this.global.openChannelOrUserThread = true);
-    } else {
-      return (this.global.openChannelOrUserThread = false);
-    }
-  }
 
-  openvollThreadBox() {
-    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
-      return (this.global.checkWideChannelOrUserThreadBox = true);
-    } else {
-      return (this.global.checkWideChannelOrUserThreadBox = false);
-    }
-  }
-
-  hiddenFullChannelOrUserThreadBox() {
-    if (
-      window.innerWidth <= 1349 &&
-      window.innerWidth > 720 &&
-      this.global.checkWideChannelorUserBox
-    ) {
-      this.global.checkWideChannelorUserBox = false;
-    }
-  }
 
   splitMessage(text: string): string[] {
     const mentionRegex = /(@[\w\-\*_!$]+)/g;
@@ -895,18 +867,44 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = true;
   }
 
+  hoveredMessageId: string | null = null;
+
+onMessageMouseEnter(id: string) {
+  console.log('Mouseenter auf Nachricht mit ID:', id);
+  this.hoveredMessageId = id;
+}
+
+onMessageMouseLeave() {
+  console.log('Mouseleave');
+  this.hoveredMessageId = null;
+}
+
   async addEmoji(event: any, message: any) {
+    console.log('addEmoji() aufgerufen');
+    console.log('Event:', event);
+    console.log('Message vor Änderung:', message);
+  
+    // Überprüfe, ob event.emoji und event.emoji.native vorhanden sind:
+    if (!event.emoji || !event.emoji.native) {
+      console.error('Kein Emoji in event gefunden!');
+      return;
+    }
     const emoji = event.emoji.native;
+    console.log('Extrahiertes Emoji:', emoji);
+  
     this.shouldScroll = false;
-    const currentUserIsSender =
-      this.global.currentUserData?.id === message.senderId;
+    const currentUserIsSender = this.global.currentUserData?.id === message.senderId;
+    console.log('Ist aktueller User Sender?', currentUserIsSender);
+  
     if (currentUserIsSender) {
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.senderSticker === emoji) {
+        console.log('Gleiches Emoji – SenderSticker wird geleert');
         message.senderSticker = '';
         message.senderStickerCount = 0;
       } else {
+        console.log('Neues Emoji – SenderSticker wird gesetzt');
         message.senderSticker = emoji;
         message.senderStickerCount = 1;
       }
@@ -914,30 +912,40 @@ export class ChatComponent implements OnInit, OnChanges {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
       if (message.recipientSticker === emoji) {
+        console.log('Gleiches Emoji – RecipientSticker wird geleert');
         message.recipientSticker = '';
         message.recipientStickerCount = 0;
       } else {
+        console.log('Neues Emoji – RecipientSticker wird gesetzt');
         message.recipientSticker = emoji;
         message.recipientStickerCount = 1;
       }
     }
+  
+    console.log('Message nach Änderung:', message);
     this.isEmojiPickerVisible = false;
     this.messageIdHovered = null;
+  
     const docRef = doc(this.firestore, 'messages', message.id);
-    await updateDoc(docRef, {
-      senderSticker: message.senderSticker,
-      senderStickerCount: message.senderStickerCount,
-      recipientSticker: message.recipientSticker,
-      recipientStickerCount: message.recipientStickerCount,
-      senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-      recipientChoosedStickerBackColor:
-        message.recipientChoosedStickerBackColor,
-      stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-      stickerBoxOpacity: message.stickerBoxOpacity,
-    });
-
+    try {
+      await updateDoc(docRef, {
+        senderSticker: message.senderSticker,
+        senderStickerCount: message.senderStickerCount,
+        recipientSticker: message.recipientSticker,
+        recipientStickerCount: message.recipientStickerCount,
+        senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
+        recipientChoosedStickerBackColor: message.recipientChoosedStickerBackColor,
+        stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
+        stickerBoxOpacity: message.stickerBoxOpacity,
+      });
+      console.log('updateDoc erfolgreich ausgeführt');
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren des Dokuments:', error);
+    }
+    
     this.closePicker();
   }
+  
 
   async emojiSender(message: any) {
     this.wasRemoved = false;

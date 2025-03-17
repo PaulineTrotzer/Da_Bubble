@@ -2,35 +2,36 @@
     <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"
         (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
     <div class="main-content">
-        <div [ngClass]="{'reset-gap':global.checkWideChannelOrUserThreadBox}" class="full-page-content">
-            <app-workspace [ngClass]="{
+        <div class="full-page-content">
+            <app-workspace (mobileChannelSelected)="handleMobileChannelSelected()" [ngClass]="{
 
             'workspace-open': isWorkspaceOpen,
             'workspace-closed':!isWorkspaceOpen,
-            'close-box':global.openChannelorUserBox || global.openChannelOrUserThread ,
-            'open-box':!global.openChannelorUserBox && !global.openChannelOrUserThread,
+            'close-box':global.openChannelorUserBox,
+            'open-box':!global.openChannelorUserBox
 
         }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
 
-            <app-start-screen   [ngStyle]="{'width': calculateStartScreenWidth()}" (enterChat)="handleEnterChat($event)" [ngClass]="{ 'display-show':global.checkWideChannelorUserBox,
-            'hiddenFullWidth':global.checkWideChannelOrUserThreadBox,
+            <app-start-screen   [ngStyle]="{'width': startScreenWidth}"(enterChat)="handleEnterChat($event)"
+                [ngClass]="{
              'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
              'start-screen-reduced': reduceStartScreen,
     'start-screen-full': !reduceStartScreen,
-              'hidden':global.openChannelOrUserThread}"
+              'hidden': !global.openChannelorUserBox}"
                 (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
                 (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
                 (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel"
                 [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser"
                 [selectedChannel]="selectedChannel" (threadOpened)="onThreadOpened()"
-                (channelSelected)="onChannelSelected($event)">
+                (channelSelected)="onChannelSelected($event)" (threadOpenedToHome)="onThreadOpened()">
             </app-start-screen>
 
-            <app-thread *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
+            <app-thread
+                [ngClass]="{'full-thread-width': ((!global.openChannelorUserBox && !isWorkspaceOpen) || specialSpaceOption)}"
+                *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
                 [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
                 [selectedChannel]="selectedChannel" (userSelectedFromThread)="handleUserSelectionFromThread($event)"
-                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)"
-                (threadClosedToHome)="onThreadClosed()">
+                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
             </app-thread>
         </div>
     </div>

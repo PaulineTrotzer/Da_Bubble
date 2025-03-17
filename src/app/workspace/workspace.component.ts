@@ -167,15 +167,9 @@ export class WorkspaceComponent implements OnInit {
       this.channelService.setSelectedUser(user);
       this.handleUIChanges();
     });
-    if (window.innerWidth <= 600) {
- 
-      // TODO: Hier deine Logik bei schmalen Screens
-      // z.B. den Workspace schließen, ein anderes Panel öffnen, etc.
-      console.log('Channel selected on a screen <= 600px!');
-      
-      // Beispiel: Du möchtest den Workspace schließen:
-      this.global.openChannelorUserBox = true;
-      // Oder den Startscreen öffnen usw. – ganz nach deinem Bedarf.
+    this.global.openChannelorUserBox = true;
+    if (window.innerWidth < 900) {
+      this.mobileChannelSelected.emit();
     }
   }
 
@@ -353,6 +347,8 @@ export class WorkspaceComponent implements OnInit {
     return !!(user.name && user.picture && user.status);
   }
 
+  @Output() mobileChannelSelected = new EventEmitter<void>();
+
   selectChannel(channel: any) {
     this.resetUserAndChannel();
     this.global.setCurrentChannel(channel);
@@ -362,17 +358,9 @@ export class WorkspaceComponent implements OnInit {
       this.resetGlobalStates();
       this.global.channelSelected = true;
     });
-  
-    // Zusätzliche Logik für sehr kleine Bildschirme:
-    if (window.innerWidth <= 600) {
- 
-      // TODO: Hier deine Logik bei schmalen Screens
-      // z.B. den Workspace schließen, ein anderes Panel öffnen, etc.
-      console.log('Channel selected on a screen <= 600px!');
-      
-      // Beispiel: Du möchtest den Workspace schließen:
-      this.global.openChannelorUserBox = true;
-      // Oder den Startscreen öffnen usw. – ganz nach deinem Bedarf.
+    this.global.openChannelorUserBox = true;
+    if (window.innerWidth < 900) {
+      this.mobileChannelSelected.emit();
     }
   }
   

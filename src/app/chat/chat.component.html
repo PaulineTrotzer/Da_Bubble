@@ -169,24 +169,27 @@
                                         </div>
                                         <div class="button-box">
                                             <div class="edit-button">
-                                              <button class="btn-secondary chat" (click)="cancelEdit()">
-                                                <ng-container *ngIf="isNarrowScreen; else cancelText">
-                                                  <img class="edit-icon-textarea" src="assets/img/cross.svg" alt="Abbrechen" />
-                                                </ng-container>
-                                                <ng-template #cancelText>
-                                                  Abbrechen
-                                                </ng-template>
-                                              </button>
-                                              <button class="btn-primary chat" (click)="saveOrDeleteMessage(message)">
-                                                <ng-container *ngIf="isNarrowScreen; else saveText">
-                                                  <img class="edit-icon-textarea" src="assets/img/check-mark.svg" alt="Speichern" />
-                                                </ng-container>
-                                                <ng-template #saveText>
-                                                  {{ editableMessageText.trim() === '' ? 'Löschen' : 'Speichern' }}
-                                                </ng-template>
-                                              </button>
+                                                <button class="btn-secondary chat" (click)="cancelEdit()">
+                                                    <ng-container *ngIf="isNarrowScreen; else cancelText">
+                                                        <img class="edit-icon-textarea" src="assets/img/cross.svg"
+                                                            alt="Abbrechen" />
+                                                    </ng-container>
+                                                    <ng-template #cancelText>
+                                                        Abbrechen
+                                                    </ng-template>
+                                                </button>
+                                                <button class="btn-primary chat" (click)="saveOrDeleteMessage(message)">
+                                                    <ng-container *ngIf="isNarrowScreen; else saveText">
+                                                        <img class="edit-icon-textarea" src="assets/img/check-mark.svg"
+                                                            alt="Speichern" />
+                                                    </ng-container>
+                                                    <ng-template #saveText>
+                                                        {{ editableMessageText.trim() === '' ? 'Löschen' : 'Speichern'
+                                                        }}
+                                                    </ng-template>
+                                                </button>
                                             </div>
-                                          </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <ng-template #normalMode>

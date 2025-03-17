@@ -827,10 +827,14 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   onClose() {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
+    this.global.openChannelorUserBox = true;
     this.global.currentThreadMessageSubject.next(null);
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.unsubscribe$ = new Subject<void>();
+    if(window.innerWidth < 900 ){
+      this.global.openChannelorUserBox = false;
+    }
   }
 
   onMessageSent(): void {

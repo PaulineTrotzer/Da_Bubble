@@ -173,7 +173,6 @@ export class ChannelThreadComponent implements OnInit {
     return `${day}.${month}.${year}`;
   }
 
-
   scrollToBottom(): void {
     if (this.messageContainer) {
       this.messageContainer.nativeElement.scrollTop =
@@ -402,9 +401,8 @@ export class ChannelThreadComponent implements OnInit {
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
-    this.hiddenThreadFullBox();
+    this.global.openChannelorUserBox = true;
     this.closeThreadChannel.emit();
-/*     this.checkResponsiveWidtSize(); */
   }
 
   hiddenThreadFullBox() {
@@ -417,21 +415,6 @@ export class ChannelThreadComponent implements OnInit {
       this.global.checkWideChannelorUserBox = true;
     }
   }
-  checkResponsiveWidtSize() {
-    if (window.innerWidth <= 950) {
-      // Prüfe, ob sowohl der Channel als auch der Thread geöffnet sind
-      if (this.global.openChannelOrUserThread && this.global.checkWideChannelOrUserThreadBox) {
-        this.global.openChannelOrUserThread = false; // Channel schließen
-      }
-    }
-  }
-
-  /*   async addEmoji(event: any, messageId: string) {
-    const emoji = event.emoji;
-    this.isPickerVisible = null;
-    await this.addLastUsedEmoji(emoji);
-    await this.addToReactionInfo(emoji, messageId);
-  } */
 
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();
