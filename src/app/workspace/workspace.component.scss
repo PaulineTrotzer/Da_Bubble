@@ -422,11 +422,8 @@
   }
 }
 
-/* 
-  @media(max-width:720px){
-    .card{
-      max-width: unset;
-    } 
+@media (max-width: 950px) {
+  .workspace-header {
+    margin-bottom: 50px;
   }
-
- */
+}

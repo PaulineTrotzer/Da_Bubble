@@ -376,6 +376,8 @@ header {
   border-radius: 100%;
   line-height: 1;
   text-align: center;
+  font-size: 20px;
+    margin-top: 3px;
   &:hover {
     background-color: #eceefe;
   }
@@ -708,9 +710,15 @@ form {
     justify-content: end;
   }
   .message-edit-dialog {
-    /*     display: block;
-    font-size: 11px;
-    white-space: pre-wrap; */
+    padding: 0px;
+    span{
+     padding: 5px;
+     border-radius: 20px;
+     &:hover{
+      padding: 5px;
+      border-radius: 20px;
+     }
+    }
   }
   textarea {
     min-width: auto;
@@ -728,7 +736,6 @@ form {
     top: -2px;
   }
   .emoji {
-    font-size: 13px;
     width: 26px;
     height: 26px;
   }
@@ -736,7 +743,7 @@ form {
     width: 24px;
     height: 20px;
     padding: 2px;
-    margin-bottom: 1px;
+    margin-bottom: 3px;
     svg {
       height: 26px;
       width: 26px;

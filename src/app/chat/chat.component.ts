@@ -162,7 +162,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData.forEach((msg) => {
       this.showReactionPopUpSenderAtCu[msg.id] = false;
     });
-/*     this.checkEditScreenSize(); */
+    this.checkEditScreenSize();
   }
 
   checkEditScreenSize() {
@@ -291,7 +291,6 @@ export class ChatComponent implements OnInit, OnChanges {
   closePicker() {
     this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
-    // Optional: currentMessage zurücksetzen, falls gewünscht:
     this.currentMessage = null;
   }
   
@@ -844,7 +843,6 @@ export class ChatComponent implements OnInit, OnChanges {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    // Suche beide Container
     const reactPicker =
       this.elementRef.nativeElement.querySelector('.react-picker');
     const editPicker =
@@ -852,8 +850,6 @@ export class ChatComponent implements OnInit, OnChanges {
 
     const isReactPickerClicked = reactPicker && reactPicker.contains(target);
     const isEditPickerClicked = editPicker && editPicker.contains(target);
-
-    // Schließe beide Picker, wenn außerhalb von beiden geklickt wird
     if (!isReactPickerClicked && !isEditPickerClicked) {
       this.isEmojiPickerVisible = false;
       this.isEmojiPickerVisibleEdit = false;
@@ -899,10 +895,8 @@ export class ChatComponent implements OnInit, OnChanges {
         recipientStickerCount: this.currentMessage.recipientSticker === emoji ? 0 : 1
       };
     }
-  
     this.isEmojiPickerVisible = false;
     this.messageIdHovered = null;
-  
     const docRef = doc(this.firestore, 'messages', updatedMessage.id);
     try {
       await updateDoc(docRef, {
@@ -950,7 +944,6 @@ export class ChatComponent implements OnInit, OnChanges {
     message.stickerBoxCurrentStyle = true;
   }
   
-
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;
     this.editableMessageText += emoji;
@@ -964,11 +957,9 @@ export class ChatComponent implements OnInit, OnChanges {
     const emojiPicker = targetElement.querySelector(
       '.edit-emoji-main .emoji-picker-edit'
     );
-
     const isEmojiButtonClicked =
       emojiButton && emojiButton.contains(event.target);
     const isPickerClicked = emojiPicker && emojiPicker.contains(event.target);
-
     if (!isEmojiButtonClicked && !isPickerClicked) {
       this.isEmojiPickerVisibleEdit = false;
     }

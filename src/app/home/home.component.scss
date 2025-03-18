@@ -74,17 +74,8 @@ app-workspace {
   border-bottom-right-radius: unset;
 }
 
-.fade-out {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 175ms ease-in-out;
-
-  /* Wichtig: Aus dem Dokumentenfluss nehmen */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.hidden {
+  display: none;
 }
 
 .login-sended-info.visible {
@@ -115,9 +106,7 @@ app-workspace {
 
 .startScreen-reduced {
   width: 60% !important;
-  transition: width 175ms ease-in-out;
 }
-
 
 app-thread {
   height: 97vh;
@@ -171,7 +160,6 @@ app-thread {
 
 .startScreen-open {
   width: 100%;
-  transition: width 175ms ease-in-out;
 }
 
 app-start-screen {
@@ -243,27 +231,21 @@ app-start-screen {
 }
 
 .start-screen-full {
-  width: 100%;
+  width: 100% !important;
 }
 
 .start-screen-reduced {
   width: 60%;
 }
 
-
-
-/* Thread anfangs schmal/geschlossen */
-::ng-deep app-thread.thread-closed {
-  width: 0;
-  overflow-x: hidden;
-  transition: width 175ms ease-in-out;
+app-thread.display-hidden {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
 }
 
-/* Thread erweitert sich auf 100vw */
 ::ng-deep app-thread.full-thread-width {
   width: 100vw !important;
-  overflow-x: hidden;
-  transition: width 175ms ease-in-out;
 }
 
 
@@ -296,16 +278,12 @@ app-start-screen {
     pointer-events: auto;
   }
 
-/*   .startScreen-open.hidden {
+  .startScreen-open.hidden {
     display: none;
-  } */
+  }
 }
 
-/* @media(min-width: 951px){
-.hidden{
-  display: block;
-}
-} */
+
 @media (min-width: 320px) and (max-width: 770px) {
   .main-content {
     max-height: calc(100vh - 165px);
@@ -350,6 +328,13 @@ app-start-screen {
     max-width: unset;
   }
 
+  .startScreen-open.hidden {
+    display: none;
+  }
+
+  .thread-hidden {
+    display: none;
+  }
 }
 
 @media (min-width: 320px) and (max-width: 450px) {

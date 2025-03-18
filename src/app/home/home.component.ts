@@ -105,11 +105,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
     this.onResize({ target: window } as any);
   }
-
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     const width = window.innerWidth;
     console.log('onResize: width =', width);
+
+    // --- Basislogik für isWorkspaceOpen und openChannelorUserBox ---
+    // Fall A: Kleine Screens (<900px) – wenn openChannelorUserBox aktiv ist und kein Thread offen ist,
+    // soll der Workspace geschlossen werden.
     if (width < 900) {
       if (
         this.global.openChannelorUserBox &&
@@ -117,16 +120,27 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.isWorkspaceOpen
       ) {
         this.isWorkspaceOpen = false;
+        console.log(
+          'Bedingung A: width < 900, openChannelorUserBox=true, threadOpened=false, isWorkspaceOpen=true → isWorkspaceOpen = false'
+        );
       }
     } else {
+      // Fall B: Größere Screens (>=900px)
+      // Wenn sowohl openChannelorUserBox als auch threadOpened aktiv sind und der Workspace offen ist, schließen wir den Workspace.
       if (
         this.global.openChannelorUserBox &&
         this.global.threadOpened &&
         this.isWorkspaceOpen
       ) {
         this.isWorkspaceOpen = false;
+        console.log(
+          'Bedingung B: width >= 900, openChannelorUserBox & threadOpened true, isWorkspaceOpen=true → isWorkspaceOpen = false'
+        );
       }
     }
+
+    // Zusätzliche Regel: Wenn die Breite unter 950px liegt, kein openChannelorUserBox, aber ein Thread offen ist und der Workspace noch offen,
+    // soll der Workspace geschlossen werden.
     if (
       width < 950 &&
       !this.global.openChannelorUserBox &&
@@ -134,14 +148,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.isWorkspaceOpen
     ) {
       this.isWorkspaceOpen = false;
+      console.log(
+        'Bedingung C: width < 950, openChannelorUserBox=false, threadOpened=true, isWorkspaceOpen=true → isWorkspaceOpen = false'
+      );
     }
+
+    // Weitere Regel: Wenn die Breite unter 1100px liegt und sowohl openChannelorUserBox als auch threadOpened aktiv sind,
+    // dann schalten wir openChannelorUserBox aus und markieren, dass der Channel-Bereich geschlossen wurde.
     if (
       width < 1100 &&
       this.global.openChannelorUserBox &&
       this.global.threadOpened
     ) {
       this.global.openChannelorUserBox = false;
+      this.channelChatWasClosed = true;
+      console.log(
+        'Bedingung D: width < 1100, openChannelorUserBox & threadOpened true → openChannelorUserBox = false, channelChatWasClosed = true'
+      );
     }
+
+    // --- Ableiten von specialSpaceOption ---
+    // Wir setzen specialSpaceOption auf true, wenn:
+    // - Die Breite größer als 1020px ist,
+    // - der Workspace offen ist,
+    // - kein Channel/Chat sichtbar ist (openChannelorUserBox false),
+    // - und ein Thread offen ist.
     if (
       width > 1020 &&
       this.isWorkspaceOpen &&
@@ -149,9 +180,27 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.global.threadOpened
     ) {
       this.specialSpaceOption = true;
+      console.log(
+        'Bedingung specialSpaceOption: width > 1020, isWorkspaceOpen true, openChannelorUserBox false, threadOpened true → specialSpaceOption = true'
+      );
     } else {
       this.specialSpaceOption = false;
+      console.log(
+        'Bedingung specialSpaceOption: nicht erfüllt → specialSpaceOption = false'
+      );
     }
+
+    // Startscreen-Breite aktualisieren
+    this.updateStartScreenWidth();
+
+    // Erzwinge eine Change Detection
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
+  }
+
+  updateStartScreenWidth(): void {
+    this.startScreenWidth = this.calculateStartScreenWidth();
     setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);
@@ -330,6 +379,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.updateLayout();
     }, 0);
   }
+
+  channelChatWasClosed = false;
 
   updateLayout(): void {
     const width = window.innerWidth;

@@ -15,8 +15,8 @@
             <app-start-screen [ngStyle]="{'width': startScreenWidth}" (enterChat)="handleEnterChat($event)" [ngClass]="{
              'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
              'start-screen-reduced': reduceStartScreen,
-    'start-screen-full': !reduceStartScreen,
-    'fade-out': !global.openChannelorUserBox}"
+    'start-screen-full': !reduceStartScreen || !this.global.threadOpened,
+    'hidden': !global.openChannelorUserBox}"
                 (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
                 (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
                 (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel"

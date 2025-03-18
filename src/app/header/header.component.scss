@@ -428,11 +428,17 @@ input.radius {
   }
 }
 
+@media (max-width: 900px) {
+  .bubble-img {
+    width: 140px;
+  }
+}
+
 @media (min-width: 320px) and (max-width: 450px) {
   .user-info {
     position: absolute;
     right: 0;
-    top: 30px;
+    top: 55px;
     svg {
       width: 9px;
       height: 5px;
@@ -457,9 +463,13 @@ input.radius {
 
 @media (min-width: 450px) and (max-width: 770px) {
   .user-info {
+    top: 4px;
     .user-img {
       width: 60px;
       height: 60px;
+    }
+    h2 {
+      font-size: 20px;
     }
   }
   .bubble-img {
@@ -472,6 +482,15 @@ input.radius {
     padding-left: 28px;
     &:focus {
       padding-left: 28px;
+    }
+  }
+}
+
+@media (min-width: 770px) and (max-width: 1510px) {
+  .user-info {
+    left: 12px;
+    h2 {
+      font-size: 27px;
     }
   }
 }

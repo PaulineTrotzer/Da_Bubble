@@ -869,10 +869,6 @@ app-input-field {
   right: 100px;
 }
 
-.edited-sender-view {
-  left: -45px;
-}
-
 .mention-message {
   color: blue;
   cursor: pointer;
@@ -1158,6 +1154,7 @@ app-mention-message-box {
     white-space: pre-wrap;
   }
   .edit-message-content:hover {
+    padding: 6px !important;
     span {
       font-size: 11px;
       padding: 0px;
@@ -1165,6 +1162,7 @@ app-mention-message-box {
     }
   }
   .edit-message-content {
+    padding: 6px !important;
     span {
       font-size: 11px;
       padding: 0px;
@@ -1220,9 +1218,6 @@ app-mention-message-box {
 
 @media (min-width: 450px) and (max-width: 770px) {
   app-input-field {
-    width: 95vw;
-  }
-  .full-app-content{
     width: 95vw;
   }
 }
