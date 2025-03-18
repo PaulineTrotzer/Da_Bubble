@@ -137,6 +137,7 @@ export class ChatComponent implements OnInit, OnChanges {
   currentThreadMessage: any;
   currentComponentId = 'chat';
   isNarrowScreen = false;
+  currentMessage: any = null;
 
   constructor() {}
 
@@ -161,7 +162,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData.forEach((msg) => {
       this.showReactionPopUpSenderAtCu[msg.id] = false;
     });
-    this.checkEditScreenSize();
+/*     this.checkEditScreenSize(); */
   }
 
   checkEditScreenSize() {
@@ -290,14 +291,18 @@ export class ChatComponent implements OnInit, OnChanges {
   closePicker() {
     this.isOverlayOpen = false;
     this.isEmojiPickerVisible = false;
+    // Optional: currentMessage zurücksetzen, falls gewünscht:
+    this.currentMessage = null;
   }
+  
 
   trackByMessageId(index: number, message: any): string {
     return message.id;
   }
-  
-  openEmojiPicker(event: MouseEvent) {
+
+  openEmojiPicker(event: MouseEvent, message: any) {
     event.stopPropagation();
+    this.currentMessage = message;
     this.isEmojiPickerVisibleEdit = false;
     this.isEmojiPickerVisible = true;
     this.isOverlayOpen = true;
@@ -746,8 +751,6 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
-
-
   splitMessage(text: string): string[] {
     const mentionRegex = /(@[\w\-\*_!$]+)/g;
     const parts = text.split(mentionRegex);
@@ -867,91 +870,72 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisibleEdit = true;
   }
 
-  hoveredMessageId: string | null = null;
-
-onMessageMouseEnter(id: string) {
-  console.log('Mouseenter auf Nachricht mit ID:', id);
-  this.hoveredMessageId = id;
-}
-
-onMessageMouseLeave() {
-  console.log('Mouseleave');
-  this.hoveredMessageId = null;
-}
-
-  async addEmoji(event: any, message: any) {
-    console.log('addEmoji() aufgerufen');
-    console.log('Event:', event);
-    console.log('Message vor Änderung:', message);
-  
-    // Überprüfe, ob event.emoji und event.emoji.native vorhanden sind:
+  async addEmoji(event: any) {
+    if (!this.currentMessage) {
+      console.error('Kein currentMessage gesetzt!');
+      return;
+    }
     if (!event.emoji || !event.emoji.native) {
-      console.error('Kein Emoji in event gefunden!');
       return;
     }
     const emoji = event.emoji.native;
-    console.log('Extrahiertes Emoji:', emoji);
-  
     this.shouldScroll = false;
-    const currentUserIsSender = this.global.currentUserData?.id === message.senderId;
-    console.log('Ist aktueller User Sender?', currentUserIsSender);
-  
+    const currentUserIsSender = this.global.currentUserData?.id === this.currentMessage.senderId;
+    let updatedMessage: any;
     if (currentUserIsSender) {
-      message.senderchoosedStickereBackColor = emoji;
-      message.stickerBoxCurrentStyle = true;
-      if (message.senderSticker === emoji) {
-        console.log('Gleiches Emoji – SenderSticker wird geleert');
-        message.senderSticker = '';
-        message.senderStickerCount = 0;
-      } else {
-        console.log('Neues Emoji – SenderSticker wird gesetzt');
-        message.senderSticker = emoji;
-        message.senderStickerCount = 1;
-      }
+      updatedMessage = {
+        ...this.currentMessage,
+        senderchoosedStickereBackColor: emoji,
+        stickerBoxCurrentStyle: true,
+        senderSticker: this.currentMessage.senderSticker === emoji ? '' : emoji,
+        senderStickerCount: this.currentMessage.senderSticker === emoji ? 0 : 1
+      };
     } else {
-      message.recipientChoosedStickerBackColor = emoji;
-      message.stickerBoxCurrentStyle = true;
-      if (message.recipientSticker === emoji) {
-        console.log('Gleiches Emoji – RecipientSticker wird geleert');
-        message.recipientSticker = '';
-        message.recipientStickerCount = 0;
-      } else {
-        console.log('Neues Emoji – RecipientSticker wird gesetzt');
-        message.recipientSticker = emoji;
-        message.recipientStickerCount = 1;
-      }
+      updatedMessage = {
+        ...this.currentMessage,
+        recipientChoosedStickerBackColor: emoji,
+        stickerBoxCurrentStyle: true,
+        recipientSticker: this.currentMessage.recipientSticker === emoji ? '' : emoji,
+        recipientStickerCount: this.currentMessage.recipientSticker === emoji ? 0 : 1
+      };
     }
   
-    console.log('Message nach Änderung:', message);
     this.isEmojiPickerVisible = false;
     this.messageIdHovered = null;
   
-    const docRef = doc(this.firestore, 'messages', message.id);
+    const docRef = doc(this.firestore, 'messages', updatedMessage.id);
     try {
       await updateDoc(docRef, {
-        senderSticker: message.senderSticker,
-        senderStickerCount: message.senderStickerCount,
-        recipientSticker: message.recipientSticker,
-        recipientStickerCount: message.recipientStickerCount,
-        senderchoosedStickereBackColor: message.senderchoosedStickereBackColor,
-        recipientChoosedStickerBackColor: message.recipientChoosedStickerBackColor,
-        stickerBoxCurrentStyle: message.stickerBoxCurrentStyle,
-        stickerBoxOpacity: message.stickerBoxOpacity,
+        senderSticker: updatedMessage.senderSticker,
+        senderStickerCount: updatedMessage.senderStickerCount,
+        recipientSticker: updatedMessage.recipientSticker,
+        recipientStickerCount: updatedMessage.recipientStickerCount,
+        senderchoosedStickereBackColor: updatedMessage.senderchoosedStickereBackColor,
+        recipientChoosedStickerBackColor: updatedMessage.recipientChoosedStickerBackColor,
+        stickerBoxCurrentStyle: updatedMessage.stickerBoxCurrentStyle,
+        stickerBoxOpacity: updatedMessage.stickerBoxOpacity,
       });
-      console.log('updateDoc erfolgreich ausgeführt');
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Dokuments:', error);
     }
-    
+    const index = this.messagesData.findIndex((m: any) => m.id === updatedMessage.id);
+    if (index !== -1) {
+      this.messagesData = [
+        ...this.messagesData.slice(0, index),
+        updatedMessage,
+        ...this.messagesData.slice(index + 1)
+      ];
+    }
+    this.currentMessage = null;
     this.closePicker();
   }
-  
 
   async emojiSender(message: any) {
     this.wasRemoved = false;
     if (message.senderSticker) {
+      this.currentMessage = message;
       const event = { emoji: { native: message.senderSticker } };
-      await this.addEmoji(event, message);
+      await this.addEmoji(event); 
     }
     message.stickerBoxCurrentStyle = true;
   }
@@ -959,11 +943,13 @@ onMessageMouseLeave() {
   async emojirecipient(message: any) {
     this.wasRemoved = false;
     if (message.recipientSticker) {
+      this.currentMessage = message;
       const event = { emoji: { native: message.recipientSticker } };
-      await this.addEmoji(event, message);
+      await this.addEmoji(event);
     }
     message.stickerBoxCurrentStyle = true;
   }
+  
 
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;

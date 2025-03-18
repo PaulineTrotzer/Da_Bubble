@@ -109,60 +109,49 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     const width = window.innerWidth;
-    console.log("onResize: width =", width);
-  
-    if (width < 900 && this.global.openChannelorUserBox) {
-      this.isWorkspaceOpen = false;
-      console.log("Bedingung 1: width < 900 && openChannelorUserBox → isWorkspaceOpen = false");
-    } else if (width > 900 && !this.global.threadOpened) {
-      this.isWorkspaceOpen = true;
-      console.log("Bedingung 2: width > 900 && !threadOpened → isWorkspaceOpen = true");
-    } else if (width > 900 && this.global.openChannelorUserBox && this.global.threadOpened) {
-      this.isWorkspaceOpen = false;
-      console.log("Bedingung 3: width > 900 && openChannelorUserBox && threadOpened → isWorkspaceOpen = false");
-    } else if (width < 1080 && this.global.openChannelorUserBox && this.global.threadOpened && !this.isWorkspaceOpen) {
-      this.global.openChannelorUserBox = false;
-      console.log("Bedingung 4: width < 1080 && openChannelorUserBox && threadOpened && !isWorkspaceOpen → openChannelorUserBox = false");
-    } else if (width < 950 && !this.global.openChannelorUserBox && this.global.threadOpened && this.isWorkspaceOpen) {
-      this.isWorkspaceOpen = false;
-      console.log("Bedingung 5: width < 950 && !openChannelorUserBox && threadOpened && isWorkspaceOpen → isWorkspaceOpen = false");
-    } else if (width > 950 && this.isWorkspaceOpen && (!this.global.threadOpened || this.global.openChannelorUserBox)) {
-      this.global.openChannelorUserBox = true;
-      console.log("Bedingung 6: width > 950 && isWorkspaceOpen && (!threadOpened || openChannelorUserBox) → openChannelorUserBox = true");
-    } else if (
-      width < 1020 &&
-      this.global.openChannelorUserBox &&
-      this.global.threadOpened &&
-      !this.isWorkspaceOpen
-    ) {
-      console.log("Bedingung 7: width < 1020 && openChannelorUserBox && threadOpened && !isWorkspaceOpen");
-      // Hier kannst du weitere Logik einfügen, falls nötig.
+    console.log('onResize: width =', width);
+    if (width < 900) {
+      if (
+        this.global.openChannelorUserBox &&
+        !this.global.threadOpened &&
+        this.isWorkspaceOpen
+      ) {
+        this.isWorkspaceOpen = false;
+      }
+    } else {
+      if (
+        this.global.openChannelorUserBox &&
+        this.global.threadOpened &&
+        this.isWorkspaceOpen
+      ) {
+        this.isWorkspaceOpen = false;
+      }
     }
-    
-    // Setze specialSpaceOption
+    if (
+      width < 950 &&
+      !this.global.openChannelorUserBox &&
+      this.global.threadOpened &&
+      this.isWorkspaceOpen
+    ) {
+      this.isWorkspaceOpen = false;
+    }
+    if (
+      width < 1100 &&
+      this.global.openChannelorUserBox &&
+      this.global.threadOpened
+    ) {
+      this.global.openChannelorUserBox = false;
+    }
     if (
       width > 1020 &&
       this.isWorkspaceOpen &&
       !this.global.openChannelorUserBox &&
       this.global.threadOpened
     ) {
-      console.log("Bedingung specialSpaceOption: width > 1020 && isWorkspaceOpen && !openChannelorUserBox && threadOpened → specialSpaceOption = true");
       this.specialSpaceOption = true;
     } else {
       this.specialSpaceOption = false;
     }
-    
-    // Aktualisiere eventuell andere Werte, z. B. den Startscreen
-    this.updateStartScreenWidth();
-  
-    setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 0);
-  }
-  
-
-  updateStartScreenWidth(): void {
-    this.startScreenWidth = this.calculateStartScreenWidth();
     setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);
@@ -335,13 +324,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onThreadOpened() {
+  onThreadOpened(): void {
     this.isThreadOpen = true;
+    setTimeout(() => {
+      this.updateLayout();
+    }, 0);
+  }
+
+  updateLayout(): void {
+    const width = window.innerWidth;
+    if (
+      width < 1500 &&
+      this.isWorkspaceOpen &&
+      this.global.openChannelorUserBox
+    ) {
+      this.global.openChannelorUserBox = false;
+    }
+    this.cdr.detectChanges();
   }
 
   onThreadClosed() {
     this.isThreadOpen = false;
     this.isWorkspaceOpen = true;
+    if (window.innerWidth < 1350) {
+      this.global.openChannelorUserBox = true;
+    }
   }
 
   calculateStartScreenWidth(): string {
@@ -362,17 +369,55 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   toggleWorkspace() {
     const width = window.innerWidth;
+
+    // Fall 1: Kleine Screens (<951px) und bereits: kein Channel offen (false) aber ein Thread offen (true)
     if (
-      width < 950 &&
-      (this.global.openChannelorUserBox || this.global.threadOpened)
+      width < 951 &&
+      !this.global.openChannelorUserBox &&
+      this.global.threadOpened
     ) {
-      this.global.openChannelorUserBox = false;
+      // Wir schließen den Thread und aktivieren den Channel-Bereich:
       this.global.setThreadOpened(false);
       this.directThreadId = null;
       this.channelThreadId = null;
-      this.isWorkspaceOpen = true;
-    } else {
+      // Workspace soll in diesem Fall geschlossen werden,
+      // sodass der Channelbereich (openChannelorUserBox) aktiv bleibt.
+      this.isWorkspaceOpen = false;
+      this.global.openChannelorUserBox = true;
+      console.log(
+        'Kleiner Screen, Thread offen, Channel nicht aktiv: Workspace geschlossen, Channel aktiviert'
+      );
+    }
+    // Fall 2: Kleine Screens (<951px) und andere Fälle (z.B. wenn entweder channel oder thread nicht aktiv sind)
+    else if (width < 951) {
+      // Toggle-Logik für kleine Screens:
+      if (this.isWorkspaceOpen) {
+        // Wenn der Workspace offen ist, schließen wir ihn und aktivieren den Channel-/Userbereich.
+        this.isWorkspaceOpen = false;
+        this.global.openChannelorUserBox = true;
+        // Schließe auch den Thread, falls offen.
+        this.global.setThreadOpened(false);
+        this.directThreadId = null;
+        this.channelThreadId = null;
+        console.log(
+          'Kleiner Screen: Workspace war offen → jetzt geschlossen, Channel aktiviert'
+        );
+      } else {
+        // Wenn der Workspace geschlossen ist, öffnen wir ihn und deaktivieren den Channel-/Userbereich.
+        this.isWorkspaceOpen = true;
+        this.global.openChannelorUserBox = false;
+        // Falls erforderlich: Thread-Status hier ebenfalls auf false setzen.
+        this.global.setThreadOpened(false);
+        console.log(
+          'Kleiner Screen: Workspace war geschlossen → jetzt geöffnet, Channel deaktiviert'
+        );
+      }
+    }
+    // Fall 3: Große Screens (>=951px)
+    else {
+      // Normale Toggle-Logik für große Bildschirme:
       this.isWorkspaceOpen = !this.isWorkspaceOpen;
+      console.log('Große Screen: Workspace getoggelt →', this.isWorkspaceOpen);
     }
   }
 

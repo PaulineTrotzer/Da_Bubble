@@ -675,6 +675,11 @@ form {
   transform: scale(1.2);
 }
 
+.edit-icon {
+  width: 15px !important;
+  height: 17px !important;
+}
+
 .channel-welcome {
   display: flex;
   flex-direction: column;
@@ -822,10 +827,7 @@ form {
     align-items: center;
   }
 
-  .edit-icon {
-    width: 15px !important;
-    height: 17px !important;
-  }
+
   textarea {
     font-size: 15px;
   }
@@ -833,7 +835,8 @@ form {
     max-width: 280px;
   }
   .edit-message-button-row {
-    left: 1px;
+    left: 5px;
+    width: 97%;
   }
   .edit-mode-active {
     justify-content: center;
@@ -847,14 +850,14 @@ form {
   .img-container-textarea {
     height: 32px;
   }
-  .reaction-from-container{
+  .reaction-from-container {
     font-size: 11px;
     padding: 3px 4px !important;
     max-width: 125px;
     max-height: 50px;
     white-space: nowrap;
   }
-  .emoji{
+  .emoji {
     width: 26px;
     height: 26px;
   }
@@ -862,12 +865,11 @@ form {
     width: 26px;
     height: 26px;
   }
-  .message-edit{
-    span{
+  .message-edit {
+    span {
       padding: 2px;
       font-size: 11px;
     }
-
   }
 }
 
@@ -917,6 +919,7 @@ form {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0;
     width: 95vw;
+    height: 94vh;
   }
   app-input-field {
     width: 95vw;

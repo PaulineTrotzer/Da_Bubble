@@ -6,7 +6,7 @@
 
     <div class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
-            <div *ngFor="let message of messagesData; let i=index">
+            <div *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
                 <div *ngIf="!message.deleted">
                     <div *ngIf="displayDayInfo(i)" class="new-day-info"
                         [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
@@ -19,7 +19,7 @@
                     <div (click)="closePicker()" *ngIf="isEmojiPickerVisible"
                         class="emoji-picker-container react-picker">
                         <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
-                            (emojiClick)="addEmoji($event,message)" size="18"></emoji-mart>
+                            (emojiClick)="addEmoji($event)" size="18"></emoji-mart>
                     </div>
 
 
@@ -51,7 +51,7 @@
                                 </div>
 
 
-                                <div class="add-reaction" (click)="openEmojiPicker($event)">
+                                <div class="add-reaction" (click)="openEmojiPicker($event, message)">
                                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <mask id="mask0_489_4318" style="mask-type:alpha" maskUnits="userSpaceOnUse"
@@ -273,7 +273,7 @@
   message.senderSticker === message.recipientSticker;
   else differentStickers
 ">
-                                <div class="comment-sticker-holder" *ngIf="message.text?.trim() !== ''" [ngClass]="{
+                                <div class="comment-sticker-holder" *ngIf="message.senderSticker" [ngClass]="{
     'comment-sticker-holder-partner': message.senderName === selectedUser?.name
   }">
                                     <div class="sticker-item" (mouseenter)="toggleReactionInfoSender(message.id, true)"

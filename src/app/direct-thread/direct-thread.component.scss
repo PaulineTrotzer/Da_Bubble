@@ -786,7 +786,6 @@ h3 {
   text-align: center;
 }
 
-
 .static-bubble {
   position: relative;
   background-color: #eceefe;
@@ -948,25 +947,25 @@ svg {
   max-width: 230px;
 }
 
-@media (max-width: 1349px) {
-  .full-page-content.hidden-width {
-    width: unset;
-  }
-}
-
-@media (max-width: 720px) {
-  .full-page-content.reset-width {
-    width: unset;
-  }
-}
-
-@media (min-width: 320px) and (max-width: 770px) {
-
+@media (min-width: 320px) and (max-width: 450px) {
   .full-page-content {
-    width: 100vw;
     border-radius: 0;
+  }
+}
+
+@media (max-width: 450px) {
+  .full-page-content {
+    min-width: 100vw;
+  }
+}
+
+@media (min-width: 450px) and (max-width: 530px) {
+  .full-page-content {
     min-width: auto;
   }
+}
+
+@media (min-width: 320px) and (max-width: 1024px) {
   .text-info-edit {
     font-size: 10px;
   }
@@ -1014,7 +1013,7 @@ svg {
   .last-emoji-holder {
     height: 25px;
     width: 25px;
-    span{
+    span {
       font-size: 14px;
     }
   }
@@ -1068,7 +1067,7 @@ svg {
     overflow-x: hidden;
   }
   .cu-message-column {
-    right: 73px;
+    right: 89px;
   }
   .message-holder {
     max-width: 70%;
@@ -1084,7 +1083,7 @@ svg {
     left: 80px;
   }
   .avatar-container {
-    right: 15px;
+    right: 30px;
   }
   .avatar-container-partner {
     left: 15px;
@@ -1096,5 +1095,11 @@ svg {
   .edit-input {
     min-width: 225px;
     font-size: 13px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .full-bottom-flex {
+    bottom: 17px;
   }
 }
