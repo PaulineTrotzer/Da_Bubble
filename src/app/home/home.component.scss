@@ -10,18 +10,12 @@ app-workspace {
     transform: translateX(0);
     transition: transform 0.3s ease-in-out;
   }
-
   &.workspace-closed {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
   }
 }
 
-.main-content {
-  /*   display: flex;
-  justify-content: center;
-  overflow-y: auto; */
-}
 
 .full-flex {
   max-width: 2200px;
@@ -177,9 +171,9 @@ app-start-screen {
     0,
     0,
     0.7
-  ); /* Halbtransparentes Schwarz für den Hintergrund */
-  backdrop-filter: blur(8px); /* Hintergrund wird weichgezeichnet */
-  -webkit-backdrop-filter: blur(8px); /* Unterstützung für Safari */
+  ); 
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); 
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -238,7 +232,7 @@ app-start-screen {
   width: 60%;
 }
 
-app-thread.display-hidden {
+/* app-thread.display-hidden {
   opacity: 0;
   transform: translateX(100%);
   pointer-events: none;
@@ -246,9 +240,16 @@ app-thread.display-hidden {
 
 ::ng-deep app-thread.full-thread-width {
   width: 100vw !important;
+} */
+
+.thread-holder {
+  width: 510px;       
+  transition: width 0.3s ease;
 }
 
-
+.thread-holder.full-thread-width {
+  width: 100vw !important;
+}
 
 @media (max-width: 950px) {
   .full-page-content {
@@ -282,7 +283,6 @@ app-thread.display-hidden {
     display: none;
   }
 }
-
 
 @media (min-width: 320px) and (max-width: 770px) {
   .main-content {
@@ -361,7 +361,6 @@ app-thread.display-hidden {
   app-thread {
     width: 100vw;
   }
-
   .full-page-content {
     width: 100% !important;
   }

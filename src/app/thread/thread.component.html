@@ -1,5 +1,7 @@
-<app-direct-thread (userSelectedFromDirectThread)="handleDirectThreadUserSelection($event)"
-    (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser"
-    *ngIf="directThreadId"></app-direct-thread>
-<app-channel-thread *ngIf="channelThreadId" (userSelectedFromChannelThread)="handleChannelThreadSelection($event)"
-    [selectedChannel]="selectedChannel" (closeThreadChannel)="onChannelThreadClosed()"></app-channel-thread>
+<div [class.fade-in]="!isFadingOut" [class.fade-out]="isFadingOut">
+    <app-direct-thread (userSelectedFromDirectThread)="handleDirectThreadUserSelection($event)"
+        (closeDirectThread)="onDirectThreadClosed()" [selectedUser]="selectedUser"
+        *ngIf="directThreadId"></app-direct-thread>
+    <app-channel-thread *ngIf="channelThreadId" (userSelectedFromChannelThread)="handleChannelThreadSelection($event)"
+        [selectedChannel]="selectedChannel" (closeThreadChannel)="onChannelThreadClosed()"></app-channel-thread>
+</div>

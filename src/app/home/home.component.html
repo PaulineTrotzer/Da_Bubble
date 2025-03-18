@@ -16,8 +16,7 @@
              'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
              'start-screen-reduced': reduceStartScreen,
     'start-screen-full': !reduceStartScreen || !this.global.threadOpened,
-    'hidden': !global.openChannelorUserBox}"
-                (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
+    'hidden': !global.openChannelorUserBox}" (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
                 (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
                 (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel"
                 [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser"
@@ -25,12 +24,14 @@
                 (channelSelected)="onChannelSelected($event)" (threadOpenedToHome)="onThreadOpened()">
             </app-start-screen>
 
-            <app-thread [ngClass]="{'full-thread-width': !this.global.openChannelorUserBox}"
-                *ngIf="directThreadId || channelThreadId" [directThreadId]="directThreadId"
-                [channelThreadId]="channelThreadId" (closeThread)="onThreadClosed()" [selectedUser]="selectedUser"
-                [selectedChannel]="selectedChannel" (userSelectedFromThread)="handleUserSelectionFromThread($event)"
-                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
-            </app-thread>
+            <div class="thread-holder" *ngIf="directThreadId || channelThreadId" @fadeOutThread
+                [ngClass]="{'full-thread-width': !this.global.openChannelorUserBox}">
+                <app-thread [directThreadId]="directThreadId" [channelThreadId]="channelThreadId"
+                    (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"
+                    (userSelectedFromThread)="handleUserSelectionFromThread($event)"
+                    (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
+                </app-thread>
+            </div>
         </div>
     </div>
 </div>

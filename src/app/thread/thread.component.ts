@@ -22,7 +22,7 @@ import { GlobalVariableService } from '../services/global-variable.service';
 export class ThreadComponent implements OnDestroy {
   @Output() closeThread = new EventEmitter<void>();
   global = inject(GlobalVariableService);
-
+  isFadingOut = false;
   constructor() {
     this.global.setThreadOpened(true);
   }
@@ -49,10 +49,20 @@ export class ThreadComponent implements OnDestroy {
     this.userSelectedFromChannelThread.emit(channel);
   }
 
+  animationDurationMs = 200;
   onDirectThreadClosed() {
-    this.closeThread.emit();
-    this.global.setThreadOpened(false);
+    console.log('Thread => fade out...');
+    this.isFadingOut = true;
+    
+    // NICHTS sonst, kein closeThread.emit() hier
+    //  => Komponente bleibt noch im DOM
+  
+    setTimeout(() => {
+      console.log('Thread => fade animation done => remove from DOM');
+      this.closeThread.emit(); // => Home => *ngIf false
+    }, this.animationDurationMs);
   }
+  
 
   onChannelThreadClosed() {
     this.threadClosedToHome.emit();
