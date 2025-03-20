@@ -2,10 +2,6 @@ mat-card {
   background-color: white;
   border-style: none;
 }
-/* 
-.full-page-content{
-  width: 100vw;
-} */
 
 .overlay {
   position: fixed;
@@ -28,7 +24,7 @@ mat-card {
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
   width: 100%;
   position: absolute;
-  top: 0;
+    top: 0;
   z-index: 10;
   background-color: white;
 }
@@ -62,9 +58,9 @@ mat-card {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  width: fit-content;
   min-height: 58px;
-  padding: 8px 16px;
+  padding: 5px 10px;
   cursor: pointer;
   border-radius: 30px;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -210,6 +206,7 @@ mat-card {
   }
   .user-chat-info {
     margin-bottom: 14px;
+  
     img {
       width: 50px;
       height: 50px;
@@ -253,7 +250,7 @@ mat-card {
 }
 
 @media (min-width: 450px) and (max-width: 770px) {
-  .mat-mdc-card{
+  .mat-mdc-card {
     width: 100vw;
   }
   .header {
@@ -275,10 +272,10 @@ mat-card {
     height: 35px;
     width: 35px;
   }
-  app-channel-chat {
+/*   app-channel-chat {
     display: flex;
     width: 95vw;
-  }
+  } */
   .welcome-sheet {
     width: 95vw;
   }
@@ -297,3 +294,4 @@ mat-card {
     min-width: 990px;
   }
 }
+

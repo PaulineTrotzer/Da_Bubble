@@ -1211,13 +1211,3 @@ app-mention-message-box {
     height: 21px;
   }
 }
-
-@media (min-width: 320px) and (max-width: 450px) {
-
-}
-
-@media (min-width: 450px) and (max-width: 770px) {
-  app-input-field {
-    width: 95vw;
-  }
-}

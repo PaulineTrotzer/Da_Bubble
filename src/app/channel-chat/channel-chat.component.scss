@@ -918,12 +918,11 @@ form {
     border-top-right-radius: 30px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0;
-    width: 95vw;
     height: 94vh;
   }
   app-input-field {
-    width: 95vw;
     position: fixed;
     bottom: 0;
+    width: 100vw;
   }
 }

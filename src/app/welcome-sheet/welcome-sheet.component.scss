@@ -8,7 +8,7 @@
     #fff 95%
   );
   border-radius: 30px;
-  padding: 36px 28px;
+  padding: 55px 28px 0;
   height: 97vh;
   overflow-y: auto;
 }
@@ -131,7 +131,7 @@ h2 {
 @media (min-width: 450px) and (max-width: 770px) {
   .full-page-content {
     border-radius: 30px;
-    padding: 36px 28px;
+/*     padding: 36px 28px; */
     height: auto;
   }
 }

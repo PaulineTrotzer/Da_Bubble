@@ -23,14 +23,7 @@ export class ThreadComponent implements OnDestroy {
   @Output() closeThread = new EventEmitter<void>();
   global = inject(GlobalVariableService);
   isFadingOut = false;
-  constructor() {
-    this.global.setThreadOpened(true);
-  }
-
-  ngOnDestroy(): void {
-    this.global.setThreadOpened(false);
-  }
-
+  animationDurationMs = 200;
   @Input() selectedUser: any;
   @Input() directThreadId: any;
   @Input() channelThreadId: any;
@@ -41,6 +34,15 @@ export class ThreadComponent implements OnDestroy {
   @ViewChild(DirectThreadComponent) directThreadComp!: DirectThreadComponent;
   @ViewChild(ChannelThreadComponent) channelThreadComp!: ChannelThreadComponent;
 
+
+  constructor() {
+    this.global.setThreadOpened(true);
+  }
+
+  ngOnDestroy(): void {
+    this.global.setThreadOpened(false);
+  }
+
   handleDirectThreadUserSelection(user: any) {
     this.userSelectedFromThread.emit(user);
   }
@@ -49,7 +51,7 @@ export class ThreadComponent implements OnDestroy {
     this.userSelectedFromChannelThread.emit(channel);
   }
 
-  animationDurationMs = 200;
+
   onDirectThreadClosed() {
     console.log('Thread => fade out...');
     this.isFadingOut = true;

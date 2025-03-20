@@ -1,39 +1,42 @@
 <div class="full-flex" [ngClass]="{'page-content-plus-header': successfullyLogged}">
     <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"
-        (headerUserSelected)="onHeaderUserSelected($event)"></app-header>
-    <div class="main-content">
-        <div class="full-page-content">
-            <app-workspace (mobileChannelSelected)="handleMobileChannelSelected()" [ngClass]="{
+        (headerUserSelected)="onHeaderUserSelected($event)">
+    </app-header> <!-- Hier binden wir die CSS-Variable direkt am Grid-Container -->
+    <div class="full-page-content" [style.gap]="getGridGap()"
+        [style.--workspace-width]="workspaceColumnWidth" [style.grid-template-columns]="calcGridTemplateColumns()">
+        <!-- Workspace-Container (erste Spalte) -->
+        <div class="workspace-container">
+            <div class="workspace-wrapper" [ngClass]="{'closed': !isWorkspaceOpen, 'opened': isWorkspaceOpen}"
+                (transitionend)="onWorkspaceTransitionEnd()">
 
-            'workspace-open': isWorkspaceOpen,
-            'workspace-closed':!isWorkspaceOpen,
-            'close-box':global.openChannelorUserBox,
-            'open-box':!global.openChannelorUserBox
-
-        }" (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)"></app-workspace>
-
-            <app-start-screen [ngStyle]="{'width': startScreenWidth}" (enterChat)="handleEnterChat($event)" [ngClass]="{
-             'startScreen-open':global.openChannelorUserBox || !isWorkspaceOpen,
-             'start-screen-reduced': reduceStartScreen,
-    'start-screen-full': !reduceStartScreen || !this.global.threadOpened,
-    'hidden': !global.openChannelorUserBox}" (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
-                (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
-                (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel"
-                [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser"
-                [selectedChannel]="selectedChannel" (threadOpened)="onThreadOpened()"
-                (channelSelected)="onChannelSelected($event)" (threadOpenedToHome)="onThreadOpened()">
-            </app-start-screen>
-
-            <div class="thread-holder" *ngIf="directThreadId || channelThreadId" @fadeOutThread
-                [ngClass]="{'full-thread-width': !this.global.openChannelorUserBox}">
-                <app-thread [directThreadId]="directThreadId" [channelThreadId]="channelThreadId"
-                    (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"
-                    (userSelectedFromThread)="handleUserSelectionFromThread($event)"
-                    (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
-                </app-thread>
+                <app-workspace (mobileChannelSelected)="handleMobileChannelSelected()"
+                    (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)">
+                </app-workspace>
             </div>
         </div>
+
+        <!-- Startscreen-Container (zweite Spalte) -->
+        <div class="start-screen-container"
+            [style.width]="!this.global.threadOpened ? calcStartScreenContainerWidth() : '100%'">
+        <app-start-screen (enterChat)="handleEnterChat($event)"
+            (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
+            (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
+            (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
+            [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
+            (threadOpened)="onThreadOpened()" (channelSelected)="onChannelSelected($event)"
+            (threadOpenedToHome)="onThreadOpened()">
+        </app-start-screen>
     </div>
+
+    <!-- Thread-Holder (dritte Spalte) -->
+    <div class="thread-holder-container" *ngIf="isThreadOpened" @fadeOutThread      [style.width]="this.global.threadOpened ? '100%' : calcThreadWidth()">
+        <app-thread [directThreadId]="directThreadId" [channelThreadId]="channelThreadId"
+            (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"
+            (userSelectedFromThread)="handleUserSelectionFromThread($event)"
+            (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
+        </app-thread>
+    </div>
+</div>
 </div>
 
 <div *ngIf="successfullyLogged" class="overlay"></div>
@@ -51,7 +54,6 @@
                     : global.currentUserData.email
                     }}
                 </b>
-
             </span>
         </span>
     </mat-card-content>
@@ -67,8 +69,8 @@
 </div>
 <div class="workspace-opener" [class.hovered]="isHovered" (click)="toggleWorkspace()" (mouseenter)="isHovered = true"
     (mouseleave)="isHovered = false">
-    <p>{{!global.openChannelorUserBox && isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p>
+    <p>{{ isWorkspaceOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'}}</p>
 
     <img class="workspace-drawer" [src]="getImageSource()"
-        [alt]="!global.openChannelorUserBox && isWorkspaceOpen  ? 'Hide workspace' : 'Show workspace'">
+        [alt]="isWorkspaceOpen  ? 'Hide workspace' : 'Show workspace'">
 </div>
