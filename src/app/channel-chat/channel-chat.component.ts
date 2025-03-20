@@ -126,6 +126,7 @@ export class ChannelChatComponent implements OnInit {
   isNarrowScreen = false;
   firstDayInfoIndex: number | null = null;
 
+
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
@@ -150,11 +151,10 @@ export class ChannelChatComponent implements OnInit {
     for (let i = 0; i < this.messagesData.length; i++) {
       if (this.displayDayInfo(i)) {
         this.firstDayInfoIndex = i;
-        break;  // Abbrechen, sobald der erste Treffer gefunden ist
+        break;  
       }
     }
   }
-
 
   checkEditScreenSize(){
     this.isNarrowScreen = window.innerWidth < 600; 
@@ -598,33 +598,6 @@ export class ChannelChatComponent implements OnInit {
     }
   }
 
-  checkThreadOpen() {
-    if (window.innerWidth <= 750 && this.global.openChannelorUserBox) {
-      this.global.openChannelorUserBox = false;
-    }
-  }
-
-  checkWidthSize() {
-    if (window.innerWidth <= 750) {
-      return (this.global.openChannelOrUserThread = true);
-    } else {
-      return (this.global.openChannelOrUserThread = false);
-    }
-  }
-
-  /*   openvollThreadBox() {
-    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
-      return (this.global.checkWideChannelOrUserThreadBox = true);
-    } else {
-      return (this.global.checkWideChannelOrUserThreadBox = false);
-    }
-  }
- */
-  hiddenFullChannelOrUserThreadBox() {
-    if (window.innerWidth <= 950 && this.global.checkWideChannelorUserBox) {
-      this.global.checkWideChannelorUserBox = false;
-    }
-  }
 
   displayDayInfo(index: number): boolean {
     if (index === 0) return true;

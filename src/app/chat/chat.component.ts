@@ -745,9 +745,9 @@ export class ChatComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
-    if (window.innerWidth < 1350) {
+/*     if (window.innerWidth < 1350) {
       this.global.openChannelorUserBox = false;
-    }
+    } */
   }
 
   splitMessage(text: string): string[] {

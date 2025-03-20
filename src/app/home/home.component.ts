@@ -4,10 +4,8 @@ import {
   Component,
   ElementRef,
   HostListener,
-  OnChanges,
   OnInit,
   Renderer2,
-  SimpleChanges,
   ViewChild,
   inject,
 } from '@angular/core';
@@ -96,69 +94,125 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.setDirectThread();
     this.setChannelThread();
     this.authService.initAuthListener();
-    this.global.threadOpened$.subscribe((isOpened) => {
+ /*    this.global.threadOpened$.subscribe((isOpened) => {
       Promise.resolve().then(() => {
         this.reduceStartScreen = isOpened;
         this.cdr.detectChanges();
       });
-    });
-    this.isWorkspaceOpen = true; // Workspace soll offen sein
-    this.workspaceColumnWidth = '385px'; // Entspricht dem „offenen“ Zustand
-    this.global.openChannelorUserBox = true; // Startscreen soll sichtbar sein
+    }); */
+    this.initializeScreen();
     this.onResize({ target: window } as any);
+  }
+
+  initializeScreen() {
+    this.isWorkspaceOpen = true; 
+    this.workspaceColumnWidth = '385px'; 
+    this.global.openChannelorUserBox = true;
   }
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     const width = window.innerWidth;
-    console.log('onResize: width =', width);
+    console.log('onResize() aufgerufen, width =', width);
+    console.log('Zustände vor Bedingungsprüfung:', {
+      isWorkspaceOpen: this.isWorkspaceOpen,
+      threadOpened: this.global.threadOpened,
+      openChannelorUserBox: this.global.openChannelorUserBox,
+    });
+  
+    // Desktop-Bereich (width >= 951px)
+    if (width >= 951) {
+      // Sonderfall: Wenn width zwischen 1100 und 1450 liegt, threadOpened true, workspaceOpen true und UserBox aktiv,
+      // dann schließe den Workspace.
+      if (
+        width > 1100 &&
+        width < 1450 &&
+        this.global.threadOpened &&
+        this.isWorkspaceOpen &&
+        this.global.openChannelorUserBox
+      ) {
+        console.log(
+          'onResize Sonderfall: width > 1100 und < 1450, threadOpened, workspaceOpen, UserBox aktiv → closeWorkspace()'
+        );
+        this.closeWorkspace();
+      }
+      if (
+        width < 1100 &&
+        this.global.threadOpened &&
+        this.global.openChannelorUserBox
+      ) {
+        console.log(
+          'onResize: width < 1100, threadOpened, UserBox aktiv → set openChannelorUserBox = false'
+        );
+        this.global.openChannelorUserBox = false;
+      }
+    }
+  
+    // Bedingung: Wenn width >= 1450, der Workspace geschlossen ist und die UserBox aktiv ist,
+    // dann öffne den Workspace automatisch.
     if (
-      width >= 951 &&
+      width >= 1450 &&
       !this.isWorkspaceOpen &&
-      this.global.openChannelorUserBox &&
-      !this.global.threadOpened
+      this.global.openChannelorUserBox
     ) {
+      console.log(
+        'Neue Bedingung: width >= 1450, workspace geschlossen, aber UserBox aktiv → openWorkspace()'
+      );
       this.openWorkspace();
-      console.log(
-        'Desktop: Workspace wird automatisch geöffnet, da er geschlossen war.'
-      );
     }
+  
+    // Neuer Zusatz: Wenn nur der Thread geöffnet ist (Workspace geschlossen, UserBox inaktiv)
+    // und die Bildschirmbreite über 950px liegt, dann toggle (öffne) den Workspace.
     if (
-      width < 950 &&
-      this.global.openChannelorUserBox &&
-      this.isWorkspaceOpen
-    ) {
-      this.closeWorkspace();
-      console.log(
-        'Zusätzliche Bedingung: Workspace geschlossen (<950px, App-Startscreen offen)'
-      );
-    }
-    if (
-      width < 1450 &&
+      width >= 950 &&
+      !this.isWorkspaceOpen &&
       this.global.threadOpened &&
+      !this.global.openChannelorUserBox
+    ) {
+      console.log(
+        'onResize Zusatz: Nur Thread geöffnet und width >= 950 → toggle (öffne) Workspace'
+      );
+      this.openWorkspace();
+    }
+  
+    // Bestehende Bedingung: Wenn width >= 1450, workspace offen, threadOpened true und UserBox inaktiv,
+    // dann setze UserBox auf aktiv.
+    if (
+      width >= 1450 &&
       this.isWorkspaceOpen &&
-      this.global.openChannelorUserBox
-    ) {
-      this.closeWorkspace();
-    }
-    if (
-      width < 1100 &&
       this.global.threadOpened &&
-      this.global.openChannelorUserBox
+      !this.global.openChannelorUserBox
     ) {
-      this.global.openChannelorUserBox = false;
+      console.log(
+        'Bedingung: Desktop, width >= 1450, workspace open, thread open, UserBox inactive → set UserBox true'
+      );
+      this.global.openChannelorUserBox = true;
+    } else {
+      // Mobile-Bereich (width < 951):
+      if (
+        width < 950 &&
+        this.global.openChannelorUserBox &&
+        this.isWorkspaceOpen
+      ) {
+        console.log(
+          'onResize Mobile: width < 950, UserBox aktiv, workspaceOpen → closeWorkspace()'
+        );
+        this.closeWorkspace();
+      }
     }
-    if (
-      width < 1100 &&
-      this.global.threadOpened &&
-      this.global.openChannelorUserBox
-    ) {
-      this.global.openChannelorUserBox = false;
-    }
-
+  
+    console.log('Zustände nach onResize:', {
+      isWorkspaceOpen: this.isWorkspaceOpen,
+      threadOpened: this.global.threadOpened,
+      openChannelorUserBox: this.global.openChannelorUserBox,
+    });
     setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);
   }
+  
+  
+  
+  
 
   closeWorkspace(): void {
     this.isWorkspaceOpen = false;
@@ -353,6 +407,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   onThreadOpened(): void {
     this.global.setThreadOpened(true);
+    if (window.innerWidth < 1450 && this.global.openChannelorUserBox) {
+      this.global.openChannelorUserBox = true;
+      this.closeWorkspace();
+    }
   }
 
   onThreadClosed() {
@@ -374,72 +432,139 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // oder irgendeinem anderen Wert.
     return '510px';
   }
+
+  
   calcGridTemplateColumns(): string {
-    const threadFixedWidth = '510px';
+    const workspaceWidth = '385px';
+    const threadFixedWidthStandard = '510px';
     const width = window.innerWidth;
-    const gap = '32px';
-    
-    // Mobile-Bereich (unter 951px):
+    const gap = '32px'; // Wird separat via [style.gap] gesetzt
+  
+    console.log('calcGridTemplateColumns() aufgerufen, width =', width);
+    console.log('Zustände in calcGrid:', {
+      isWorkspaceOpen: this.isWorkspaceOpen,
+      threadOpened: this.global.threadOpened,
+      openChannelorUserBox: this.global.openChannelorUserBox,
+    });
+  
+    // 1. Mobile-Bereich (width < 951):
     if (width < 951) {
       if (this.global.threadOpened) {
-        // Wenn ein Thread (Direct oder Channel) geöffnet ist, soll dieser den gesamten Bildschirm einnehmen.
+        console.log('Mobile: threadOpened true → return "0 0 100vw"');
         return `0 0 100vw`;
       } else if (this.isWorkspaceOpen) {
-        return `100vw 0 0`;
+        // Wenn der Workspace geöffnet ist und openChannelorUserBox aktiv,
+        // soll der Workspace bereits 0fr einnehmen: "0 1fr 0".
+        if (this.global.openChannelorUserBox) {
+          console.log('Mobile: workspace open & UserBox aktiv → return "0 1fr 0"');
+          return `0 1fr 0`;
+        } else {
+          console.log('Mobile: workspaceOpen true → return "100vw 0 0"');
+          return `100vw 0 0`;
+        }
       } else {
+        console.log('Mobile: keine Komponente offen → return "0 100vw 0"');
         return `0 100vw 0`;
       }
-    } else {
-      // Desktop-Bereich (width >= 951):
-      
-      // Falls die User Box (global.openChannelorUserBox) **nicht** aktiv ist:
-      if (!this.global.openChannelorUserBox) {
-        if (this.global.threadOpened) {
-          // NEU: Falls die Breite unter 1100px liegt, soll der Thread den gesamten Raum einnehmen
-          // (also "0 0 100vw"), ansonsten verwenden wir den fixen Wert.
-          if (width < 1100) {
-            return `0 0 100vw`;
-          } else {
-            return `0 0 ${threadFixedWidth}`;
-          }
+    }
+  
+    // 2. Desktop-Bereich (width >= 951):
+    console.log('Desktop-Bereich wird geprüft...');
+  
+    // 2a. Sonderfall: Wenn nur der Thread offen ist (Workspace geschlossen, UserBox inaktiv),
+    //     dann soll der Thread über die gesamte Bildschirmbreite (100vw) angezeigt werden.
+    if (!this.isWorkspaceOpen && this.global.threadOpened && !this.global.openChannelorUserBox) {
+      console.log('Desktop: nur Thread offen → return "0 0 100vw"');
+      return `0 0 100vw`;
+    }
+  
+    // 2b. Sonderfall: Wenn die Bildschirmbreite unter 1450px liegt,
+    //      der Workspace offen, der Thread geöffnet und die User-Box **geschlossen** (false) ist,
+    //      dann soll das Grid "385px 0 1fr" zurückliefern.
+    if (
+      width < 1450 &&
+      this.isWorkspaceOpen &&
+      this.global.threadOpened &&
+      !this.global.openChannelorUserBox
+    ) {
+      console.log(
+        'Sonderfall: Desktop, width < 1450, workspace open, thread open, UserBox closed → return "385px 0 1fr"'
+      );
+      return `${workspaceWidth} 0 1fr`;
+    }
+  
+    // 2c. Falls die UserBox nicht aktiv ist (false):
+    if (!this.global.openChannelorUserBox) {
+      console.log('Desktop: openChannelorUserBox false');
+      if (this.global.threadOpened) {
+        if (width < 1100) {
+          console.log('Desktop: width < 1100 → return "0 0 100vw"');
+          return `0 0 100vw`;
         } else {
-          return `385px 0 0`;
-        }
-      }
-      
-      // Standardfall: global.openChannelorUserBox ist aktiv.
-      if (this.isWorkspaceOpen) {
-        if (this.global.threadOpened) {
-          // Workspace und Thread geöffnet:
-          return `385px 1fr ${threadFixedWidth}`;
-        } else {
-          // Workspace offen, Thread geschlossen:
-          return `385px 1fr 0`;
+          console.log(
+            'Desktop: width >= 1100 → return "0 0 ' +
+              threadFixedWidthStandard +
+              '"'
+          );
+          return `0 0 ${threadFixedWidthStandard}`;
         }
       } else {
-        // Workspace geschlossen – dann soll der Startscreen den gesamten Platz einnehmen:
-        if (this.global.threadOpened) {
-          return `0 1fr minmax(${threadFixedWidth}, 1fr)`;
-        } else {
-          return `0 1fr 0`;
-        }
+        console.log(
+          'Desktop: openChannelorUserBox false, kein Thread → return "' +
+            workspaceWidth +
+            ' 0 0"'
+        );
+        return `${workspaceWidth} 0 0`;
       }
     }
+  
+    // 2d. Standardfall: Wenn die UserBox aktiv ist (true)
+    if (this.isWorkspaceOpen && this.global.openChannelorUserBox) {
+      if (this.global.threadOpened) {
+        console.log(
+          'Standardfall: workspace open, thread open, UserBox active → return "' +
+            workspaceWidth +
+            ' 1fr ' +
+            threadFixedWidthStandard +
+            '"'
+        );
+        return `${workspaceWidth} 1fr ${threadFixedWidthStandard}`;
+      } else {
+        console.log(
+          'Standardfall: workspace open, thread closed, UserBox active → return "' +
+            workspaceWidth +
+            ' 1fr 0"'
+        );
+        return `${workspaceWidth} 1fr 0`;
+      }
+    }
+  
+    if (!this.isWorkspaceOpen && this.global.openChannelorUserBox) {
+      if (this.global.threadOpened) {
+        console.log(
+          'Standardfall: workspace closed, thread open, UserBox active → return "0 1fr minmax(' +
+            threadFixedWidthStandard +
+            ', 1fr)"'
+        );
+        return `0 1fr minmax(${threadFixedWidthStandard}, 1fr)`;
+      } else {
+        console.log(
+          'Standardfall: workspace closed, thread closed, UserBox active → return "0 1fr 0"'
+        );
+        return `0 1fr 0`;
+      }
+    }
+  
+    console.log('Fallback: return "0 1fr 0"');
+    return `0 1fr 0`;
   }
   
 
   getGridGap(): string {
     const width = window.innerWidth;
-
-    // Im mobilen Bereich (<951px) soll kein Gap verwendet werden.
     if (width < 951) {
       return '0px';
     }
-
-    // Im Desktop:
-    // Spezieller Fall: wenn der Bildschirm unter 1450px liegt und
-    // der Thread geöffnet ist, die User-Box aktiv ist und der Workspace offen ist,
-    // dann soll der Gap 32px betragen.
     if (
       width < 1450 &&
       this.global.threadOpened &&
@@ -448,32 +573,25 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ) {
       return '32px';
     }
-
-    // Standardfall: Falls der Workspace offen ist, soll der Gap 32px betragen, ansonsten 0.
     return this.isWorkspaceOpen ? '32px' : '0px';
   }
 
   calcStartScreenContainerWidth(): string {
-    const gap = 32; // Abstand zwischen Spalten
+    const gap = 32;
     const width = window.innerWidth;
-
-    if (width >= 951) {
+    
+    if (width >= 951) { // Desktop-Bereich
       if (this.isWorkspaceOpen) {
-        // Workspace offen: Abzug von 385px plus Gap
+        // Wenn der Workspace geöffnet ist, wird immer die Breite abgezogen
         return `calc(100vw - 385px - ${gap}px)`;
       } else {
-        // Workspace geschlossen:
         if (this.global.threadOpened && this.global.openChannelorUserBox) {
-          // Falls Thread offen und UserBox aktiv – evtl. soll der Startscreen
-          // nur um den Thread-Bereich verkleinert werden. Beispielsweise:
           return `calc(100vw - 510px - ${gap}px)`;
         } else {
-          // Falls kein Thread offen, dann den gesamten Viewport nutzen:
           return `100vw`;
         }
       }
-    } else {
-      // Mobile-Bereich:
+    } else { // Mobile-Bereich
       if (this.isWorkspaceOpen) {
         return `calc(100vw - 385px - ${gap}px)`;
       } else {
@@ -481,42 +599,91 @@ export class HomeComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
+  
+  
   toggleWorkspace(): void {
     const width = window.innerWidth;
-
+    console.log('toggleWorkspace() aufgerufen, width =', width);
+    console.log('Zustände VOR Toggle:', {
+      isWorkspaceOpen: this.isWorkspaceOpen,
+      openChannelorUserBox: this.global.openChannelorUserBox,
+      threadOpened: this.global.threadOpened,
+    });
+  
     if (width < 951) {
-      // Mobile-Logik – wie gehabt
+      // Mobile-Logik:
       if (this.isWorkspaceOpen) {
+        console.log('Mobile: Workspace war offen → closeWorkspace()');
         this.closeWorkspace();
+        // Beim Schließen soll die UserBox sichtbar werden
         this.global.openChannelorUserBox = true;
         this.global.setThreadOpened(false);
         this.directThreadId = null;
         this.channelThreadId = null;
+        console.log('Mobile: Zustände nach Schließen:', {
+          isWorkspaceOpen: this.isWorkspaceOpen,
+          openChannelorUserBox: this.global.openChannelorUserBox,
+          threadOpened: this.global.threadOpened,
+        });
       } else {
+        console.log('Mobile: Workspace war geschlossen → openWorkspace()');
         this.openWorkspace();
+        // Beim Öffnen soll die UserBox verschwinden
         this.global.openChannelorUserBox = false;
         this.global.setThreadOpened(false);
+        console.log('Mobile: Zustände nach Öffnen:', {
+          isWorkspaceOpen: this.isWorkspaceOpen,
+          openChannelorUserBox: this.global.openChannelorUserBox,
+          threadOpened: this.global.threadOpened,
+        });
+      }
+      if (
+        width < 1450 &&
+        this.isWorkspaceOpen &&
+        this.global.openChannelorUserBox &&
+        this.global.threadOpened
+      ) {
+        console.log(
+          'Mobile-Sonderfall: width < 1450, Workspace offen, UserBox aktiv, Thread offen → closeWorkspace()'
+        );
+        this.closeWorkspace();
       }
     } else {
-      // Desktop: Hier toggeln wir, dass der Workspace geöffnet wird,
-      // wenn er derzeit geschlossen ist – ansonsten bleibt er offen.
-      if (!this.isWorkspaceOpen) {
-        this.isWorkspaceOpen = true;
-        this.workspaceColumnWidth = '385px';
-      } else {
+      // Desktop-Bereich:
+      // Falls der Workspace bereits offen ist und die UserBox aktiv, dann muss der Workspace auf 0 (geschlossen) gehen.
+      if (this.isWorkspaceOpen && this.global.openChannelorUserBox) {
+        console.log('Desktop: Workspace open & UserBox aktiv → wird geschlossen');
         this.isWorkspaceOpen = false;
         this.workspaceColumnWidth = '0px';
+      } else {
+        if (!this.isWorkspaceOpen) {
+          console.log('Desktop: Workspace war geschlossen → wird geöffnet');
+          this.isWorkspaceOpen = true;
+          this.workspaceColumnWidth = '385px';
+        } else {
+          console.log('Desktop: Workspace war offen → wird geschlossen');
+          this.isWorkspaceOpen = false;
+          this.workspaceColumnWidth = '0px';
+        }
+      }
+      if (
+        width < 1450 &&
+        this.global.threadOpened &&
+        this.global.openChannelorUserBox
+      ) {
+        this.global.openChannelorUserBox = false;
       }
     }
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
   }
+  
+  
 
   onWorkspaceTransitionEnd(): void {
-    // Wenn der Workspace-Inhalt animiert (geschlossen) ist,
-    // passe den Grid-Platz an.
     if (!this.isWorkspaceOpen) {
       this.workspaceColumnWidth = '0px';
-      // Danach kannst du ggf. detectChanges() aufrufen.
       this.cdr.detectChanges();
     }
   }
