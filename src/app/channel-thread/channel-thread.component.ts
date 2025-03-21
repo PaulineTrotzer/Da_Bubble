@@ -401,6 +401,7 @@ export class ChannelThreadComponent implements OnInit {
 
   closeThread() {
     this.global.channelThreadSubject.next(null);
+    this.global.setThreadOpened(false);
     this.global.openChannelorUserBox = true;
     this.closeThreadChannel.emit();
   }
