@@ -107,14 +107,4 @@
   flex-direction: column;
 }
 
-@media (min-width: 320px) and (max-width:600px){
-  .file-name{
-    font-size: 11px;
-  }
-  .file-info{
-    img{
-      width: 33px;
-      height: 43px;
-    }
-  }
-}
+@import "./mobile-view-styling/files-preview.mobile.scss";

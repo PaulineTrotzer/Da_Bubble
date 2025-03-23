@@ -1,0 +1,109 @@
+
+@media (max-width: 1349px) {
+    .email-card-content {
+      span {
+        font-size: 22px;
+      }
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  @media (max-width: 610px) {
+    .upload-label {
+      padding: 5px 9px;
+      font-size: 16px;
+      &:hover {
+        padding: 5px 9px;
+        font-size: 16px;
+      }
+    }
+  }
+  
+  @media (max-width: 860px) {
+    .image-box {
+      position: absolute;
+      top: 25px;
+      left: unset;
+    }
+  }
+  
+  
+  @media (max-width: 679px) {
+    .main-picture-box {
+      padding: 0 12px;
+    }
+    .title-div {
+      padding-left: 10px;
+    }
+  }
+  
+  @media (max-width: 610px) {
+    .title-div {
+      h1 {
+        font-size: 29px;
+      }
+    }
+    .picture-frame {
+      img {
+        width: 120px;
+        height: 120px;
+      }
+    }
+    .avatar-box {
+      img {
+        width: 48px;
+        height: 48px;
+      }
+    }
+  
+    @media (max-width: 543px) {
+      .picture-info-text {
+        font-size: 16px;
+      }
+    }
+  }
+  
+  @media (max-width: 458px) {
+   .email-card-content{
+    span{
+      font-size: 18px;
+    }
+    }
+    .mat-card {
+      padding: 26px 0;
+    }
+    .btn-primary {
+      padding: 7px 20px;
+      margin-top: 15px;
+      &:hover {
+        padding: 7px 20px;
+      }
+    }
+    .user-name {
+      h2 {
+        font-size: 27px;
+      }
+    }
+    .avatar-title {
+      display: none;
+    }
+    .avatar-abstract-title {
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+    }
+    .avatar-box {
+      gap: 6px;
+      img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .title-div {
+      align-items: baseline;
+    }
+  }
+  

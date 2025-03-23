@@ -9,6 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-size: 20px;
 }
 
 .img-container {
@@ -36,6 +37,7 @@
   gap: 8px;
   max-height: 200px;
   overflow-y: scroll;
+  font-size: 20px;
 }
 
 .member {
@@ -112,40 +114,4 @@
   border-radius: 100%;
 }
 
-@media (min-width: 320px) and (max-width: 600px) {
-  .member {
-    padding: 2px 0;
-    font-size: 14px;
-    img {
-      width: 40px;
-      height: 40px;
-      margin-right: 0;
-    }
-  }
-  .online {
-    width: 10px;
-    height: 10px;
-  }
-  .offline {
-    width: 10px;
-    height: 10px;
-  }
-  .status-border{
-    left: 0;
-    top: 30px;
-  }
-  .add-user-container{
-    padding: 1px 9px;
-    margin-top: 28px;
-    p{
-      font-size: 15px;
-    }
-  }
-  .img-container{
-    width: 30px;
-  }
-  .heading{
-    position: relative;
-    bottom: 20px;
-  }
-}
+@import "./mobile-view-styling/dialog-channel-user.mobile.scss";

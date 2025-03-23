@@ -31,8 +31,8 @@ export class DialogHeaderProfilCardComponent implements OnInit {
   loginAuthService = inject(LoginAuthService);
   clicked = true;
   guestAccount = false;
-  @Output() closeProfile = new EventEmitter<void>();
   authService = inject(LoginAuthService);
+  @Output() closeProfile = new EventEmitter<void>();
 
   constructor(private route: ActivatedRoute) {}
 
@@ -49,7 +49,6 @@ export class DialogHeaderProfilCardComponent implements OnInit {
     });
     this.loginAuthService.isGuestLogin$.subscribe((status) => {
       this.guestLogin = status;
-      console.log('aha', this.guestLogin);
     });
   }
 

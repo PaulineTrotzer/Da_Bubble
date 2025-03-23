@@ -42,12 +42,7 @@ import { WorkspaceService } from '../services/workspace.service';
   templateUrl: './dialog-create-channel.component.html',
   styleUrl: './dialog-create-channel.component.scss',
 })
-export class DialogCreateChannelComponent implements OnInit {
-  constructor(
-    private db: Firestore,
-    private dialogRef: MatDialogRef<DialogCreateChannelComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { userId: string | null }
-  ) {}
+export class DialogCreateChannelComponent {
   isHovered: boolean = false;
   channel: Channel = new Channel();
   readonly dialog = inject(MatDialog);
@@ -63,14 +58,18 @@ export class DialogCreateChannelComponent implements OnInit {
     description: new FormControl('', [Validators.maxLength(64)]),
   });
 
+  constructor(
+    private db: Firestore,
+    private dialogRef: MatDialogRef<DialogCreateChannelComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { userId: string | null }
+  ) {}
+
   onSubmit() {
     debugger;
     if (this.channelForm.valid) {
       this.addChannel();
     }
   }
-
-  ngOnInit(): void {}
 
   openDialog(channelId: string) {
     const dialogRef = this.dialog.open(DialogAddUserComponent, {
@@ -80,11 +79,10 @@ export class DialogCreateChannelComponent implements OnInit {
       },
       height: '310px',
       width: '710px',
-      autoFocus: false, // Deaktiviere das automatische Fokussieren
+      autoFocus: false,
       restoreFocus: false,
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
       this.openNewChannelDirectly(this.channel);
     });
   }
@@ -104,57 +102,34 @@ export class DialogCreateChannelComponent implements OnInit {
   }
   async addChannel() {
     const channelName = this.channelForm.value.name?.trim();
-
     if (!channelName) {
-      console.error('Fehler: Channel-Name ist leer!');
       this.channelExists = true;
       return;
     }
-
     const channelsRef = collection(this.db, 'channels');
     const channelQuery = query(channelsRef, where('name', '==', channelName));
     const querySnapshot = await getDocs(channelQuery);
-
     if (!querySnapshot.empty) {
       this.channelExists = true;
       return;
     }
-
-    // 🔥 Erstelle eine Instanz von Channel statt eines einfachen Objekts
     const newChannel = new Channel();
     newChannel.name = channelName;
     newChannel.description = this.channelForm.value.description || '';
     newChannel.userIds = [];
     newChannel.createdBy = this.global.currentUserData.uid || '';
     try {
-      // 🚀 Speichere den Channel mit toJSON()
       const docRef = await addDoc(channelsRef, newChannel.toJSON());
-
       if (!docRef.id) {
         console.error('Fehler: Keine ID für den Channel erhalten!');
         return;
       }
-
-      console.log(
-        'Channel erfolgreich erstellt:',
-        newChannel,
-        'mit ID:',
-        docRef.id
-      );
-
-      // 🔥 Setze die ID im Channel-Objekt und aktualisiere Firestore
       newChannel.id = docRef.id;
       const channelDocRef = doc(this.db, 'channels', docRef.id);
       await updateDoc(channelDocRef, { id: docRef.id });
-
-
       this.workspaceService.updateChannel(newChannel);
-      console.log('for workspace',newChannel);
-
-      // 🎯 Setze `this.channel` korrekt
       this.channel = newChannel;
       this.openDialog(this.channel.id);
-
       this.channelForm.reset();
       this.closeDialog();
     } catch (error) {

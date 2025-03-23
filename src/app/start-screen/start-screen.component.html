@@ -1,13 +1,11 @@
 <div class="full-page-content">
   <mat-card class="big-chat-card" appearance="outlined">
     <mat-card-header class="header">
-
       <div class="welcome-sheet" *ngIf="afterLoginSheet"><app-welcome-sheet></app-welcome-sheet></div>
       <div *ngIf="!afterLoginSheet" class="drop-down-div">
         <button *ngIf="selectedChannel " class="drop-down-button" mat-button (click)="openDialog(selectedChannel)">
           <span class="btn-text-img"># {{ selectedChannel?.name}} </span>
         </button>
-
         <div (click)="showMyUserProfile()" class="user-chat-info" *ngIf="selectedUser && !selectedChannel">
           <img [src]="
               statusCheck 
@@ -26,7 +24,6 @@
         </div>
       </div>
     </mat-card-header>
-
     <div>
       <div *ngIf="openMyProfile">
         <div *ngIf="currentUserwasSelected">
@@ -38,18 +35,15 @@
         </div>
       </div>
     </div>
-
     <div *ngIf="!afterLoginSheet">
       <div *ngIf="!global.channelSelected">
         <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
           [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
           [selectedUser]="selectedUser"></app-chat-component>
       </div>
-
       <div *ngIf="global.channelSelected">
         <app-channel-chat [selectedChannel]="selectedChannel"></app-channel-chat>
       </div>
-
       <div class="members-container" *ngIf="global.channelSelected">
         <div class="member-avatars" (click)="openMemberDialog()">
           <div class="avatar-container">

@@ -69,21 +69,18 @@ export class CreateAccountComponent implements OnInit {
     const firstName = parts[0];
     const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
     const base = lastName ? `${firstName} ${lastName}` : firstName;
-
     return this.makeSlug(base);
   }
 
+  
   async createAuthUser(email: string, password: string) {
     try {
-      // 1) Neuen User anlegen
       const userCredential = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password
       );
       const authUser = userCredential.user;
-  
-      // 2) Username generieren und User-Daten anlegen
       const generatedUsername = this.generateUsername(this.userData.name);
       this.newUser = new User({
         uid: authUser.uid,
@@ -94,22 +91,15 @@ export class CreateAccountComponent implements OnInit {
         password: '',
         status: 'offline',
       });
-  
-      // 3) User in Firestore speichern
       await this.addUserToFirestore(this.newUser);
-  
-      // 4) Verifizierungslink an die E-Mail des Users schicken
       await sendEmailVerification(authUser);
       console.log('Verifizierungslink an', authUser.email, 'gesendet.');
-  
-      // 5) Zeige dem Nutzer an, dass eine Mail gesendet wurde
       this.linkWasSend = true;
   
       // Optional: Wenn du direkt auf einen anderen Screen leiten willst
       // this.router.navigate(['/avatar', this.newUser.uid]);
   
     } catch (error: any) {
-      // Fehlerbehandlung
       if (error.code === 'auth/email-already-in-use') {
         this.linkAlreadySended = true;
       } else {

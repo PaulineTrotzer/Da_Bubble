@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { User } from '../models/user.class';
-import { doc, Firestore } from '@angular/fire/firestore';
-import { getDoc } from '@firebase/firestore';
 import { DialogAddMemberComponent } from '../dialog-add-member/dialog-add-member.component';
 import { DialogMemberProfileCardComponent } from '../dialog-member-profile-card/dialog-member-profile-card.component';
 import { WorkspaceService } from '../services/workspace.service';
 import { Subscription } from 'rxjs';
 import { MemberDataService } from '../services/member-data.service';
+import { Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-dialog-channel-user',
@@ -77,7 +76,6 @@ export class DialogChannelUserComponent implements OnInit {
 
   openAddMemberDialog() {
     const channel = this.workspaceService.selectedChannelSubject.value;
-
     if (!channel) {
       console.warn('Kein Channel ausgewählt, kann Dialog nicht öffnen!');
       return;

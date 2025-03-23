@@ -3,7 +3,6 @@
     <app-mention-message-box (cancelMessageBoxCard)="onCancelMentionBox()" *ngIf="wasClickedChatInput"
         (enterChatUser)="enterChatByUserName($event)">
     </app-mention-message-box>
-
     <div class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
             <div *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
@@ -15,14 +14,11 @@
                             <span class="day-span">{{ getDayInfoForMessage(i) }}</span>
                         </div>
                     </div>
-
                     <div (click)="closePicker()" *ngIf="isEmojiPickerVisible"
                         class="emoji-picker-container react-picker">
                         <emoji-mart class="emoji-picker" (click)="letPickerVisible($event)"
                             (emojiClick)="addEmoji($event)" size="18"></emoji-mart>
                     </div>
-
-
                     <div [ngClass]="{'main-mesage-info-current':message.senderId===global.currentUserData.id,
               'main-message-info-user':message.senderId !== global.currentUserData.id, 
               'backiColor':checkUpdateBackcolor===message.id,
@@ -43,14 +39,11 @@
                                     (click)="emojiSender(message)">
                                     <span class="last-used-emoji">{{message.senderSticker}}</span>
                                 </div>
-
                                 <div class="comment-recipientSticker-box"
                                     *ngIf="message.recipientSticker!=='' && message.recipientSticker!==message.senderSticker"
                                     (click)="emojirecipient(message)">
                                     <span>{{message.recipientSticker}}</span>
                                 </div>
-
-
                                 <div class="add-reaction" (click)="openEmojiPicker($event, message)">
                                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -65,8 +58,6 @@
                                         </g>
                                     </svg>
                                 </div>
-
-
                                 <div (click)="openThread(message.id)" class="open-thread">
                                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -96,9 +87,6 @@
                                                     fill="#1C1B1F" />
                                             </g>
                                         </svg>
-
-
-
                                         <mat-card *ngIf="checkEditbox"
                                             [ngClass]="{'position-edit':isiconShow===message.id}"
                                             class="edit-messages-card" appearance="outlined">
@@ -106,20 +94,10 @@
                                                 <span (click)="editMessages(message)">Nachricht bearbeiten</span>
                                             </mat-card-content>
                                         </mat-card>
-
                                     </div>
-
                                 </div>
-
-
                             </mat-card-content>
                         </mat-card>
-
-
-
-
-
-
                         <div [ngClass]="{
             'picture-box-current':
               message.senderId === global.currentUserData.id,
@@ -147,7 +125,6 @@
                             <div>
                                 <div *ngIf="(editWasClicked &&editMessageId === message.id); else normalMode"
                                     class="edit-mesage-box">
-
                                     <textarea #editableTextarea (input)="onInput($event)" rows="3" class="edit-input"
                                         [(ngModel)]="editableMessageText"></textarea>
                                     <div class="full-bottom-options">
@@ -207,12 +184,15 @@
                                 message.senderId !== global.currentUserData.id
                             }">
                                             <div (click)="handleClickOnMention($event)" class="text-container">
-                                                <ng-container *ngFor="let mentionName of splitMessage(message.text)">
-                                                    <span *ngIf="isMention(mentionName)" class="mention-message"
+                                                <ng-container
+                                                    *ngFor="let mentionName of mentionService.splitMessage(message.text)">
+                                                    <span *ngIf="mentionService.isMention(mentionName)"
+                                                        class="mention-message"
                                                         (click)="handleMentionClick(mentionName)">
                                                         {{ mentionName }}
                                                     </span>
-                                                    <span class="only-name" *ngIf="!isMention(mentionName)">{{
+                                                    <span class="only-name"
+                                                        *ngIf="!mentionService.isMention(mentionName)">{{
                                                         mentionName
                                                         }}</span>
                                                 </ng-container>
@@ -246,7 +226,6 @@
                                                 </div>
                                             </div>
                                         </mat-card-content>
-
                                         <div *ngIf="message.editedTextShow" class="text-info-edit" [ngClass]="{
                                         'edited-sender-view': message.senderName === global.currentUserData.name && message.recipientName !== global.currentUserData.name,
                                         'edited-recipient-view': message.recipientName === global.currentUserData.name && message.senderName !== global.currentUserData.name,
@@ -257,7 +236,6 @@
                                     </mat-card>
                                 </ng-template>
                             </div>
-
                             <div class="placeholder-thread-answer">
                                 <div (click)="openThread(message.id)"
                                     [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
@@ -282,7 +260,6 @@
                                             <span>{{ message.senderSticker }}</span>
                                             <span class="count-span">2</span>
                                         </div>
-
                                         <mat-card class="sticker-info-tooltip"
                                             [ngClass]="{ 'hovered': showReactionPopUpSenderAtCu[message.id] }">
                                             <mat-card-content>
@@ -334,7 +311,6 @@
                                             </mat-card-content>
                                         </mat-card>
                                     </div>
-
                                     <!-- EMPFÄNGER-STICKER -->
                                     <div class="sticker-item" *ngIf="message.recipientSticker !== ''" (mouseenter)="
       toggleReactionInfoRecipient(message.id, true);
@@ -378,7 +354,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="self-chat-opener-ct" *ngIf="isSelfChat  && hasNoMessages">
                 <div class="self-name-and-img">
                     <img class="self-chat-img" src={{global.currentUserData.picture}}>

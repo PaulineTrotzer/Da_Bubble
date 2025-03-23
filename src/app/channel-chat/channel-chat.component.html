@@ -18,7 +18,7 @@
       'message-from-current': message.senderId === global.currentUserData.id
     }" *ngFor="let message of messagesData; let i = index" (mouseenter)="hoveredMessageId = message.id"
       (mouseleave)="hoveredMessageId = null; showEditDialog = null">
-      <div *ngIf="displayDayInfo(i)" class="new-day-info"
+      <div *ngIf="displayDayInfo(messagesData, i)" class="new-day-info"
         [ngClass]="{ 'first-indicated-time': i === firstDayInfoIndex }">
         <div class="day-info">
           <div class="line"></div>
@@ -50,7 +50,6 @@
             </g>
           </svg>
         </div>
-
         <div class="img-container" (click)="openThread(message.id)">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">
             <mask id="mask0_1823_21561" style="mask-type: alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24"
@@ -79,7 +78,6 @@
           </div>
         </div>
       </div>
-
       <div class="message">
         <div class="message-content" [ngClass]="{'edit-mode-active': editWasClicked && showEditArea === message.id}">
           <img class="sender-img" [src]="message.senderPicture" alt="" />
@@ -88,7 +86,6 @@
               <h3>{{ message.senderName }}</h3>
               <span> {{ message.timestamp | date : "HH:mm" }} Uhr</span>
             </div>
-
             <div class="text-content">
               <ng-container *ngIf="!(editWasClicked && showEditArea === message.id); else editMode">
                 <div class="text" (click)="handleClickOnMention($event)">
@@ -101,7 +98,6 @@
                       {{ mentionName }}
                     </span>
                   </ng-container>
-
                   <div class="show-selected-files">
                     <div *ngFor="let file of message.selectedFiles">
                       <div class="mai-file" *ngIf="file.url">
@@ -111,7 +107,6 @@
                             <img [src]="file.url" alt="Image File" />
                           </a>
                         </div>
-
                         <!-- Für PDFs -->
                         <div class="file-info" *ngIf="file.type === 'application/pdf'">
                           <a [href]="file.url" target="_blank">
@@ -124,15 +119,12 @@
                 </div>
               </ng-container>
             </div>
-
-
             <div class="edited-holder" *ngIf="message.isEdited" [ngClass]="{
               'lablel-user': message.senderId !== global.currentUserData.id,
               'label-current': message.senderId === global.currentUserData.id
             }">
               <span class="edited-label" *ngIf="message.isEdited" class="edited-label">(Bearbeitet)</span>
             </div>
-
             <div class="placeholder-thread-answer">
               <div (click)="openThread(message.id)"
                 [ngClass]="{'thread-answer-display': true, 'show': getReplyCountValue(message.id) > 0}">
@@ -142,19 +134,15 @@
                   }}</span>
               </div>
             </div>
-
-
             <div (click)="closeEmojiPickerEdit()" *ngIf="EmojiEditclicked" class="emoji-picker-container-edit">
               <emoji-mart size="18" (click)="letPickerVisible($event, message.id)"
                 (emojiClick)="editMessageAdd($event)"></emoji-mart>
             </div>
-
             <div class="reactions-wrapper">
               <div class="reactions-container" [ngClass]="{
                      'reactions-from-user': message.senderId !== global.currentUserData.id,
                      'reactions-from-current': message.senderId === global.currentUserData.id
                    }">
-
                 <div class="single-reaction-wrapper" *ngFor="let reaction of message.reactions | keyvalue"
                   (mouseover)="onReactionHover(message, reaction.key)">
                   <span class="reaction" [ngClass]="{
@@ -181,14 +169,11 @@
           </div>
         </div>
       </div>
-
       <ng-template #editMode>
         <div class="edit-message-container" *ngIf="showEditArea === message.id">
-
           <div class="textarea-wrapper">
             <textarea #myTextarea name="message" [(ngModel)]="messageToEdit"></textarea>
             <div class="button-row edit-message-button-row">
-
               <div class="img-container-textarea" (click)="openEmojiPickerEdit($event, message.id)">
                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                   class="icon">
@@ -211,7 +196,6 @@
                 <button class="btn-primary channel" (click)="saveEditedMessage(message.id)">
                   <img class="edit-icon" *ngIf="isNarrowScreen" src="assets/img/check-mark.svg" alt="Speichern" />
                   <span *ngIf="!isNarrowScreen">Speichern</span>
-
                 </button>
               </div>
             </div>
@@ -219,7 +203,6 @@
         </div>
       </ng-template>
     </div>
-
   </div>
   <app-input-field [activeComponentId]="'channel'" [selectedChannel]="selectedChannel"></app-input-field>
 </div>

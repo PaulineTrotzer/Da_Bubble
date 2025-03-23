@@ -7,7 +7,6 @@
   gap: 20px;
   width: 100%;
   max-width: 500px;
-  height: 10%;
 }
 
 .heading {
@@ -58,6 +57,7 @@
   outline: none;
   border-radius: 30px;
   width: 100%;
+  font-size: 18px;;
   &:focus{
     border: 1px solid #797ef3;
   }
@@ -143,7 +143,7 @@ form {
   padding: 8px;
   border-radius: 8px;
   transition: background-color 0.2s ease;
-
+  font-size: 18px;
   img {
     height: 40px;
     width: 40px;
@@ -210,26 +210,5 @@ form {
   }
 }
 
-@media(min-width: 320px) and (max-width: 600px){
-  .card{
-    max-width: 100vw;
-  }
-  h3{
-    font-size: 17px;
-  }
-  .subheader{
-    bottom: -4px;
-  }
-  .input-container{
-    margin-top: 16px;
-  }
-  .add-input{
-    padding: 12px 13px;
-  }
-  .btn-primary{
-    padding: 6px 15px;
-  }
-  .btn-primary-disabled{
-    padding: 6px 15px;
-  }
-}
+
+@import './mobile-view-styling/dialog-add-member.mobile.scss';

@@ -5,7 +5,6 @@
       <h1>DABubble</h1>
     </div>
   </header>
-
   <div class="card">
     <div class="heading">
       <div class="img-container" routerLink="/">
@@ -27,11 +26,8 @@
       <span>Mit deinem Namen und deiner E-mail-Adresse hast du dein neues
         DABubble-Konto</span>
     </div>
-
     <div *ngIf="linkAlreadySended" class="error err-link-sended">Ein Link zur Verifizierung wurde bereits gesendet</div>
     <div *ngIf="userError" class="error err-user-exists">Ein User mit dieser Email existiert bereits</div>
-
-
     <form (ngSubmit)="onSubmit(userForm)" #userForm="ngForm">
       <div class="form-row">
         <label for="name"></label>
@@ -88,7 +84,6 @@
     <a routerLink="/impressum" routerLinkActive="active">Impressum</a>
     <a routerLink="/privacy-policy" routerLinkActive="active">Datenschutz</a>
   </div>
-
   <mat-card *ngIf="linkWasSend" appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
     <mat-card-content class="link-card-content">
       <img class="link-img" src="../../assets/img/send.png">

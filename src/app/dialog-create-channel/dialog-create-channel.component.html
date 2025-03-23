@@ -19,7 +19,6 @@
     Channels dienen deinem Team zur Kommunikation. Am besten sollten sie
     themenbezogen sein #marketing zum Beispiel.
   </p>
-
   <form [formGroup]="channelForm" (ngSubmit)="onSubmit()">
     <div class="form-row">
       <label for="channel-name">Channel-Name</label>
@@ -36,7 +35,6 @@
     <p class="warning-max-length" *ngIf="channelForm.get('description')?.hasError('maxlength')">
       Maximalanzahl an Zeichen erreicht!
     </p>
-
     <div class="button-row">
       <button type="submit" [disabled]="channelForm.invalid" (mouseenter)="toggleHover()" (mouseleave)="toggleHover()"
         [ngClass]="{

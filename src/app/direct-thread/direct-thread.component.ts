@@ -23,6 +23,7 @@ import {
   orderBy,
   setDoc,
   deleteDoc,
+  getDocs,
 } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
 import { ActivatedRoute } from '@angular/router';
@@ -35,11 +36,11 @@ import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { currentThreadMessage } from '../models/threadMessage.class';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { SendMessageInfo } from '../models/send-message-info.interface';
 import { ThreadParentMessageComponent } from '../thread-parent-message/thread-parent-message.component';
 import { MentionThreadService } from '../services/mention-thread.service';
+import { fadeIn, slideIn } from './component.animation';
 
 @Component({
   selector: 'app-direct-thread',
@@ -55,30 +56,7 @@ import { MentionThreadService } from '../services/mention-thread.service';
   ],
   templateUrl: './direct-thread.component.html',
   styleUrls: ['./direct-thread.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-in-out', style({ opacity: 1 })),
-      ]),
-    ]),
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50%)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 1, transform: 'translateX(0)' })
-        ),
-      ]),
-      transition(':leave', [
-        style({ opacity: 1, transform: 'translateX(0)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 0, transform: 'translateX(-50%)' })
-        ),
-      ]),
-    ]),
-  ],
+  animations: [fadeIn, slideIn],
 })
 export class DirectThreadComponent implements OnInit, OnDestroy {
   @Output() closeDirectThread = new EventEmitter<void>();
@@ -96,11 +74,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   isEmojiPickerVisible = false;
   isEmojiPickerEditVisible = false;
   currentSrc?: string;
-  icons: { [key: string]: string } = {
-    iconMore: 'assets/img/more_vertical.svg',
-    iconAddReaction: 'assets/img/comment/add_reaction.svg',
-    iconThird: 'assets/img/third.svg',
-  };
   isDirectThreadOpen: boolean = true;
   reactions: { [messageId: string]: any[] } = {};
   selectFiles: any[] = [];
@@ -140,15 +113,32 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
   mentionService = inject(MentionThreadService);
   localUserLastEmoji: any;
   showTooltipForSenderEmoji: { [messageId: string]: boolean } = {};
+  allUsersFromDb: any[] = [];
 
   constructor(private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
   async ngOnInit(): Promise<void> {
     await this.mentionService.getAllUsersname();
+    await this.loadAllUsersFromDb();
     this.shouldScrollToBottom = true;
     await this.initializeComponent();
     this.subscribeToThreadChanges();
     this.setCurrentUserId();
     this.checkIfSelfThread();
+  }
+
+  async loadAllUsersFromDb(): Promise<void> {
+    const userRef = collection(this.firestore, 'users');
+    const snapshot = await getDocs(userRef);
+    this.allUsersFromDb = snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        name: data['name'],
+        username: data['username'] || '',
+        email: data['email'],
+        picture: data['picture'] || 'assets/img/default-avatar.png',
+      };
+    });
   }
 
   toggleReactionInfoForSenderEmoji(messageId: string, show: boolean) {
@@ -205,7 +195,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
 
   async updateSingleParentMessagePhoto(message: any) {
     if (!message) return;
-
     const newPhotoUrl = this.global.currentUserData?.picture;
     if (!newPhotoUrl) return;
     if (
@@ -230,7 +219,20 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
         if (data['timestamp']?.toDate) {
           data['timestamp'] = data['timestamp'].toDate();
         }
-        return { id: doc.id, ...data };
+        const sender = this.allUsersFromDb.find(
+          (user) => user.id === data['senderId']
+        );
+        const recipient = this.allUsersFromDb.find(
+          (user) => user.id === data['recipientId']
+        );
+        return {
+          id: doc.id,
+          ...data,
+          senderName: sender?.name || data['senderName'],
+          senderPicture: sender?.picture || data['senderPicture'],
+          recipientName: recipient?.name || data['recipientName'],
+          recipientPicture: recipient?.picture || data['recipientPicture'],
+        };
       });
       this.scrollAutoDown();
       this.cdr.detectChanges();
@@ -422,8 +424,6 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         container.scrollTop = container.scrollHeight;
       }, 50);
-    } else {
-      console.log('scrollToBottom - No scroll container found');
     }
   }
 
@@ -828,11 +828,10 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.toggleThreadStatus(false);
     this.closeDirectThread.emit();
     this.global.openChannelorUserBox = true;
-/*     this.global.currentThreadMessageSubject.next(null); */
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.unsubscribe$ = new Subject<void>();
-    if(window.innerWidth < 900 ){
+    if (window.innerWidth < 900) {
       this.global.openChannelorUserBox = false;
     }
   }

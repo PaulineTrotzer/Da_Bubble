@@ -3,19 +3,6 @@ mat-card {
   z-index: 110;
 }
 
-/* app-workspace {
-  position: relative;
-
-  &.workspace-open {
-    transform: translateX(0);
-    transition: transform 0.3s ease-in-out;
-  }
-  &.workspace-closed {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
-} */
-
 .full-flex {
   max-width: 2200px;
 }
@@ -40,8 +27,6 @@ mat-card {
   overflow: hidden;
 }
 
-
-
 .workspace-wrapper {
   transform-origin: left;
   transition: transform 0.3s ease, opacity 0.3s ease;
@@ -50,7 +35,6 @@ mat-card {
   width: 100% !important;
 }
 
-/* Wenn der Workspace geschlossen werden soll */
 .workspace-wrapper.closed {
   transform: scaleX(0);
   opacity: 0;
@@ -304,9 +288,6 @@ app-thread {
 }
 
 @media (min-width: 450px) and (max-width: 770px) {
-/*   app-thread {
-    width: 100vw;
-  } */
   .workspace-opener {
     left: -134px;
     padding: 2px;

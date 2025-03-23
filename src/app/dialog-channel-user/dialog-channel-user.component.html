@@ -15,7 +15,6 @@
       </svg>
     </div>
   </div>
-
   <div class="members-container">
     <div class="member" style="position: relative;" *ngFor="let member of allMembers"
       (click)="openProfileDialog(member)">
@@ -23,7 +22,6 @@
         <img src="{{ member?.picture }}" alt="" />
         {{ member?.name }}
       </span>
-
       <div class="status-border">
         <div class="status" [ngClass]="{
             online: member.status === 'online',
@@ -32,7 +30,6 @@
       </div>
     </div>
   </div>
-
   <div class="add-user-container" (click)="openAddMemberDialog()">
     <div class="img-container">
       <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon">

@@ -127,7 +127,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.focusInputField();
   }
 
-
   onResize(): void {
     const width = window.innerWidth;
     if (width <= 600) {
@@ -149,9 +148,7 @@ export class InputFieldComponent implements OnInit, OnChanges {
     this.onResize();
     this.authService.initAuthListener();
     this.userId = this.route.snapshot.paramMap.get('id');
-    if (this.userId && this.selectedUser?.id) {
-      this.getByUserName();
-    }
+    this.getByUserName();
     this.subscription.add(
       this.threadControlService.firstThreadMessageId$.subscribe((messageId) => {
         this.currentThreadMessageId = messageId;

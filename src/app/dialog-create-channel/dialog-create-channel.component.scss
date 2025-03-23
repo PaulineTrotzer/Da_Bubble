@@ -56,6 +56,7 @@ form {
   flex-direction: column;
   position: relative;
   gap: 20px;
+  font-size: 18px;
   label {
     font-family: Nunito;
     font-size: 18px;
@@ -75,6 +76,7 @@ form {
     border: 1px solid #adb0d9;
     padding: 18px 20px;
     outline: none;
+    font-size: 18px;
   }
   .channel-name {
     padding-left: 50px;
@@ -94,22 +96,4 @@ form {
   font-size: 15px;
 }
 
-@media (min-width: 320px )  and (max-width: 600px) {
-  .top-bar {
-    font-size: 20px;
-  }
-  form {
-    gap: 32px;
-  }
-  .card {
-    gap: 36px;
-  }
-  .btn-primary-disabled {
-    margin-top: 22px;
-    padding: 8px 21px;
-  }
-  .btn-primary {
-    margin-top: 22px;
-    padding: 8px 21px;
-  }
-}
+@import "./mobile-view-styling/dialog-create-channel.mobile.scss";

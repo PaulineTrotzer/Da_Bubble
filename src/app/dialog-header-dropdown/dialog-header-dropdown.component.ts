@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { DialogHeaderProfilCardComponent } from '../dialog-header-profil-card/dialog-header-profil-card.component';
@@ -24,7 +31,8 @@ export class DialogHeaderDropdownComponent implements OnInit, OnDestroy {
   userId: any;
   overlayStatusService = inject(OverlayStatusService);
   global = inject(GlobalVariableService);
-  LoginAuthService=inject(LoginAuthService);
+  LoginAuthService = inject(LoginAuthService);
+  @Output() closeOverlayFromDropDown = new EventEmitter<void>();
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
@@ -45,9 +53,6 @@ export class DialogHeaderDropdownComponent implements OnInit, OnDestroy {
     this.LoginAuthService.setGoogleAccountLogIn(false);
     this.updateStatus(this.userId);
   }
-
-
-  @Output() closeOverlayFromDropDown = new EventEmitter<void>();
 
   handleClickOutside = (event: MouseEvent) => {
     const dropdown = document.querySelector('.dialog-ct');

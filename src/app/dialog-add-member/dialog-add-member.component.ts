@@ -23,8 +23,6 @@ import {
   styleUrl: './dialog-add-member.component.scss',
 })
 export class DialogAddMemberComponent implements OnInit {
-  constructor() {}
-
   channel = inject(MAT_DIALOG_DATA);
   dialog = inject(MatDialog);
   db = inject(Firestore);
@@ -34,8 +32,9 @@ export class DialogAddMemberComponent implements OnInit {
   searchInput: string = '';
   errorMessage: string = '';
 
+  constructor() {}
+
   ngOnInit(): void {
-    console.log('Channel Data:', this.channel);
     this.getAllUsers();
   }
 
@@ -65,10 +64,7 @@ export class DialogAddMemberComponent implements OnInit {
       const searchTerm = this.searchInput.toLowerCase();
       this.filteredUsers = this.allUsers
         .filter((user) => {
-          return (
-            user.name &&
-            user.name.toLowerCase().includes(searchTerm)
-          );
+          return user.name && user.name.toLowerCase().includes(searchTerm);
         })
         .filter((user) => user.name.toLowerCase() !== 'gast');
     }
@@ -107,13 +103,13 @@ export class DialogAddMemberComponent implements OnInit {
     }
   }
 
-  private async addSelectedUsersToChannel() {
+  async addSelectedUsersToChannel() {
     const userIds = this.selectedUsers.map((user) => user.uid);
     await this.updateChannelUserIds(userIds);
     this.closeDialog();
   }
 
-  private async updateChannelUserIds(userIds: string[]) {
+  async updateChannelUserIds(userIds: string[]) {
     const channelRef = doc(this.db, 'channels', this.channel.id);
     try {
       await updateDoc(channelRef, {

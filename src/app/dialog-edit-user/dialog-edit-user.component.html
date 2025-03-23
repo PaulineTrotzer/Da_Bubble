@@ -5,16 +5,13 @@
             <img (click)="closeEditModus()" src="./assets/img/close.svg">
         </div>
     </div>
-
     <div class="img-frame">
         <img [src]="chossePicture || user.picture || previewUrl">
     </div>
-
     <div *ngIf="loadingSpinner" class="loading-indicator">
         <span>Bild wird hochgeladen...</span>
         <div class="spinner"></div>
     </div>
-
     <div *ngIf="!guestAccount" class="avatar-box">
         <div *ngFor="let avatar of avatarBox">
             <img [src]="avatar" (click)="selectAvatar(avatar)">
@@ -23,16 +20,13 @@
     <div *ngIf="fileTooLargeMessage" class="error-message">
         <span>{{ fileTooLargeMessage }}</span>
     </div>
-
     <div *ngIf="!guestAccount" class="added-avatar">
         <div class="picture-info-text">oder Bild</div>
         <div>
             <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
             <label for="upload">Datei hochladen</label>
         </div>
-
     </div>
-
     <div class="name-edit-flex">
         <div class="description-input">
             <img src="assets/img/account_circle.svg">
@@ -42,26 +36,18 @@
             <input [(ngModel)]="currentUser.name" placeholder="{{user.name}}">
         </div>
     </div>
-
     <div class="mail-flex-column">
         <div>
             <img src="./assets/img/mail.svg">
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
-
         <input *ngIf="!guestAccount && !googleAccountLogIn" class="user-mail-input" [(ngModel)]="currentUser.email"
             placeholder="{{user.email}}" />
-
         <input *ngIf="guestAccount" class="user-mail-input" [value]="currentUser.email" readonly />
         <span *ngIf="guestAccount" class="error-msg">Kein Zugriff als Gast</span>
-
-
         <input *ngIf="googleAccountLogIn" class="user-mail-input" [value]="currentUser.email" disabled />
         <span *ngIf="googleAccountLogIn" class="error-msg">Mail kann nicht geändert werden</span>
     </div>
-
-
-
     <div class="button-flex">
         <button (click)="closeEditModus()" class="btn-secondary">Abbrechen</button>
         <button (click)="saveUser()" class="btn-primary">Speichern</button>

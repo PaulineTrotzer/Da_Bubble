@@ -4,7 +4,12 @@ import { MatCardModule } from '@angular/material/card';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { getAuth, confirmPasswordReset, applyActionCode, onAuthStateChanged } from "firebase/auth";
+import {
+  getAuth,
+  confirmPasswordReset,
+  applyActionCode,
+  onAuthStateChanged,
+} from 'firebase/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -14,12 +19,9 @@ import { GlobalVariableService } from '../services/global-variable.service';
   standalone: true,
   imports: [FormsModule, MatCardModule, RouterModule, CommonModule],
   templateUrl: './create-new-password.component.html',
-  styleUrl: './create-new-password.component.scss'
+  styleUrl: './create-new-password.component.scss',
 })
 export class CreateNewPasswordComponent {
-  constructor(public global: GlobalVariableService) { }
-
-
   sendInfo: boolean = false;
   disabled: boolean = true;
   route = inject(ActivatedRoute);
@@ -27,9 +29,11 @@ export class CreateNewPasswordComponent {
   password: string = '';
   confirmPassword: string = '';
   oobCode: any;
-  mode: any
+  mode: any;
   firestore = inject(Firestore);
   router = inject(Router);
+
+  constructor(public global: GlobalVariableService) {}
 
   openDiv() {
     setTimeout(() => {
@@ -39,16 +43,15 @@ export class CreateNewPasswordComponent {
 
   resetFields(): void {
     this.confirmPassword = '';
-    this.password = ''
+    this.password = '';
   }
 
   ngOnInit() {
     debugger;
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.oobCode = params['oobCode'];
       this.mode = params['mode'];
       if (this.oobCode && this.mode === 'resetPassword') {
-        console.log('Ok')
         this.global.createNewPassword = true;
         this.global.verifyEmail = false;
       } else if (this.oobCode && this.mode === 'verifyEmail') {
@@ -67,31 +70,29 @@ export class CreateNewPasswordComponent {
       if (user) {
         this.getUserDoc(user.uid);
       }
-    })
+    });
   }
-
 
   async getUserDoc(uid: string) {
     const userDocRef = doc(this.firestore, 'users', uid);
     const getDocRef = await getDoc(userDocRef);
     if (getDocRef.exists()) {
       this.userDocument = { id: getDocRef.id, ...getDocRef.data() };
-      console.log('User Document:', this.userDocument);
     }
   }
 
   checkPasswordFields() {
     if (this.password && this.confirmPassword) {
-      this.disabled = false; 
-      this.checkPasswordinfo = false; 
+      this.disabled = false;
+      this.checkPasswordinfo = false;
     } else {
-      this.disabled = true; 
+      this.disabled = true;
     }
   }
 
   async createNewPassword() {
     if (this.password !== this.confirmPassword) {
-      this.checkPasswordinfo = true; 
+      this.checkPasswordinfo = true;
       return;
     }
     const auth = getAuth();
@@ -110,20 +111,19 @@ export class CreateNewPasswordComponent {
       this.router.navigate(['/']);
     }, 1500);
   }
-  
-  
+
   async verifyEmail() {
     debugger;
     const auth = getAuth();
     if (!this.oobCode) {
       return;
-    }else{
+    } else {
       await applyActionCode(auth, this.oobCode);
       this.global.verifyEmail = true;
       const currentUser = auth.currentUser;
       if (currentUser) {
         const uid = currentUser.uid;
-        this.sendInfo=true;
+        this.sendInfo = true;
         this.openDiv();
         setTimeout(() => {
           this.router.navigate(['/avatar', uid]);

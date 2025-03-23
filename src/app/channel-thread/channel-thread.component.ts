@@ -16,6 +16,7 @@ import {
   DocumentReference,
   Firestore,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -28,22 +29,12 @@ import { InputFieldComponent } from '../input-field/input-field.component';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MentionThreadService } from '../services/mention-thread.service';
-
-interface Message {
-  id: string;
-  senderId: string;
-  text: string;
-  timestamp: Date;
-  senderName: string;
-  senderPicture: string;
-  selectedFiles?: any[];
-  reactions: { [emoji: string]: string[] };
-  isEdited: boolean;
-}
+import { formatDate, isSameDay, displayDayInfo } from '../date-utils';
+import { Message } from '../channel-message.interface';
+import { slideInAnimation } from './component.animation';
 
 @Component({
   selector: 'app-channel-thread',
@@ -57,24 +48,7 @@ interface Message {
   ],
   templateUrl: './channel-thread.component.html',
   styleUrl: './channel-thread.component.scss',
-  animations: [
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50%)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 100, transform: 'translateX(0)' })
-        ),
-      ]),
-      transition(':enter', [
-        style({ opacity: 100, transform: 'translateX(0)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 0, transform: 'translateX(-50%)' })
-        ),
-      ]),
-    ]),
-  ],
+  animations: [slideInAnimation]
 })
 export class ChannelThreadComponent implements OnInit {
   visiblePickerValue = false;
@@ -115,10 +89,13 @@ export class ChannelThreadComponent implements OnInit {
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   mentionService = inject(MentionThreadService);
   @Output() closeThreadChannel = new EventEmitter<void>();
+  public displayDayInfo = displayDayInfo;
+  allUsersFromDb: any[] = [];
 
   constructor() {}
 
   async ngOnInit(): Promise<void> {
+    await this.loadAllUsersFromDb();
     await this.mentionService.getAllUsersname();
     this.global.channelThread$.subscribe(async (threadId) => {
       if (threadId) {
@@ -133,22 +110,20 @@ export class ChannelThreadComponent implements OnInit {
     this.scrollOrNot('yes');
   }
 
-  displayDayInfo(index: number): boolean {
-    if (index === 0) return true;
-    const currentMessage = this.messages[index];
-    const previousMessage = this.messages[index - 1];
-    return !this.isSameDay(
-      new Date(currentMessage.timestamp),
-      new Date(previousMessage.timestamp)
-    );
-  }
 
-  isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
+  async loadAllUsersFromDb(): Promise<void> {
+    const userRef = collection(this.firestore, 'users');
+    const snapshot = await getDocs(userRef);
+    this.allUsersFromDb = snapshot.docs.map((docSnap: { data: () => any; id: any; }) => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        name: data['name'],
+        username: data['username'] || '',
+        email: data['email'],
+        picture: data['picture'] || 'assets/img/default-avatar.png',
+      };
+    });
   }
 
   getDayInfoForMessage(index: number): string {
@@ -157,20 +132,13 @@ export class ChannelThreadComponent implements OnInit {
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
 
-    if (this.isSameDay(messageDate, today)) {
+    if (isSameDay(messageDate, today)) {
       return 'Heute';
-    } else if (this.isSameDay(messageDate, yesterday)) {
+    } else if (isSameDay(messageDate, yesterday)) {
       return 'Gestern';
     } else {
-      return this.formatDate(messageDate);
+      return formatDate(messageDate);
     }
-  }
-
-  formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
   }
 
   scrollToBottom(): void {
@@ -182,7 +150,6 @@ export class ChannelThreadComponent implements OnInit {
 
   getReplyCountText(): string {
     const replyCount = this.messages.length;
-
     if (replyCount === 1) {
       return '1 Antwort';
     } else if (replyCount > 1) {
@@ -218,25 +185,6 @@ export class ChannelThreadComponent implements OnInit {
         this.handleMentionClick(mentionName);
       }
     }
-  }
-
-  splitMessage(text: string): string[] {
-    const regex = /(@[\w\-_!$*]+)/g;
-    const parts = text.split(regex);
-    const cleanedParts = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
-    return cleanedParts;
-  }
-
-  isMention(textPart: string): boolean {
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name.trim().toLowerCase()
-    );
-    const mentionName = textPart.startsWith('@')
-      ? textPart.substring(1).toLowerCase()
-      : '';
-    return normalizedUserNames.includes(mentionName);
   }
 
   async handleMentionClick(mention: string) {
@@ -284,18 +232,38 @@ export class ChannelThreadComponent implements OnInit {
         'messages',
         this.channelMessageId
       );
-      onSnapshot(docRef, (doc) => {
-        const data = doc.data();
+      onSnapshot(docRef, (docSnap) => {
+        const data = docSnap.data();
         if (data) {
-          if (data['timestamp']?.seconds) {
-            data['timestamp'] = new Date(data['timestamp'].seconds * 1000);
-          }
-          this.topicMessage = { ...data, id: this.channelMessageId } as Message;
+          const sender = this.allUsersFromDb.find(user => user.id === data['senderId']);
+          const recipient = this.allUsersFromDb.find(user => user.id === data['recipientId']);
+  
+          const timestamp =
+            data['timestamp']?.seconds
+              ? new Date(data['timestamp'].seconds * 1000)
+              : new Date();
+  
+          this.topicMessage = {
+            id: docSnap.id,
+            senderId: data['senderId'],
+            text: data['text'],
+            timestamp: timestamp,
+            reactions: data['reactions'] || {},
+            formattedText: this.formatMentions(data['text']),
+            senderName: sender?.name || data['senderName'],
+            senderPicture: sender?.picture || data['senderPicture'],
+            recipientName: recipient?.name || data['recipientName'],
+            recipientPicture: recipient?.picture || data['recipientPicture'],
+            isEdited: data['isEdited'] ?? false
+          } as Message;
+
           resolve();
         }
       });
     });
   }
+  
+  
 
   async loadThreadMessages() {
     if (!this.channelMessageId) {
@@ -325,11 +293,18 @@ export class ChannelThreadComponent implements OnInit {
         if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
-        data.formattedText = this.formatMentions(data.text);
-        if (data.isEdited === undefined) {
-          data.isEdited = false;
-        }
-        return { id: doc.id, ...data };
+        const sender = this.allUsersFromDb.find(user => user.id === data['senderId']);
+        const recipient = this.allUsersFromDb.find(user => user.id === data['recipientId']);
+        return {
+          id: doc.id,
+          ...data,
+          formattedText: this.formatMentions(data.text),
+          senderName: sender?.name || data['senderName'],
+          senderPicture: sender?.picture || data['senderPicture'],
+          recipientName: recipient?.name || data['recipientName'],
+          recipientPicture: recipient?.picture || data['recipientPicture'],
+          isEdited: data.isEdited ?? false
+        };
       });
       if (newMessageArrived) {
         setTimeout(() => {
@@ -339,7 +314,6 @@ export class ChannelThreadComponent implements OnInit {
       await this.updateMessagesWithNewPhoto();
     });
   }
-
   scrollOrNot(command: string) {
     if (command === 'yes') {
       setTimeout(() => this.scrollToBottom(), 50);
@@ -352,7 +326,6 @@ export class ChannelThreadComponent implements OnInit {
     try {
       const newPhotoUrl = this.global.currentUserData?.picture;
       if (!newPhotoUrl) {
-        console.warn('Keine neue Foto-URL verfügbar');
         return;
       }
       await this.updateMessagePhoto(this.topicMessage, newPhotoUrl);
@@ -381,7 +354,7 @@ export class ChannelThreadComponent implements OnInit {
     }
   }
 
-  private async updateMessagePhoto(message: any, newPhotoUrl: string) {
+  async updateMessagePhoto(message: any, newPhotoUrl: string) {
     if (
       message &&
       message.senderId === this.global.currentUserData.id &&
@@ -406,17 +379,6 @@ export class ChannelThreadComponent implements OnInit {
     this.closeThreadChannel.emit();
   }
 
-  hiddenThreadFullBox() {
-    if (
-      window.innerWidth <= 1349 &&
-      window.innerWidth > 720 &&
-      this.global.checkWideChannelOrUserThreadBox
-    ) {
-      this.global.checkWideChannelOrUserThreadBox = false;
-      this.global.checkWideChannelorUserBox = true;
-    }
-  }
-
   async addLastUsedEmoji(emoji: any) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
@@ -434,9 +396,7 @@ export class ChannelThreadComponent implements OnInit {
   async addToReactionInfo(emoji: any, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
     if (!currentUserId) return;
-
     const messageDocRef =
       messageId === this.topicMessage?.id
         ? doc(
@@ -455,24 +415,18 @@ export class ChannelThreadComponent implements OnInit {
             'messages',
             messageId
           );
-
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       if (!messageSnapshot.exists()) return;
-
       const messageData = messageSnapshot.data();
       let reactions = messageData?.['reactions'] || {};
-
       const hasReacted = Object.values(reactions).some((userIds) =>
         (userIds as string[]).includes(currentUserId)
       );
-
       if (hasReacted) return;
-
       if (!reactions[emoji.native]) {
         reactions[emoji.native] = [];
       }
-
       reactions[emoji.native].push(currentUserId);
       await updateDoc(messageDocRef, { reactions });
     } catch (error) {
@@ -547,9 +501,7 @@ export class ChannelThreadComponent implements OnInit {
   async removeReaction(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
     if (!currentUserId) return;
-
     const messageDocRef =
       messageId === this.topicMessage?.id
         ? doc(
@@ -568,21 +520,17 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-
     try {
       const messageSnapshot = await getDoc(messageDocRef);
       const messageData = messageSnapshot.data();
       const reactions = messageData?.['reactions'] || {};
-
       if (reactions[emoji] && reactions[emoji].includes(currentUserId)) {
         reactions[emoji] = reactions[emoji].filter(
           (userId: string) => userId !== currentUserId
         );
-
         if (reactions[emoji].length === 0) {
           delete reactions[emoji];
         }
-
         await updateDoc(messageDocRef, { reactions });
       }
     } catch (error) {
@@ -597,10 +545,8 @@ export class ChannelThreadComponent implements OnInit {
   async loadCurrentUserEmojis() {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
     if (currentUserId) {
       const userDocRef = doc(this.db, 'users', currentUserId);
-
       onSnapshot(userDocRef, (docSnapshot) => {
         const userData = docSnapshot.data();
         if (userData?.['lastEmojis']) {
@@ -611,17 +557,13 @@ export class ChannelThreadComponent implements OnInit {
       console.warn('No current user logged in');
     }
   }
+
   async addEmojiToMessage(emoji: string, messageId: string) {
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid;
-
-    // A) Ist man gerade in "Nachricht Bearbeiten"-Modus?
     if (this.editingMessageId === messageId) {
-      // Füge das Emoji einfach dem zu bearbeitenden Text an
       this.messageToEdit += emoji;
-    }
-    // B) Reaktions-Logik
-    else if (currentUserId) {
+    } else if (currentUserId) {
       const isInThread = messageId === this.threadMessageId;
       const messageDocRef = isInThread
         ? doc(
@@ -640,15 +582,10 @@ export class ChannelThreadComponent implements OnInit {
             'thread',
             messageId
           );
-
-      // Dokument holen und Reaction-Update durchführen
       const messageSnapshot = await getDoc(messageDocRef);
       if (messageSnapshot.exists()) {
         const messageData = messageSnapshot.data();
-        console.log('Nachricht Daten:', messageData);
         const reactions = messageData?.['reactions'] || {};
-
-        // Prüfen, ob man bereits mit einem anderen Emoji reagiert hat
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
           if ((userIds as string[]).includes(currentUserId)) {
@@ -656,10 +593,7 @@ export class ChannelThreadComponent implements OnInit {
             break;
           }
         }
-
-        // Gleicher Emoji -> Reaction entfernen, sonst Reaction setzen
         if (oldReaction === emoji) {
-          // Entfernen
           reactions[emoji] = reactions[emoji].filter(
             (userId: string) => userId !== currentUserId
           );
@@ -667,7 +601,6 @@ export class ChannelThreadComponent implements OnInit {
             delete reactions[emoji];
           }
         } else {
-          // Alte Reaction löschen (falls vorhanden)
           if (oldReaction) {
             reactions[oldReaction] = reactions[oldReaction].filter(
               (userId: string) => userId !== currentUserId
@@ -676,16 +609,12 @@ export class ChannelThreadComponent implements OnInit {
               delete reactions[oldReaction];
             }
           }
-          // Neue Reaction hinzufügen
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
-
         await updateDoc(messageDocRef, { reactions });
-      } else {
-        console.error('Dokument existiert nicht!');
       }
       this.addLastUsedEmoji({ native: emoji });
     }
@@ -696,13 +625,11 @@ export class ChannelThreadComponent implements OnInit {
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
-
     const auth = getAuth();
     const reactors = message.reactions[emoji] || [];
     const unknownUsers = reactors
       .filter((userId) => userId !== auth.currentUser?.uid)
       .filter((userId) => !this.reactionUserNames[userId]);
-
     if (unknownUsers.length > 0) {
       Promise.all(
         unknownUsers.map(async (userId) => {
@@ -718,17 +645,14 @@ export class ChannelThreadComponent implements OnInit {
 
   getReactionText(message: Message, emoji: string | null): string {
     if (!emoji || !message.reactions) return '';
-
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid || '';
     const reactors = message.reactions[emoji] || [];
     if (reactors.length === 0) return '';
-
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter((userId) => userId !== currentUserId);
     let userString = '';
     let verb = '';
-
     if (currentUserReacted) {
       if (otherReactors.length === 0) {
         userString = 'Du';
@@ -757,12 +681,10 @@ export class ChannelThreadComponent implements OnInit {
   }
 
   toggleEditDialog(messageId: string | null): void {
-    // Falls messageId null => schließe den Dialog
     if (!messageId) {
       this.showEditDialog = null;
       return;
     }
-    // Andernfalls: Setze showEditDialog auf die ID
     this.showEditDialog = messageId;
   }
 
@@ -800,7 +722,6 @@ export class ChannelThreadComponent implements OnInit {
   async saveEditedMessage(messageId: string) {
     try {
       const isTopicMessage = messageId === this.topicMessage?.id;
-
       const messageDocRef = isTopicMessage
         ? doc(
             this.db,
@@ -820,7 +741,6 @@ export class ChannelThreadComponent implements OnInit {
           );
       if (!this.messageToEdit || this.messageToEdit.trim() === '') {
         await deleteDoc(messageDocRef);
-
         if (isTopicMessage) {
           this.topicMessage = null;
         } else {
@@ -831,7 +751,6 @@ export class ChannelThreadComponent implements OnInit {
           text: this.messageToEdit.trim(),
           isEdited: true,
         });
-
         if (isTopicMessage && this.topicMessage) {
           this.topicMessage.text = this.messageToEdit.trim();
           this.topicMessage.isEdited = true;

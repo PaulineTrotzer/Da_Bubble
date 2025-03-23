@@ -4,7 +4,9 @@
   flex-direction: column;
   gap: 20px;
 }
-
+h3 {
+  font-size: 20px;
+}
 .top-bar {
   display: flex;
   align-items: center;
@@ -17,6 +19,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  font-size: 18px;
 }
 
 .form-row {
@@ -139,14 +142,4 @@ form {
   background-color: #f2f3ff;
 }
 
-@media (min-width: 320px)  and (max-width: 600px) {
-  p {
-    margin-left: 8px;
-  }
-  .btn-primary-disabled {
-    margin-top: 28px;
-  }
-  .btn-primary {
-    margin-top: 28px;
-  }
-}
+@import "./moble-view-styling/dialog-add-user.mobile.scss";

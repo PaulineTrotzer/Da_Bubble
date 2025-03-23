@@ -19,6 +19,7 @@ import {
   DocumentReference,
   Firestore,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -36,19 +37,9 @@ import { InputFieldComponent } from '../input-field/input-field.component';
 import { InputfieldService } from '../services/inputfield.service';
 import { MentionThreadService } from '../services/mention-thread.service';
 import { ThreadControlService } from '../services/thread-control.service';
-
-interface Message {
-  formattedText: any;
-  id: string;
-  senderId: string;
-  text: string;
-  timestamp: Date;
-  senderName: string;
-  senderPicture: string;
-  reactions: { [emoji: string]: string[] };
-  selectedFiles?: any[];
-  isEdited: boolean;
-}
+import { formatDate, isSameDay, displayDayInfo } from '../date-utils';
+import { Message } from '../channel-message.interface';
+import { slideInAnimation } from './component.animation';
 
 @Component({
   selector: 'app-channel-chat',
@@ -62,24 +53,7 @@ interface Message {
   ],
   templateUrl: './channel-chat.component.html',
   styleUrl: './channel-chat.component.scss',
-  animations: [
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50%)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 100, transform: 'translateX(0)' })
-        ),
-      ]),
-      transition(':enter', [
-        style({ opacity: 100, transform: 'translateX(0)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 0, transform: 'translateX(-50%)' })
-        ),
-      ]),
-    ]),
-  ],
+  animations: [slideInAnimation],
 })
 export class ChannelChatComponent implements OnInit {
   [x: string]: any;
@@ -125,15 +99,16 @@ export class ChannelChatComponent implements OnInit {
   EmojiEditclicked = false;
   isNarrowScreen = false;
   firstDayInfoIndex: number | null = null;
-
+  public displayDayInfo = displayDayInfo;
+  allUsersFromDb: any[] = [];
 
   constructor(private elRef: ElementRef) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadCurrentUserEmojis();
-
     this.checkEditScreenSize();
     await this.mentionService.getAllUsersname();
+    this.allUsersFromDb = await this.getAllUsersname();
     await this.loadUserNames();
     this.userChannelSelectService.selectedChannel$.subscribe((channel) => {
       this.selectedChannel = channel;
@@ -143,21 +118,47 @@ export class ChannelChatComponent implements OnInit {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
     this.scrollOrNot('yes');
-
   }
 
+  getUserById(userId: string) {
+    return this.allUsersFromDb.find((user) => user.id === userId);
+  }
+  
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.closeChannelOnSmallScreen();
+  }
 
   findFirstDayInfoIndex() {
     for (let i = 0; i < this.messagesData.length; i++) {
-      if (this.displayDayInfo(i)) {
+      if (displayDayInfo(this.messagesData, i)) {
         this.firstDayInfoIndex = i;
-        break;  
+        break;
       }
     }
   }
 
-  checkEditScreenSize(){
-    this.isNarrowScreen = window.innerWidth < 600; 
+  async getAllUsersname(): Promise<any[]> {
+    const userRef = collection(this.firestore, 'users');
+    const snapshot = await getDocs(userRef);
+    const tempArray: any[] = [];
+    snapshot.forEach((doc) => {
+      const dataUser = doc.data();
+      tempArray.push({
+        name: dataUser['name'],
+        email: dataUser['email'],
+        picture: dataUser['picture'] || 'assets/img/default-avatar.png',
+        id: doc.id,
+        lastUsedEmoji: dataUser['lastUsedEmoji'] || '',
+        username: dataUser['username'] || '',
+      });
+    });
+    return tempArray;
+  }
+
+  checkEditScreenSize() {
+    this.isNarrowScreen = window.innerWidth < 600;
   }
 
   getReplyCountValue(messageId: string): number {
@@ -218,40 +219,9 @@ export class ChannelChatComponent implements OnInit {
     this.global.openMentionMessageBox = true;
   }
 
-  async ensureUserDataLoaded(name: string): Promise<any> {
-    while (this.getAllUsersName.length === 0) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    const foundUser = this.getAllUsersName.find(
-      (user) => user.name.trim().toLowerCase() === name.trim().toLowerCase()
-    );
-    if (!foundUser) {
-      return null;
-    }
-    return foundUser;
-  }
 
   closeMentionBoxHandler() {
     this.wasClickedInChannelInput = false;
-  }
-
-  splitMessage(text: string): string[] {
-    const regex = /(@[\w\-_!$*]+)/g;
-    const parts = text.split(regex);
-    const cleanedParts = parts
-      .map((part) => part.trim())
-      .filter((part) => part.length > 0);
-    return cleanedParts;
-  }
-
-  isMention(textPart: string): boolean {
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name.trim().toLowerCase()
-    );
-    const mentionName = textPart.startsWith('@')
-      ? textPart.substring(1).toLowerCase()
-      : '';
-    return normalizedUserNames.includes(mentionName);
   }
 
   async loadUserNames() {
@@ -275,57 +245,84 @@ export class ChannelChatComponent implements OnInit {
           if (userData?.['name']) {
             this.reactionUserNames[doc.id] = userData['name'];
           }
-        } else {
-          console.log(`No user found for ID: ${doc.id}`);
         }
       });
     } catch (error) {
       console.error('Error loading user names:', error);
     }
   }
-
   async loadChannelMessages() {
     if (!this.selectedChannel) {
-      console.warn('No channel selected');
+      console.warn('⚠️ Kein Channel ausgewählt');
       return;
     }
-
+  
+    // 🔹 Channel Messages Referenz
     const messagesRef = collection(
       this.firestore,
       'channels',
       this.selectedChannel.id,
       'messages'
     );
+  
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-
+  
     onSnapshot(q, async (querySnapshot) => {
+      console.log('📦 Channel Messages Snapshot:', querySnapshot.size);
+  
       let newMessageArrived = false;
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           newMessageArrived = true;
         }
       });
-
+  
       this.messagesData = querySnapshot.docs.map((docSnap: any) => {
         const data = docSnap.data();
         if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
+  
         data.formattedText = this.formatMentions(data.text);
+        console.log('📩 Verarbeite Nachricht', docSnap.id);
+        console.log('   ➤ senderId:', data.senderId, ', recipientId:', data.recipientId);
+  
+        // 🧠 Nutzerinformationen aus lokal geladenem User-Array holen
+        const sender = this.allUsersFromDb.find(u => u.id === data.senderId);
+        if (sender) {
+          data.senderName = sender.name;
+          data.senderPicture = sender.picture;
+        } else {
+          console.warn(`⚠️ Kein Nutzer gefunden für senderId ${data.senderId}`);
+        }
+  
+        if (data.recipientId) {
+          const recipient = this.allUsersFromDb.find(u => u.id === data.recipientId);
+          if (recipient) {
+            data.recipientName = recipient.name;
+            data.recipientPicture = recipient.picture;
+          }
+        }
+  
         return { id: docSnap.id, ...data };
       });
+  
+      // 🔁 Antworten laden
       this.subscribeToThreadAnswers();
+  
+      // 📜 Nach unten scrollen bei neuer Nachricht
       if (newMessageArrived) {
         setTimeout(() => {
           this.scrollToBottom();
         }, 50);
       }
+  
       this.findFirstDayInfoIndex();
       await this.updateMessagesWithNewPhoto();
       this.channelWasLoaded = true;
     });
-
   }
+  
 
   subscribeToThreadAnswers() {
     this.messagesData.forEach((message) => {
@@ -336,21 +333,37 @@ export class ChannelChatComponent implements OnInit {
         });
     });
   }
-
   formatMentions(text: string): SafeHtml {
-    const regex = /@([\w\-\*_!$]+(?:\s[\w\-\*_!$]+)?)/g;
-    const normalizedUserNames = this.getAllUsersName.map((user: any) =>
-      user.name ? user.name.trim().toLowerCase() : ''
-    );
-    const formattedText = text.replace(regex, (match) => {
-      const mentionName = match.substring(1).trim().toLowerCase();
-      if (normalizedUserNames.includes(mentionName)) {
-        return `&nbsp;<span class="mention-message">${match}</span>&nbsp;`;
-      }
-      return match;
+    const regex = /@(\S+)/g;
+  
+    const normalizedUserNames = this.getAllUsersName.map((user: any) => {
+      const name = user.name?.trim().toLowerCase() || '';
+      return name;
     });
+  
+    console.log('📌 Normalisierte Usernamen für Mentions:', normalizedUserNames);
+    console.log('✉️ Ursprünglicher Text:', text);
+  
+    const formattedText = text.replace(regex, (match) => {
+      let mentionName = match.substring(1).toLowerCase().trim();
+      mentionName = mentionName.split(' ')[0];
+  
+      console.log('🔍 Erkanntes Mention:', mentionName);
+  
+      if (normalizedUserNames.includes(mentionName)) {
+        console.log(`✅ "${mentionName}" erkannt als gültiger Mention-Name`);
+        return `<span class="mention">@${mentionName}</span>`;
+      } else {
+        console.warn(`❌ "${mentionName}" nicht in der Liste. Kein Styling.`);
+        return match;
+      }
+    });
+  
+    console.log('💡 Formatierter Text mit Mentions:', formattedText);
+  
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
+  
 
   async updateMessagesWithNewPhoto() {
     try {
@@ -503,12 +516,10 @@ export class ChannelChatComponent implements OnInit {
     } else {
       const auth = getAuth();
       const currentUserId = auth.currentUser?.uid;
-
       if (!currentUserId) {
         console.warn('No current user logged in');
         return;
       }
-
       const messageDocRef = doc(
         this.firestore,
         'channels',
@@ -516,11 +527,9 @@ export class ChannelChatComponent implements OnInit {
         'messages',
         messageId
       );
-
       getDoc(messageDocRef).then((messageSnapshot) => {
         const messageData = messageSnapshot.data();
         const reactions = messageData?.['reactions'] || {};
-
         let oldReaction: string | null = null;
         for (const [reactionEmoji, userIds] of Object.entries(reactions)) {
           if ((userIds as string[]).includes(currentUserId)) {
@@ -528,7 +537,6 @@ export class ChannelChatComponent implements OnInit {
             break;
           }
         }
-
         if (oldReaction === emoji) {
           reactions[emoji] = reactions[emoji].filter(
             (userId: string) => userId !== currentUserId
@@ -545,19 +553,16 @@ export class ChannelChatComponent implements OnInit {
               delete reactions[oldReaction];
             }
           }
-
           if (!reactions[emoji]) {
             reactions[emoji] = [];
           }
           reactions[emoji].push(currentUserId);
         }
-
         updateDoc(messageDocRef, { reactions }).catch((error) => {
           console.error('Error updating reactions:', error);
         });
       });
     }
-
     this.isPickerVisible = null;
     this.clicked = false;
     this.isOverlayOpen = false;
@@ -578,13 +583,12 @@ export class ChannelChatComponent implements OnInit {
     return reactions && Object.keys(reactions).length > 0;
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.closeChannelOnSmallScreen();
-  }
-
   closeChannelOnSmallScreen() {
-    if (window.innerWidth <= 950 && this.global.openChannelorUserBox && this.global.openChannelOrUserThread) {
+    if (
+      window.innerWidth <= 950 &&
+      this.global.openChannelorUserBox &&
+      this.global.openChannelOrUserThread
+    ) {
       this.global.openChannelorUserBox = false;
     }
   }
@@ -598,45 +602,19 @@ export class ChannelChatComponent implements OnInit {
     }
   }
 
-
-  displayDayInfo(index: number): boolean {
-    if (index === 0) return true;
-    const currentMessage = this.messagesData[index];
-    const previousMessage = this.messagesData[index - 1];
-    return !this.isSameDay(
-      new Date(currentMessage.timestamp),
-      new Date(previousMessage.timestamp)
-    );
-  }
-
-  isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }
-
   getDayInfoForMessage(index: number): string {
     const messageDate = new Date(this.messagesData[index].timestamp);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
 
-    if (this.isSameDay(messageDate, today)) {
+    if (isSameDay(messageDate, today)) {
       return 'Heute';
-    } else if (this.isSameDay(messageDate, yesterday)) {
+    } else if (isSameDay(messageDate, yesterday)) {
       return 'Gestern';
     } else {
-      return this.formatDate(messageDate);
+      return formatDate(messageDate);
     }
-  }
-
-  formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
   }
 
   toggleEditDialog(messageId: string | null): void {
@@ -646,6 +624,7 @@ export class ChannelChatComponent implements OnInit {
     }
     this.showEditDialog = messageId;
   }
+
   toggleEditArea(messageId: string, messageText: string) {
     this.editWasClicked = false;
     if (this.showEditArea === messageId) {
@@ -670,7 +649,6 @@ export class ChannelChatComponent implements OnInit {
         'messages',
         messageId
       );
-
       if (this.messageToEdit.trim() === '') {
         await deleteDoc(messageDocRef);
       } else {
@@ -693,17 +671,14 @@ export class ChannelChatComponent implements OnInit {
 
   getReactionText(message: Message, emoji: string | null): string {
     if (!emoji || !message.reactions) return '';
-
     const auth = getAuth();
     const currentUserId = auth.currentUser?.uid || '';
     const reactors = message.reactions[emoji] || [];
     if (reactors.length === 0) return '';
-
     const currentUserReacted = reactors.includes(currentUserId);
     const otherReactors = reactors.filter((userId) => userId !== currentUserId);
     let userString = '';
     let verb = '';
-
     if (currentUserReacted) {
       if (otherReactors.length === 0) {
         userString = 'Du';
@@ -734,13 +709,11 @@ export class ChannelChatComponent implements OnInit {
   onReactionHover(message: Message, emoji: string) {
     this.hoveredReactionMessageId = message.id;
     this.hoveredEmoji = emoji;
-
     const auth = getAuth();
     const reactors = message.reactions[emoji] || [];
     const unknownUsers = reactors
       .filter((userId) => userId !== auth.currentUser?.uid)
       .filter((userId) => !this.reactionUserNames[userId]);
-
     if (unknownUsers.length > 0) {
       Promise.all(
         unknownUsers.map(async (userId) => {

@@ -53,8 +53,6 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
     onSnapshot(usersRef, (querySnapshot) => {
       this.allUsers = [];
       querySnapshot.forEach((docSnap) => {
-        console.log('DOC SNAP:', docSnap.id, docSnap.data());
-        // Dann ggf. filtern und pushen
         if (docSnap.id !== this.global.currentUserData.id) {
           const dataUser = docSnap.data();
           if (dataUser['name'] !== 'Guest') {
@@ -62,7 +60,6 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
           }
         }
       });
-      console.log(this.allUsers);
     });
   }
 

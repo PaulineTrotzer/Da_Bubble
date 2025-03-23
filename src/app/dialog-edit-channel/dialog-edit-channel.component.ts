@@ -66,9 +66,7 @@ export class DialogEditChannelComponent implements OnInit {
           this.channel = channel;
           this.getCreaterData();
         } else {
-          console.warn(
-            ' Kein Channel gefunden'
-          );
+          console.warn(' Kein Channel gefunden');
         }
       });
     }
@@ -95,7 +93,6 @@ export class DialogEditChannelComponent implements OnInit {
     try {
       const docRef = doc(this.db, 'users', this.channel.createdBy);
       const docSnap = await getDoc(docRef);
-
       if (docSnap.exists()) {
         const user = docSnap.data();
         this.createdBy = user['name'];
@@ -147,7 +144,6 @@ export class DialogEditChannelComponent implements OnInit {
       userIds: arrayRemove(currentUserId),
     });
     this.workspaceService.setSelectedChannel(defaultChannel);
-    console.log('cahnnelser', defaultChannel);
     this.closeDialog();
   }
 }

@@ -1,12 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  Inject,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, Inject, inject, OnInit } from '@angular/core';
 import {
   MatDialogModule,
   MatDialog,
@@ -38,12 +31,6 @@ import { MemberDataService } from '../services/member-data.service';
   styleUrl: './dialog-add-user.component.scss',
 })
 export class DialogAddUserComponent implements OnInit {
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { channelId: string; userId: string },
-    private db: Firestore,
-    private dialogRef: MatDialogRef<DialogAddUserComponent>,
-    private route: ActivatedRoute
-  ) {}
   readonly dialog = inject(MatDialog);
   isHovered: boolean = false;
   channel: any = {};
@@ -59,6 +46,13 @@ export class DialogAddUserComponent implements OnInit {
   firestore = inject(Firestore);
   memberDataService = inject(MemberDataService);
 
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { channelId: string; userId: string },
+    private db: Firestore,
+    private dialogRef: MatDialogRef<DialogAddUserComponent>,
+    private route: ActivatedRoute
+  ) {}
+
   async ngOnInit(): Promise<void> {
     this.getCreatedChannel(this.data.channelId);
     this.getAllUsers();
@@ -68,13 +62,11 @@ export class DialogAddUserComponent implements OnInit {
     if (!this.isFormValid()) {
       return;
     }
-
     if (this.addAllUsers) {
       await this.addAllUsersToChannel();
     } else if (this.selectUsers) {
       await this.addSelectedUsersToChannel();
     }
-
     this.dialogRef.close(true);
   }
 
@@ -178,18 +170,12 @@ export class DialogAddUserComponent implements OnInit {
   deleteUser(index: number) {
     const removedUser = this.selectedUsers[index];
     this.selectedUsers.splice(index, 1);
-
-    // 🔄 Füge den entfernten User zurück zur Auswahl hinzu
     if (!this.allUsers.some((user) => user.uid === removedUser.uid)) {
       this.allUsers.push(removedUser);
     }
-
-    // 🔄 Falls Suchbegriff existiert, Liste neu filtern
     if (this.searchInput) {
       this.searchUser();
     }
-
-    // 🔄 Setze den Formular-Status neu
     this.updateFormState();
   }
 
@@ -206,7 +192,7 @@ export class DialogAddUserComponent implements OnInit {
   toggleAllUsers() {
     this.addAllUsers = true;
     this.selectUsers = false;
-    this.selectedUsers = []; 
+    this.selectedUsers = [];
     this.updateDialogHeight();
   }
 

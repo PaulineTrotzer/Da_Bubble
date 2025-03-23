@@ -59,24 +59,7 @@
   height: 71vh;
   scroll-behavior: smooth !important;
   position: relative;
-  top: 17px;
-}
-
-.message-preview {
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.click-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  background: transparent;
-  pointer-events: none;
+  top: 54px;
 }
 
 app-input-field {
@@ -457,18 +440,15 @@ app-input-field {
   align-items: center;
   width: 35px;
   height: 35px;
-  background-color: transparent; /* Ausgangszustand */
+  background-color: transparent; 
   transition: background-color 0.2s ease, border-radius 0.2s ease;
-
   svg {
     width: 35px;
     height: 35px;
   }
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-
     svg {
       path {
         fill: #444df2;
@@ -491,10 +471,9 @@ app-input-field {
     width: 35px;
     height: 35px;
   }
-  background-color: transparent; // definiere Ausgangszustand
+  background-color: transparent;
   transition: background-color 0.2s ease, border-radius 0.2s ease,
     fill 0.2s ease;
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
@@ -521,19 +500,16 @@ app-input-field {
   position: relative;
   width: 35px;
   height: 35px;
-  background-color: transparent; // Ausgangszustand
+  background-color: transparent; 
   transition: background-color 0.2s ease, border-radius 0.2s ease;
-
   svg {
     width: 35px;
     height: 35px;
-    transition: fill 0.2s ease; // optional, falls fill animiert werden soll
+    transition: fill 0.2s ease;
   }
-
   &:hover {
     background-color: #eceefe;
     border-radius: 100%;
-    // width und height nicht neu setzen, da sie schon fix sind
     svg {
       path {
         fill: #444df2;
@@ -1021,193 +997,4 @@ app-mention-message-box {
   bottom: 4px;
 }
 
-@media (min-width: 320px) and (max-width: 600px) {
-  .full-bottom-options {
-    bottom: 5px;
-    height: 27px;
-  }
-  .thread-answer-display {
-    font-size: 11px;
-  }
-  .file-info {
-    gap: 0;
-    img {
-      width: 35px !important;
-      height: 35px !important;
-    }
-  }
-  .file-name {
-    font-size: 10px;
-  }
-  .picture-box-current {
-    margin-right: 1px !important;
-  }
-  .picture-box-user {
-    margin-left: 14px;
-  }
-  .sender-name {
-    font-size: 16px;
-  }
-  .full-app-content {
-    width: 100vw;
-  }
-  app-input-field {
-    position: fixed;
-    bottom: -4px;
-    z-index: 2;
-    width: 100vw;
-  }
-  .day-span {
-    font-size: 12px;
-  }
-  .message-time {
-    font-size: 11px;
-  }
-  .only-name {
-    font-size: 13px;
-  }
-  .mention-message {
-    font-size: 13px;
-  }
-  .sender-picture {
-    width: 50px;
-    height: 50px;
-  }
-  .message-card-current {
-    padding: 7px 0;
-    width: 100%;
-    left: 7px;
-  }
-  .message-card-user {
-    padding: 7px 0;
-    width: 100%;
-  }
-  .self-chat-txt,
-  .two-chat-txt {
-    font-size: 17px;
-  }
-  .self-chat-img {
-    width: 55px;
-    height: 55px;
-  }
-  .img-and-name {
-    gap: 8px;
-  }
-  p {
-    font-size: 20px;
-  }
-  .first-day-info {
-    margin-top: 14px;
-  }
-  .main-current-messagebox {
-    height: 852px;
-  }
-  .main-mesage-info-current:hover .comment-box-current {
-    left: 15px;
-  }
-  .last-used-emoji {
-    width: 20px;
-    height: 20px;
-    margin-left: 7px;
-    font-size: 14px;
-    margin-top: 3px;
-    margin: 3px 3px 0 7px;
-  }
-  .add-reaction {
-    width: 30px;
-    height: 30px;
-    svg {
-      width: 30px;
-      height: 30px;
-    }
-  }
-  .open-thread {
-    width: 30px;
-    height: 30px;
-  }
-  .edit-icon {
-    width: 30px;
-    height: 30px;
-  }
-
-  .text-container {
-    font-size: 10px;
-  }
-  .comment-box-current {
-    height: 40px;
-    top: 15px;
-  }
-  .comment-box-user {
-    height: 40px;
-    top: 15px;
-  }
-  .comment-content {
-    height: 33px;
-  }
-  .text-info-edit {
-    font-size: 10px;
-  }
-  .sticker-content {
-    font-size: 11px !important;
-  }
-  .edit-message:hover .edit-messages-card {
-    white-space: pre-wrap;
-  }
-  .edit-message-content:hover {
-    padding: 6px !important;
-    span {
-      font-size: 11px;
-      padding: 0px;
-      background-color: white;
-    }
-  }
-  .edit-message-content {
-    padding: 6px !important;
-    span {
-      font-size: 11px;
-      padding: 0px;
-    }
-  }
-  .edit-mesage-box {
-    min-width: auto;
-    width: 100%;
-    left: 10px;
-  }
-  .edit-input {
-    font-size: 15px;
-  }
-  .edit-icon-textarea {
-    width: 15px !important;
-    height: 17px !important;
-  }
-  .chat {
-    padding: 2px 15px !important;
-    display: flex;
-    justify-content: center;
-    .edit-emoji-main {
-      width: 38px !important;
-      height: 30px !important;
-      margin-top: 6px;
-    }
-  }
-  .scroll-container {
-    height: 640px;
-  }
-  .sticker-info-tooltip{
-    font-size: 10px;
-    left: 2%;
-    max-height: 50px;
-    max-width: 114px;
-    white-space: nowrap;
-    padding: 3px 0;
-  }
-  .comment-sticker-holder{
-    min-width: unset;
-    position: relative;
-    right: 10px;
-  }
-  .sticker-item{
-    width: 27px;
-    height: 21px;
-  }
-}
+@import './mobile-view-styling/chat.mobile.scss';

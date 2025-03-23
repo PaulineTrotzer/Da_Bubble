@@ -40,9 +40,11 @@ import { MentionMessageBoxComponent } from '../mention-message-box/mention-messa
 import { ThreadControlService } from '../services/thread-control.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { WorkspaceService } from '../services/workspace.service';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { InputfieldService } from '../services/inputfield.service';
+import { formatDate, isSameDay, displayDayInfo } from '../date-utils';
+import { fadeInOutAnimation } from './component.animation';
+import { MentionThreadService } from '../services/mention-thread.service';
 
 @Component({
   selector: 'app-chat-component',
@@ -58,23 +60,7 @@ import { InputfieldService } from '../services/inputfield.service';
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
-  animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate(
-          '300ms ease',
-          style({ opacity: 1, transform: 'translateY(0)' })
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '300ms ease',
-          style({ opacity: 0, transform: 'translateY(-10px)' })
-        ),
-      ]),
-    ]),
-  ],
+  animations: [fadeInOutAnimation],
 })
 export class ChatComponent implements OnInit, OnChanges {
   threadControlService = inject(ThreadControlService);
@@ -138,6 +124,8 @@ export class ChatComponent implements OnInit, OnChanges {
   currentComponentId = 'chat';
   isNarrowScreen = false;
   currentMessage: any = null;
+  allUsersFromDb: any[] = [];
+  mentionService = inject(MentionThreadService);
 
   constructor() {}
 
@@ -157,12 +145,31 @@ export class ChatComponent implements OnInit, OnChanges {
     this.inputFieldService.files$.subscribe((filesByComponent) => {
       this.selectFiles = filesByComponent[this.currentComponentId] || [];
     });
+    await this.mentionService.getAllUsersname();
+    this.allUsersFromDb = await this.getAllUsersFromDb();
     this.updateSubscriptionText();
-    await this.getAllUsersname();
     this.messagesData.forEach((msg) => {
       this.showReactionPopUpSenderAtCu[msg.id] = false;
     });
+    this.ensureMessagesLoaded();
     this.checkEditScreenSize();
+  }
+
+  async getAllUsersFromDb(): Promise<any[]> {
+    const userRef = collection(this.firestore, 'users');
+    return new Promise((resolve) => {
+      onSnapshot(userRef, (querySnapshot) => {
+        const users = querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          name: docSnap.data()['name'],
+          username: docSnap.data()['username'] || '',
+          email: docSnap.data()['email'],
+          picture: docSnap.data()['picture'] || 'assets/img/default-avatar.png',
+        }));
+        this.allUsersFromDb = users;
+        resolve(users);
+      });
+    });
   }
 
   checkEditScreenSize() {
@@ -258,15 +265,29 @@ export class ChatComponent implements OnInit, OnChanges {
         id: doc.id,
         ...doc.data(),
       }));
-      this.messagesData = loadedMessages.map((loadedMessage) => {
-        const localMessage = this.messagesData.find(
-          (msg) => msg.id === loadedMessage.id
-        );
-        return localMessage
-          ? { ...loadedMessage, ...localMessage }
-          : loadedMessage;
-      });
+      this.messagesData = loadedMessages;
     }
+    const currentUserId = this.global.currentUserData?.id;
+    const currentUserName = this.global.currentUserData?.name;
+    this.messagesData = this.messagesData.map((msg: any) => {
+      const foundSender = this.allUsersFromDb.find(
+        (user) => user.id === msg.senderId
+      );
+      const foundRecipient = this.allUsersFromDb.find(
+        (user) => user.id === msg.recipientId
+      );
+      if (foundSender) {
+        msg.senderName = foundSender.name;
+        msg.senderPicture = foundSender.picture;
+      }
+      if (foundRecipient) {
+        msg.recipientName = foundRecipient.name;
+        msg.recipientPicture = foundRecipient.picture;
+      }
+      return msg;
+    });
+    this.messagesData = [...this.messagesData];
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy() {
@@ -293,7 +314,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.isEmojiPickerVisible = false;
     this.currentMessage = null;
   }
-  
 
   trackByMessageId(index: number, message: any): string {
     return message.id;
@@ -362,7 +382,7 @@ export class ChatComponent implements OnInit, OnChanges {
     if (currentMessage.deleted || previousMessage.deleted) {
       return false;
     }
-    return !this.isSameDay(
+    return !isSameDay(
       new Date(currentMessage.timestamp),
       new Date(previousMessage.timestamp)
     );
@@ -390,21 +410,15 @@ export class ChatComponent implements OnInit, OnChanges {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-    if (this.isSameDay(messageDate, today)) {
+    if (isSameDay(messageDate, today)) {
       return 'Heute';
-    } else if (this.isSameDay(messageDate, yesterday)) {
+    } else if (isSameDay(messageDate, yesterday)) {
       return 'Gestern';
     } else {
-      return this.formatDate(messageDate);
+      return formatDate(messageDate);
     }
   }
 
-  formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  }
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
@@ -551,14 +565,6 @@ export class ChatComponent implements OnInit, OnChanges {
     }, 100);
   }
 
-  isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }
-
   messageData(
     chatMessage: string,
     senderStickerCount: number = 0,
@@ -612,72 +618,75 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   async getMessages() {
-    try {
-      if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
-        return;
-      }
-      const docRef = collection(this.firestore, 'messages');
-      const q = query(
-        docRef,
-        where('recipientId', 'in', [
-          this.selectedUser.id,
-          this.global.currentUserData.id,
-        ]),
-        where('senderId', 'in', [
-          this.selectedUser.id,
-          this.global.currentUserData.id,
-        ])
-      );
-      onSnapshot(
-        q,
-        async (querySnapshot) => {
-          try {
-            this.messagesData = [];
-            querySnapshot.forEach((doc) => {
-              const messageData = doc.data();
-              if (!this.selectedUser?.id || !this.global.currentUserData?.id) {
-                console.warn(
-                  'Selected user or current user data is not available.'
-                );
-                return;
-              }
-              if (messageData['timestamp'] && messageData['timestamp'].toDate) {
-                messageData['timestamp'] = messageData['timestamp'].toDate();
-              }
-              messageData['formattedText'] = this.formatMentions(
-                messageData['text']
-              );
-              if (
-                (messageData['senderId'] === this.global.currentUserData.id &&
-                  messageData['recipientId'] === this.selectedUser.id) ||
-                (messageData['senderId'] === this.selectedUser.id &&
-                  messageData['recipientId'] === this.global.currentUserData.id)
-              ) {
-                this.messagesData.push({ id: doc.id, ...messageData });
-              }
-            });
-            await this.updateMessagesWithNewPhoto();
-            this.messagesData.sort(
-              (a: any, b: any) => a.timestamp - b.timestamp
-            );
-            this.updateSubscriptionText();
-            if (this.shouldScroll) {
-              this.scrollAutoDown();
-            }
-            this.dataLoaded = true;
-            await this.subscribeToThreadAnswers();
-          } catch (innerError) {
-            console.error('Error while querySnapshot:', innerError);
-          }
-        },
-        (error) => {
-          console.error('Error in onSnapshot:', error);
+    if (!this.selectedUser?.id || !this.global.currentUserData?.id) return;
+  
+    const docRef = collection(this.firestore, 'messages');
+    const q = query(
+      docRef,
+      where('recipientId', 'in', [this.selectedUser.id, this.global.currentUserData.id]),
+      where('senderId', 'in', [this.selectedUser.id, this.global.currentUserData.id])
+    );
+  
+    onSnapshot(q, async (querySnapshot) => {
+      console.log('📦 Direct Messages Snapshot:', querySnapshot.size);
+  
+      let newMessageArrived = false;
+      querySnapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          newMessageArrived = true;
         }
-      );
-    } catch (error) {
-      console.error('Error initializing messages query:', error);
-    }
+      });
+  
+      this.messagesData = querySnapshot.docs.map((docSnap: any) => {
+        const data = docSnap.data();
+  
+        // 🕒 Timestamp umwandeln
+        if (data.timestamp?.seconds) {
+          data.timestamp = new Date(data.timestamp.seconds * 1000);
+        } else if (data.timestamp?.toDate) {
+          data.timestamp = data.timestamp.toDate();
+        } else {
+          console.warn('⚠️ Ungültiger Timestamp:', data.timestamp);
+          data.timestamp = new Date(); // fallback
+        }
+  
+        // 🧠 Nutzerinfos auflösen
+        const sender = this.allUsersFromDb.find(u => u.id === data.senderId);
+        const recipient = this.allUsersFromDb.find(u => u.id === data.recipientId);
+  
+        if (sender) {
+          data.senderName = sender.name;
+          data.senderPicture = sender.picture;
+        } else {
+          console.warn(`⚠️ Kein Nutzer gefunden für senderId ${data.senderId}`);
+        }
+  
+        if (recipient) {
+          data.recipientName = recipient.name;
+          data.recipientPicture = recipient.picture;
+        }
+  
+        // 💬 Mentions formatieren
+        data.formattedText = this.formatMentions(data.text);
+  
+        return { id: docSnap.id, ...data };
+      });
+  
+      this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
+  
+      if (newMessageArrived) {
+        setTimeout(() => {
+          this.scrollAutoDown();
+        }, 100);
+      }
+  
+      await this.updateMessagesWithNewPhoto();
+      this.updateSubscriptionText();
+      this.dataLoaded = true;
+      await this.subscribeToThreadAnswers();
+    });
   }
+  
 
   updateSubscriptionText() {
     this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
@@ -745,9 +754,6 @@ export class ChatComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
-/*     if (window.innerWidth < 1350) {
-      this.global.openChannelorUserBox = false;
-    } */
   }
 
   splitMessage(text: string): string[] {
@@ -791,7 +797,7 @@ export class ChatComponent implements OnInit, OnChanges {
   async handleMentionClick(mention: string) {
     this.wasClickedChatInput = true;
     const cleanName = mention.substring(1).trim().toLowerCase();
-    const user = await this.ensureUserDataLoaded(cleanName);
+    const user = await this.mentionService.ensureUserDataLoaded(cleanName);
     if (!user) {
       return;
     }
@@ -799,40 +805,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.global.openMentionMessageBox = true;
   }
 
-  async ensureUserDataLoaded(name: string): Promise<any> {
-    while (this.getAllUsersName.length === 0) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    const foundUser = this.getAllUsersName.find(
-      (user) =>
-        (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
-    );
-    if (!foundUser) {
-      console.warn('Benutzer nicht gefunden:', name);
-      return null;
-    }
-    return foundUser;
-  }
-
-  async getAllUsersname(): Promise<void> {
-    const userRef = collection(this.firestore, 'users');
-    return new Promise((resolve) => {
-      onSnapshot(userRef, (querySnapshot) => {
-        this.getAllUsersName = [];
-        querySnapshot.forEach((docSnap) => {
-          const dataUser = docSnap.data();
-          this.getAllUsersName.push({
-            id: docSnap.id,
-            name: dataUser['name'],
-            username: dataUser['username'] || '',
-            email: dataUser['email'],
-            picture: dataUser['picture'] || 'assets/img/default-avatar.png',
-          });
-        });
-        resolve();
-      });
-    });
-  }
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
@@ -876,7 +848,8 @@ export class ChatComponent implements OnInit, OnChanges {
     }
     const emoji = event.emoji.native;
     this.shouldScroll = false;
-    const currentUserIsSender = this.global.currentUserData?.id === this.currentMessage.senderId;
+    const currentUserIsSender =
+      this.global.currentUserData?.id === this.currentMessage.senderId;
     let updatedMessage: any;
     if (currentUserIsSender) {
       updatedMessage = {
@@ -884,15 +857,17 @@ export class ChatComponent implements OnInit, OnChanges {
         senderchoosedStickereBackColor: emoji,
         stickerBoxCurrentStyle: true,
         senderSticker: this.currentMessage.senderSticker === emoji ? '' : emoji,
-        senderStickerCount: this.currentMessage.senderSticker === emoji ? 0 : 1
+        senderStickerCount: this.currentMessage.senderSticker === emoji ? 0 : 1,
       };
     } else {
       updatedMessage = {
         ...this.currentMessage,
         recipientChoosedStickerBackColor: emoji,
         stickerBoxCurrentStyle: true,
-        recipientSticker: this.currentMessage.recipientSticker === emoji ? '' : emoji,
-        recipientStickerCount: this.currentMessage.recipientSticker === emoji ? 0 : 1
+        recipientSticker:
+          this.currentMessage.recipientSticker === emoji ? '' : emoji,
+        recipientStickerCount:
+          this.currentMessage.recipientSticker === emoji ? 0 : 1,
       };
     }
     this.isEmojiPickerVisible = false;
@@ -904,20 +879,24 @@ export class ChatComponent implements OnInit, OnChanges {
         senderStickerCount: updatedMessage.senderStickerCount,
         recipientSticker: updatedMessage.recipientSticker,
         recipientStickerCount: updatedMessage.recipientStickerCount,
-        senderchoosedStickereBackColor: updatedMessage.senderchoosedStickereBackColor,
-        recipientChoosedStickerBackColor: updatedMessage.recipientChoosedStickerBackColor,
+        senderchoosedStickereBackColor:
+          updatedMessage.senderchoosedStickereBackColor,
+        recipientChoosedStickerBackColor:
+          updatedMessage.recipientChoosedStickerBackColor,
         stickerBoxCurrentStyle: updatedMessage.stickerBoxCurrentStyle,
         stickerBoxOpacity: updatedMessage.stickerBoxOpacity,
       });
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Dokuments:', error);
     }
-    const index = this.messagesData.findIndex((m: any) => m.id === updatedMessage.id);
+    const index = this.messagesData.findIndex(
+      (m: any) => m.id === updatedMessage.id
+    );
     if (index !== -1) {
       this.messagesData = [
         ...this.messagesData.slice(0, index),
         updatedMessage,
-        ...this.messagesData.slice(index + 1)
+        ...this.messagesData.slice(index + 1),
       ];
     }
     this.currentMessage = null;
@@ -929,7 +908,7 @@ export class ChatComponent implements OnInit, OnChanges {
     if (message.senderSticker) {
       this.currentMessage = message;
       const event = { emoji: { native: message.senderSticker } };
-      await this.addEmoji(event); 
+      await this.addEmoji(event);
     }
     message.stickerBoxCurrentStyle = true;
   }
@@ -943,7 +922,7 @@ export class ChatComponent implements OnInit, OnChanges {
     }
     message.stickerBoxCurrentStyle = true;
   }
-  
+
   editMessageAdd(event: any) {
     const emoji = event.emoji.native;
     this.editableMessageText += emoji;
