@@ -1,10 +1,9 @@
 <div class="full-flex" [ngClass]="{'page-content-plus-header': successfullyLogged}">
     <app-header (headerChannelSelcted)="onHeaderchannelSelected($event)"
         (headerUserSelected)="onHeaderUserSelected($event)">
-    </app-header> <!-- Hier binden wir die CSS-Variable direkt am Grid-Container -->
-    <div class="full-page-content" [style.gap]="getGridGap()"
-        [style.--workspace-width]="workspaceColumnWidth" [style.grid-template-columns]="calcGridTemplateColumns()">
-        <!-- Workspace-Container (erste Spalte) -->
+    </app-header>
+    <div class="full-page-content" [style.gap]="getGridGap()" [style.--workspace-width]="workspaceColumnWidth"
+        [style.grid-template-columns]="calcGridTemplateColumns()">
         <div class="workspace-container">
             <div class="workspace-wrapper" [ngClass]="{'closed': !isWorkspaceOpen, 'opened': isWorkspaceOpen}"
                 (transitionend)="onWorkspaceTransitionEnd()">
@@ -15,28 +14,27 @@
             </div>
         </div>
 
-        <!-- Startscreen-Container (zweite Spalte) -->
         <div class="start-screen-container"
             [style.width]="!this.global.threadOpened ? calcStartScreenContainerWidth() : '100%'">
-        <app-start-screen (enterChat)="handleEnterChat($event)"
-            (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
-            (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
-            (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel" [onHeaderUser]="onHeaderUser"
-            [selectedUser]="selectedUser" [mentionUser]="mentionUser" [selectedChannel]="selectedChannel"
-            (threadOpened)="onThreadOpened()" (channelSelected)="onChannelSelected($event)"
-            (threadOpenedToHome)="onThreadOpened()">
-        </app-start-screen>
-    </div>
+            <app-start-screen (enterChat)="handleEnterChat($event)"
+                (userSelectedFromStartscreen)="handleUserSelectionFromStartscreen($event)"
+                (channelSelectedFromStartscreen)="handleChannelSelectionFromStartscreen($event)"
+                (userSelected)="onUserSelected($event)" [onHeaderChannel]="onHeaderChannel"
+                [onHeaderUser]="onHeaderUser" [selectedUser]="selectedUser" [mentionUser]="mentionUser"
+                [selectedChannel]="selectedChannel" (threadOpened)="onThreadOpened()"
+                (channelSelected)="onChannelSelected($event)" (threadOpenedToHome)="onThreadOpened()">
+            </app-start-screen>
+        </div>
 
-    <!-- Thread-Holder (dritte Spalte) -->
-    <div class="thread-holder-container" *ngIf="isThreadOpened" @fadeOutThread      [style.width]="this.global.threadOpened ? '100%' : calcThreadWidth()">
-        <app-thread [directThreadId]="directThreadId" [channelThreadId]="channelThreadId"
-            (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"
-            (userSelectedFromThread)="handleUserSelectionFromThread($event)"
-            (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
-        </app-thread>
+        <div class="thread-holder-container" *ngIf="isThreadOpened" @fadeOutThread
+            [style.width]="this.global.threadOpened ? '100%' : calcThreadWidth()">
+            <app-thread [directThreadId]="directThreadId" [channelThreadId]="channelThreadId"
+                (closeThread)="onThreadClosed()" [selectedUser]="selectedUser" [selectedChannel]="selectedChannel"
+                (userSelectedFromThread)="handleUserSelectionFromThread($event)"
+                (userSelectedFromChannelThread)="handleUserSelectionFromChannelThread($event)">
+            </app-thread>
+        </div>
     </div>
-</div>
 </div>
 
 <div *ngIf="successfullyLogged" class="overlay"></div>

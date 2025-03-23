@@ -1,0 +1,20 @@
+@media screen and (max-width: 815px) {
+  .fly-up {
+    animation: whiteFlyUpMobile 0.75s ease-in-out forwards;
+  }
+  .white-text {
+    font-size: 22px !important;
+  }
+  .white-logo {
+    width: 55px !important;
+  }
+  .white-logo-text {
+    gap: 0 !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .fly-up {
+    animation: whiteFlyUpSmartphone 0.75s ease-in-out forwards;
+  }
+}

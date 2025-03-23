@@ -24,9 +24,14 @@ mat-card {
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
   width: 100%;
   position: absolute;
-    top: 0;
+  top: 0;
   z-index: 10;
-  background: linear-gradient(to bottom, rgb(200 202 251), rgba(121, 126, 243, 0));
+  background-color: white !important;
+  background: linear-gradient(
+    to bottom,
+    rgb(200 202 251),
+    rgba(121, 126, 243, 0)
+  );
 }
 
 .header-chat-holder {
@@ -96,7 +101,6 @@ mat-card {
   left: 20px;
 }
 
-/* Avatar Members Section*/
 .members-container {
   display: flex;
   align-items: center;
@@ -175,123 +179,4 @@ mat-card {
   z-index: 2;
 }
 
-@media (min-width: 320px) and (max-width: 600px) {
-  .header-chat-holder {
-    height: 880px;
-  }
-  .member-count {
-    font-size: 15px;
-  }
-  .img-container {
-    height: 30px;
-    width: 30px;
-  }
-}
-
-@media (min-width: 320px) and (max-width: 450px) {
-  .header {
-    position: absolute;
-    left: 0;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    min-height: 92px;
-    box-shadow: 0 2px 5px rgba(68, 77, 242, 0.41),
-      0 2px 2px rgba(255, 255, 255, 0.5) inset;
-  }
-  .big-chat-card {
-    /*     position: fixed; */
-    max-width: max-content;
-    min-width: auto;
-  }
-  .user-chat-info {
-    margin-bottom: 14px;
-  
-    img {
-      width: 50px;
-      height: 50px;
-    }
-    h4 {
-      font-size: 16px;
-    }
-  }
-  .btn-text-img {
-    font-size: 22px;
-  }
-  .drop-down-div {
-    left: 0;
-    max-width: 145px;
-    white-space: pre-line;
-    height: auto;
-  }
-  .members-container {
-    top: 30px;
-  }
-  .avatar {
-    height: 33px;
-    width: 33px;
-  }
-  app-channel-chat {
-    display: block;
-    width: 100vw;
-  }
-
-  app-welcome-sheet {
-    display: flex;
-    width: 100vw;
-  }
-  .mat-mdc-button {
-    margin-top: -14px;
-  }
-  .welcome-sheet {
-    left: -1px;
-    width: 100vw;
-  }
-}
-
-@media (min-width: 450px) and (max-width: 770px) {
-  .mat-mdc-card {
-    width: 100vw;
-  }
-  .header {
-    min-height: 85px;
-  }
-  .startScreen-open {
-    width: 95vw;
-  }
-  .btn-text-img {
-    font-size: 21px;
-  }
-  .drop-down-div {
-    left: 40px;
-  }
-  .members-container {
-    top: 28px;
-  }
-  .avatar {
-    height: 35px;
-    width: 35px;
-  }
-/*   app-channel-chat {
-    display: flex;
-    width: 95vw;
-  } */
-  .welcome-sheet {
-    width: 95vw;
-  }
-
-  app-welcome-sheet {
-    display: block;
-    width: 100vw;
-  }
-  .mat-mdc-button {
-    margin-top: 11px;
-  }
-}
-
-@media (min-width: 2100px) {
-  .big-chat-card {
-    min-width: 990px;
-  }
-}
-
+@import "./mobile-view-styling/start-screen.mobile.scss";

@@ -5,8 +5,8 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class OverlayStatusService {
-  private overlayStatus = new BehaviorSubject<boolean>(false); 
-  overlayStatus$ = this.overlayStatus.asObservable(); 
+  private overlayStatus = new BehaviorSubject<boolean>(false);
+  overlayStatus$ = this.overlayStatus.asObservable();
 
   constructor() {}
 
@@ -15,6 +15,6 @@ export class OverlayStatusService {
   }
 
   getOverlayStatus(): boolean {
-    return this.overlayStatus.value; 
+    return this.overlayStatus.value;
   }
 }

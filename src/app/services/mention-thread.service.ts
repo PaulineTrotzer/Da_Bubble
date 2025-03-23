@@ -40,27 +40,23 @@ export class MentionThreadService {
     const normalizedUserNames = this.allUsersName.map((user: any) =>
       (user.username ?? '').toLowerCase().trim()
     );
-  
     return normalizedUserNames.includes(mentionName);
   }
 
-  
   splitMessage(text: string): string[] {
     const mentionRegex = /(@[\w\-\*_!$]+)/g;
     const parts = text.split(mentionRegex);
-
     return parts.map((p) => p.trim()).filter((p) => p.length > 0);
   }
-
 
   async ensureUserDataLoaded(name: string): Promise<any> {
     while (this.allUsersName.length === 0) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     const foundUser = this.allUsersName.find(
-      (user) => (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
+      (user) =>
+        (user.username ?? '').trim().toLowerCase() === name.trim().toLowerCase()
     );
-    
     if (!foundUser) {
       console.warn('Benutzer nicht gefunden:', name);
       return null;

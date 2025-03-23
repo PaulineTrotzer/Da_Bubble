@@ -29,7 +29,6 @@ import { GlobalVariableService } from '../services/global-variable.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { Auth, getAuth } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { MentionMessageBoxComponent } from '../mention-message-box/mention-message-box.component';
 import { UserChannelSelectService } from '../services/user-channel-select.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';

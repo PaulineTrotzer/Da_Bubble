@@ -1,6 +1,5 @@
 <mat-card class="main-card" appearance="outlined">
     <mat-card-content class="card-content">
-
         <div class="info-title">
             <h3>Leute erwähnen</h3>
             <div (click)="cancelCard()" class="cancel-box">
@@ -15,15 +14,14 @@
                             fill="black" />
                     </g>
                 </svg>
-
             </div>
         </div>
         <div>
-            <input [(ngModel)]="searchUserName"  placeholder="Name eingeben" style="width: 100%;" type="text">
+            <input [(ngModel)]="searchUserName" placeholder="Name eingeben" style="width: 100%;" type="text">
         </div>
-        <div class="user-info-box" >
+        <div class="user-info-box">
             <div *ngFor="let user of getFilteredUsers()" (click)="selectUser(user)">
-                <div class="user-info" >
+                <div class="user-info">
                     <div class="img-box">
                         <img *ngIf="user.picture!==''" [src]="(user.picture?user.picture:'' )">
                     </div>
@@ -34,15 +32,13 @@
                         <span [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span>
                     </div>
                     <div *ngIf="user.picture === '' " class="noImage-status">
-                        <span [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span>  
+                        <span [ngClass]="{'online':user.status==='online','offline':user.status==='offline'}"></span>
                     </div>
-                </div> 
-            </div> 
+                </div>
+            </div>
             <div *ngIf="noUserFound" class="no-user-found">
                 Keine User gefunden.
             </div>
-           
-        </div> 
-      
+        </div>
     </mat-card-content>
 </mat-card>

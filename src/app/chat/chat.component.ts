@@ -159,13 +159,16 @@ export class ChatComponent implements OnInit, OnChanges {
     const userRef = collection(this.firestore, 'users');
     return new Promise((resolve) => {
       onSnapshot(userRef, (querySnapshot) => {
-        const users = querySnapshot.docs.map((docSnap) => ({
-          id: docSnap.id,
-          name: docSnap.data()['name'],
-          username: docSnap.data()['username'] || '',
-          email: docSnap.data()['email'],
-          picture: docSnap.data()['picture'] || 'assets/img/default-avatar.png',
-        }));
+        const users = querySnapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            name: data['name'] || 'Gelöschter Benutzer',
+            username: data['username'] || '',
+            email: data['email'] || '',
+            picture: data['picture'] || 'assets/img/default-avatar.png',
+          };
+        });
         this.allUsersFromDb = users;
         resolve(users);
       });
@@ -246,6 +249,13 @@ export class ChatComponent implements OnInit, OnChanges {
     }
   }
 
+  convertToDate(timestamp: any): Date {
+    if (timestamp instanceof Date) return timestamp;
+    if (timestamp?.toDate) return timestamp.toDate();
+    if (timestamp?.seconds) return new Date(timestamp.seconds * 1000);
+    return new Date(timestamp);
+  }
+
   async handleDeletedMessage(updatedMessage: any): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
     try {
@@ -264,6 +274,7 @@ export class ChatComponent implements OnInit, OnChanges {
       const loadedMessages = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        timestamp: this.convertToDate(doc.data()['timestamp']),
       }));
       this.messagesData = loadedMessages;
     }
@@ -418,7 +429,6 @@ export class ChatComponent implements OnInit, OnChanges {
       return formatDate(messageDate);
     }
   }
-
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedUser'] && this.selectedUser) {
@@ -616,77 +626,70 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData.push(newLocalMsg);
     this.scrollAutoDown();
   }
-
   async getMessages() {
     if (!this.selectedUser?.id || !this.global.currentUserData?.id) return;
-  
     const docRef = collection(this.firestore, 'messages');
     const q = query(
       docRef,
-      where('recipientId', 'in', [this.selectedUser.id, this.global.currentUserData.id]),
-      where('senderId', 'in', [this.selectedUser.id, this.global.currentUserData.id])
+      where('recipientId', 'in', [
+        this.selectedUser.id,
+        this.global.currentUserData.id,
+      ]),
+      where('senderId', 'in', [
+        this.selectedUser.id,
+        this.global.currentUserData.id,
+      ])
     );
-  
     onSnapshot(q, async (querySnapshot) => {
-      console.log('📦 Direct Messages Snapshot:', querySnapshot.size);
-  
       let newMessageArrived = false;
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           newMessageArrived = true;
         }
       });
-  
       this.messagesData = querySnapshot.docs.map((docSnap: any) => {
         const data = docSnap.data();
-  
-        // 🕒 Timestamp umwandeln
         if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         } else if (data.timestamp?.toDate) {
           data.timestamp = data.timestamp.toDate();
         } else {
-          console.warn('⚠️ Ungültiger Timestamp:', data.timestamp);
-          data.timestamp = new Date(); // fallback
+          data.timestamp = new Date();
         }
-  
-        // 🧠 Nutzerinfos auflösen
-        const sender = this.allUsersFromDb.find(u => u.id === data.senderId);
-        const recipient = this.allUsersFromDb.find(u => u.id === data.recipientId);
-  
+        const sender = this.allUsersFromDb.find((u) => u.id === data.senderId);
         if (sender) {
           data.senderName = sender.name;
           data.senderPicture = sender.picture;
         } else {
           console.warn(`⚠️ Kein Nutzer gefunden für senderId ${data.senderId}`);
+          data.senderName = 'Gelöschter Nutzer';
+          data.senderPicture = 'assets/img/default-avatar.png';
         }
-  
+        const recipient = this.allUsersFromDb.find(
+          (u) => u.id === data.recipientId
+        );
         if (recipient) {
           data.recipientName = recipient.name;
           data.recipientPicture = recipient.picture;
+        } else {
+          data.recipientName = 'Gelöschter Nutzer';
+          data.recipientPicture = 'assets/img/default-avatar.png';
         }
-  
-        // 💬 Mentions formatieren
         data.formattedText = this.formatMentions(data.text);
-  
         return { id: docSnap.id, ...data };
       });
-  
       this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
-  
       if (newMessageArrived) {
         setTimeout(() => {
           this.scrollAutoDown();
         }, 100);
       }
-  
       await this.updateMessagesWithNewPhoto();
       this.updateSubscriptionText();
       this.dataLoaded = true;
       await this.subscribeToThreadAnswers();
     });
   }
-  
 
   updateSubscriptionText() {
     this.isSelfChat = this.selectedUser?.id === this.global.currentUserData?.id;
@@ -804,7 +807,6 @@ export class ChatComponent implements OnInit, OnChanges {
     this.global.getUserByName = user;
     this.global.openMentionMessageBox = true;
   }
-
 
   onInput(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;

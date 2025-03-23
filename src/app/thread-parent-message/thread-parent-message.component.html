@@ -1,48 +1,33 @@
-<!-- Optional: Overlay, falls nötig -->
 <div *ngIf="isOverlay" class="overlay"></div>
-
-<div *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container"
-(click)="closePickerEdit()">
-<div class="emoji-picker">
-    <emoji-mart (click)="letPickerEditVisible($event)"
-        (emojiClick)="addEmojiToEdit($event)"
-        size="18"></emoji-mart>
+<div *ngIf="isEmojiPickerEditVisible" class="emoji-picker-container" (click)="closePickerEdit()">
+    <div class="emoji-picker">
+        <emoji-mart (click)="letPickerEditVisible($event)" (emojiClick)="addEmojiToEdit($event)" size="18"></emoji-mart>
+    </div>
 </div>
-</div>
-
 <div *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
     <div class="emoji-picker">
-        <emoji-mart (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event, pm)"
-            size="18">
+        <emoji-mart (click)="letPickerVisible($event)" (emojiClick)="addEmoji($event, pm)" size="18">
         </emoji-mart>
     </div>
 </div>
-
 <ng-container>
     <div *ngIf="pm && currentUser" class="thread-container" else #load>
-        <!-- Haupt-Container für eine Parent-Nachricht / "color-separator" -->
         <div class="color-separator" (mouseenter)="toggleOptionBar(pm.id, true)"
             (mouseleave)="toggleOptionBar(pm.id, false)" [ngClass]="{
     'first-separator': displayDayInfoForParent()
   }">
-            <!-- Anzeige "Neuer Tag" usw. -->
             <div class="new-day-info">
                 <div class="day-info">
                     <div class="line"></div>
                     <span class="day-span">{{ displayDayInfoForParent() }}</span>
                 </div>
             </div>
-
-
-            <!-- Sticker-Hover-Icons (Edit & Reaction), je nach User rechts/links -->
             <div class="sticker-hover-ct" *ngIf="showOptionBar[pm.id]"
                 [ngClass]="pm.senderId === currentUser.uid ? 'left-hover' : 'right-hover'">
                 <div class="show-set" [ngClass]="pm.senderId === currentUser.uid ? 'show-set-right' : 'show-set-left'"
                     @slideIn>
                     <div class="img-flex-bar-options">
-                        <!-- Edit-Wrapper nur für eigenen User -->
                         <div class="edit-wrapper" *ngIf="pm.senderId === currentUser.uid">
-                            <!-- Edit-Icon -->
                             <div class="edit-icon-holder" (mouseenter)="toggleEditOption(pm.id, true)">
                                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -57,9 +42,6 @@
                                     </g>
                                 </svg>
                             </div>
-                            <!-- / Edit-Icon -->
-
-                            <!-- Edit-Karte (Optional) -->
                             <mat-card *ngIf="showEditOption[pm.id] && !editWasClicked" class="edit-messages-card"
                                 appearance="outlined" (mouseleave)="toggleEditOption(pm.id, false)">
                                 <mat-card-content class="edit-message-content" (click)="editMessage(pm)"
@@ -68,9 +50,6 @@
                                 </mat-card-content>
                             </mat-card>
                         </div>
-                        <!-- / edit-wrapper -->
-
-                        <!-- Reaction-Icon (Emoji) -->
                         <div class="add-reaction-ct" (click)="openEmojiPicker()">
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -85,41 +64,27 @@
                                 </g>
                             </svg>
                         </div>
-
-                        <!-- Last-Emoji (Global) -->
                         <div class="last-emoji-holder" *ngIf="currentUser && currentUser.lastUsedEmoji"
                             (click)="applyGlobalEmoji(currentUser.lastUsedEmoji, pm)">
                             <span class="single-emoji">
                                 {{ currentUser.lastUsedEmoji }}
                             </span>
                         </div>
-                        <!-- / Reaction-Icon -->
                     </div>
                 </div>
             </div>
-            <!-- / sticker-hover-ct -->
-
-            <!-- Emoji-Picker als Overlay -->
-
-
-            <!-- ================== MESSAGE-CONTAINER ================== -->
             <div class="message-container" [ngClass]="{
       'is-current-user': pm.senderId === currentUser.uid,
       'is-partner': pm.senderId !== currentUser.uid,
       'has-sticker': pm.senderSticker || pm.recipientSticker
     }">
-                <!-- Avatar -->
                 <div class="avatar-container" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
                     <img [src]="pm.senderPicture
           " alt="
           no Picture found
         " />
                 </div>
-                <!-- / avatar-container -->
-
-                <!-- Spalte für Name, Uhrzeit & Message-Bubble -->
                 <div class="message-column" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                    <!-- Name & Uhrzeit -->
                     <div class="time-name-flex" [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
                         <h4>
                             {{
@@ -132,28 +97,19 @@
                             {{ pm.timestamp | date: 'HH:mm' }} Uhr
                         </span>
                     </div>
-
-                    <!-- ============ NORMALER MODUS vs. EDIT-MODUS ============ -->
                     <div class="flex-box-text" (click)="handleClickOnMention($event)">
                         <ng-container *ngIf="!(editWasClicked && editMessageId === pm.id); else editMode">
-                            <!-- =========== NORMALER MODUS =========== -->
                             <div class="message-bubble"
                                 [ngClass]="pm.senderId === currentUser.uid ? null : 'is-partner'">
-                                <!-- Nachrichtentext -->
                                 <ng-container *ngFor="let mentionName of mentionService.splitMessage(pm.text)">
-                                    <!-- FALL A: es ist ein @mention -->
                                     <span *ngIf="mentionService.isMention(mentionName)" class="mention-message"
                                         (click)="handleMentionClick(mentionName)">
                                         {{ mentionName }}
                                     </span>
-
-                                    <!-- FALL B: normaler Text -->
                                     <span class="only-name" *ngIf="!mentionService.isMention(mentionName)">
                                         {{ mentionName }}
                                     </span>
                                 </ng-container>
-
-                                <!-- Dateianhänge -->
                                 <div class="show-selected-files" *ngIf="pm.selectedFiles?.length">
                                     <div *ngFor="let file of pm.selectedFiles">
                                         <div class="file-info" *ngIf="file.url">
@@ -166,27 +122,19 @@
                                             <!-- PDF -->
                                             <ng-container *ngIf="file.type === 'application/pdf'">
                                                 <a [href]="file.url" target="_blank">
-                                                    <img src="../../assets/img/pdf.png" alt="PDF File" />
+                                                    <img src="assets/img/pdf.png" alt="PDF File" />
                                                 </a>
                                             </ng-container>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Bearbeitet-Hinweis -->
-
                             </div>
                         </ng-container>
-
-                        <!-- =========== EDIT-MODUS =========== -->
                         <ng-template #editMode>
                             <div class="message-bubble-edit">
-                                <!-- Textarea -->
                                 <textarea rows="3" class="edit-input" [(ngModel)]="editableMessageText">
                                 </textarea>
-
                                 <div class="full-bottom-flex">
-                                    <!-- Emoji-Picker für Edit-Mode -->
                                     <div (click)="openEmojiPickerEditMode()" class="reaction-icon-container-editMode">
                                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
@@ -201,10 +149,6 @@
                                             </g>
                                         </svg>
                                     </div>
-
-
-
-                                    <!-- Buttons: Speichern / Abbrechen -->
                                     <div class="option-flex">
                                         <img class="save-icon" src="assets/img/check-mark.svg" alt="Speichern"
                                             (click)="saveOrDeleteMessage(pm)" />
@@ -215,19 +159,13 @@
                             </div>
                         </ng-template>
                     </div>
-
-
                     <div class="text-info-edit" *ngIf="pm.editedTextShow">
                         (Bearbeitet)
                     </div>
-
-                    <!-- ================== REACTIONS / STICKERS ================== -->
-                    <!-- Container für die Sticker/Emoji-Reaktionen -->
                     <div class="sticker-view-ct" [ngClass]="{
           'sticker-view-right': pm.senderId === currentUser.uid,
           'sticker-view-left': pm.senderId !== currentUser.uid
         }">
-                        <!-- Fall A: Beide Sticker identisch => ein Emoji mit Counter "2" -->
                         <ng-container *ngIf="
             pm.senderSticker &&
             pm.recipientSticker &&
@@ -236,11 +174,8 @@
           ">
                             <div class="emoji-holder" (mouseenter)="toggleReactionBothInfo(pm.id, true)"
                                 (mouseleave)="toggleReactionBothInfo(pm.id, false)">
-                                <!-- EINE Emoji-Anzeige + Counter 2 -->
                                 <span class="single-emoji">{{ pm.senderSticker }}</span>
                                 <span class="reaction-counter">2</span>
-
-                                <!-- Hover-Info (z. B. "Ihr beide habt mit … reagiert") -->
                                 <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpBoth[pm.id]"
                                     *ngIf="pm.senderSticker">
                                     <span class="reaction-info-txt">
@@ -251,21 +186,15 @@
                                 </div>
                             </div>
                         </ng-container>
-
-                        <!-- Fall B: Unterschiedliche Sticker oder nur einer vorhanden -->
                         <ng-template #differentStickers>
-                            <!-- Sender-Sticker (falls vorhanden) -->
                             <div class="emoji-holder" *ngIf="pm.senderSticker"
                                 (mouseenter)="toggleReactionSenderInfo(pm.id, true)"
                                 (mouseleave)="toggleReactionSenderInfo(pm.id, false)">
                                 <span class="single-emoji">{{ pm.senderSticker }}</span>
-
-                                <!-- Infobox (am Sender-Emoji) -->
                                 <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpSender[pm.id]"
                                     *ngIf="pm.senderSticker">
                                     <span class="reaction-info-txt">
                                         <ng-container *ngIf="pm.senderId === currentUser.uid; else partnerSenderText">
-                                            <!-- Falls currentUser = Sender -->
                                             Du hast mit
                                             <span class="react-emoji-value">{{ pm.senderSticker }}</span>
                                             reagiert
@@ -278,14 +207,10 @@
                                     </span>
                                 </div>
                             </div>
-
-                            <!-- Empfänger-Sticker (falls vorhanden) -->
                             <div class="emoji-holder" *ngIf="pm.recipientSticker"
                                 (mouseenter)="toggleReactionRecipientInfo(pm.id, true)"
                                 (mouseleave)="toggleReactionRecipientInfo(pm.id, false)">
                                 <span class="single-emoji">{{ pm.recipientSticker }}</span>
-
-                                <!-- Infobox (am Recipient-Emoji) -->
                                 <div class="reaction-name-info-ct-sender" [class.hovered]="showPopUpRecipient[pm.id]"
                                     *ngIf="pm.recipientSticker">
                                     <span class="reaction-info-txt">
@@ -305,16 +230,9 @@
                             </div>
                         </ng-template>
                     </div>
-                    <!-- / sticker-view-ct -->
                 </div>
-                <!-- / message-column -->
             </div>
         </div>
-
-        <!-- / message-container -->
-
-        <!-- Separator (Antwort-Anzeige?), je nach Bedarf -->
-        <!-- / color-separator -->
     </div>
 </ng-container>
 <div class="seperator">

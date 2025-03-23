@@ -63,7 +63,6 @@ export class ThreadControlService {
   setCurrentThreadMessageId(id: string) {
     if (id) {
       this.currentThreadMessageIdSubject.next(id);
-      console.log('currentThreadMessageId gesetzt auf:', id);
     } else {
       console.error('Keine gültige Thread-Nachricht-ID übergeben.');
     }
@@ -84,7 +83,10 @@ export class ThreadControlService {
     });
   }
 
-  getReplyCountChannel(channelId: string, messageId: string): Observable<number> {
+  getReplyCountChannel(
+    channelId: string,
+    messageId: string
+  ): Observable<number> {
     return new Observable<number>((observer) => {
       const repliesRef = collection(
         this.firestore,
@@ -92,7 +94,7 @@ export class ThreadControlService {
         channelId,
         'messages',
         messageId,
-        'thread'  
+        'thread'
       );
       const unsubscribe = onSnapshot(repliesRef, (snapshot) => {
         observer.next(snapshot.size);

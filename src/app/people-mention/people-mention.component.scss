@@ -1,7 +1,7 @@
 .main-card {
-  width: 300px; // Breite etwas reduzieren
+  width: 300px;
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Dezenterer Schatten
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: none;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 30px;
@@ -38,12 +38,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   &:hover {
     background-color: rgb(236, 238, 254);
     cursor: pointer;
     border-radius: 100%;
-
     svg {
       path {
         fill: #444df2;
@@ -61,11 +59,9 @@ input {
   border: 2px solid transparent;
   cursor: text;
   font-family: "Nunito";
-
   &:hover {
     outline: 2px solid grey;
   }
-
   &:focus {
     border-color: #444df2;
     outline: none;
@@ -158,43 +154,4 @@ input {
   color: #000000;
 }
 
-@media (min-width: 320px) and (max-width: 600px) {
-  .main-card {
-    width: 100vw;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-  .info-title {
-    h3 {
-      font-size: 17px;
-    }
-  }
-  input {
-    height: auto;
-  }
-  .user-name {
-    font-size: 12px;
-  }
-  .status-border{
-    left: 0;
-    top: 25px;
-  }
-  .offline{
-    width: 10px;
-    height: 10px;
-  }
-  .online{
-    width: 10px;
-    height: 10px;
-  }
-  .img-box {
-    img {
-      width: 35px;
-      height: 35px;
-    }
-  }
-  .user-info{
-    gap: 9px;
-  }
-}
+@import "./mobile-view-styling/people-mention.mobile.scss";

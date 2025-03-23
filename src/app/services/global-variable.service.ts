@@ -17,16 +17,15 @@ export class GlobalVariableService {
   getUserByName: any = {};
   createNewPassword: boolean = false;
   verifyEmail: boolean = true;
-  checkoben:boolean=false
-  checkCountStatus:any
-  checkCountStatusUser:any
-  currentRoom:any
-  openChannelorUserBox:boolean=false;
-  openChannelOrUserThread:boolean=false;
- 
-  checkWideChannelorUserBox:boolean=false;
-  checkWideChannelOrUserThreadBox:boolean=false;
+  checkoben: boolean = false;
+  checkCountStatus: any;
+  checkCountStatusUser: any;
+  currentRoom: any;
+  openChannelorUserBox: boolean = false;
+  openChannelOrUserThread: boolean = false;
 
+  checkWideChannelorUserBox: boolean = false;
+  checkWideChannelOrUserThreadBox: boolean = false;
 
   private _threadOpened = new BehaviorSubject<boolean>(false);
   public threadOpened$ = this._threadOpened.asObservable();
@@ -48,14 +47,13 @@ export class GlobalVariableService {
   public channelThreadSubject = new BehaviorSubject<string | null>(null);
   channelThread$ = this.channelThreadSubject.asObservable();
 
-  private currentUserDataSubject = new BehaviorSubject<any>(null);  
-  currentUserData$ = this.currentUserDataSubject.asObservable(); 
+  private currentUserDataSubject = new BehaviorSubject<any>(null);
+  currentUserData$ = this.currentUserDataSubject.asObservable();
 
   constructor() {}
 
-
   async setCurrentUserData(userData: any) {
-    this.currentUserDataSubject.next(userData);  // Hier den BehaviorSubject aktualisieren
+    this.currentUserDataSubject.next(userData);
     this.statusCheck = true;
   }
 
@@ -88,7 +86,6 @@ export class GlobalVariableService {
 
   setCurrentThreadMessage(messageId: string) {
     this.currentThreadMessageSubject.next(messageId);
-    console.log('global Message set:', messageId);
   }
 
   setChannelThread(messageId: string) {

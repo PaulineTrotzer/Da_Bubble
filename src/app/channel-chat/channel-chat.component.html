@@ -5,7 +5,7 @@
   </app-mention-message-box>
   <div class="message-scroll-container" #messageContainer>
     <div class="channel-welcome" *ngIf="messagesData?.length === 0 && channelWasLoaded">
-      <img src="./../../assets/img/connection.png" alt="Kanal Illustration" class="welcome-illustration" />
+      <img src="assets/img/connection.png" alt="Kanal Illustration" class="welcome-illustration" />
       <h2>Willkommen im Kanal <span class="channel-name">#{{ selectedChannel?.name }}</span></h2>
       <p class="welcome-text">
         Dies ist der Beginn eures Gesprächs in <b>{{ selectedChannel?.name }}</b>.
@@ -110,7 +110,7 @@
                         <!-- Für PDFs -->
                         <div class="file-info" *ngIf="file.type === 'application/pdf'">
                           <a [href]="file.url" target="_blank">
-                            <img src="../../assets/img/pdf.png" alt="PDF File" />
+                            <img src="assets/img/pdf.png" alt="PDF File" />
                           </a>
                         </div>
                       </div>

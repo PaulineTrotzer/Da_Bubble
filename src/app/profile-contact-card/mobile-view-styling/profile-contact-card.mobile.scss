@@ -1,0 +1,54 @@
+@media (min-width: 320px) and (max-width: 600px) {
+  .email-title {
+    font-size: 15px;
+  }
+  .img-frame {
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  }
+  .user-mail {
+    font-size: 14px;
+    margin-top: 2px;
+    position: relative;
+    right: 32px;
+  }
+  .mail-flex-column {
+    gap: 4px;
+    margin: 50px 0 0 30px;
+    img {
+      width: 20px;
+    }
+  }
+  .online-status-div {
+    font-size: 10px;
+    gap: 4px;
+  }
+  .name-escape-flex {
+    span {
+      font-size: 20px;
+    }
+  }
+  .name-status-flex {
+    h2 {
+      font-size: 20px;
+    }
+    p {
+      font-size: 16px;
+    }
+  }
+}
+
+@media (min-width: 320px) and (max-width: 450px) {
+  .profile-card-ct {
+    width: 100vw;
+    height: 490px !important;
+  }
+}
+
+@media (min-width: 450px) and (max-width: 600px) {
+  .profile-card-ct {
+    height: 490px !important;
+  }
+}

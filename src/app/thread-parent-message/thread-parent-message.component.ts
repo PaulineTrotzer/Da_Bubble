@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -12,9 +11,9 @@ import { Firestore, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { Emoji } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { GlobalVariableService } from '../services/global-variable.service';
 import { MentionThreadService } from '../services/mention-thread.service';
+import { fadeIn, slideIn } from './component.animation';
 
 @Component({
   selector: 'app-thread-parent-message',
@@ -28,30 +27,7 @@ import { MentionThreadService } from '../services/mention-thread.service';
   ],
   templateUrl: './thread-parent-message.component.html',
   styleUrl: './thread-parent-message.component.scss',
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-in-out', style({ opacity: 1 })),
-      ]),
-    ]),
-    trigger('slideIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50%)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 1, transform: 'translateX(0)' })
-        ),
-      ]),
-      transition(':leave', [
-        style({ opacity: 1, transform: 'translateX(0)' }),
-        animate(
-          '150ms ease-in-out',
-          style({ opacity: 0, transform: 'translateX(-50%)' })
-        ),
-      ]),
-    ]),
-  ],
+  animations: [fadeIn, slideIn],
 })
 export class ThreadParentMessageComponent implements OnInit {
   @Input() pm: any;
@@ -80,6 +56,9 @@ export class ThreadParentMessageComponent implements OnInit {
   }>();
   getAllUsersName: any[] = [];
   isReadyToShow = false;
+  messageIdHovered: string | null = null;
+  showPopUpSender: { [key: string]: boolean } = {};
+  showPopUpRecipient: { [key: string]: boolean } = {};
 
   async ngOnInit() {
     await this.mentionService.getAllUsersname();
@@ -140,7 +119,6 @@ export class ThreadParentMessageComponent implements OnInit {
     try {
       if (!this.editableMessageText.trim()) {
         await deleteDoc(messageRef);
-        console.log('Nachricht gelöscht:', pm.id);
       } else {
         const updatedFields = {
           text: this.editableMessageText.trim(),
@@ -148,7 +126,6 @@ export class ThreadParentMessageComponent implements OnInit {
           editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, updatedFields);
-        console.log('Nachricht aktualisiert:', pm.id);
       }
     } catch (error) {
       console.error('Error in saveOrDeleteParentMessage:', error);
@@ -208,8 +185,6 @@ export class ThreadParentMessageComponent implements OnInit {
     this.isEmojiPickerEditVisible = false;
   }
 
-  messageIdHovered: string | null = null;
-
   async addEmoji(event: any, message: any) {
     const chosenEmoji = event?.emoji?.native;
     const emoji = event?.emoji?.native;
@@ -218,11 +193,9 @@ export class ThreadParentMessageComponent implements OnInit {
       return;
     }
     message.lastUsedEmoji = chosenEmoji;
-
     if (this.global.currentUserData?.id === message.senderId) {
       message.senderchoosedStickereBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
-
       if (message.senderSticker === emoji) {
         message.senderSticker = '';
         if (message.senderStickerCount === 2) {
@@ -232,7 +205,6 @@ export class ThreadParentMessageComponent implements OnInit {
         message.senderSticker = emoji;
         message.senderStickerCount = 1;
       }
-
       if (message.recipientSticker === emoji) {
         message.recipientStickerCount =
           (message.recipientStickerCount || 1) + 1;
@@ -244,21 +216,17 @@ export class ThreadParentMessageComponent implements OnInit {
           message.recipientStickerCount = 1;
         }
       }
-
       if (message.senderSticker !== message.recipientSticker) {
         message.recipientStickerCount = 1;
       }
-
       if (message.senderSticker === message.recipientSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
-
       this.isEmojiPickerVisible = false;
       this.messageIdHovered = null;
     } else {
       message.recipientChoosedStickerBackColor = emoji;
       message.stickerBoxCurrentStyle = true;
-
       if (message.recipientSticker === emoji) {
         message.recipientSticker = '';
         if (message.recipientStickerCount === 2) {
@@ -268,19 +236,16 @@ export class ThreadParentMessageComponent implements OnInit {
         message.recipientSticker = emoji;
         message.recipientStickerCount = 1;
       }
-
       if (message.senderSticker === emoji) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
         if (message.senderStickerCount >= 3) {
           message.senderStickerCount = 1;
         }
       }
-
       if (message.recipientSticker !== '' && message.senderStickerCount === 2) {
         message.senderStickerCount = 1;
         message.recipientSticker = emoji;
       }
-
       if (message.recipientSticker === message.senderSticker) {
         message.senderStickerCount = (message.senderStickerCount || 1) + 1;
       }
@@ -309,9 +274,6 @@ export class ThreadParentMessageComponent implements OnInit {
     await this.storeLastUsedEmojiGlobally(chosenEmoji);
     this.closePicker();
   }
-
-  showPopUpSender: { [key: string]: boolean } = {};
-  showPopUpRecipient: { [key: string]: boolean } = {};
 
   toggleReactionSenderInfo(id: string, show: boolean) {
     this.showPopUpSender[id] = show;

@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoginAuthService {
-
   private loginSuccessfulSubject = new BehaviorSubject<boolean>(false);
   loginSuccessful$ = this.loginSuccessfulSubject.asObservable();
 
@@ -14,7 +13,6 @@ export class LoginAuthService {
 
   private googleAccountLogInSubject = new BehaviorSubject<boolean>(false);
   googleAccountLogIn$ = this.googleAccountLogInSubject.asObservable();
-
 
   setLoginSuccessful(status: boolean) {
     this.loginSuccessfulSubject.next(status);
@@ -25,13 +23,12 @@ export class LoginAuthService {
   }
 
   getIsGuestLogin(): boolean {
-    return this.isGuestLoginSubject.value; 
+    return this.isGuestLoginSubject.value;
   }
 
   getGoogleAccountLogIn(): boolean {
     return this.googleAccountLogInSubject.getValue();
   }
-
 
   setGoogleAccountLogIn(status: boolean) {
     this.googleAccountLogInSubject.next(status);

@@ -2,7 +2,7 @@
     <div class="name-escape-flex">
         <span>Dein Profil bearbeiten</span>
         <div>
-            <img (click)="closeEditModus()" src="./assets/img/close.svg">
+            <img (click)="closeEditModus()" src="assets/img/close.svg">
         </div>
     </div>
     <div class="img-frame">
@@ -38,7 +38,7 @@
     </div>
     <div class="mail-flex-column">
         <div>
-            <img src="./assets/img/mail.svg">
+            <img src="assets/img/mail.svg">
             <h3 class="email-title">E-Mail-Adresse</h3>
         </div>
         <input *ngIf="!guestAccount && !googleAccountLogIn" class="user-mail-input" [(ngModel)]="currentUser.email"

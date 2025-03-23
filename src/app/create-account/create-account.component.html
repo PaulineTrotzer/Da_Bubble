@@ -50,11 +50,16 @@
       </div>
       <div class="form-row">
         <label for="password"></label>
-        <input name=password [(ngModel)]="userData.password" #password="ngModel" type="password" id="password"
-          placeholder="Passwort" (focus)="passwordIcon.src = './assets/img/lock_filled_black.svg'"
+        <input name="password" [(ngModel)]="userData.password" #password="ngModel" type="password" id="password"
+          placeholder="Passwort" minlength="7" (focus)="passwordIcon.src = './assets/img/lock_filled_black.svg'"
           (blur)="passwordIcon.src = './assets/img/lock.svg'" (input)="resetUserError()" required />
-        <img #passwordIcon class="icon" #password src="./assets/img/lock.svg" alt="" />
-        <span class="error-message" *ngIf="!password.valid && password.touched">*Ein Passwort ist erforderlich.</span>
+        <img #passwordIcon class="icon" src="./assets/img/lock.svg" alt="" />
+        <span class="error-message" *ngIf="password.errors?.['required'] && password.touched">
+          *Ein Passwort ist erforderlich.
+        </span>
+        <span class="error-message" *ngIf="password.errors?.['minlength'] && password.touched">
+          *Das Passwort muss mindestens 7 Zeichen lang sein.
+        </span>
       </div>
       <div class="checkbox-row">
         <input id="privacy-policy" name="privacy-policy" (click)="toggleChecked()" type="checkbox"
@@ -84,9 +89,10 @@
     <a routerLink="/impressum" routerLinkActive="active">Impressum</a>
     <a routerLink="/privacy-policy" routerLinkActive="active">Datenschutz</a>
   </div>
-  <mat-card *ngIf="linkWasSend" appearance="outlined" class="link-sended-info" [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
+  <mat-card *ngIf="linkWasSend" appearance="outlined" class="link-sended-info"
+    [ngClass]="{'visible': linkWasSend,'hidden':!linkWasSend}">
     <mat-card-content class="link-card-content">
-      <img class="link-img" src="../../assets/img/send.png">
+      <img class="link-img" src="assets/img/send.png">
       <span class="link-sended-text">Link wurde an {{userData.email}} gesendet</span>
     </mat-card-content>
   </mat-card>

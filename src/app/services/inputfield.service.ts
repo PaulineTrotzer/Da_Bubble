@@ -19,24 +19,20 @@ export class InputfieldService {
     if (this.activeComponentId.getValue() !== id) {
       this.activeComponentId.next(id);
     } else {
-     return
+      return;
     }
   }
 
   updateFiles(componentId: string, files: any[]): void {
     this.filesByComponent[componentId] = files;
-    this.filesSubject.next({ ...this.filesByComponent }); 
+    this.filesSubject.next({ ...this.filesByComponent });
     if (componentId === this.activeComponentId.getValue()) {
-      this.selectFiles.next(files); 
+      this.selectFiles.next(files);
     }
-  
-    console.log(`Updated files for component [${componentId}]:`, files);
   }
-  
 
   getFiles(componentId: string): any[] {
     const files = this.filesByComponent[componentId] || [];
-    console.log(`getFiles for component [${componentId}]:`, files);
     return files;
   }
 }

@@ -57,14 +57,8 @@ export class LoginComponent implements OnInit {
   public flyUpActive = false;
 
   ngOnInit() {
-    // Zeitlicher Ablauf:
-    // 0s => Shift + Type starten
-    // Type nimmt 2s, also Sekunde 3 sind wir fertig
-    // => ab Sekunde 3 => FlyUp
-
     setTimeout(() => {
       this.flyUpActive = true;
-      // => Container fliegt 0.75s => Sek 3–3.75
     }, 1000);
   }
 
@@ -81,7 +75,6 @@ export class LoginComponent implements OnInit {
 
   async logIn() {
     if (this.loginAuthService.getIsGuestLogin()) {
-      console.log('Gast-Login aktiv, Login wird abgebrochen');
       return;
     }
     this.isGuestLogin = false;

@@ -32,6 +32,7 @@ export class CreateNewPasswordComponent {
   mode: any;
   firestore = inject(Firestore);
   router = inject(Router);
+  userDocument: any = {};
 
   constructor(public global: GlobalVariableService) {}
 
@@ -62,7 +63,6 @@ export class CreateNewPasswordComponent {
     this.fetchUserDocument();
   }
 
-  userDocument: any = {};
 
   async fetchUserDocument() {
     const auth = getAuth();

@@ -1,7 +1,6 @@
 <div class="main-header">
     <div class="header-content">
-        <img class="bubble-img" src="../../assets/img/bubble.png" />
-
+        <img class="bubble-img" src="assets/img/bubble.png" />
         <div class="search-container">
             <input [ngClass]="{
             'radius':
@@ -18,7 +17,6 @@
             (getSeperateUser.searchHeaderResult?.length > 0 && listlastResultResult)
           " class="mainSearch-box">
                 <mat-card-content class="search-result-content">
-
                     <!--  USER-LISTE -->
                     <div *ngIf="showUserList" class="main-user">
                         <div class="user-list">
@@ -47,7 +45,6 @@
                             Keine User gefunden
                         </div>
                     </div>
-
                     <!--  CHANNEL-LISTE -->
                     <div *ngIf="showChannelList" class="main-channel">
                         <div class="channel-list">
@@ -67,7 +64,6 @@
                             Keine Channel gefunden
                         </div>
                     </div>
-
                     <!--  NACHRICHTEN-SUCHE -->
                     <div *ngIf="showMessageList" class="main-messages">
                         <h3>Gefundene Nachrichten</h3>
@@ -96,12 +92,10 @@
                                 </ng-template>
                             </div>
                         </div>
-
                         <div *ngIf="filteredMessages.length === 0" class="noMessage-info">
                             Keine Nachrichten gefunden
                         </div>
                     </div>
-
                     <!-- AKTUELLE SUCHANFRAGEN -->
                     <div class="main-result-box" *ngIf="
                 getSeperateUser.searchHeaderResult?.length > 0 &&
@@ -138,7 +132,6 @@
                                         <div *ngIf="
                           hoverResultnameId !== searchResult.id
                         " class="svg-box" (click)="deleteUser(searchResult)">
-                                            <!-- Papierkorb-Icon -->
                                             <svg width="20px" height="20px" viewBox="0 0 1024 1024" fill="#000000"
                                                 class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -148,7 +141,6 @@
                                             </svg>
                                         </div>
                                     </div>
-
                                     <div *ngIf="!searchResult.status" class="main-result-channel">
                                         <div class="channel-info-list" (mouseenter)="checkChannelResultId(searchResult)"
                                             (mouseleave)="leaveCheckChannelResultId()"
@@ -182,7 +174,6 @@
                 </mat-card-content>
             </mat-card>
         </div>
-
         <div class="user-info">
             <h2>{{ user.name }}</h2>
             <img class="user-img" [src]="user.picture" />
@@ -200,7 +191,6 @@
                         fill="#444DF2" />
                 </svg>
             </button>
-
             <div *ngIf="clicked">
                 <div class="overlay"></div>
                 <app-dialog-header-dropdown (closeOverlayFromDropDown)="onOverlayClosed()"></app-dialog-header-dropdown>
@@ -208,5 +198,4 @@
         </div>
     </div>
 </div>
-
 <div *ngIf="overlayOpen" class="overlay"></div>

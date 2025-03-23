@@ -52,12 +52,12 @@ export class DialogEditUserComponent implements OnInit {
   previewUrl: string | undefined;
   selectedFile: File | null = null;
   avatarBox: string[] = [
-    '../../assets/img/avatar/avatar1.png',
-    '../../assets/img/avatar/avatar2.png',
-    '../../assets/img/avatar/avatar3.png',
-    '../../assets/img/avatar/avatar4.png',
-    '../../assets/img/avatar/avatar5.png',
-    '../../assets/img/avatar/avatar6.png',
+    'assets/img/avatar/avatar1.png',
+    'assets/img/avatar/avatar2.png',
+    'assets/img/avatar/avatar3.png',
+    'assets/img/avatar/avatar4.png',
+    'assets/img/avatar/avatar5.png',
+    'assets/img/avatar/avatar6.png',
   ];
   storage = inject(Storage);
   userData: any = {};

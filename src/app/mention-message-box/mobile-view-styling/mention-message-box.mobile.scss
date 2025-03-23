@@ -1,0 +1,44 @@
+@media (min-width: 320px) and (max-width: 600px) {
+  .info-title {
+    padding: 0 35px;
+  }
+  .name-box {
+    font-size: 15px;
+  }
+  .status-box {
+    gap: 0;
+    span {
+      margin-top: -8px;
+    }
+  }
+  .personal-info-flex {
+    gap: 15px;
+  }
+  .email-box {
+    margin-top: 20px;
+  }
+  .email-info {
+    gap: 5px;
+    img {
+      width: 22px;
+    }
+    span {
+      font: 14px;
+    }
+  }
+  .user-email {
+    position: relative;
+    top: 3px;
+  }
+  .btn-div {
+    top: 41px;
+  }
+  .btn-primary {
+    font-size: 15px;
+    padding: 9px 17px;
+  }
+  .icon {
+    width: 19px;
+    margin-right: 5px;
+  }
+}

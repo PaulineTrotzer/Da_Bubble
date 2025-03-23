@@ -20,7 +20,7 @@
                 <span class="advice-mail">Wir empfehlen dir, die E-Mail Adresse zu benutzen,
                     die du bei der Arbeit verwendest.</span>
                 <div class="input-container">
-                    <img src="./../../assets/img/mail.svg">
+                    <img src="assets/img/mail.svg">
                     <label for="email"></label>
                     <input autocomplete="off" class="input-styling" name="email" type="email"
                         placeholder="beispielname@email.com" id="email" #email="ngModel" [(ngModel)]="loginData.email"
@@ -37,7 +37,7 @@
                     <span *ngIf="formFailed" class="error-message">
                         Falsches Passwort oder Email. Bitte noch einmal versuchen.
                     </span>
-                    <img src="./../../assets/img/lock.svg">
+                    <img src="assets/img/lock.svg">
                     <label for="password"></label>
                     <input autocomplete="off" class="input-styling" type="password" placeholder="Passwort"
                         name="password" [(ngModel)]="loginData.password" #password="ngModel"
@@ -50,13 +50,13 @@
                         Passwort vergessen?
                     </a>
                     <div class="oder-part">
-                        <img class="line-img" src="./../../assets/img/line.svg">
+                        <img class="line-img" src="assets/img/line.svg">
                         <div class="oder">ODER</div>
                     </div>
                 </div>
                 <div>
                     <button (click)="googleLogIn()" class="input-styling google-button">
-                        <img src="./../../assets/img/google.svg">
+                        <img src="assets/img/google.svg">
                         <p>Anmelden mit Google</p>
                     </button>
                 </div>

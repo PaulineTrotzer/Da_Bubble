@@ -67,7 +67,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   filteredUsers: any[] = [];
   noUserFounded: boolean = false;
   userIdHover: string = '';
-  getChannels: any[] = []; 
+  getChannels: any[] = [];
   filterChannel: any[] = [];
   noChannelFounded: boolean = false;
   channelIdHover: string = '';
@@ -160,19 +160,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   checkInputValue() {
     const trimmed = this.searcheNameOrChannel.trim();
     if (trimmed.startsWith('@') && trimmed !== '') {
-      // > USER-SUCHE
       this.showUserList = true;
       this.showChannelList = false;
       this.showMessageList = false;
       this.filterUsers();
     } else if (trimmed.startsWith('#') && trimmed !== '') {
-      // > CHANNEL-SUCHE
       this.showUserList = false;
       this.showChannelList = true;
       this.showMessageList = false;
       this.filterChannels();
     } else {
-      // > NACHRICHTEN-SUCHE (ChannelMessages + privateMessages)
       this.showUserList = false;
       this.showChannelList = false;
       this.filterMessages();
@@ -289,7 +286,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.listlastResultResult = false;
   }
 
-
   async getAllPrivateMessages() {
     const privateMessagesRef = collection(this.firestore, 'messages');
     onSnapshot(privateMessagesRef, (querySnapshot) => {
@@ -332,7 +328,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     }
 
-
     for (const pmsg of this.allPrivateMessages) {
       if (
         pmsg.text &&
@@ -354,7 +349,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.filteredMessages = results;
     this.showMessageList = this.filteredMessages.length > 0;
   }
-
 
   getUser(currentId: any) {
     const docRef = doc(this.firestore, 'searchHeaderResult', currentId);

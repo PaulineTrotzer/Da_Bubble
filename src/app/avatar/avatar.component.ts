@@ -33,16 +33,16 @@ export class AvatarComponent implements OnInit {
   nameObject: any = {};
   sendInfo: boolean = false;
   userService = inject(UserService);
-  defaultPicture: any | null = '../../assets/img/picture_frame.png';
+  defaultPicture: any | null = 'assets/img/picture_frame.png';
   loading = false;
 
   avatarBox: string[] = [
-    '../../assets/img/avatar/avatar1.png',
-    '../../assets/img/avatar/avatar2.png',
-    '../../assets/img/avatar/avatar3.png',
-    '../../assets/img/avatar/avatar4.png',
-    '../../assets/img/avatar/avatar5.png',
-    '../../assets/img/avatar/avatar6.png',
+    'assets/img/avatar/avatar1.png',
+    'assets/img/avatar/avatar2.png',
+    'assets/img/avatar/avatar3.png',
+    'assets/img/avatar/avatar4.png',
+    'assets/img/avatar/avatar5.png',
+    'assets/img/avatar/avatar6.png',
   ];
 
   chossePicture(avatar: string) {
@@ -82,7 +82,7 @@ export class AvatarComponent implements OnInit {
 
   async saveAvatar() {
     if (!this.userId) return;
-    this.loading = true; 
+    this.loading = true;
     try {
       if (this.selectedFile) {
         const filePath = `avatars/${this.userId}/${this.selectedFile.name}`;
@@ -99,7 +99,7 @@ export class AvatarComponent implements OnInit {
     } catch (error) {
       console.error('Fehler beim Hochladen des Avatars:', error);
     } finally {
-      this.loading = false; 
+      this.loading = false;
     }
   }
 

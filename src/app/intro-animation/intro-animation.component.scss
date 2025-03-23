@@ -52,25 +52,29 @@
 
 @keyframes whiteFlyUp {
   0% {
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     opacity: 1;
   }
   100% {
-    top: 40px; left: 60px;
+    top: 40px;
+    left: 60px;
     transform: translate(0, 0);
-    opacity: 0; 
+    opacity: 0;
   }
 }
 
 @keyframes whiteFlyUpMobile {
   0% {
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     opacity: 1;
   }
   100% {
-    top: 50px; left: 50%;
+    top: 50px;
+    left: 50%;
     transform: translate(-50%, 0);
     opacity: 0;
   }
@@ -78,12 +82,14 @@
 
 @keyframes whiteFlyUpSmartphone {
   0% {
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     opacity: 1;
   }
   100% {
-    top: 110px; left: 50%;
+    top: 110px;
+    left: 50%;
     transform: translate(-50%, 0);
     opacity: 0;
   }
@@ -112,36 +118,14 @@
   animation: typeText 1s steps(8, end) forwards;
 }
 
-
 .fly-up {
   animation: whiteFlyUp 0.75s ease-in-out forwards;
 }
 
 .white-logo {
   width: 110px;
-  animation: logoShift 1.5s  forwards;
+  animation: logoShift 1.5s forwards;
   animation-delay: 0.5s;
 }
 
-
-
-@media screen and (max-width: 815px) {
-  .fly-up {
-    animation: whiteFlyUpMobile 0.75s ease-in-out forwards;
-  }
-  .white-text{
-    font-size: 22px !important;
-  }
-  .white-logo{
-    width: 55px !important;
-  }
-  .white-logo-text{
-    gap: 0 !important;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .fly-up {
-    animation: whiteFlyUpSmartphone 0.75s ease-in-out forwards;
-  }
-}
+@import "./mobile-view-styling/intro-animation.mobile.scss";

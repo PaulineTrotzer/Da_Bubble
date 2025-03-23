@@ -43,6 +43,7 @@ import { AuthService } from '../services/auth.service';
 import { InputfieldService } from '../services/inputfield.service';
 import { FilesPreviewComponent } from '../files-preview/files-preview.component';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { fadeInOut } from './component.animation';
 
 @Component({
   selector: 'app-input-field',
@@ -56,15 +57,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
   ],
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
-  animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-out', style({ opacity: 1 })),
-      ]),
-      transition(':leave', [animate('300ms ease-in', style({ opacity: 0 }))]),
-    ]),
-  ],
+  animations: [fadeInOut],
 })
 export class InputFieldComponent implements OnInit, OnChanges {
   currentThreadMessageId: string | null = null;
@@ -376,7 +369,6 @@ export class InputFieldComponent implements OnInit, OnChanges {
       );
       let uploadedFiles: any[] = [];
       if (selectedFiles.length > 0) {
-        console.log('Selected Files:', selectedFiles);
         uploadedFiles = await this.uploadFilesToFirebaseStorage(selectedFiles);
       }
       const threadMessagesRef = collection(

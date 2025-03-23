@@ -1,0 +1,53 @@
+@media (max-width: 700px) {
+  .image-box {
+    left: unset;
+  }
+}
+
+@media (max-width: 680px) {
+  h1 {
+    font-size: 32px;
+    text-align: center;
+  }
+  h2 {
+    font-size: 25px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    margin-top: 8px;
+    text-align: center;
+  }
+  h4 {
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 16px;
+    text-align: center;
+  }
+  ul {
+    text-align: center;
+  }
+}
+
+@media (max-width: 470px) {
+  .image-box {
+    img {
+      width: 204px;
+      height: 56px;
+    }
+  }
+  .privacy-card {
+    padding: 48px 13px;
+  }
+}
+
+@media (max-width: 460px) {
+  a {
+    font-size: 14px;
+  }
+}

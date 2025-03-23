@@ -7,15 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import {
-  Firestore,
-  collection,
-  onSnapshot,
-  query,
-  where,
-  doc,
-  updateDoc,
-} from '@angular/fire/firestore';
+import { Firestore, collection, onSnapshot } from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GlobalVariableService } from '../services/global-variable.service';
@@ -28,12 +20,14 @@ import { GlobalVariableService } from '../services/global-variable.service';
   styleUrl: './people-mention.component.scss',
 })
 export class PeopleMentionComponent implements OnInit, OnChanges {
-  constructor(public global: GlobalVariableService) {}
-
   firestore = inject(Firestore);
   allUsers: any[] = [];
   searchUserName: string = '';
+  noUserFound: boolean = false;
   @Output() cardClosed = new EventEmitter<void>();
+  @Output() mentionUser = new EventEmitter<string>();
+
+  constructor(public global: GlobalVariableService) {}
 
   async ngOnInit(): Promise<void> {
     await this.getAllUsers();
@@ -63,14 +57,11 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
     });
   }
 
-  noUserFound: boolean = false;
-
   getFilteredUsers() {
     if (!this.searchUserName.trim()) {
       this.noUserFound = false;
       return this.allUsers.filter((user) => user.name !== 'Gast');
     }
-
     const filteredUsers = this.allUsers.filter(
       (user) =>
         user.name.toLowerCase().includes(this.searchUserName.toLowerCase()) &&
@@ -80,8 +71,6 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
     this.noUserFound = filteredUsers.length === 0;
     return filteredUsers;
   }
-
-  @Output() mentionUser = new EventEmitter<string>();
 
   selectUser(user: any) {
     const mention = user.username;

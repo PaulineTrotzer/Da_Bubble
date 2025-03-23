@@ -1,0 +1,40 @@
+@media (min-width: 320px) and (max-width: 600px) {
+  .main-card {
+    width: 100vw;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .info-title {
+    h3 {
+      font-size: 17px;
+    }
+  }
+  input {
+    height: auto;
+  }
+  .user-name {
+    font-size: 12px;
+  }
+  .status-border {
+    left: 0;
+    top: 25px;
+  }
+  .offline {
+    width: 10px;
+    height: 10px;
+  }
+  .online {
+    width: 10px;
+    height: 10px;
+  }
+  .img-box {
+    img {
+      width: 35px;
+      height: 35px;
+    }
+  }
+  .user-info {
+    gap: 9px;
+  }
+}

@@ -230,90 +230,22 @@ app-thread {
   --start-screen-width: 100%;
 }
 
-/* Wenn Workspace geöffnet ist: 
-   -> der Startscreen darf nur (100% - 385px) haben */
+
 .start-screen--full-with-workspace {
   --start-screen-width: calc(100% - 385px);
 }
 
-/* Reduziert: z. B. 60% (falls du so einen Zustand willst) */
 .start-screen--reduced {
   --start-screen-width: 60%;
 }
 
-/* Versteckt: 0 Breite, zusammengeklappt */
 .start-screen--hidden {
   --start-screen-width: 0;
   transform: scaleX(0);
 }
 
 .thread-holder-container {
-  /* Deine bisherigen Styles bleiben hier weitgehend gleich */
   transition: width 0.3s ease;
 }
 
-@media (min-width: 320px) and (max-width: 770px) {
-  .sended-text {
-    font-size: 14px;
-    white-space: nowrap;
-  }
-  .guest-or-mail {
-    white-space: nowrap;
-  }
-  .login-sended-info {
-    padding: 2px 4px;
-  }
-  .workspace-drawer {
-    width: 32px;
-    object-fit: cover;
-  }
-}
-
-@media (min-width: 320px) and (max-width: 450px) {
-  .workspace-opener {
-    position: fixed;
-    top: 78%;
-    left: -3px;
-    padding: 3px;
-    width: 36px;
-    background-color: #e0e0ff;
-    p {
-      display: none;
-    }
-  }
-  .start-screen-container{
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-}
-
-@media (min-width: 450px) and (max-width: 770px) {
-  .workspace-opener {
-    left: -134px;
-    padding: 2px;
-    top: 80%;
-  }
-}
-
-@media (min-width: 450px) and (max-width: 1024px) {
-  .workspace-opener {
-    top: 70%;
-  }
-  .workspace-open {
-    width: 500px;
-  }
-}
-
-@media (min-width: 2200px) {
-  :host {
-    display: flex;
-    width: 100vw;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 950px) {
-  .workspace-container {
-    width: 100vw;
-  }
-}
+@import './mobile-view-styling/home.mobile.scss';

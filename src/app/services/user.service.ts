@@ -20,10 +20,8 @@ export class UserService {
   private currentUser: string | null = null;
   private selectedUserSubject = new BehaviorSubject<User | null>(null);
   selectedUser$ = this.selectedUserSubject.asObservable();
-
-  private profileSelectionSubject = new BehaviorSubject<string | null>(null); 
+  private profileSelectionSubject = new BehaviorSubject<string | null>(null);
   profileSelection$ = this.profileSelectionSubject.asObservable();
-
   user: User = new User();
   uid: any;
   unsub?: () => void;

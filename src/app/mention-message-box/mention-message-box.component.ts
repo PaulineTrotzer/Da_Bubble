@@ -23,7 +23,7 @@ export class MentionMessageBoxComponent implements OnInit {
   @Output() closeMentionBox = new EventEmitter<void>();
   @Input() mention: string = '';
   @Output() cancelMessageBoxCard = new EventEmitter<any>();
-  userChannelSelectService =inject(UserChannelSelectService);
+  userChannelSelectService = inject(UserChannelSelectService);
 
   ngOnInit(): void {}
 
@@ -41,6 +41,6 @@ export class MentionMessageBoxComponent implements OnInit {
   enterChat(user: any) {
     this.enterChatUser.emit(user);
     this.userChannelSelectService.setSelectedUser(user);
-    this.closeMentionBox.emit(); 
+    this.closeMentionBox.emit();
   }
 }

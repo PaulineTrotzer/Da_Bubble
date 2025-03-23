@@ -43,6 +43,7 @@ export class WorkspaceComponent implements OnInit {
   userService = inject(UserService);
   @Output() userSelected = new EventEmitter<any>();
   @Output() channelSelected = new EventEmitter<Channel>();
+  @Output() mobileChannelSelected = new EventEmitter<void>();
   readonly dialog = inject(MatDialog);
   channelsUnsubscribe: Unsubscribe | undefined;
   logInAuth = inject(LoginAuthService);
@@ -165,7 +166,6 @@ export class WorkspaceComponent implements OnInit {
       this.resetGlobalStates();
       this.resetMessageCountIfNeeded();
       this.channelService.setSelectedUser(user);
-      this.handleUIChanges();
     });
     this.global.openChannelorUserBox = true;
     if (window.innerWidth < 900) {
@@ -198,45 +198,6 @@ export class WorkspaceComponent implements OnInit {
       updateDoc(docRef, resetMessageCount);
     }
   }
-
-  handleUIChanges() {
-    // this.openvollWidtChannelOrUserBox();
-    // this.hiddenVoolThreadBox();
-    /*   this.checkWidtSize(); */
-    //this.cheackChatOpen();
-  }
-
-  /*   openvollWidtChannelOrUserBox() {
-    if (window.innerWidth <= 1349 && window.innerWidth > 720) {
-      return (this.global.checkWideChannelorUserBox = true);
-    } else {
-      return (this.global.checkWideChannelorUserBox = false);
-    }
-  }
-
-  hiddenVoolThreadBox() {
-    if (
-      window.innerWidth <= 1349 &&
-      window.innerWidth > 720 &&
-      this.global.checkWideChannelOrUserThreadBox
-    ) {
-      this.global.checkWideChannelOrUserThreadBox = false;
-    }
-  } */
-  /* 
-  cheackChatOpen() {
-    if (window.innerWidth <= 720 && this.global.openChannelOrUserThread) {
-      this.global.openChannelOrUserThread = false;
-    }
-  }
- */
-  /*  checkWidtSize() {
-    if (window.innerWidth <= 720) {
-      return (this.global.openChannelorUserBox = true);
-    } else {
-      return (this.global.openChannelorUserBox = false);
-    }
-  } */
 
   openDialog() {
     const dialogRef = this.dialog.open(DialogCreateChannelComponent, {
@@ -347,8 +308,6 @@ export class WorkspaceComponent implements OnInit {
     return !!(user.name && user.picture && user.status);
   }
 
-  @Output() mobileChannelSelected = new EventEmitter<void>();
-
   selectChannel(channel: any) {
     this.resetUserAndChannel();
     this.global.setCurrentChannel(channel);
@@ -363,7 +322,6 @@ export class WorkspaceComponent implements OnInit {
       this.mobileChannelSelected.emit();
     }
   }
-  
 
   resetUserAndChannel() {
     this.selectedUser = null;

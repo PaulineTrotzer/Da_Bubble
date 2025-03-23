@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',  
+  providedIn: 'root',
 })
 export class WorkspaceService {
-
-   selectedUserSubject = new BehaviorSubject<any>(null);
-   selectedChannelSubject = new BehaviorSubject<any>(null);
+  selectedUserSubject = new BehaviorSubject<any>(null);
+  selectedChannelSubject = new BehaviorSubject<any>(null);
 
   constructor() {}
 
@@ -15,22 +14,19 @@ export class WorkspaceService {
     return this.selectedUserSubject.asObservable();
   }
 
-
   setSelectedUser(user: any) {
     this.selectedUserSubject.next(user);
   }
-
 
   get selectedChannel$() {
     return this.selectedChannelSubject.asObservable();
   }
 
-
   setSelectedChannel(channel: any) {
     this.selectedChannelSubject.next(channel);
   }
 
-    updateChannel(channel: any) {
+  updateChannel(channel: any) {
     this.selectedChannelSubject.next(channel);
   }
 }

@@ -27,7 +27,7 @@ import {
   onSnapshot,
 } from '@angular/fire/firestore';
 import { AuthService } from '../services/auth.service';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { fadeOutThread } from './component.animation';
 
 @Component({
   selector: 'app-home',
@@ -42,14 +42,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  animations: [
-    trigger('fadeOutThread', [
-      transition(':leave', [
-        style({ opacity: 1 }),
-        animate('200ms ease', style({ opacity: 0 })),
-      ]),
-    ]),
-  ],
+  animations: [fadeOutThread],
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   selectedUser: any;
@@ -81,6 +74,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   specialSpaceOption = false;
   cdr = inject(ChangeDetectorRef);
   startScreenWidth: string = '100%';
+  workspaceColumnWidth: string = '385px';
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
@@ -94,12 +88,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.setDirectThread();
     this.setChannelThread();
     this.authService.initAuthListener();
-    /*    this.global.threadOpened$.subscribe((isOpened) => {
-      Promise.resolve().then(() => {
-        this.reduceStartScreen = isOpened;
-        this.cdr.detectChanges();
-      });
-    }); */
     this.initializeScreen();
     this.onResize({ target: window } as any);
   }
@@ -113,13 +101,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.workspaceColumnWidth = '385px';
     this.global.openChannelorUserBox = true;
   }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     const width = window.innerWidth;
-    // Desktop-Bereich (width >= 951px)
     if (width >= 951) {
-      // Sonderfall: Wenn width zwischen 1100 und 1450 liegt, threadOpened true, workspaceOpen true und UserBox aktiv,
-      // dann schließe den Workspace.
       if (
         width > 1100 &&
         width < 1450 &&
@@ -138,8 +124,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       }
     }
 
-    // Bedingung: Wenn width >= 1450, der Workspace geschlossen ist und die UserBox aktiv ist,
-    // dann öffne den Workspace automatisch.
     if (
       width >= 1450 &&
       !this.isWorkspaceOpen &&
@@ -147,9 +131,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ) {
       this.openWorkspace();
     }
-
-    // Neuer Zusatz: Wenn nur der Thread geöffnet ist (Workspace geschlossen, UserBox inaktiv)
-    // und die Bildschirmbreite über 950px liegt, dann toggle (öffne) den Workspace.
     if (
       width >= 950 &&
       !this.isWorkspaceOpen &&
@@ -158,9 +139,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ) {
       this.openWorkspace();
     }
-
-    // Bestehende Bedingung: Wenn width >= 1450, workspace offen, threadOpened true und UserBox inaktiv,
-    // dann setze UserBox auf aktiv.
     if (
       width >= 1450 &&
       this.isWorkspaceOpen &&
@@ -169,7 +147,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ) {
       this.global.openChannelorUserBox = true;
     } else {
-      // Mobile-Bereich (width < 951):
       if (
         width < 950 &&
         this.global.openChannelorUserBox &&
@@ -194,7 +171,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   openWorkspace(): void {
     const width = window.innerWidth;
     if (width < 951) {
-      // Mobile: Reserviere 100% Platz
       this.workspaceColumnWidth = '100%';
     } else {
       this.workspaceColumnWidth = '385px';
@@ -204,8 +180,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.cdr.detectChanges();
     }, 10);
   }
-
-  workspaceColumnWidth: string = '385px';
 
   get isThreadOpened(): boolean {
     return !!(this.directThreadId || this.channelThreadId);
@@ -265,9 +239,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Erzwinge ein initiales Update der Layout-Zustände
     this.onResize({ target: window } as any);
-
     this.workspaceComponent.channelSelected.subscribe((channel: any) => {
       this.selectedChannel = channel;
       this.global.channelSelected = true;
@@ -402,9 +374,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     const workspaceWidth = '385px';
     const threadFixedWidthStandard = '510px';
     const width = window.innerWidth;
-    const gap = '32px'; // Wird separat via [style.gap] gesetzt
-
-    // 1. Mobile-Bereich (width < 951):
+    const gap = '32px';
     if (width < 951) {
       if (this.global.threadOpened) {
         return `0 0 100vw`;
@@ -418,14 +388,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
         return `0 100vw 0`;
       }
     }
-  
-  
-    // 2a. Sonderfall: Nur der Thread offen (Workspace geschlossen, UserBox inaktiv)
-    if (!this.isWorkspaceOpen && this.global.threadOpened && !this.global.openChannelorUserBox) {
+    if (
+      !this.isWorkspaceOpen &&
+      this.global.threadOpened &&
+      !this.global.openChannelorUserBox
+    ) {
       return `0 0 100vw`;
     }
-  
-    // 2b. Sonderfall: width < 1450, Workspace offen, Thread offen, UserBox geschlossen
     if (
       width < 1450 &&
       this.isWorkspaceOpen &&
@@ -434,8 +403,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     ) {
       return `${workspaceWidth} 0 1fr`;
     }
-  
-    // 2c. Explizite Unterscheidung: Workspace offen UND UserBox aktiv
     if (this.isWorkspaceOpen && this.global.openChannelorUserBox) {
       if (this.global.threadOpened) {
         return `${workspaceWidth} 1fr ${threadFixedWidthStandard}`;
@@ -443,8 +410,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         return `${workspaceWidth} 1fr 0`;
       }
     }
-  
-    // 2d. Falls die UserBox nicht aktiv ist (false)
     if (!this.global.openChannelorUserBox) {
       if (this.global.threadOpened) {
         if (width < 1100) {
@@ -456,8 +421,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         return `${workspaceWidth} 0 0`;
       }
     }
-  
-    // 2e. Standardfall: Workspace geschlossen, UserBox aktiv
+
     if (!this.isWorkspaceOpen && this.global.openChannelorUserBox) {
       if (this.global.threadOpened) {
         return `0 1fr minmax(${threadFixedWidthStandard}, 1fr)`;
@@ -467,29 +431,29 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
     return `0 1fr 0`;
   }
-  
-
 
   getGridGap(): string {
     const width = window.innerWidth;
     if (width < 951) {
       return '0px';
     }
-    if (this.isWorkspaceOpen || (!this.isWorkspaceOpen && this.global.threadOpened && this.global.openChannelorUserBox)) {
+    if (
+      this.isWorkspaceOpen ||
+      (!this.isWorkspaceOpen &&
+        this.global.threadOpened &&
+        this.global.openChannelorUserBox)
+    ) {
       return '32px';
     }
     return '0px';
   }
-  
 
   calcStartScreenContainerWidth(): string {
     const gap = 32;
     const width = window.innerWidth;
 
     if (width >= 951) {
-      // Desktop-Bereich
       if (this.isWorkspaceOpen) {
-        // Wenn der Workspace geöffnet ist, wird immer die Breite abgezogen
         return `calc(100vw - 385px - ${gap}px)`;
       } else {
         if (this.global.threadOpened && this.global.openChannelorUserBox) {
@@ -499,7 +463,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
       }
     } else {
-      // Mobile-Bereich: Hier reicht 100vw, da calcGrid dies bereits übernimmt
       return `100vw`;
     }
   }
@@ -507,17 +470,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
   toggleWorkspace(): void {
     const width = window.innerWidth;
     if (width < 951) {
-      // Mobile-Logik:
       if (this.isWorkspaceOpen) {
         this.closeWorkspace();
-        // Beim Schließen soll die UserBox sichtbar werden
         this.global.openChannelorUserBox = true;
         this.global.setThreadOpened(false);
         this.directThreadId = null;
         this.channelThreadId = null;
       } else {
         this.openWorkspace();
-        // Beim Öffnen soll die UserBox verschwinden
         this.global.openChannelorUserBox = false;
         this.global.setThreadOpened(false);
       }
@@ -530,8 +490,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.closeWorkspace();
       }
     } else {
-      // Desktop-Bereich:
-      // Falls der Workspace bereits offen ist und die UserBox aktiv, dann muss der Workspace auf 0 (geschlossen) gehen.
       if (this.isWorkspaceOpen && this.global.openChannelorUserBox) {
         this.isWorkspaceOpen = false;
         this.workspaceColumnWidth = '0px';
@@ -567,6 +525,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   getImageSource(): string {
     const state = this.isWorkspaceOpen ? 'hide' : 'show';
     const variant = this.isHovered ? 'hover' : 'black';
-    return `../../assets/img/${state}-workspace-${variant}.png`;
+    return `assets/img/${state}-workspace-${variant}.png`;
   }
 }

@@ -1,0 +1,39 @@
+@media (min-width: 320px) and (max-width: 770px) {
+  .main-input-area {
+    border: none;
+    border-top: 1px solid #adb0d9;
+    border-radius: 0;
+  }
+  .msg-input-ct {
+    padding: 4px 0;
+  }
+
+  .error-message {
+    font-size: 11px;
+  }
+  .emoji-picker {
+    width: 95%;
+    left: 0;
+  }
+  .interactions-send-msg-ct {
+    bottom: -6px;
+    padding-bottom: 5px;
+  }
+  .chat-editable {
+    font-size: 14px;
+    max-height: 140px;
+  }
+  .plus {
+    width: 20px;
+  }
+  .emoji-at-ct {
+    div {
+      img {
+        width: 32px;
+      }
+    }
+  }
+  .msg-send {
+    width: 28px;
+  }
+}

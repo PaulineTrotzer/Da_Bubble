@@ -6,6 +6,7 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInAnonymously,
+  deleteUser,
 } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { User } from '../models/user.class';
@@ -46,7 +47,6 @@ export class AuthService {
   workspaceInitializedSubject = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    // Falls du beim Fenster-Schließen offline setzen willst:
     window.addEventListener('beforeunload', async (event) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -68,20 +68,95 @@ export class AuthService {
         } else {
           this.loginAuthService.setIsGuestLogin(false);
         }
-
         await this.updateStatus(user.uid, 'online');
       } else {
         this.currentUser = null;
         this.globalVariable.setCurrentUserData(null);
-
         this.loginAuthService.setGoogleAccountLogIn(false);
         this.loginAuthService.setIsGuestLogin(false);
       }
     });
   }
 
-  async deleteGuest(userId: any) {
-    await deleteDoc(doc(this.firestore, 'users', userId));
+  async deleteGuest(userId: string) {
+    try {
+      const messagesRef = collection(this.firestore, 'messages');
+      const directMessagesSnapshot = await getDocs(
+        query(messagesRef, where('senderId', '==', userId))
+      );
+      for (const docSnap of directMessagesSnapshot.docs) {
+        await deleteDoc(doc(messagesRef, docSnap.id));
+        const threadRef = collection(
+          this.firestore,
+          `messages/${docSnap.id}/threadMessages`
+        );
+        const threadSnapshot = await getDocs(threadRef);
+        for (const threadDoc of threadSnapshot.docs) {
+          if (threadDoc.data()['senderId'] === userId) {
+            await deleteDoc(doc(threadRef, threadDoc.id));
+          }
+        }
+      }
+    } catch (err) {
+      console.error(' Fehler beim Löschen von Direct Messages:', err);
+    }
+    const allChannelsRef = collection(this.firestore, 'channels');
+    const allChannelsSnapshot = await getDocs(allChannelsRef);
+    for (const channelDoc of allChannelsSnapshot.docs) {
+      const channelData = channelDoc.data();
+      const channelId = channelDoc.id;
+      const createdBy = channelData['createdBy'];
+      if (createdBy === userId) {
+        const messagesRef = collection(
+          this.firestore,
+          `channels/${channelId}/messages`
+        );
+        const messagesSnapshot = await getDocs(messagesRef);
+        for (const msgDoc of messagesSnapshot.docs) {
+          const threadRef = collection(
+            this.firestore,
+            `channels/${channelId}/messages/${msgDoc.id}/thread`
+          );
+          const threadSnapshot = await getDocs(threadRef);
+          for (const threadMsg of threadSnapshot.docs) {
+            await deleteDoc(threadMsg.ref);
+          }
+          await deleteDoc(msgDoc.ref);
+        }
+        try {
+          await deleteDoc(doc(this.firestore, 'channels', channelId));
+        } catch (error) {
+          console.error(' Fehler beim Löschen des Channels:', channelId, error);
+        }
+      }
+    }
+    const channelsSnapshot = await getDocs(allChannelsRef);
+    for (const channelDoc of channelsSnapshot.docs) {
+      const channelId = channelDoc.id;
+      const channelMessagesRef = collection(
+        this.firestore,
+        `channels/${channelId}/messages`
+      );
+      const messagesSnapshot = await getDocs(
+        query(channelMessagesRef, where('senderId', '==', userId))
+      );
+      for (const messageDoc of messagesSnapshot.docs) {
+        const threadRef = collection(
+          this.firestore,
+          `channels/${channelId}/messages/${messageDoc.id}/thread`
+        );
+        const threadSnapshot = await getDocs(threadRef);
+        for (const threadMsg of threadSnapshot.docs) {
+          await deleteDoc(threadMsg.ref);
+        }
+        await deleteDoc(messageDoc.ref);
+      }
+    }
+    try {
+      await deleteDoc(doc(this.firestore, 'users', userId));
+    } catch (err) {
+      console.error('Fehler beim Löschen des Nutzer-Dokuments:', err);
+    }
   }
 
   async updateStatus(userId: string, status: 'online' | 'offline') {
@@ -126,8 +201,6 @@ export class AuthService {
         this.globalVariable.setCurrentUserData(this.user);
         this.loginAuthService.setGoogleAccountLogIn(true);
         this.LogInAuth.setLoginSuccessful(true);
-
-        // Nach dem Login zur Welcome-Seite, dann reload:
         this.router.navigate(['/welcome', this.user.uid]).then(() => {
           window.location.reload();
         });
@@ -168,17 +241,13 @@ export class AuthService {
         createdAt: new Date(),
         googleAccount: true,
       });
-      console.log('Google-User erstellt.', slugUsername);
     } else {
-      // Wenn der Benutzer schon existiert, aktualisiere das Bild trotzdem
-      // – nur wenn Du das möchtest!
       try {
         const finalPhotoUrl = await this.uploadGooglePhotoToStorage(
           user.picture,
           user.uid
         );
         await updateDoc(userRef, { picture: finalPhotoUrl });
-        console.log('Google-Profilbild aktualisiert.');
       } catch (e) {
         console.warn('Konnte Google-Foto nicht aktualisieren', e);
       }
@@ -197,7 +266,9 @@ export class AuthService {
       const storageRef = ref(storage, `avatars/${userUid}/googlePhoto.jpg`);
       const response = await fetch(googlePhotoURL);
       if (!response.ok) {
-        throw new Error('Fehler beim Laden des Google-Fotos: ' + response.status);
+        throw new Error(
+          'Fehler beim Laden des Google-Fotos: ' + response.status
+        );
       }
       const blob = await response.blob();
       await uploadBytes(storageRef, blob);
@@ -208,7 +279,6 @@ export class AuthService {
       throw error;
     }
   }
-  
 
   generateUsername(fullName: string): string {
     const parts = fullName.trim().split(/\s+/);
@@ -228,27 +298,26 @@ export class AuthService {
   }
 
   async logOut() {
-    this.loginAuthService.setGoogleAccountLogIn(false);
     const auth = getAuth();
     const currentUser = auth.currentUser;
+
     try {
       if (currentUser) {
         await this.updateStatus(currentUser.uid, 'offline');
         if (currentUser.isAnonymous) {
+          await this.deleteGuest(currentUser.uid);
           await deleteDoc(doc(this.firestore, 'users', currentUser.uid));
-        }
-        if (currentUser?.isAnonymous) {
-          this.deleteGuest(currentUser.uid);
         }
         this.currentUser = null;
         this.globalVariable.setCurrentUserData(null);
         this.loginAuthService.setIsGuestLogin(false);
+        this.loginAuthService.setGoogleAccountLogIn(false);
         await signOut(auth);
       }
       this.overlayStatusService.setOverlayStatus(false);
       this.router.navigate(['/']);
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error(' Fehler beim Logout:', error);
     }
   }
 
