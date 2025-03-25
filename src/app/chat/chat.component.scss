@@ -2,9 +2,23 @@
   border-style: none;
 }
 
-.full-app-content {
+.full-app-content,
+.main-current-messagebox,
+.scroll-container {
+  min-height: 0;
+}
+
+:host {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.full-app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background-color: white;
   border-radius: 30px;
 }
@@ -47,6 +61,7 @@
   padding-bottom: 0;
 }
 
+
 .only-name {
   margin: 0 2px;
 }
@@ -63,17 +78,13 @@
 }
 
 .scroll-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex: 1;
   overflow-y: auto;
-  height: 71vh;
   scroll-behavior: smooth !important;
-  margin-top: 108px;
 }
 
 app-input-field {
-  position: relative;
+  flex: 0 0 auto;
 }
 
 .self-chat-opener-ct,
@@ -180,10 +191,9 @@ app-input-field {
 }
 
 .main-current-messagebox {
-  width: 100%;
-  overflow-y: auto;
-  padding-top: 15px;
-  scroll-behavior: smooth;
+  display: flex !important;
+  flex-direction: column;
+  height: calc(100vh - var(--app-header-height) - var(--chat-header-height));
 }
 
 .first-day-info {
@@ -898,8 +908,8 @@ app-mention-message-box {
   font-size: 15px;
   gap: 8px;
   img {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 55px;
+    max-height: 65px;
     object-fit: cover;
     border-radius: 8px;
   }

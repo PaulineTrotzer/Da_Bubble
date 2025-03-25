@@ -3,6 +3,24 @@ mat-card {
   border-style: none;
 }
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.full-page-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flex-parent {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -15,16 +33,11 @@ mat-card {
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 102px;
+  flex: 0 0 102px;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
   box-shadow: 0 5px 5px rgba(136, 136, 136, 0.25);
   width: 100%;
-  position: absolute;
-  top: 0;
   z-index: 10;
   background-color: white !important;
   background: linear-gradient(
@@ -32,19 +45,36 @@ mat-card {
     rgb(200 202 251),
     rgba(121, 126, 243, 0)
   );
-}
-
-.header-chat-holder {
-  display: flex;
-  flex-direction: column;
-  height: calc(880px - 107px);
+  padding: 0 !important;
 }
 
 .big-chat-card {
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  height: 100%;
+}
+
+.big-chat-card > div:not(mat-card-header) > .big-chat-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.big-chat-card > mat-card-header {
+  flex: 0 0 102px;
+}
+
+.big-chat-card > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.big-chat-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .mat-mdc-card {

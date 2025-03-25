@@ -19,6 +19,8 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .info-title {
@@ -73,7 +75,8 @@ input {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 240px;
+  flex: 1;
+  max-height: 15vh;
   overflow-y: auto;
 }
 

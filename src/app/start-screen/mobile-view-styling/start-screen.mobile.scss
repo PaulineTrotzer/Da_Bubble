@@ -12,22 +12,6 @@
 }
 
 @media (min-width: 320px) and (max-width: 450px) {
-  .header {
-    position: absolute;
-    left: 0;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    min-height: 92px;
-    box-shadow: 0 2px 5px rgba(68, 77, 242, 0.41),
-      0 2px 2px rgba(255, 255, 255, 0.5) inset;
-  }
-
-  .big-chat-card {
-    max-width: max-content;
-    min-width: auto;
-  }
-
   .user-chat-info {
     margin-bottom: 14px;
     img {
@@ -40,7 +24,7 @@
   }
 
   .btn-text-img {
-    font-size: 22px;
+    font-size: 17px;
   }
 
   .drop-down-div {
@@ -55,8 +39,12 @@
   }
 
   .avatar {
-    height: 33px;
-    width: 33px;
+    height: 25px;
+    width: 25px;
+  }
+  svg {
+    width: 26px;
+    height: 26p;
   }
 
   app-channel-chat {
@@ -70,7 +58,7 @@
   }
 
   .mat-mdc-button {
-    margin-top: -14px;
+    margin-top: 2px;
   }
 
   .welcome-sheet {
@@ -83,11 +71,6 @@
   .mat-mdc-card {
     width: 100vw;
   }
-
-  .header {
-    min-height: 85px;
-  }
-
   .startScreen-open {
     width: 95vw;
   }
@@ -114,16 +97,28 @@
   }
 
   app-welcome-sheet {
-    display: block;
+    display: flex;
     width: 100vw;
-  }
-  .mat-mdc-button {
-    margin-top: 11px;
   }
 }
 
 @media (min-width: 2100px) {
   .big-chat-card {
     min-width: 990px;
+  }
+}
+
+@media (max-width: 770px) {
+  .big-chat-card > mat-card-header {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    flex: 0 0 75px;
+  }
+  .drop-down-div {
+    height: auto;
+    margin-top: 8px;
+  }
+  .btn-text-img{
+    margin-top: 10px;
   }
 }

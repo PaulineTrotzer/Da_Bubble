@@ -34,7 +34,7 @@
 
 .file-box {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 5px;
   position: relative;
 }
@@ -80,8 +80,10 @@
 }
 
 .file-name {
-  display: flex;
-  align-self: center;
+  max-width: 120px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .file-info-mix {

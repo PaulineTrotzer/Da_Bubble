@@ -1,10 +1,17 @@
 .main-header {
-  background-color: #eceefe;
+  flex: 0 0 120px;
+  width: 100%;
+  display: flex;
   justify-content: center;
   align-items: flex-start;
+  background-color: #eceefe;
+  border: 3px solid red !important;
+}
+
+:host {
   display: flex;
-  position: relative;
-  height: 120px;
+  flex-direction: column;
+  width: 100%;
 }
 
 .main-messages {

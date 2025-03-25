@@ -1,12 +1,16 @@
 .chat-box {
   display: flex;
   flex-direction: column;
-  top: 120px;
-  position: relative;
+  height: calc(100vh - var(--app-header-height) - var(--chat-header-height));
   overflow: hidden;
   background-color: white;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
+}
+
+app-input-field {
+  flex: 0 0 auto;
+  position: relative !important;
 }
 
 .edit-wrapper {
@@ -115,16 +119,14 @@
   }
 }
 
-/* Scroll-Container für Nachrichten */
+.message-scroll-container > *:first-child {
+  margin-top: 19px;
+}
+
 .message-scroll-container {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  height: 65vh;
-  padding-top: 21px;
-  overflow: auto;
-  scroll-behavior: smooth;
-  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;  
 }
 
 .message-from-user {
@@ -533,21 +535,20 @@
 }
 
 textarea {
-  padding: 20px;
-  border-radius: 20px;
-  border: 1px solid #adb0d9;
-  resize: none;
-  outline: none;
-  font-family: Nunito;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 24.55px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
   width: 100%;
-  min-height: 300px;
-  overflow: auto;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  resize: none;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+  font-family: Nunito, "Helvetica Neue";
+  font-size: 16px;
+  min-height: 150px;
+  max-width: 300px;
+  height: 100%;
+  overflow-y: auto;
 }
 ::-webkit-scrollbar {
   width: 0;
@@ -562,14 +563,13 @@ form {
 .edit-message-container {
   position: relative;
   display: flex;
-  min-width: 325px;
   gap: 20px;
   z-index: 10;
 }
 .button-row {
   display: flex;
   justify-content: space-between;
-  width: 99%;
+  width: 100%;
   height: 31px;
   background-color: white;
   border-bottom-left-radius: 40px;
@@ -587,8 +587,11 @@ form {
 
 .edit-message-button-row {
   position: absolute;
-  bottom: 7px;
-  left: 3px;
+  bottom: 1px;
+  left: 0;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .channel {
@@ -674,8 +677,8 @@ form {
   flex-direction: column;
 }
 .file-info img {
-  width: 40px;
-  height: 40px;
+  max-width: 55px;
+  max-height: 65px;
   object-fit: cover;
   border-radius: unset !important;
 }

@@ -1,212 +1,238 @@
-
 @media (min-width: 320px) and (max-width: 600px) {
-    .placeholder-thread-answer {
-      height: 21px;
+  .placeholder-thread-answer {
+    height: 21px;
+  }
+  .file-info {
+    img {
+      width: 35px !important;
+      height: 35px !important;
     }
-    .file-info {
-      img {
-        width: 35px !important;
-        height: 35px !important;
-      }
+  }
+  .message-scroll-container {
+    flex: 1;
+    padding-top: 16px;
+    overflow-y: auto;
+    gap: 18px;
+    min-height: 0;
+  }
+  .reaction {
+    min-width: 32px;
+    height: 20px;
+    font-size: 11px;
+  }
+  .message-from-current .text-container .text {
+    padding: 10px 12px;
+  }
+  .message-from-user .text-container .text {
+    padding: 10px 12px;
+  }
+
+  .message-from-current .text-container {
+    min-height: 94px;
+  }
+  .message-from-user .text-container {
+    min-height: 94px;
+  }
+  .edited-label {
+    font-size: 10px;
+  }
+  .message-from-user .message .message-content {
+    padding-top: 0;
+  }
+  .only-name {
+    font-size: 13px;
+  }
+  .mention-message {
+    font-size: 13px;
+  }
+  h3 {
+    font-size: 15px;
+  }
+  .mat-mdc-card {
+    border-radius: 0;
+  }
+  .new-day-info {
+    top: -16px;
+  }
+  .first-indicated-time {
+    top: -33px !important;
+  }
+  .message-from-user {
+    padding: 20px 0 10px 45px;
+    img {
+      width: 33px;
+      height: 33px;
     }
-    .message-scroll-container {
-      gap: 18px;
-      padding-top: 82px;
-      height: 79vh;
-    }
-  
-    .edited-label {
-      font-size: 10px;
-    }
-    .message-from-user .message .message-content {
-      padding-top: 0;
-    }
-    .only-name {
-      font-size: 13px;
-    }
-    .mention-message {
-      font-size: 13px;
-    }
-    h3 {
-      font-size: 16px;
-    }
-    .mat-mdc-card {
-      border-radius: 0;
-    }
-    .new-day-info {
-      top: -16px;
-    }
-    .first-indicated-time {
-      top: -33px !important;
-    }
-    .message-from-user {
-      padding: 20px 0 10px 45px;
-      img {
-        width: 50px;
-        height: 50px;
-      }
-    }
-    .message-from-user .text-container .heading {
-      span {
-        font-size: 11px;
-      }
-    }
-    .message-from-current .text-container .heading {
-      span {
-        font-size: 11px;
-      }
-    }
-    .message-from-current {
-      padding: 20px 0 10px 45px;
-      img {
-        width: 50px;
-        height: 50px;
-      }
-    }
-    .message-from-user .reaction-bar {
-      top: 9px;
-      padding: 3px 9px 3px 5px;
-      z-index: 2;
-      height: 35px;
-    }
-    .message-from-current .reaction-bar {
-      top: 9px;
-      padding: 3px 9px 3px 5px;
-      z-index: 2;
-      height: 35px;
-    }
-    .used-emojis .emoji:nth-child(1) {
-      display: none;
-    }
-    .emoji {
-      font-size: 13px;
-    }
-    .img-container {
-      svg {
-        width: 19px;
-      }
-    }
-    .message-edit {
+  }
+  .message-from-user .text-container .heading {
+    span {
       font-size: 11px;
-      white-space: pre-wrap;
     }
-    .day-span {
-      font-size: 12px;
-      padding: 3px 13px;
-    }
-    .img-container-textarea {
-      svg {
-        width: 20px;
-      }
-    }
-    .channel {
-      padding: 5px 19px !important;
-      font-size: 11px !important;
-      height: 25px;
-      width: 31px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  
-  
-    textarea {
-      font-size: 15px;
-    }
-    .textarea-wrapper {
-      max-width: 280px;
-    }
-    .edit-message-button-row {
-      left: 5px;
-      width: 97%;
-    }
-    .edit-mode-active {
-      justify-content: center;
-      max-width: 400px;
-      gap: 0 !important;
-    }
-    .message-from-current .message .message-content {
-      margin-right: 35px;
-    }
-  
-    .img-container-textarea {
-      height: 32px;
-    }
-    .reaction-from-container {
+  }
+  .message-from-current .text-container .heading {
+    span {
       font-size: 11px;
-      padding: 3px 4px !important;
-      max-width: 125px;
-      max-height: 50px;
-      white-space: nowrap;
-    }
-    .emoji {
-      width: 26px;
-      height: 26px;
-    }
-    .img-container {
-      width: 26px;
-      height: 26px;
-    }
-    .message-edit {
-      span {
-        padding: 2px;
-        font-size: 11px;
-      }
     }
   }
-  
-  @media (min-width: 320px) and (max-width: 450px) {
-    .edit-message-container {
-      min-width: fit-content;
-    }
-    .chat-box {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      margin-bottom: 0;
-      width: 100vw;
-      top: 55px;
-    }
-    .first-message {
-      margin-top: 40px !important;
-    }
-    app-input-field {
-      width: 100vw;
-      position: fixed;
-      bottom: -3px;
-    }
-    .thread-answer-display {
-      font-size: 12px;
-      margin-bottom: 15px;
-      margin-right: 3px;
+  .message-from-current {
+    padding: 20px 0 10px 45px;
+    img {
+      width: 33px;
+      height: 33px;
     }
   }
-  
-  @media (min-width: 450px) and (max-width: 600px) {
-    .thread-answer-display {
-      margin-bottom: 52px;
-    }
-    .edit-message-container {
-      min-width: 300px;
-    }
-    textarea {
-      min-height: 200px;
-    }
-    .first-message {
-      margin-top: 40px !important;
-    }
-    .chat-box {
-      border-top-left-radius: 30px;
-      border-top-right-radius: 30px;
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0;
-      height: 94vh;
-    }
-    app-input-field {
-      position: fixed;
-      bottom: 0;
-      width: 100vw;
+  .message-from-user .reaction-bar {
+    top: 9px;
+    padding: 3px 9px 3px 5px;
+    z-index: 2;
+    height: 35px;
+  }
+  .message-from-current .reaction-bar {
+    top: 9px;
+    padding: 3px 9px 3px 5px;
+    z-index: 2;
+    height: 35px;
+  }
+  .used-emojis .emoji:nth-child(1) {
+    display: none;
+  }
+  .emoji {
+    font-size: 13px;
+  }
+  .img-container {
+    svg {
+      width: 19px;
     }
   }
-  
+  .message-edit {
+    font-size: 11px;
+    white-space: pre-wrap;
+  }
+  .day-span {
+    font-size: 12px;
+    padding: 3px 13px;
+  }
+  .img-container-textarea {
+    svg {
+      width: 16px;
+    }
+  }
+  .edit-icon {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .channel {
+    padding: 0px !important;
+    font-size: 11px !important;
+    height: 17px;
+    width: 31px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  textarea {
+    min-height: 100px;
+    font-size: 15px;
+  }
+  .textarea-wrapper {
+    max-width: 280px;
+  }
+  .edit-message-button-row {
+    left: 5px;
+    width: 97%;
+  }
+  .edit-mode-active {
+    justify-content: center;
+    max-width: 400px;
+    gap: 0 !important;
+  }
+  .message-from-current .message .message-content {
+    margin-right: 35px;
+  }
+
+  .img-container-textarea {
+    height: 32px;
+  }
+  .reaction-from-container {
+    font-size: 11px;
+    padding: 3px 4px !important;
+    max-width: 125px;
+    max-height: 50px;
+    white-space: nowrap;
+  }
+  .emoji {
+    width: 26px;
+    height: 26px;
+  }
+  .img-container {
+    width: 26px;
+    height: 26px;
+  }
+  .message-edit {
+    span {
+      padding: 2px;
+      font-size: 11px;
+    }
+  }
+}
+
+@media (min-width: 320px) and (max-width: 450px) {
+  .edit-message-container {
+    min-width: fit-content;
+  }
+  .chat-box {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+    width: 100vw;
+    top: 55px;
+  }
+  app-input-field {
+    width: 100vw;
+    position: fixed;
+    bottom: -3px;
+  }
+  .thread-answer-display {
+    font-size: 12px;
+    margin-bottom: 15px;
+    margin-right: 3px;
+  }
+}
+
+@media (min-width: 450px) and (max-width: 600px) {
+  .thread-answer-display {
+    margin-bottom: 52px;
+  }
+  .edit-message-container {
+    min-width: 300px;
+  }
+  textarea {
+    min-height: 200px;
+  }
+  .first-message {
+    margin-top: 40px !important;
+  }
+  .chat-box {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0;
+  }
+  app-input-field {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+  }
+}
+
+@media(max-width: 770px){
+  .new-day-info{
+    width: 100vw;
+  }
+  .chat-box{
+    border-radius: 0;
+  }
+}

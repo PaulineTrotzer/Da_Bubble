@@ -51,7 +51,6 @@
   .full-page-content {
     border-radius: 0;
     padding: 12px;
-    height: 80vh;
     border: 0;
     overflow-y: auto;
   }
@@ -59,8 +58,11 @@
 
 @media (min-width: 450px) and (max-width: 770px) {
   .full-page-content {
-    border-radius: 30px;
-    height: 80vh;
     overflow-y: auto;
+  }
+}
+@media (max-width: 770px) {
+  .full-page-content {
+    border-radius: 0;
   }
 }

@@ -42,7 +42,6 @@ export class PeopleMentionComponent implements OnInit, OnChanges {
   }
 
   async getAllUsers() {
-    debugger;
     const usersRef = collection(this.firestore, 'users');
     onSnapshot(usersRef, (querySnapshot) => {
       this.allUsers = [];

@@ -82,11 +82,7 @@
     border-radius: 0;
     padding: 0;
     max-width: 100vw;
-    height: 80vh;
     overflow-y: auto;
-  }
-  .background{
-    max-height: 80vh;
   }
   .channel-row {
     span {
@@ -111,11 +107,7 @@
     border-radius: 30px;
     padding: 32px 30px;
     max-width: 100vw;
-    height: 80vh;
     overflow-y: auto;
-  }
-  .background{
-    max-height: 80vh;
   }
   .workspace-header {
     padding: 19px 17px;
@@ -143,5 +135,13 @@
     cursor: none;
     pointer-events: none;
     display: none;
+  }
+}
+
+@media (max-width: 770px) {
+  .card {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    margin-top: 10px;
   }
 }

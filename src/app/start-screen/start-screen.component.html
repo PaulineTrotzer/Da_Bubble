@@ -35,8 +35,8 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!afterLoginSheet">
-      <div *ngIf="!global.channelSelected">
+    <div class="flex-parent" *ngIf="!afterLoginSheet">
+      <div class="big-chat-body" *ngIf="!global.channelSelected">
         <app-chat-component (enterChatUser)="enterByUsername($event)" (threadOpened)="onThreadOpened()"
           [selectedChannel]="selectedChannel" (messageForwarded)="onMessageForwarded($event)"
           [selectedUser]="selectedUser"></app-chat-component>

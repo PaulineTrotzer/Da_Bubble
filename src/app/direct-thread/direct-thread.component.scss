@@ -6,6 +6,14 @@
   min-width: 510px;
   display: flex;
   flex-direction: column;
+  flex: 1;
+}
+
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .overlay {
@@ -148,7 +156,12 @@
 }
 
 .overflow-container {
-  height: 87vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100vh - var(--app-header-height) - var(--chat-header-height));
+
+  min-height: 0;
   scroll-behavior: smooth !important;
 }
 
@@ -224,16 +237,15 @@
   display: flex;
   width: 97%;
   position: absolute;
-  bottom: 16px;
+  bottom: 0;
   justify-content: space-around;
-  background-color: white;
-  height: 31px;
+  background-color: rgba(255, 255, 255, 0.9);
+  height: 35px;
   align-items: center;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   left: 3px;
+  z-index: 10;
 }
 
 .edit-input {
@@ -247,8 +259,8 @@
   border-radius: 20px;
   font-family: Nunito, "Helvetica Neue";
   font-size: 16px;
-  min-height: 190px;
-  min-width: 300px;
+  min-height: 150px;
+  max-width: 300px;
   height: 100%;
   overflow-y: auto;
   &:focus {
@@ -399,6 +411,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 32px 40px;
+  flex: 0 0 102px;
 }
 
 .headline-ct {
@@ -429,11 +442,11 @@ h3 {
   }
 }
 
+
 .header-seperator {
   width: 100%;
   height: 4px;
   box-shadow: 0 4px 3px 0px rgba(0, 0, 0, 0.25);
-  margin-bottom: 8px;
 }
 
 .avatar-container {
@@ -482,10 +495,11 @@ h3 {
 .all-thread-message-container {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 25px;
-  height: 70vh;
   overflow-y: auto;
   scroll-behavior: smooth;
+  min-height: 0;
 }
 
 .cu-msg-text {
@@ -771,8 +785,7 @@ h3 {
 
 .message-holder {
   position: relative;
-  padding: 15px 0 10px 0;
-  right: 31px;
+  right: 10px;
 }
 
 .message-content-bubble {
@@ -929,9 +942,7 @@ h3 {
 }
 
 .input-holder {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+  flex: 0 0 auto;
 }
 
 svg {
@@ -951,5 +962,4 @@ svg {
   max-width: 230px;
 }
 
-
-@import './mobile-view-styling/direct-thread.mobile.scss';
+@import "./mobile-view-styling/direct-thread.mobile.scss";

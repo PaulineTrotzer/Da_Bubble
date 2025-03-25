@@ -105,7 +105,7 @@
     justify-content: start;
   }
   .full-bottom-flex {
-    bottom: 18px;
+    bottom: 7px;
     left: 10px;
   }
   .img-flex-bar-options {
@@ -151,6 +151,12 @@
 
 @media (min-width: 1024px) {
   .full-bottom-flex {
-    bottom: 17px;
+    bottom: 7px;
+  }
+}
+
+@media(max-width: 770px){
+  .show-set{
+    left: 110px;
   }
 }

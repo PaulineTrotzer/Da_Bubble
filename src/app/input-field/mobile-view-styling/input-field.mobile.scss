@@ -3,10 +3,14 @@
     border: none;
     border-top: 1px solid #adb0d9;
     border-radius: 0;
-    height: 105px;
+    height: auto;
   }
   .msg-input-ct {
     padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+
   }
 
   .error-message {
@@ -16,13 +20,9 @@
     width: 95%;
     left: 0;
   }
-  .interactions-send-msg-ct {
-    bottom: -6px;
-    padding-bottom: 5px;
-  }
   .chat-editable {
     font-size: 14px;
-    max-height: 140px;
+    height: 100px;
   }
   .plus {
     width: 20px;

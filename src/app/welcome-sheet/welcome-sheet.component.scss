@@ -9,8 +9,14 @@
   );
   border-radius: 30px;
   padding: 55px 28px 0;
-  height: 97vh;
+  flex: 1;
   overflow-y: auto;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .text-flex {

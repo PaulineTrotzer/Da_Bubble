@@ -1,8 +1,4 @@
 @media (min-width: 320px) and (max-width: 600px) {
-  .full-bottom-options {
-    bottom: 5px;
-    height: 27px;
-  }
   .thread-answer-display {
     font-size: 11px;
   }
@@ -30,9 +26,11 @@
   }
   app-input-field {
     position: fixed;
-    bottom: -4px;
-    z-index: 2;
+    bottom: 0;
     width: 100vw;
+    flex: 0 0 auto;
+    z-index: 10;
+
   }
   .day-span {
     font-size: 12px;
@@ -59,7 +57,8 @@
     padding: 7px 0;
     width: 100%;
   }
-  .self-chat-opener-ct, .two-chat-opener-ct{
+  .self-chat-opener-ct,
+  .two-chat-opener-ct {
     padding: 8px;
     gap: 9px;
   }
@@ -80,9 +79,6 @@
   .first-day-info {
     margin-top: 14px;
   }
- /*  .main-current-messagebox {
-    height: 852px;
-  } */
   .main-mesage-info-current:hover .comment-box-current {
     left: 15px;
   }
@@ -172,9 +168,6 @@
       margin-top: 6px;
     }
   }
-  .scroll-container {
-    height: 640px;
-  }
   .sticker-info-tooltip {
     font-size: 10px;
     left: 2%;
@@ -191,5 +184,11 @@
   .sticker-item {
     width: 27px;
     height: 21px;
+  }
+}
+
+@media(max-width: 770px){
+  .full-app-content{
+    border-radius: 0;
   }
 }

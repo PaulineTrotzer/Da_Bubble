@@ -11,104 +11,118 @@
 
   <div class="main-input-area">
     <label for="msg-input"></label>
-
-    <div class="chat-editable" contenteditable="true" (input)="onInput($event)" (keydown)="sendMessage($event)"
-      #editableDiv [attr.data-placeholder]="'Schreib etwas...'" [innerHTML]="formattedMessage">
-    </div>
-    <div class="flex-preview" *ngIf="activeComponentId === 'direct-thread'">
-      <div class="error-message" *ngIf="multipleFilesErrorMessage">
-        {{ multipleFilesErrorMessage }}
+    <div class="chat-editable-container">
+      <div class="chat-editable" contenteditable="true" (input)="onInput($event)" (keydown)="sendMessage($event)"
+        #editableDiv [attr.data-placeholder]="'Schreib etwas...'" [innerHTML]="formattedMessage">
       </div>
-
-      <!-- Feedback für zu große Datei -->
-      <div class="error-message" *ngIf="fileTooLargeMessage">
-        {{ fileTooLargeMessage }}
-      </div>
-      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
-        [currentComponentId]="activeComponentId"></app-files-preview>
     </div>
 
-    <div class="flex-preview" *ngIf="activeComponentId === 'chat'">
-      <div class="error-message" *ngIf="multipleFilesErrorMessage">
-        {{ multipleFilesErrorMessage }}
-      </div>
-      <!-- Feedback für zu große Datei -->
-      <div class="error-message" *ngIf="fileTooLargeMessage">
-        {{ fileTooLargeMessage }}
-      </div>
-      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
-        [currentComponentId]="activeComponentId"></app-files-preview>
-    </div>
-
-
-    <div class="flex-preview" *ngIf="activeComponentId === 'channel'">
-      <div class="error-message" *ngIf="multipleFilesErrorMessage">
-        {{ multipleFilesErrorMessage }}
-      </div>
-      <!-- Feedback für zu große Datei -->
-      <div class="error-message" *ngIf="fileTooLargeMessage">
-        {{ fileTooLargeMessage }}
-      </div>
-      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
-        [currentComponentId]="activeComponentId"></app-files-preview>
-    </div>
-
-    <div class="flex-preview" *ngIf="activeComponentId === 'channel-thread'">
-      <div class="error-message" *ngIf="multipleFilesErrorMessage">
-        {{ multipleFilesErrorMessage }}
-      </div>
-      <!-- Feedback für zu große Datei -->
-      <div class="error-message" *ngIf="fileTooLargeMessage">
-        {{ fileTooLargeMessage }}
-      </div>
-      <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
-        [currentComponentId]="activeComponentId"></app-files-preview>
-    </div>
-
-    <div class="interactions-send-msg-ct">
-      <div class="only-interactions-bottom-ct">
-        <div class="plus-separator-flex">
-          <div>
-            <div *ngIf="activeComponentId === 'direct-thread'">
-              <input type="file" id="upload-thread" (change)="onFileSelected($event, activeComponentId)" hidden />
-              <label for="upload-thread">
-                <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Direct Thread" />
-              </label>
-            </div>
-
-            <div *ngIf="activeComponentId === 'chat'">
-              <input type="file" id="upload-chat" (change)="onFileSelected($event, activeComponentId)" hidden />
-              <label for="upload-chat">
-                <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
-              </label>
-            </div>
-            <div *ngIf="activeComponentId === 'channel'">
-              <input type="file" id="upload-channel" (change)="onFileSelected($event, activeComponentId)" hidden />
-              <label for="upload-channel">
-                <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
-              </label>
-            </div>
-
-            <div *ngIf="activeComponentId === 'channel-thread'">
-              <input type="file" id="upload-channel-thread" (change)="onFileSelected($event, activeComponentId)"
-                hidden />
-              <label for="upload-channel-thread">
-                <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
-              </label>
-            </div>
-          </div>
-          <img class="vector" src="assets/img/vector_4.svg">
+    <div class="flex-preview-container">
+      <div class="flex-preview" *ngIf="activeComponentId === 'direct-thread'">
+        <div class="error-message" *ngIf="multipleFilesErrorMessage">
+          {{ multipleFilesErrorMessage }}
         </div>
 
-        <div class="emoji-at-ct">
-          <div class="emoji-picker-container">
-            <div> <img (click)="toggleEmojiPicker()" src="assets/img/emoji.svg"></div>
-          </div>
-          <div (click)="openMentionPeople()"> <img src="assets/img/at_react.svg"></div>
+        <!-- Feedback für zu große Datei -->
+        <div class="error-message" *ngIf="fileTooLargeMessage">
+          {{ fileTooLargeMessage }}
         </div>
+        <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+          [currentComponentId]="activeComponentId"></app-files-preview>
+      </div>
 
-        <img class="msg-send" src="assets/img/msg_send.svg" (click)="sendMessageClick()">
+      <div class="flex-preview" *ngIf="activeComponentId === 'chat'">
+        <div class="error-message" *ngIf="multipleFilesErrorMessage">
+          {{ multipleFilesErrorMessage }}
+        </div>
+        <!-- Feedback für zu große Datei -->
+        <div class="error-message" *ngIf="fileTooLargeMessage">
+          {{ fileTooLargeMessage }}
+        </div>
+        <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+          [currentComponentId]="activeComponentId"></app-files-preview>
+      </div>
+
+
+      <div class="flex-preview" *ngIf="activeComponentId === 'channel'">
+        <div class="error-message" *ngIf="multipleFilesErrorMessage">
+          {{ multipleFilesErrorMessage }}
+        </div>
+        <!-- Feedback für zu große Datei -->
+        <div class="error-message" *ngIf="fileTooLargeMessage">
+          {{ fileTooLargeMessage }}
+        </div>
+        <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+          [currentComponentId]="activeComponentId"></app-files-preview>
+      </div>
+
+      <div class="flex-preview" *ngIf="activeComponentId === 'channel-thread'">
+        <div class="error-message" *ngIf="multipleFilesErrorMessage">
+          {{ multipleFilesErrorMessage }}
+        </div>
+        <!-- Feedback für zu große Datei -->
+        <div class="error-message" *ngIf="fileTooLargeMessage">
+          {{ fileTooLargeMessage }}
+        </div>
+        <app-files-preview (previewUpdated)="handlePreviewUpdated($event)" (resetErrors)="handleResetErrors()"
+          [currentComponentId]="activeComponentId"></app-files-preview>
+      </div>
+    </div>
+
+
+    <div class="button-container-wrapper">
+
+      <div class="button-container">
+
+        <div class="interactions-send-msg-ct">
+          <div class="only-interactions-bottom-ct">
+            <div class="plus-separator-flex">
+              <div>
+                <div *ngIf="activeComponentId === 'direct-thread'">
+                  <input type="file" id="upload-thread" (change)="onFileSelected($event, activeComponentId)" hidden />
+                  <label for="upload-thread">
+                    <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Direct Thread" />
+                  </label>
+                </div>
+
+                <div *ngIf="activeComponentId === 'chat'">
+                  <input type="file" id="upload-chat" (change)="onFileSelected($event, activeComponentId)" hidden />
+                  <label for="upload-chat">
+                    <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
+                  </label>
+                </div>
+                <div *ngIf="activeComponentId === 'channel'">
+                  <input type="file" id="upload-channel" (change)="onFileSelected($event, activeComponentId)" hidden />
+                  <label for="upload-channel">
+                    <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
+                  </label>
+                </div>
+
+                <div *ngIf="activeComponentId === 'channel-thread'">
+                  <input type="file" id="upload-channel-thread" (change)="onFileSelected($event, activeComponentId)"
+                    hidden />
+                  <label for="upload-channel-thread">
+                    <img class="plus" src="assets/img/add.svg" alt="Upload Icon for Chat" />
+                  </label>
+                </div>
+              </div>
+              <img class="vector" src="assets/img/vector_4.svg">
+            </div>
+
+            <div class="emoji-at-ct">
+              <div class="emoji-picker-container">
+                <div> <img (click)="toggleEmojiPicker()" src="assets/img/emoji.svg"></div>
+              </div>
+              <div (click)="openMentionPeople()"> <img src="assets/img/at_react.svg"></div>
+            </div>
+
+            <img class="msg-send" src="assets/img/msg_send.svg" (click)="sendMessageClick()">
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
+
+
 </div>

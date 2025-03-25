@@ -5,8 +5,8 @@
     </app-mention-message-box>
     <div class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
-            <ng-container *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
-                <ng-container *ngIf="!message.deleted else deletedMessageInfo">
+            <div *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
+                <div *ngIf="!message.deleted">
                     <div *ngIf="displayDayInfo(i)" class="new-day-info"
                         [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
                         <div class="day-info">
@@ -352,25 +352,15 @@
                             </ng-template>
                         </div>
                     </div>
-                </ng-container>
-                <ng-template #deletedMessageInfo>
-                    <div class="message-deleted-box" [ngClass]="{
-                        'message-content-current': message.senderId === global.currentUserData.id,
-                        'message-content-user': message.senderId !== global.currentUserData.id
-                      }">
-                        <mat-card class="deleted-card" appearance="outlined">
-                            <mat-card-content class="deleted-card-content">
-                                <span class="deleted-text">
-                                    Nachricht von {{ message.senderName }} wurde gelöscht.
-                                </span>
-                            </mat-card-content>
-                        </mat-card>
-                    </div>
-                </ng-template>
-            </ng-container>
+                </div>
 
+            </div>
 
         </div>
+        <app-input-field (messageCreated)="onMessageCreated($event)" [activeComponentId]="'chat'"
+            (mentionCardOpened)="handleMentionCardOpened($event)" [selectedUser]="selectedUser"
+            (messageSent)="onMessageSent()">
+        </app-input-field>
     </div>
     <div class="self-chat-opener-ct" *ngIf="isSelfChat  && hasNoMessages">
         <div class="self-name-and-img">
@@ -397,8 +387,4 @@
             statt
         </div>
     </div>
-    <app-input-field (messageCreated)="onMessageCreated($event)" [activeComponentId]="'chat'"
-        (mentionCardOpened)="handleMentionCardOpened($event)" [selectedUser]="selectedUser"
-        (messageSent)="onMessageSent()">
-    </app-input-field>
 </div>
