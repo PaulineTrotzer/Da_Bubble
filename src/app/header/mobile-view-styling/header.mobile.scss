@@ -8,7 +8,7 @@
   .user-info {
     position: absolute;
     right: 0;
-    top: 55px;
+    top: 10px;
     svg {
       width: 9px;
       height: 5px;
@@ -32,14 +32,28 @@
   .search-container {
     top: 125px;
   }
+  .header-content{
+    padding: 0;
+  }
+  header{
+    padding: 0;
+    max-width: none;
+  }
 }
 
 @media (min-width: 450px) and (max-width: 770px) {
+  .header-content{
+    padding: 0;
+    max-width: none;
+  }
+  header{
+    padding: 0;
+  }
   .search-container {
     top: 115px;
   }
   .user-info {
-    top: 4px;
+    top: 10px;
     .user-img {
       width: 60px;
       height: 60px;
@@ -110,12 +124,14 @@
     width: 7px;
   }
   .main-header {
-    height: 165px;
+    height: 133px;
+    margin-bottom: 3px;
   }
   .search-container {
     position: absolute;
     left: 0;
     max-width: 100vw;
+    top: 92px;
   }
   input {
     width: 100%;

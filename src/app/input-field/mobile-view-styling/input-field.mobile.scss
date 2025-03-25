@@ -3,6 +3,7 @@
     border: none;
     border-top: 1px solid #adb0d9;
     border-radius: 0;
+    height: 105px;
   }
   .msg-input-ct {
     padding: 4px 0;
@@ -35,5 +36,6 @@
   }
   .msg-send {
     width: 28px;
+    right: 10px;
   }
 }

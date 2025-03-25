@@ -22,12 +22,18 @@
 @media (min-width: 480px) and (max-width: 770px) {
   .profile-card-ct {
     width: 89vw;
+    width: 89vw;
+    position: fixed;
+    top: 15%;
   }
 }
 
 @media (max-width: 480px) {
   .profile-card-ct {
     width: 100vw;
+    width: 89vw;
+    position: fixed;
+    top: 15%;
   }
 }
 

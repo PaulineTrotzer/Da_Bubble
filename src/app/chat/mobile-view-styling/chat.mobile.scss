@@ -59,26 +59,30 @@
     padding: 7px 0;
     width: 100%;
   }
+  .self-chat-opener-ct, .two-chat-opener-ct{
+    padding: 8px;
+    gap: 9px;
+  }
   .self-chat-txt,
   .two-chat-txt {
-    font-size: 17px;
+    font-size: 13px;
   }
   .self-chat-img {
-    width: 55px;
-    height: 55px;
+    width: 36px;
+    height: 36px;
   }
   .img-and-name {
     gap: 8px;
   }
   p {
-    font-size: 20px;
+    font-size: 16px;
   }
   .first-day-info {
     margin-top: 14px;
   }
-  .main-current-messagebox {
+ /*  .main-current-messagebox {
     height: 852px;
-  }
+  } */
   .main-mesage-info-current:hover .comment-box-current {
     left: 15px;
   }
@@ -152,6 +156,7 @@
   }
   .edit-input {
     font-size: 15px;
+    min-height: unset;
   }
   .edit-icon-textarea {
     width: 15px !important;

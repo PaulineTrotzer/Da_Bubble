@@ -145,7 +145,7 @@
                   <div class="emoji-position-ct">
                     <div class="emoji-holder-both" (mouseenter)="toggleBothReactionInfo(message.id, true)"
                       (mouseleave)="toggleBothReactionInfo(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ getEmojiFromFirstUser(message.reactions) }}
                       </span>
                       <span class="reaction-counter">
@@ -190,7 +190,7 @@
                     <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
                       (mouseenter)="toggleReactionInfoSenderAtSelectedUser(message.id, true)"
                       (mouseleave)="toggleReactionInfoSenderAtSelectedUser(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ message.reactions[message.senderId]?.emoji }}
                       </span>
                       <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
@@ -214,7 +214,7 @@
                     <div *ngIf="message.reactions[message.recipientId]?.counter > 0" class="emoji-holder"
                       (mouseenter)="toggleReactionInfoRecipientAtSelectedUser(message.id, true)"
                       (mouseleave)="toggleReactionInfoRecipientAtSelectedUser(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ message.reactions[message.recipientId]?.emoji }}
                       </span>
                       <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">
@@ -294,14 +294,16 @@
                       {{ localUserLastEmoji }}
                     </span>
                   </div>
-                  <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
-                    <div class="emoji-picker">
-                      <emoji-mart (click)="letPickerVisible($event)"
-                        (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')" class="emoji-picker"
-                        size="18"></emoji-mart>
-                    </div>
-                  </div>
+
                 </div>
+              </div>
+            </div>
+
+            <div (click)="closePicker()" *ngIf="isEmojiPickerVisible" class="emoji-picker-container">
+              <div class="emoji-picker">
+                <emoji-mart (click)="letPickerVisible($event)"
+                  (emojiClick)="addEmoji($event, message.id, currentUser.uid, 'FROM_PICKER')" class="emoji-picker"
+                  size="18"></emoji-mart>
               </div>
             </div>
             <div *ngIf="message.senderId === currentUser.uid" class="cu-message-container">
@@ -391,7 +393,7 @@
                   <div class="emoji-position-ct-cu">
                     <div class="emoji-holder-both" (mouseenter)="toggleBothReactionInfo(message.id, true)"
                       (mouseleave)="toggleBothReactionInfo(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ getEmojiFromFirstUser(message.reactions) }}
                       </span>
                       <span class="reaction-counter">
@@ -434,7 +436,7 @@
                     <div *ngIf="message.reactions[message.senderId]?.counter > 0" class="emoji-holder"
                       (mouseenter)="toggleReactionInfoSenderAtCurrentUser(message.id, true)"
                       (mouseleave)="toggleReactionInfoSenderAtCurrentUser(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ message.reactions[message.senderId]?.emoji }}
                       </span>
                       <span *ngIf="message.reactions[message.senderId]?.counter > 1" class="reaction-counter">
@@ -458,7 +460,7 @@
                     <div *ngIf="!isSelfThread && message.reactions[message.recipientId]?.counter > 0"
                       class="emoji-holder" (mouseenter)="toggleReactionInfoRecipientAtCurrentUser(message.id, true)"
                       (mouseleave)="toggleReactionInfoRecipientAtCurrentUser(message.id, false)">
-                      <span class="single-emoji">
+                      <span class="single-emoji-reaction">
                         {{ message.reactions[message.recipientId]?.emoji }}
                       </span>
                       <span *ngIf="message.reactions[message.recipientId]?.counter > 1" class="reaction-counter">

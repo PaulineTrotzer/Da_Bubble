@@ -7,6 +7,9 @@
   flex-direction: column;
   align-items: center;
   height: 100vh;
+  width: 100vw;
+  position: relative;
+  min-height: -webkit-fill-available;
 }
 header {
   width: 100%;
@@ -44,35 +47,6 @@ header {
   }
 }
 
-@keyframes blackFlyUpMobile {
-  0% {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-  100% {
-    top: 50px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
-}
-
-@keyframes blackFlyUpSmartPhone {
-  0% {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-  100% {
-    top: 110px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
-}
 
 .neu-ct {
   position: absolute;
@@ -88,12 +62,16 @@ header {
 .header-logo-ct {
   display: flex;
   align-items: center;
-  position: fixed;
-  top: 50%;
+  position: absolute;
+  top: 50%;  
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
   z-index: 300;
   gap: 12px;
+}
+
+.header-logo-ct, .fly-up {
+  transform-origin: center center;
 }
 
 .black-text {
@@ -104,6 +82,8 @@ header {
   white-space: nowrap;
   display: inline-block;
   width: 0;
+  will-change: transform;
+  backface-visibility: hidden;
   animation: typeText 1s steps(8, end) forwards;
 }
 
@@ -176,11 +156,15 @@ h2 {
 }
 
 .form-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   width: 100%;
+
 }
 
 .login-form-headline {
@@ -330,10 +314,8 @@ input[type="text"]:focus::placeholder {
 }
 
 .imprint-privacy {
-  display: flex;
-  gap: 26px;
-  position: relative;
-  bottom: 15px;
+  margin-top: auto;
+  padding-bottom: 20px; 
 }
 
 .error-message {
@@ -341,7 +323,9 @@ input[type="text"]:focus::placeholder {
   top: 66px;
   left: 22px;
   font-size: 12px;
-  color: red;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
 }
 
 .mt {
@@ -388,6 +372,5 @@ input[type="text"]:focus::placeholder {
 .guest-or-mail {
   margin-left: 6px;
 }
-
 
 @import "./mobile-view-styling/login.mobile.scss";

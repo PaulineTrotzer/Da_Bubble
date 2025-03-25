@@ -255,18 +255,31 @@ export class ChatComponent implements OnInit, OnChanges {
     if (timestamp?.seconds) return new Date(timestamp.seconds * 1000);
     return new Date(timestamp);
   }
-
   async handleDeletedMessage(updatedMessage: any): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
+  
     try {
       await deleteDoc(messageRef);
     } catch (error) {
       console.error('Fehler beim Löschen der Nachricht in Firebase:', error);
     }
-    this.messagesData = this.messagesData.filter(
-      (msg: any) => msg.id !== updatedMessage.id
-    );
+  
+    const index = this.messagesData.findIndex((msg: any) => msg.id === updatedMessage.id);
+    if (index !== -1) {
+      this.messagesData[index] = {
+        ...this.messagesData[index],
+        deleted: true
+      };
+    } else {
+      this.messagesData.push({
+        id: updatedMessage.id,
+        deleted: true
+      });
+    }
+  
+    this.messagesData = [...this.messagesData]; // trigger ChangeDetection
   }
+  
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
@@ -469,50 +482,55 @@ export class ChatComponent implements OnInit, OnChanges {
   clearInput() {
     this.messagesData = [];
   }
-
   async saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
-    if (!message.id) {
-      return;
-    }
+    if (!message.id) return;
+  
     const messageRef = doc(this.firestore, 'messages', message.id);
+  
     if (this.editableMessageText.trim() === '') {
+      // Nachricht soll gelöscht werden
       try {
         const docSnapshot = await getDoc(messageRef);
-        if (!docSnapshot.exists()) {
-          return;
-        }
+        if (!docSnapshot.exists()) return;
+  
         await deleteDoc(messageRef);
-        this.messagesData = this.messagesData.filter(
-          (msg: any) => msg.id !== message.id
-        );
-        const deletedMessage = { id: message.id, deleted: true };
-        this.messagesData.push(deletedMessage);
-        this.threadControlService.setEditedMessage(deletedMessage);
+  
+        const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
+        if (index !== -1) {
+          this.messagesData[index] = {
+            ...this.messagesData[index],
+            deleted: true
+          };
+        } else {
+          this.messagesData.push({
+            id: message.id,
+            deleted: true
+          });
+        }
+  
+        this.threadControlService.setEditedMessage({ id: message.id, deleted: true });
         this.editMessageId = null;
         this.isFirstClick = true;
         this.checkEditbox = false;
       } catch (error) {
-        console.error(
-          `Fehler beim Löschen der Nachricht (ID: ${message.id}):`,
-          error
-        );
+        console.error(`Fehler beim Löschen der Nachricht (ID: ${message.id}):`, error);
       }
     } else {
+      // Nachricht soll bearbeitet werden
       try {
         const docSnapshot = await getDoc(messageRef);
-        if (!docSnapshot.exists()) {
-          return;
-        }
+        if (!docSnapshot.exists()) return;
+  
         const editMessage = {
           text: this.editableMessageText,
           editedTextShow: true,
           editedAt: new Date().toISOString(),
         };
+  
         await updateDoc(messageRef, editMessage);
-        const index = this.messagesData.findIndex(
-          (msg: any) => msg.id === message.id
-        );
+  
+        const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
         if (index !== -1) {
           this.messagesData[index] = {
             ...this.messagesData[index],
@@ -521,24 +539,24 @@ export class ChatComponent implements OnInit, OnChanges {
         } else {
           this.messagesData.push({ id: message.id, ...editMessage });
         }
+  
         this.threadControlService.setEditedMessage({
           id: message.id,
           ...editMessage,
         });
+  
         this.editMessageId = null;
         this.checkEditbox = false;
         this.isFirstClick = true;
+  
         setTimeout(() => {
           this.shouldScroll = true;
         }, 1000);
       } catch (error) {
-        console.error(
-          `Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`,
-          error
-        );
+        console.error(`Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`, error);
       }
     }
-  }
+  }  
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;

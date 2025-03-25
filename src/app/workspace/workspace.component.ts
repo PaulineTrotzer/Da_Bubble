@@ -294,9 +294,18 @@ export class WorkspaceComponent implements OnInit {
     onSnapshot(usersCollection, (snapshot) => {
       this.allUsers = [];
       this.checkUsersExsists = false;
-      snapshot.forEach((doc) => {
-        const userData = { id: doc.id, ...doc.data() };
-        if (doc.id !== this.userId && this.isValidUser(userData)) {
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const userData: any = { id: docSnap.id, ...data };
+
+        const isVerified = data?.['emailVerified'] === true;
+
+        if (
+          docSnap.id !== this.userId &&
+          this.isValidUser(userData) &&
+          isVerified
+        ) {
           this.allUsers.push(userData);
           this.checkUsersExsists = true;
         }

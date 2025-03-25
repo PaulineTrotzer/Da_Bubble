@@ -13,6 +13,7 @@
   }
   .workspace-menu {
     padding: 9px 37px;
+    max-height: 580px;
   }
   .status-border {
     left: 35px;
@@ -71,6 +72,9 @@
       right: 7px;
     }
   }
+  .message-drawer {
+    max-height: 300px;
+  }
 }
 
 @media (min-width: 320px) and (max-width: 450px) {
@@ -78,6 +82,11 @@
     border-radius: 0;
     padding: 0;
     max-width: 100vw;
+    height: 80vh;
+    overflow-y: auto;
+  }
+  .background{
+    max-height: 80vh;
   }
   .channel-row {
     span {
@@ -102,6 +111,11 @@
     border-radius: 30px;
     padding: 32px 30px;
     max-width: 100vw;
+    height: 80vh;
+    overflow-y: auto;
+  }
+  .background{
+    max-height: 80vh;
   }
   .workspace-header {
     padding: 19px 17px;
@@ -128,5 +142,6 @@
   .logo-container {
     cursor: none;
     pointer-events: none;
+    display: none;
   }
 }

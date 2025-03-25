@@ -10,6 +10,8 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(140deg, #313ae5 0%, #797ef3 100%);
+  -webkit-animation: start-animations-helper_animation 0.75s ease-in-out 1s
+    forwards;
   animation: start-animations-helper_animation 0.75s ease-in-out 1s forwards;
 }
 
@@ -19,6 +21,7 @@
   }
   100% {
     opacity: 0%;
+    visibility: hidden;
     display: none;
   }
 }
@@ -65,40 +68,11 @@
   }
 }
 
-@keyframes whiteFlyUpMobile {
-  0% {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-  100% {
-    top: 50px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    opacity: 0;
-  }
-}
-
-@keyframes whiteFlyUpSmartphone {
-  0% {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-  100% {
-    top: 110px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    opacity: 0;
-  }
-}
 
 .white-logo-text {
   display: flex;
   align-items: center;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -115,6 +89,8 @@
   white-space: nowrap;
   display: inline-block;
   width: 0;
+  will-change: transform;
+  backface-visibility: hidden;
   animation: typeText 1s steps(8, end) forwards;
 }
 

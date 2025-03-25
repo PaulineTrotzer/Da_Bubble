@@ -90,6 +90,7 @@ export class CreateAccountComponent implements OnInit {
         picture: '',
         password: '',
         status: 'offline',
+        emailVerified: false 
       });
       await this.addUserToFirestore(this.newUser);
       await sendEmailVerification(authUser);

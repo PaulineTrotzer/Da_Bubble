@@ -181,14 +181,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     onSnapshot(userRef, (querySnapshot) => {
       this.getAllUsersCollection = [];
       querySnapshot.forEach((docSnap) => {
-        if (this.userID !== docSnap.id) {
-          const allUsers = docSnap.data();
-          this.getAllUsersCollection.push({ id: docSnap.id, ...allUsers });
+        const data = docSnap.data();
+        const isVerified = data?.['emailVerified'] === true;
+        if (this.userID !== docSnap.id && isVerified) {
+          this.getAllUsersCollection.push({ id: docSnap.id, ...data });
         }
       });
+  
       this.filterUsers();
     });
   }
+  
 
   filterUsers() {
     const searchValue = this.searcheNameOrChannel

@@ -5,8 +5,8 @@
     </app-mention-message-box>
     <div class="main-current-messagebox">
         <div class="scroll-container" #scrollContainer>
-            <div *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
-                <div *ngIf="!message.deleted else deletedMessageInfo">
+            <ng-container *ngFor="let message of messagesData; let i=index trackBy: trackByMessageId">
+                <ng-container *ngIf="!message.deleted else deletedMessageInfo">
                     <div *ngIf="displayDayInfo(i)" class="new-day-info"
                         [ngClass]="{'first-day-info': isFirstDayInfoVisible(i)}">
                         <div class="day-info">
@@ -352,16 +352,22 @@
                             </ng-template>
                         </div>
                     </div>
-                </div>
+                </ng-container>
                 <ng-template #deletedMessageInfo>
-                    <div class="deleted-message-info">
-                        <span class="deleted-message-text">
-                            Nachricht von {{ message.senderName }} wurde gelöscht
-                        </span>
-
+                    <div class="message-deleted-box" [ngClass]="{
+                        'message-content-current': message.senderId === global.currentUserData.id,
+                        'message-content-user': message.senderId !== global.currentUserData.id
+                      }">
+                        <mat-card class="deleted-card" appearance="outlined">
+                            <mat-card-content class="deleted-card-content">
+                                <span class="deleted-text">
+                                    Nachricht von {{ message.senderName }} wurde gelöscht.
+                                </span>
+                            </mat-card-content>
+                        </mat-card>
                     </div>
                 </ng-template>
-            </div>
+            </ng-container>
 
 
         </div>
