@@ -255,38 +255,26 @@ export class ChannelChatComponent implements OnInit {
       console.warn('⚠️ Kein Channel ausgewählt');
       return;
     }
-  
-    // 🔹 Channel Messages Referenz
     const messagesRef = collection(
       this.firestore,
       'channels',
       this.selectedChannel.id,
       'messages'
     );
-  
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
-  
     onSnapshot(q, async (querySnapshot) => {
-      console.log('📦 Channel Messages Snapshot:', querySnapshot.size);
-  
       let newMessageArrived = false;
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           newMessageArrived = true;
         }
       });
-  
       this.messagesData = querySnapshot.docs.map((docSnap: any) => {
         const data = docSnap.data();
         if (data.timestamp?.seconds) {
           data.timestamp = new Date(data.timestamp.seconds * 1000);
         }
-  
         data.formattedText = this.formatMentions(data.text);
-        console.log('📩 Verarbeite Nachricht', docSnap.id);
-        console.log('   ➤ senderId:', data.senderId, ', recipientId:', data.recipientId);
-  
-        // 🧠 Nutzerinformationen aus lokal geladenem User-Array holen
         const sender = this.allUsersFromDb.find(u => u.id === data.senderId);
         if (sender) {
           data.senderName = sender.name;
@@ -294,7 +282,6 @@ export class ChannelChatComponent implements OnInit {
         } else {
           console.warn(`⚠️ Kein Nutzer gefunden für senderId ${data.senderId}`);
         }
-  
         if (data.recipientId) {
           const recipient = this.allUsersFromDb.find(u => u.id === data.recipientId);
           if (recipient) {
@@ -302,20 +289,14 @@ export class ChannelChatComponent implements OnInit {
             data.recipientPicture = recipient.picture;
           }
         }
-  
         return { id: docSnap.id, ...data };
       });
-  
-      // 🔁 Antworten laden
       this.subscribeToThreadAnswers();
-  
-      // 📜 Nach unten scrollen bei neuer Nachricht
       if (newMessageArrived) {
         setTimeout(() => {
           this.scrollToBottom();
         }, 50);
       }
-  
       this.findFirstDayInfoIndex();
       await this.updateMessagesWithNewPhoto();
       this.channelWasLoaded = true;
@@ -332,34 +313,23 @@ export class ChannelChatComponent implements OnInit {
         });
     });
   }
+
+
   formatMentions(text: string): SafeHtml {
     const regex = /@(\S+)/g;
-  
     const normalizedUserNames = this.getAllUsersName.map((user: any) => {
       const name = user.name?.trim().toLowerCase() || '';
       return name;
     });
-  
-    console.log('📌 Normalisierte Usernamen für Mentions:', normalizedUserNames);
-    console.log('✉️ Ursprünglicher Text:', text);
-  
     const formattedText = text.replace(regex, (match) => {
       let mentionName = match.substring(1).toLowerCase().trim();
       mentionName = mentionName.split(' ')[0];
-  
-      console.log('🔍 Erkanntes Mention:', mentionName);
-  
       if (normalizedUserNames.includes(mentionName)) {
-        console.log(`✅ "${mentionName}" erkannt als gültiger Mention-Name`);
         return `<span class="mention">@${mentionName}</span>`;
       } else {
-        console.warn(`❌ "${mentionName}" nicht in der Liste. Kein Styling.`);
         return match;
       }
     });
-  
-    console.log('💡 Formatierter Text mit Mentions:', formattedText);
-  
     return this.sanitizer.bypassSecurityTrustHtml(formattedText);
   }
   

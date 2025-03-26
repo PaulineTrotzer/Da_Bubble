@@ -115,7 +115,7 @@ export class DialogEditUserComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0];
-      const MAX_FILE_SIZE = 500 * 1024; // 500 KB
+      const MAX_FILE_SIZE = 500 * 1024; 
       if (selectedFile.size > MAX_FILE_SIZE) {
         console.error(`Datei ist zu groß: ${selectedFile.size / 1024} KB`);
         this.fileTooLargeMessage =
@@ -154,7 +154,6 @@ export class DialogEditUserComponent implements OnInit {
         email: newEmail,
       });
       await Promise.all([editingAvatar, updatingUser]);
-      // 2) Prüfen, ob E-Mail wirklich neu ist
       if (oldEmail !== newEmail) {
         const auth = getAuth();
         const currentUser = auth.currentUser;
@@ -164,7 +163,6 @@ export class DialogEditUserComponent implements OnInit {
           );
           return;
         }
-        // 3) verifyBeforeUpdateEmail statt updateEmail
         await verifyBeforeUpdateEmail(currentUser, newEmail);
         console.log(
           'Verifizierungslink an die neue Adresse gesendet:',

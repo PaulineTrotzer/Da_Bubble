@@ -155,8 +155,11 @@
   }
 }
 
-@media(max-width: 770px){
-  .show-set{
+@media (max-width: 770px) {
+  .show-set {
     left: 110px;
+  }
+  .full-page-content {
+    border-radius: 0;
   }
 }

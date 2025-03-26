@@ -61,9 +61,6 @@
 }
 
 @media (min-width: 320px) and (max-width: 450px) {
-  .card {
-    border-radius: 0;
-  }
   header {
     border-top-right-radius: 0px;
     border-top-left-radius: 0;
@@ -71,9 +68,6 @@
 }
 
 @media (min-width: 450px) and (max-width: 600px) {
-  .card {
-    border-radius: 30px;
-  }
   header {
     border-top-right-radius: 30px;
     border-top-left-radius: 30px;
@@ -141,5 +135,17 @@
 
   .seperator {
     width: 75%;
+  }
+}
+
+@media(max-width: 340px){
+  .channel-name{
+    margin-left: 0;
+  }
+}
+
+@media(max-width: 770px){
+  .card{
+    border-radius: 0;
   }
 }

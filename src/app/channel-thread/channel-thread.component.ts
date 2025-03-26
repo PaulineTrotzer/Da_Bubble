@@ -108,6 +108,7 @@ export class ChannelThreadComponent implements OnInit {
       }
     });
     this.scrollOrNot('yes');
+
   }
 
 
@@ -254,9 +255,10 @@ export class ChannelThreadComponent implements OnInit {
             senderPicture: sender?.picture || data['senderPicture'],
             recipientName: recipient?.name || data['recipientName'],
             recipientPicture: recipient?.picture || data['recipientPicture'],
-            isEdited: data['isEdited'] ?? false
+            isEdited: data['isEdited'] ?? false,
+            selectedFiles: data['selectedFiles']
           } as Message;
-
+          console.log(this.topicMessage);
           resolve();
         }
       });

@@ -24,13 +24,15 @@
   .full-app-content {
     width: 100vw;
   }
+  .main-current-messagebox {
+    padding-bottom: 157px;
+  }
   app-input-field {
     position: fixed;
     bottom: 0;
     width: 100vw;
     flex: 0 0 auto;
     z-index: 10;
-
   }
   .day-span {
     font-size: 12px;
@@ -187,8 +189,8 @@
   }
 }
 
-@media(max-width: 770px){
-  .full-app-content{
+@media (max-width: 770px) {
+  .full-app-content {
     border-radius: 0;
   }
 }

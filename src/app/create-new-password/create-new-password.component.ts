@@ -58,6 +58,9 @@ export class CreateNewPasswordComponent {
     this.confirmPassword = '';
     this.password = '';
   }
+
+
+  
   ngOnInit() {
     this.route.queryParams.subscribe(async params => {
       this.oobCode = params['oobCode'];

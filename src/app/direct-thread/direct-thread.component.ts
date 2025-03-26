@@ -124,6 +124,13 @@ export class DirectThreadComponent implements OnInit, OnDestroy {
     this.subscribeToThreadChanges();
     this.setCurrentUserId();
     this.checkIfSelfThread();
+    this.setChatInactive();
+  }
+
+  setChatInactive(){
+    if (window.innerWidth < 600 && this.global.openChannelorUserBox && this.global.threadOpened){
+      this.global.openChannelorUserBox = false;
+    }
   }
 
   async loadAllUsersFromDb(): Promise<void> {

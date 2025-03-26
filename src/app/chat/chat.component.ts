@@ -277,7 +277,7 @@ export class ChatComponent implements OnInit, OnChanges {
       });
     }
   
-    this.messagesData = [...this.messagesData]; // trigger ChangeDetection
+    this.messagesData = [...this.messagesData]; 
   }
   
 
@@ -482,20 +482,16 @@ export class ChatComponent implements OnInit, OnChanges {
   clearInput() {
     this.messagesData = [];
   }
+
   async saveOrDeleteMessage(message: any) {
     this.shouldScroll = false;
     if (!message.id) return;
-  
     const messageRef = doc(this.firestore, 'messages', message.id);
-  
     if (this.editableMessageText.trim() === '') {
-      // Nachricht soll gelöscht werden
       try {
         const docSnapshot = await getDoc(messageRef);
         if (!docSnapshot.exists()) return;
-  
         await deleteDoc(messageRef);
-  
         const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
         if (index !== -1) {
           this.messagesData[index] = {
@@ -508,7 +504,6 @@ export class ChatComponent implements OnInit, OnChanges {
             deleted: true
           });
         }
-  
         this.threadControlService.setEditedMessage({ id: message.id, deleted: true });
         this.editMessageId = null;
         this.isFirstClick = true;
@@ -517,19 +512,15 @@ export class ChatComponent implements OnInit, OnChanges {
         console.error(`Fehler beim Löschen der Nachricht (ID: ${message.id}):`, error);
       }
     } else {
-      // Nachricht soll bearbeitet werden
       try {
         const docSnapshot = await getDoc(messageRef);
         if (!docSnapshot.exists()) return;
-  
         const editMessage = {
           text: this.editableMessageText,
           editedTextShow: true,
           editedAt: new Date().toISOString(),
         };
-  
         await updateDoc(messageRef, editMessage);
-  
         const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
         if (index !== -1) {
           this.messagesData[index] = {
@@ -539,16 +530,13 @@ export class ChatComponent implements OnInit, OnChanges {
         } else {
           this.messagesData.push({ id: message.id, ...editMessage });
         }
-  
         this.threadControlService.setEditedMessage({
           id: message.id,
           ...editMessage,
         });
-  
         this.editMessageId = null;
         this.checkEditbox = false;
         this.isFirstClick = true;
-  
         setTimeout(() => {
           this.shouldScroll = true;
         }, 1000);
@@ -611,7 +599,6 @@ export class ChatComponent implements OnInit, OnChanges {
       }
       return match;
     });
-
     return {
       text: chatMessage,
       senderId: this.global.currentUserData.id,
@@ -644,6 +631,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData.push(newLocalMsg);
     this.scrollAutoDown();
   }
+  
   async getMessages() {
     if (!this.selectedUser?.id || !this.global.currentUserData?.id) return;
     const docRef = collection(this.firestore, 'messages');
@@ -776,6 +764,7 @@ export class ChatComponent implements OnInit, OnChanges {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
   }
+
 
   splitMessage(text: string): string[] {
     const mentionRegex = /(@[\w\-\*_!$]+)/g;

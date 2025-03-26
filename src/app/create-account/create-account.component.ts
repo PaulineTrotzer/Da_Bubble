@@ -96,10 +96,7 @@ export class CreateAccountComponent implements OnInit {
       await sendEmailVerification(authUser);
       console.log('Verifizierungslink an', authUser.email, 'gesendet.');
       this.linkWasSend = true;
-  
-      // Optional: Wenn du direkt auf einen anderen Screen leiten willst
       // this.router.navigate(['/avatar', this.newUser.uid]);
-  
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         this.linkAlreadySended = true;

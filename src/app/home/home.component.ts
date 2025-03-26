@@ -155,6 +155,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.closeWorkspace();
       }
     }
+    if (width <= 600) {
+      if (this.isThreadOpened && this.global.openChannelorUserBox) {
+        this.global.openChannelorUserBox = false;
+      }
+    }
+
     setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);

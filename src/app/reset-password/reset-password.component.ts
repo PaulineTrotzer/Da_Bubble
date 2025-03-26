@@ -7,9 +7,6 @@ import { PrivacyPolicyComponent } from '../privacy-policy/privacy-policy.compone
 import { ImpressumComponent } from '../impressum/impressum.component';
 import {
   Firestore,
-  updateDoc,
-  doc,
-  getDoc,
   getDocs,
   collection,
   query,
@@ -74,7 +71,7 @@ export class ResetPasswordComponent implements OnInit {
   async sendEmailInfo(email: string) {
     const auth = getAuth();
     const actionCodeSettings = {
-      url: 'http://localhost:4200/create-new-password',
+      url: 'https://pauline-trotzer.developerakademie.net/angular-projects/da-bubble/create-new-password',
       handleCodeInApp: true,
     };
     await sendPasswordResetEmail(auth, email, actionCodeSettings);

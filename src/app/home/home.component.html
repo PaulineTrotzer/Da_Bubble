@@ -7,12 +7,12 @@
         <div class="workspace-container">
             <div class="workspace-wrapper" [ngClass]="{'closed': !isWorkspaceOpen, 'opened': isWorkspaceOpen}"
                 (transitionend)="onWorkspaceTransitionEnd()">
-
                 <app-workspace (mobileChannelSelected)="handleMobileChannelSelected()"
                     (userSelected)="onUserSelected($event)" (channelSelected)="onChannelSelected($event)">
                 </app-workspace>
             </div>
         </div>
+
 
         <div class="start-screen-container"
             [style.width]="!this.global.threadOpened ? calcStartScreenContainerWidth() : '100%'">
@@ -25,6 +25,8 @@
                 (channelSelected)="onChannelSelected($event)" (threadOpenedToHome)="onThreadOpened()">
             </app-start-screen>
         </div>
+
+
 
         <div class="thread-holder-container" *ngIf="isThreadOpened" @fadeOutThread
             [style.width]="this.global.threadOpened ? '100%' : calcThreadWidth()">
