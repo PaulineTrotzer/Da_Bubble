@@ -11,7 +11,7 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { signInWithEmailAndPassword } from '@angular/fire/auth';
+import { UserCredential, signInWithEmailAndPassword } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 import { AuthService } from '../services/auth.service';
 import { MatCardModule, MatCardContent } from '@angular/material/card';
@@ -64,51 +64,53 @@ export class LoginComponent implements OnInit {
 
   async onSubmit(ngForm: NgForm) {
     if (ngForm.submitted && ngForm.form.valid) {
-      const emailExists = await this.proofMail(this.loginData.email);
-      if (!emailExists) {
-        this.emailLoginFailed = true;
-        return;
-      }
       await this.logIn();
     }
   }
 
   async logIn() {
-    if (this.loginAuthService.getIsGuestLogin()) {
-      return;
-    }
+    if (this.loginAuthService.getIsGuestLogin()) return;
     this.isGuestLogin = false;
     this.loginAuthService.setGoogleAccountLogIn(false);
-    const auth = getAuth();
     try {
       const userCredential = await signInWithEmailAndPassword(
-        auth,
+        getAuth(),
         this.loginData.email,
         this.loginData.password
       );
-      this.loginAuthService.setLoginSuccessful(true);
-      setTimeout(() => {
-        this.loginAuthService.setLoginSuccessful(false);
-      }, 2500);
-      const user = userCredential.user;
-      const userID = await this.userDocId(user.uid);
-      localStorage.setItem('userLoggedIn', this.loginData.email);
-      this.auth.currentUser = auth.currentUser;
-      this.router.navigate(['/welcome', userID]);
-      if (userID) {
-        this.auth.updateStatus(userID, 'online');
-      }
-    } catch (error) {
-      console.error('Login error: ', error);
-      this.formFailed = true;
+      await this.handleLoginSuccess(userCredential);
+    } catch (error: any) {
+      this.handleLoginError(error);
     }
   }
 
-  async proofMail(email: string): Promise<boolean> {
-    const docRef = collection(this.firestore, 'users');
-    const q = query(docRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
+  private async handleLoginSuccess(userCredential: UserCredential) {
+    this.loginAuthService.setLoginSuccessful(true);
+    setTimeout(() => {
+      this.loginAuthService.setLoginSuccessful(false);
+    }, 2500);
+    const user = userCredential.user;
+    localStorage.setItem('userLoggedIn', this.loginData.email);
+    this.auth.currentUser = getAuth().currentUser;
+    const userID = await this.userDocId(user.uid);
+    if (userID) {
+      this.auth.updateStatus(userID, 'online');
+    }
+    this.router.navigate(['/welcome', userID]);
+  }
+
+  private handleLoginError(error: any) {
+    console.error('Login error: ', error);
+
+    if (error.code === 'auth/user-not-found') {
+      this.emailLoginFailed = true;
+    } else if (error.code === 'auth/wrong-password') {
+      this.formFailed = true;
+    } else if (error.code === 'auth/invalid-email') {
+      this.emailLoginFailed = true;
+    } else {
+      this.formFailed = true;
+    }
   }
 
   async userDocId(uid: string) {

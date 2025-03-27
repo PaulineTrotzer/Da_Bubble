@@ -23,7 +23,6 @@ export class GlobalVariableService {
   currentRoom: any;
   openChannelorUserBox: boolean = false;
   openChannelOrUserThread: boolean = false;
-
   checkWideChannelorUserBox: boolean = false;
   checkWideChannelOrUserThreadBox: boolean = false;
 

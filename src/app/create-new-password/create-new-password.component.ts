@@ -17,13 +17,12 @@ import {
   getDoc,
   getDocs,
   query,
-  setDoc,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { GlobalVariableService } from '../services/global-variable.service';
-import { checkActionCode } from '@angular/fire/auth';
+import { checkActionCode, signOut, updatePassword } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-create-new-password',
@@ -47,6 +46,7 @@ export class CreateNewPasswordComponent {
   passwordTooShort: boolean = false;
   emailRaw?: string;
   private cd: ChangeDetectorRef = inject(ChangeDetectorRef);
+  recoverEmailSuccess = false;
 
   constructor(public global: GlobalVariableService) {}
 
@@ -65,93 +65,123 @@ export class CreateNewPasswordComponent {
     this.route.queryParams.subscribe(async (params) => {
       this.oobCode = params['oobCode'];
       this.mode = params['mode'];
-
-      // Fall 1: Wenn der Mode "recoverEmail" ist, leite zur ResetPassword-Komponente weiter
-      if (this.mode === 'recoverEmail' && this.oobCode) {
-        this.global.createNewPassword = true;
-        this.global.verifyEmail = false;
-        return; // Keine weitere Verarbeitung
+      if (!this.oobCode || !this.mode) return;
+      if (this.mode === 'recoverEmail') {
+        await this.handleRecoverEmail(this.oobCode);
+        return;
       }
-
-      // Fall 2: Wenn der Mode "resetPassword" ist, setze global.createNewPassword auf true
-      if (this.mode === 'resetPassword' && this.oobCode) {
-        const auth = getAuth();
-        try {
-          const info = await checkActionCode(auth, this.oobCode);
-          const emailFromCode = info.data.email;
-          if (!emailFromCode) {
-            throw new Error('Keine Email im Action Code gefunden');
-          }
-          const email = emailFromCode.trim().toLowerCase();
-          this.emailRaw = email;
-          alert('E-Mail aus checkActionCode: ' + email);
-          // Setze den Flag, sodass der create-new-password Bereich im Template angezeigt wird
-          this.global.createNewPassword = true;
-          this.cd.detectChanges();
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.error(
-              'Fehler beim Abrufen des Action Codes:',
-              error.message
-            );
-          } else {
-            console.error('Unbekannter Fehler:', error);
-          }
-        }
-        return; // Stoppe die weitere Verarbeitung
+      if (this.mode === 'resetPassword') {
+        await this.handleResetPassword(this.oobCode);
+        return;
       }
-
-      // Fall 3: Für die Modi "verifyEmail" und "verifyAndChangeEmail" weiter verarbeiten:
-      if (
-        (this.mode === 'verifyEmail' || this.mode === 'verifyAndChangeEmail') &&
-        this.oobCode
-      ) {
-        const auth = getAuth();
-        try {
-          const info = await checkActionCode(auth, this.oobCode);
-          const emailFromCode = info.data.email;
-          if (!emailFromCode) {
-            throw new Error('Keine Email im Action Code gefunden');
-          }
-          const email = emailFromCode.trim().toLowerCase();
-          // Speichere den Wert, damit du ihn im Template nutzen kannst
-          this.emailRaw = email;
-          alert('E-Mail aus checkActionCode: ' + email);
-
-          let q;
-          if (this.mode === 'verifyAndChangeEmail') {
-            q = query(
-              collection(this.firestore, 'users'),
-              where('emailTemp', '==', email)
-            );
-          } else {
-            q = query(
-              collection(this.firestore, 'users'),
-              where('email', '==', email)
-            );
-          }
-          const snap = await getDocs(q);
-          if (!snap.empty) {
-            this.userDocument = { id: snap.docs[0].id, ...snap.docs[0].data() };
-            this.global.verifyEmail = true;
-          } else {
-            console.error(
-              'Kein User-Dokument gefunden für die E-Mail: ' + email
-            );
-          }
-          this.cd.detectChanges();
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.error(
-              'Fehler beim Abrufen des Action Codes:',
-              error.message
-            );
-          } else {
-            console.error('Unbekannter Fehler:', error);
-          }
-        }
+      if (this.mode === 'verifyEmail' || this.mode === 'verifyAndChangeEmail') {
+        await this.handleVerifyEmail(this.oobCode, this.mode);
+        return;
       }
     });
+  }
+
+  private async handleRecoverEmail(oobCode: string): Promise<void> {
+    this.recoverEmailSuccess = true;
+    this.global.verifyEmail = false;
+    this.global.createNewPassword = false;
+    const auth = getAuth();
+    try {
+      const info = await checkActionCode(auth, oobCode);
+      const revertedEmail = info.data.email;
+      if (!revertedEmail) {
+        throw new Error('Keine E-Mail im Action Code gefunden (recoverEmail).');
+      }
+      await applyActionCode(auth, oobCode);
+      const q = query(
+        collection(this.firestore, 'users'),
+        where('emailTemp', '==', revertedEmail)
+      );
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const userDocRef = doc(this.firestore, 'users', snap.docs[0].id);
+        const userData = snap.docs[0].data();
+        await updateDoc(userDocRef, {
+          email: userData['emailTemp'],
+          emailTemp: userData['email'],
+        });
+      } else {
+        console.warn(
+          'Kein Dokument mit "emailTemp" ==',
+          revertedEmail,
+          'gefunden'
+        );
+      }
+      await signOut(auth);
+      setTimeout(() => {
+        this.router.navigate(['/']);
+      }, 1800);
+    } catch (error) {
+      console.error('Fehler beim revertieren der E-Mail:', error);
+    }
+  }
+
+  async handleResetPassword(oobCode: string): Promise<void> {
+    const auth = getAuth();
+    try {
+      const info = await checkActionCode(auth, oobCode);
+      const emailFromCode = info.data.email;
+      if (!emailFromCode) {
+        throw new Error('Keine Email im Action Code gefunden (resetPassword).');
+      }
+      const email = emailFromCode.trim().toLowerCase();
+      this.emailRaw = email;
+      this.global.createNewPassword = true;
+      this.cd.detectChanges();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(
+          'Fehler beim Abrufen des Action Codes (resetPassword):',
+          error.message
+        );
+      } else {
+        console.error('Unbekannter Fehler:', error);
+      }
+    }
+  }
+
+  async handleVerifyEmail(oobCode: string, mode: string): Promise<void> {
+    const auth = getAuth();
+    try {
+      const info = await checkActionCode(auth, oobCode);
+      const emailFromCode = info.data.email;
+      if (!emailFromCode) {
+        throw new Error('Keine Email im Action Code gefunden (verifyEmail).');
+      }
+      const email = emailFromCode.trim().toLowerCase();
+      this.emailRaw = email;
+      let q;
+      if (mode === 'verifyAndChangeEmail') {
+        q = query(
+          collection(this.firestore, 'users'),
+          where('emailTemp', '==', email)
+        );
+      } else {
+        q = query(
+          collection(this.firestore, 'users'),
+          where('email', '==', email)
+        );
+      }
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        this.userDocument = { id: snap.docs[0].id, ...snap.docs[0].data() };
+        this.global.verifyEmail = true;
+      } else {
+        console.error('Kein User-Dokument gefunden für die E-Mail:', email);
+      }
+      this.cd.detectChanges();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Fehler beim Abrufen des Action Codes:', error.message);
+      } else {
+        console.error('Unbekannter Fehler:', error);
+      }
+    }
   }
 
   async fetchUserDocument() {
@@ -183,32 +213,25 @@ export class CreateNewPasswordComponent {
   }
 
   async createNewPassword() {
-    /* if (this.mode === 'recoverEmail' && this.oobCode) {
-      await confirmPasswordReset(this.currentUser.emailTemp, this.oobCode, this.password);
-
-      this.resetFields();
-      this.sendInfo = true;
-      this.openDiv();
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 1500);
-    }
     if (this.password !== this.confirmPassword) {
       this.checkPasswordinfo = true;
       return;
     }
-    const auth = getAuth();
-    if (!this.oobCode) {
+    if (this.password.length < 7) {
+      this.passwordTooShort = true;
       return;
     }
-    await confirmPasswordReset(auth, this.oobCode, this.password);
-    const user = auth.currentUser;
-    if (user) {
-      const userUID = user.uid;
+    const auth = getAuth();
+    if (this.mode === 'resetPassword' && this.oobCode) {
+      try {
+        await confirmPasswordReset(auth, this.oobCode, this.password);
+      } catch (error) {
+        console.error('Fehler bei confirmPasswordReset:', error);
+      }
     }
     this.resetFields();
     this.sendInfo = true;
-    this.openDiv(); */
+    this.openDiv();
     setTimeout(() => {
       this.router.navigate(['/']);
     }, 1500);
@@ -217,39 +240,50 @@ export class CreateNewPasswordComponent {
   async verifyEmail() {
     const auth = getAuth();
     if (!this.oobCode) return;
-
     try {
-      // Wende den Action Code an, um die E-Mail zu verifizieren
       await applyActionCode(auth, this.oobCode);
       this.global.verifyEmail = true;
-
       if (this.mode === 'verifyAndChangeEmail') {
-        console.log('E-Mail erfolgreich verifiziert und geändert.');
-        const userRef = doc(this.firestore, 'users', this.userDocument.id);
-        await updateDoc(userRef, {
-          email: this.emailRaw,
-          emailVerified: true,
-          emailTemp: this.userDocument.email,
-        });
-        console.log(this.userDocument.id.email);
-        this.sendInfo = true;
-        this.openDiv();
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1500);
+        await this.handleVerifyAndChangeEmail();
       } else if (this.mode === 'verifyEmail') {
-        if (this.userDocument && this.userDocument.id) {
-          const userRef = doc(this.firestore, 'users', this.userDocument.id);
-          await updateDoc(userRef, { emailVerified: true });
-          this.sendInfo = true;
-          this.openDiv();
-          setTimeout(() => {
-            this.router.navigate(['/avatar', this.userDocument.id]);
-          }, 1500);
-        }
+        await this.handleSimpleVerifyEmail();
       }
     } catch (error: unknown) {
       console.error('Fehler bei der E-Mail‑Bestätigung:', error);
     }
+  }
+
+  async handleVerifyAndChangeEmail() {
+    if (!this.userDocument || !this.userDocument.id) {
+      console.warn('Kein userDocument gefunden – kann E-Mail nicht ändern.');
+      return;
+    }
+    const userRef = doc(this.firestore, 'users', this.userDocument.id);
+    await updateDoc(userRef, {
+      email: this.emailRaw,
+      emailVerified: true,
+      emailTemp: this.userDocument.email,
+    });
+    this.sendInfo = true;
+    this.openDiv();
+    setTimeout(() => {
+      this.router.navigate(['/']);
+    }, 1500);
+  }
+
+  async handleSimpleVerifyEmail() {
+    if (!this.userDocument || !this.userDocument.id) {
+      console.warn(
+        'Kein userDocument vorhanden – kann Email nicht als verified markieren.'
+      );
+      return;
+    }
+    const userRef = doc(this.firestore, 'users', this.userDocument.id);
+    await updateDoc(userRef, { emailVerified: true });
+    this.sendInfo = true;
+    this.openDiv();
+    setTimeout(() => {
+      this.router.navigate(['/avatar', this.userDocument.id]);
+    }, 1500);
   }
 }

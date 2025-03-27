@@ -28,6 +28,7 @@ import {
 } from '@angular/fire/firestore';
 import { AuthService } from '../services/auth.service';
 import { fadeOutThread } from './component.animation';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -75,6 +76,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   cdr = inject(ChangeDetectorRef);
   startScreenWidth: string = '100%';
   workspaceColumnWidth: string = '385px';
+  router = inject(Router);
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
@@ -224,18 +226,26 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
 
+  
   initAuthListener() {
     const auth = getAuth();
+    let skipAuthCheck = localStorage.getItem('SKIP_AUTH_CHECK') === 'true';
+    if (skipAuthCheck) {
+      localStorage.removeItem('SKIP_AUTH_CHECK');
+    }
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      if (skipAuthCheck) {
+        skipAuthCheck = false;
+        return;
+      }
+      if (!user) {
+        this.router.navigate(['/']);
+      } else {
         this.isOverlayVisible = true;
         setTimeout(() => {
           this.isOverlayVisible = false;
         }, 1100);
         this.loadUserData(user.uid);
-      } else {
-        this.isOverlayVisible = false;
-        this.selectedUser = null;
       }
     });
   }
@@ -457,7 +467,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   calcStartScreenContainerWidth(): string {
     const gap = 32;
     const width = window.innerWidth;
-
     if (width >= 951) {
       if (this.isWorkspaceOpen) {
         return `calc(100vw - 385px - ${gap}px)`;

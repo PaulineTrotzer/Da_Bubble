@@ -18,7 +18,7 @@
 @media (min-width: 320px) and (max-width: 450px) {
   .workspace-opener {
     position: fixed;
-    top: 78%;
+    top: 65%;
     left: -3px;
     padding: 3px;
     width: 36px;
@@ -33,17 +33,9 @@
   }
 }
 
-@media (min-width: 450px) and (max-width: 770px) {
-  .workspace-opener {
-    left: -134px;
-    padding: 2px;
-    top: 80%;
-  }
-}
-
 @media (min-width: 450px) and (max-width: 1024px) {
   .workspace-opener {
-    top: 70%;
+    top: 69%;
   }
   .workspace-open {
     width: 500px;
@@ -64,9 +56,9 @@
   }
 }
 
-@media(max-width: 770px){
-.start-screen-container{
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-}
+@media (max-width: 770px) {
+  .start-screen-container {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+  }
 }

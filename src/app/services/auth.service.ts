@@ -181,6 +181,7 @@ export class AuthService {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
+    localStorage.setItem('SKIP_AUTH_CHECK', 'true');
     try {
       const result = await signInWithPopup(auth, provider);
       const currentUser = auth.currentUser;
