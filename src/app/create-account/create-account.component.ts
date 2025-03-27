@@ -94,9 +94,7 @@ export class CreateAccountComponent implements OnInit {
       });
       await this.addUserToFirestore(this.newUser);
       await sendEmailVerification(authUser);
-      console.log('Verifizierungslink an', authUser.email, 'gesendet.');
       this.linkWasSend = true;
-      // this.router.navigate(['/avatar', this.newUser.uid]);
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         this.linkAlreadySended = true;

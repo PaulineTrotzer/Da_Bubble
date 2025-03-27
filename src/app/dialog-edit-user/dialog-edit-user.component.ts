@@ -22,10 +22,7 @@ import {
   getDownloadURL,
 } from '@angular/fire/storage';
 import { LoginAuthService } from '../services/login-auth.service';
-import {
-  getAuth,
-  verifyBeforeUpdateEmail,
-} from '@angular/fire/auth';
+import { getAuth, sendEmailVerification, updateEmail, verifyBeforeUpdateEmail } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-dialog-edit-user',
@@ -115,7 +112,7 @@ export class DialogEditUserComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0];
-      const MAX_FILE_SIZE = 500 * 1024; 
+      const MAX_FILE_SIZE = 500 * 1024;
       if (selectedFile.size > MAX_FILE_SIZE) {
         console.error(`Datei ist zu groß: ${selectedFile.size / 1024} KB`);
         this.fileTooLargeMessage =
@@ -141,42 +138,59 @@ export class DialogEditUserComponent implements OnInit {
       input.value = '';
     }
   }
+async saveUser() {
+  this.loadingSpinner = true;
+  try {
+    console.log("saveUser gestartet");
 
-  async saveUser() {
-    this.loadingSpinner = true;
-    try {
-      const userRef = doc(this.firestore, 'users', this.userID);
-      const oldEmail = this.user.email;
-      const newEmail = this.currentUser.email;
-      const editingAvatar = this.editAvatar();
-      const updatingUser = updateDoc(userRef, {
-        name: this.currentUser.name,
-        email: newEmail,
-      });
-      await Promise.all([editingAvatar, updatingUser]);
-      if (oldEmail !== newEmail) {
-        const auth = getAuth();
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          console.error(
-            'Kein User eingeloggt – Email kann nicht geändert werden.'
-          );
-          return;
-        }
-        await verifyBeforeUpdateEmail(currentUser, newEmail);
-        console.log(
-          'Verifizierungslink an die neue Adresse gesendet:',
-          newEmail
-        );
+    const userRef = doc(this.firestore, 'users', this.userID);
+    const oldEmail = this.user.email;
+    const newEmail = this.currentUser.email;
+
+    console.log("Alte E-Mail: ", oldEmail);
+    console.log("Neue E-Mail: ", newEmail);
+
+    const editingAvatar = this.editAvatar();
+    const updatingUser = updateDoc(userRef, {
+      name: this.currentUser.name,
+      emailTemp: newEmail, // Speichern der neuen E-Mail temporär
+    });
+
+    console.log("Avatar wird bearbeitet: ", editingAvatar);
+    console.log("Benutzer wird aktualisiert: ", updatingUser);
+
+/*     await Promise.all([editingAvatar, updatingUser]); */
+
+    if (oldEmail !== newEmail) {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      console.log("Aktueller Benutzer: ", currentUser);
+
+      if (!currentUser) {
+        console.error('Kein User eingeloggt – Email kann nicht geändert werden.');
+        return;
       }
-      window.location.reload();
-      this.closeEditModus();
-    } catch (error) {
-      console.error('Fehler beim Speichern des Benutzers:', error);
-    } finally {
-      this.loadingSpinner = false;
+
+      console.log("Verifizierung der E-Mail vornehmen: ", newEmail);
+
+      // Verifizierungslink an die neue E-Mail-Adresse senden
+      await verifyBeforeUpdateEmail(currentUser, newEmail); // sendEmailVerification an die aktuelle E-Mail senden
+
+      console.log('Verifizierungslink an die neue Adresse gesendet:', newEmail);
     }
+
+    this.closeEditModus();
+  } catch (error) {
+    console.error('Fehler beim Speichern des Benutzers:', error);
+  } finally {
+    console.log("saveUser abgeschlossen");
+    this.loadingSpinner = false;
   }
+}
+
+  
+  
 
   async editAvatar() {
     try {

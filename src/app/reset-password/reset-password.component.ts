@@ -71,7 +71,7 @@ export class ResetPasswordComponent implements OnInit {
   async sendEmailInfo(email: string) {
     const auth = getAuth();
     const actionCodeSettings = {
-      url: 'https://pauline-trotzer.developerakademie.net/angular-projects/da-bubble/create-new-password',
+      url: 'http://localhost:64836/create-new-password',
       handleCodeInApp: true,
     };
     await sendPasswordResetEmail(auth, email, actionCodeSettings);
