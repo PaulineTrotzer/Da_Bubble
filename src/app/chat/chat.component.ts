@@ -176,7 +176,7 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   checkEditScreenSize() {
-    this.isNarrowScreen = window.innerWidth < 600;
+    this.isNarrowScreen = window.innerWidth <2500;
   }
 
   toggleReactionInfoSender(messageId: string, status: boolean) {
@@ -257,29 +257,30 @@ export class ChatComponent implements OnInit, OnChanges {
   }
   async handleDeletedMessage(updatedMessage: any): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', updatedMessage.id);
-  
+
     try {
       await deleteDoc(messageRef);
     } catch (error) {
       console.error('Fehler beim Löschen der Nachricht in Firebase:', error);
     }
-  
-    const index = this.messagesData.findIndex((msg: any) => msg.id === updatedMessage.id);
+
+    const index = this.messagesData.findIndex(
+      (msg: any) => msg.id === updatedMessage.id
+    );
     if (index !== -1) {
       this.messagesData[index] = {
         ...this.messagesData[index],
-        deleted: true
+        deleted: true,
       };
     } else {
       this.messagesData.push({
         id: updatedMessage.id,
-        deleted: true
+        deleted: true,
       });
     }
-  
-    this.messagesData = [...this.messagesData]; 
+
+    this.messagesData = [...this.messagesData];
   }
-  
 
   async ensureMessagesLoaded(): Promise<void> {
     if (!this.messagesData || this.messagesData.length === 0) {
@@ -492,24 +493,32 @@ export class ChatComponent implements OnInit, OnChanges {
         const docSnapshot = await getDoc(messageRef);
         if (!docSnapshot.exists()) return;
         await deleteDoc(messageRef);
-        const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
+        const index = this.messagesData.findIndex(
+          (msg: any) => msg.id === message.id
+        );
         if (index !== -1) {
           this.messagesData[index] = {
             ...this.messagesData[index],
-            deleted: true
+            deleted: true,
           };
         } else {
           this.messagesData.push({
             id: message.id,
-            deleted: true
+            deleted: true,
           });
         }
-        this.threadControlService.setEditedMessage({ id: message.id, deleted: true });
+        this.threadControlService.setEditedMessage({
+          id: message.id,
+          deleted: true,
+        });
         this.editMessageId = null;
         this.isFirstClick = true;
         this.checkEditbox = false;
       } catch (error) {
-        console.error(`Fehler beim Löschen der Nachricht (ID: ${message.id}):`, error);
+        console.error(
+          `Fehler beim Löschen der Nachricht (ID: ${message.id}):`,
+          error
+        );
       }
     } else {
       try {
@@ -521,7 +530,9 @@ export class ChatComponent implements OnInit, OnChanges {
           editedAt: new Date().toISOString(),
         };
         await updateDoc(messageRef, editMessage);
-        const index = this.messagesData.findIndex((msg: any) => msg.id === message.id);
+        const index = this.messagesData.findIndex(
+          (msg: any) => msg.id === message.id
+        );
         if (index !== -1) {
           this.messagesData[index] = {
             ...this.messagesData[index],
@@ -541,10 +552,13 @@ export class ChatComponent implements OnInit, OnChanges {
           this.shouldScroll = true;
         }, 1000);
       } catch (error) {
-        console.error(`Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`, error);
+        console.error(
+          `Fehler beim Bearbeiten der Nachricht (ID: ${message.id}):`,
+          error
+        );
       }
     }
-  }  
+  }
 
   displayHiddenIcon(message: any) {
     this.isiconShow = message.id;
@@ -631,7 +645,7 @@ export class ChatComponent implements OnInit, OnChanges {
     this.messagesData.push(newLocalMsg);
     this.scrollAutoDown();
   }
-  
+
   async getMessages() {
     if (!this.selectedUser?.id || !this.global.currentUserData?.id) return;
     const docRef = collection(this.firestore, 'messages');
@@ -684,6 +698,11 @@ export class ChatComponent implements OnInit, OnChanges {
         data.formattedText = this.formatMentions(data.text);
         return { id: docSnap.id, ...data };
       });
+      if (this.selectedUser.id !== this.global.currentUserData.id) {
+        this.messagesData = this.messagesData.filter(
+          (message) => message.senderId !== message.recipientId
+        );
+      }
       this.messagesData.sort((a: any, b: any) => a.timestamp - b.timestamp);
       if (newMessageArrived) {
         setTimeout(() => {
@@ -764,7 +783,6 @@ export class ChatComponent implements OnInit, OnChanges {
       console.error('Fehler beim Öffnen des Threads:', error);
     }
   }
-
 
   splitMessage(text: string): string[] {
     const mentionRegex = /(@[\w\-\*_!$]+)/g;

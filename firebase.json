@@ -1,9 +1,9 @@
 {
   "hosting": {
-    "public": "dist/da-bubble", 
+    "public": "dist/da-bubble",
     "headers": [
       {
-        "source": "**/*.@(js|css|html)", 
+        "source": "**/*.@(js|css|html)",
         "headers": [
           {
             "key": "Cross-Origin-Opener-Policy",
@@ -11,9 +11,15 @@
           },
           {
             "key": "Cross-Origin-Embedder-Policy",
-            "value": "require-corp" 
+            "value": "require-corp"
           }
         ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   }

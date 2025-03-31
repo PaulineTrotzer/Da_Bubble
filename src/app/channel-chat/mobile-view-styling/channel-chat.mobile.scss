@@ -150,10 +150,6 @@
   .message-from-current .message .message-content {
     margin-right: 35px;
   }
-
-  .img-container-textarea {
-    height: 32px;
-  }
   .reaction-from-container {
     font-size: 11px;
     padding: 3px 4px !important;
@@ -228,11 +224,26 @@
   }
 }
 
-@media(max-width: 770px){
-  .new-day-info{
+@media (max-width: 770px) {
+  .new-day-info {
     width: 100vw;
   }
-  .chat-box{
+  .chat-box {
     border-radius: 0;
+  }
+}
+
+@media (max-width: 2500px) {
+  .img-container-textarea {
+    width: 27px;
+    height: 32px;
+  }
+  .edit-message-button-row {
+    left: 6px;
+    width: 96%;
+  }
+  .channel {
+    padding: 1px 16px !important;
+    font-size: 11px !important;
   }
 }

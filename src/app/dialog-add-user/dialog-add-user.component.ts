@@ -45,9 +45,9 @@ export class DialogAddUserComponent implements OnInit {
   global = inject(GlobalVariableService);
   firestore = inject(Firestore);
   memberDataService = inject(MemberDataService);
+  data = inject(MAT_DIALOG_DATA) as { channelId: string; userId: string };
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { channelId: string; userId: string },
     private db: Firestore,
     private dialogRef: MatDialogRef<DialogAddUserComponent>,
     private route: ActivatedRoute

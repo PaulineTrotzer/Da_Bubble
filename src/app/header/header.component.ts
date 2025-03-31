@@ -237,36 +237,41 @@ export class HeaderComponent implements OnInit, OnDestroy {
         const channelData = docSnap.data();
         const channelId = docSnap.id;
         const channel: any = { id: channelId, ...channelData, messages: [] };
-        const messagesRef = collection(
-          this.firestore,
-          'channels',
-          channelId,
-          'messages'
-        );
+        const messagesRef = collection(this.firestore, 'channels', channelId, 'messages');
         const messagesSnapshot = await getDocs(messagesRef);
         messagesSnapshot.forEach((messageDoc) => {
           channel.messages.push({ id: messageDoc.id, ...messageDoc.data() });
         });
-
         loadedChannels.push(channel);
       }
-      this.getChannels = loadedChannels.filter(
-        (chan) => chan.userIds && chan.userIds.includes(this.userID)
-      );
+      const alwaysVisible = ['backend', 'frontend', 'firmenevents'];
+      this.getChannels = loadedChannels.filter((chan) => {
+        const name = chan.name?.toLowerCase();
+        return (chan.userIds && chan.userIds.includes(this.userID)) || (name && alwaysVisible.includes(name));
+      });
     });
   }
-
+  
   filterChannels() {
     const searchChannel = this.searcheNameOrChannel
       .toLowerCase()
       .replace('#', '')
       .trim();
-
-    this.filterChannel = this.getChannels.filter((channel) =>
-      channel.name.toLowerCase().includes(searchChannel)
-    );
+    const alwaysVisible = ['backend', 'frontend', 'firmenevents'];
+    this.filterChannel = this.getChannels.filter(channel => {
+      const channelName = channel.name.toLowerCase();
+      if (alwaysVisible.includes(channelName)) {
+        return true;
+      }
+      if (channelName.includes(searchChannel)) {
+        return true;
+      }
+      return false;
+    });
     this.noChannelFounded = this.filterChannel.length === 0;
   }
+  
+  
 
   checkChannelId(channel: any) {
     this.channelIdHover = channel.id;

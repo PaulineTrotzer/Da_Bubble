@@ -102,9 +102,11 @@ export class WorkspaceComponent implements OnInit {
     const willkommenChannel = channels.find(
       (channel: { name: string }) => channel.name === 'Willkommen'
     );
+    const alwaysVisible = ['BackEnd', 'FrontEnd', 'FirmenEvents'];
     this.filteredChannels = channels.filter(
-      (channel: { userIds: string | any[] }) =>
-        channel.userIds && channel.userIds.includes(this.userId)
+      (channel: { userIds: string[]; name: string }) =>
+        (channel.userIds && channel.userIds.includes(this.userId)) ||
+        alwaysVisible.includes(channel.name)
     );
     if (
       willkommenChannel &&
@@ -159,6 +161,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectUser(user: any) {
+    debugger;
     this.userService.setSelectedUser(user);
     this.selectedChannel = null;
     setTimeout(() => {
@@ -294,27 +297,21 @@ export class WorkspaceComponent implements OnInit {
     onSnapshot(usersCollection, (snapshot) => {
       this.allUsers = [];
       this.checkUsersExsists = false;
-
+  
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const userData: any = { id: docSnap.id, ...data };
-
-        const isVerified = data?.['emailVerified'] === true;
-
-        if (
-          docSnap.id !== this.userId &&
-          this.isValidUser(userData) &&
-          isVerified
-        ) {
+  
+        if (docSnap.id !== this.userId && this.isValidUser(userData)) {
           this.allUsers.push(userData);
           this.checkUsersExsists = true;
         }
       });
     });
   }
-
-  private isValidUser(user: any): boolean {
-    return !!(user.name && user.picture && user.status);
+  
+   isValidUser(user: any): boolean {
+    return !!(user.name && user.picture);
   }
 
   selectChannel(channel: any) {

@@ -157,7 +157,7 @@ export class ChannelChatComponent implements OnInit {
   }
 
   checkEditScreenSize() {
-    this.isNarrowScreen = window.innerWidth < 600;
+    this.isNarrowScreen = window.innerWidth < 2500;
   }
 
   getReplyCountValue(messageId: string): number {
